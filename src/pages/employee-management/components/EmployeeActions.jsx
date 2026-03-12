@@ -46,8 +46,9 @@ const EmployeeActions = ({
     const active = employees.filter(e => e.status === 'active').length;
     const inactive = employees.filter(e => e.status === 'inactive').length;
     const pending = employees.filter(e => e.status === 'pending').length;
+     const terminated = employees.filter(e => e.status === 'terminated').length;
 
-    return { total, active, inactive, pending };
+    return { total, active, inactive, pending ,terminated};
   }, [employees]);
 
   return (
@@ -116,7 +117,7 @@ const EmployeeActions = ({
       </div>
 
       {/* Quick Stats - dynamic */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6 pt-6 border-t border-border">
         <div className="text-center">
           <p className="text-2xl font-semibold text-foreground">{employeeCounts.total}</p>
           <p className="text-sm text-muted-foreground">Total Employees</p>
@@ -133,7 +134,12 @@ const EmployeeActions = ({
           <p className="text-2xl font-semibold text-error">{employeeCounts.inactive}</p>
           <p className="text-sm text-muted-foreground">Inactive</p>
         </div>
+        <div className="text-center">
+          <p className="text-2xl font-semibold text-error">{employeeCounts.terminated}</p>
+          <p className="text-sm text-muted-foreground">terminated</p>
+        </div>
       </div>
+      
     </div>
   );
 };

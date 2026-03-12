@@ -434,6 +434,7 @@ const EmployeeManagement = () => {
 
           <EmployeeTable
             employees={filteredAndSortedEmployees}
+            setEmployees={setEmployees}
             selectedEmployees={selectedEmployees}
             onSelectEmployee={handleSelectEmployee}
             onSelectAll={handleSelectAll}
