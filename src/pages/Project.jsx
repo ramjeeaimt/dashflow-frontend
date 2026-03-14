@@ -3,16 +3,15 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Header from "components/ui/Header";
 import Sidebar from "components/ui/Sidebar";
-import { FaTrash, FaEdit, FaEye, FaGithub } from "react-icons/fa";
-import { MdEmail, MdContactPhone } from "react-icons/md";
 import Filter from "components/Filter";
-
+import ActionDropdown from "./ActionDropdown";
 
 export default function Projects() {
   const [search, setSearch] = useState("");
   const [phase, setPhase] = useState("");
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   const parsePeople = (str) => {
@@ -26,7 +25,9 @@ export default function Projects() {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get("https://difmo-crm-backend.onrender.com/add-projects");
+      const res = await axios.get(
+        "https://difmo-crm-backend.onrender.com/add-projects"
+      );
 
       const cleanData = res.data.data.map((p) => ({
         ...p,
@@ -47,20 +48,22 @@ export default function Projects() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://difmo-crm-backend.onrender.com/add-projects/${id}`);
+      await axios.delete(
+        `https://difmo-crm-backend.onrender.com/add-projects/${id}`
+      );
       fetchProjects();
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
-  const handleView = async (id) => {
+  const handleView = (id) => {
     navigate(`/project-details/${id}`);
-  }
+  };
 
-  const handleEdit = async (id) => {
+  const handleEdit = (id) => {
     navigate(`/edit-project/${id}`);
-  }
+  };
 
   const filteredProjects = projects.filter((p) => {
     return (
@@ -74,11 +77,13 @@ export default function Projects() {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Main content */}
+      {/* Main */}
       <div className="flex-1 ml-64">
         <Header />
 
         <div className="p-8 bg-gray-50 min-h-screen mt-16">
+          
+          {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Projects</h2>
 
@@ -92,137 +97,89 @@ export default function Projects() {
 
           {loading ? (
             <p>Loading projects...</p>
-          ) : projects.length == 0 ? (<div className="text-center py-10 text-gray-500 font-semibold text-2xl">
-            No Project
-          </div>) : (
-            <>
-              <div className="overflow-x-auto bg-white rounded-xl shadow">
+          ) : projects.length === 0 ? (
+            <div className="text-center py-10 text-gray-500 font-semibold text-2xl">
+              No Project
+            </div>
+          ) : (
+            <div className="overflow-x-auto bg-white rounded-xl shadow-md">
 
-                <Filter
-                  search={search}
-                  setSearch={setSearch}
-                  phase={phase}
-                  setPhase={setPhase}
-                />
+              <Filter
+                search={search}
+                setSearch={setSearch}
+                phase={phase}
+                setPhase={setPhase}
+              />
 
+              <table className="min-w-full">
 
-                <table className="min-w-full">
-                  <thead className="bg-gray-100 sticky">
-                    <tr className="text-left text-sm font-semibold text-gray-700">
-                      <th className="p-3 border text-blue-500">Project</th>
-                      <th className="p-3 border text-blue-500">Client</th>
-                      <th className="p-3 border text-blue-500">Deadline</th>
-                      <th className="p-3 border text-blue-500">Phase</th>
-                      <th className="p-3 border text-blue-500">Assigning Date</th>
-                      <th className="p-3 border text-blue-500">Deployment</th>
-                      <th className="p-3 border text-blue-500">Payment</th>
-                      <th className="p-3 border text-blue-500">Team</th>
-                      <th className="p-3 border text-blue-500">GitHub</th>
-                      <th className="p-3 border text-blue-500">Email</th>
-                      <th className="p-3 border text-blue-500">Contact</th>
-                      <th className="p-3 border text-blue-500">Delete</th>
-                      <th className="p-3 border text-blue-500">Edit</th>
-                      <th className="p-3 border text-blue-500">View Details</th>
+                <thead className="bg-gray-100 sticky top-0">
+                  <tr className="text-left text-sm font-semibold text-gray-700">
+
+                    <th className="p-3 border text-blue-500">Project</th>
+                    <th className="p-3 border text-blue-500">Client</th>
+                    <th className="p-3 border text-blue-500">Deadline</th>
+                    <th className="p-3 border text-blue-500">Phase</th>
+                    <th className="p-3 border text-blue-500">Assigning Date</th>
+                    <th className="p-3 border text-blue-500">Deployment</th>
+                    <th className="p-3 border text-blue-500">Payment</th>
+                    <th className="p-3 border text-blue-500">Team</th>
+                    <th className="p-3 border text-blue-500 text-center">
+                      Actions
+                    </th>
+
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {filteredProjects.map((project) => (
+                    <tr
+                      key={project.id}
+                      className="hover:bg-blue-50 transition duration-200 text-sm"
+                    >
+                      <td className="p-3 border font-medium">
+                        {project.projectName}
+                      </td>
+
+                      <td className="p-3 border">{project.clientName}</td>
+
+                      <td className="p-3 border">{project.deadline}</td>
+
+                      <td className="p-3 border">{project.phase}</td>
+
+                      <td className="p-3 border">{project.assigningDate}</td>
+
+                      <td className="p-3 border break-all text-blue-600">
+                        {project.deploymentLink || "-"}
+                      </td>
+
+                      <td className="p-3 border font-medium">
+                        ₹{project.paymentReceived} / ₹{project.totalPayment}
+                      </td>
+
+                      <td className="p-3 border">
+                        {project.assignedPeople.join(", ")}
+                      </td>
+
+                      <td className="p-3 border text-center">
+                        <ActionDropdown
+                          project={project}
+                          onDelete={handleDelete}
+                          onEdit={handleEdit}
+                          onView={handleView}
+                        />
+                      </td>
+
                     </tr>
-                  </thead>
+                  ))}
 
-                  <tbody className="overflow-y-auto">
-                    {filteredProjects.map((project) => (
-                      <tr key={project.id} className="hover:bg-gray-50 text-sm">
-                        <td className="p-3 border">{project.projectName}</td>
-
-                        <td className="p-3 border">{project.clientName}</td>
-
-                        <td className="p-3 border">{project.deadline}</td>
-
-                        <td className="p-3 border">{project.phase}</td>
-
-                        <td className="p-3 border">{project.assigningDate}</td>
-
-                        <td className="p-3 border break-all">
-                          {project.deploymentLink}
-                        </td>
-
-                        <td className="p-3 border">
-                          ₹{project.paymentReceived} / ₹{project.totalPayment}
-                        </td>
-
-                        <td className="p-3 border">
-                          {project.assignedPeople.join(", ")}
-                        </td>
-
-                        <td className="p-3 border break-all">
-                          {project.githubLink ? (
-                            <a
-                              href={project.githubLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-gray-700 hover:text-blue-600"
-                            >
-                              <FaGithub size={24} />
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td className="p-3 border">
-                          {project.clientEmail ? (
-                            <a
-                              href={`mailto:${project.clientEmail}`}
-                              className="text-gray-700 hover:text-blue-600"
-                            >
-                              <MdEmail size={24} />
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td className="p-3 border">
-                          {project.contactInfo ? (
-                            <a
-                              href={`tel:${project.contactInfo}`}
-                              className="text-gray-700 hover:text-blue-600"
-                            >
-                              <MdContactPhone size={24} />
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td className="p-3 border text-red-500 text-xl">
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            className="font-bold px-3 py-1 rounded"
-                          >
-                            <FaTrash />
-                          </button>
-                        </td>
-
-                        <td className="p-3 border text-blue-500 text-xl">
-                          <button className="font-bold px-3 py-1 rounded" onClick={() => handleEdit(project.id)}>
-                            <FaEdit />
-                          </button>
-                        </td>
-
-                        <td className="p-3 border text-yellow-500 text-xl">
-                          <button className="font-bold px-3 py-1 rounded" onClick={() => handleView(project.id)}>
-                            <FaEye />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
+                </tbody>
+              </table>
+            </div>
           )}
-
         </div>
       </div>
     </div>
   );
-
 }

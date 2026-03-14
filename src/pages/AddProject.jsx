@@ -69,7 +69,7 @@ const AddProject = () => {
   };
 
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex  bg-gray-100 min-h-screen">
       <Sidebar />
       <div className="flex-1">
         <Header />
@@ -81,7 +81,7 @@ const AddProject = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="bg-white shadow-lg rounded-2xl p-8 space-y-6"
+            className="bg-white shadow-lg ml-28 w-full rounded-2xl p-8 space-y-6"
           >
             {/* Project Name & GitHub */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

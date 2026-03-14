@@ -6,7 +6,7 @@ import AttendanceTable from './components/AttendanceTable';
 import AttendanceFilters from './components/AttendanceFilters';
 import AttendanceAnalytics from './components/AttendanceAnalytics';
 import AttendanceActions from './components/AttendanceActions';
-import PolicyViolationAlerts from './components/PolicyViolationAlerts';
+
 import AttendanceHistoryModal from './components/AttendanceHistoryModal';
 import AttendanceModal from './components/AttendanceModal';
 import TakeAttendanceModal from './components/TakeAttendanceModal';
@@ -384,7 +384,7 @@ const AttendanceManagement = () => {
           }
 
           {/* Policy Violation Alerts */}
-          <PolicyViolationAlerts />
+          
 
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
             {/* Filters Panel */}
