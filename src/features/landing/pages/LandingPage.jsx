@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, CheckCircle, BarChart2, Users, Shield, LogOut, User } from 'lucide-react';
+import {
+    ArrowRight, CheckCircle, BarChart2, Users, Shield,
+    LogOut, User, Zap, Globe, MessageSquare, ChevronRight
+} from 'lucide-react';
 import useAuthStore from '../../../store/useAuthStore';
 
 const LandingPage = () => {
@@ -12,44 +15,38 @@ const LandingPage = () => {
         navigate('/login');
     };
 
-    const getFullName = () => {
-        if (user?.firstName && user?.lastName) {
-            return `${user.firstName} ${user.lastName}`;
-        }
-        return user?.email || 'User';
-    };
+    const getFullName = () => user?.firstName ? `${user.firstName} ${user.lastName}` : user?.email || 'User';
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Navigation */}
-            <nav className="bg-white border-b border-gray-100">
+        <div className="min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900">
+            {/* Sticky Navigation */}
+            <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center">
-                            <span className="text-2xl font-bold text-blue-600">DifmoCRM</span>
+                    <div className="flex justify-between h-16 items-center">
+                        <div className="flex items-center gap-8">
+                            <span className="text-2xl font-extrabold tracking-tighter text-blue-600">DIFMO<span className="text-gray-900">CRM</span></span>
+                            <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
+                                <Link to="/features" className="hover:text-blue-600 transition">Features</Link>
+                                <Link to="/pricing" className="hover:text-blue-600 transition">Pricing</Link>
+                                <button onClick={() => navigate('/privacypolicy')} className="hover:text-blue-600 transition">Privacy</button>
+                            </div>
                         </div>
+
                         <div className="flex items-center space-x-4">
                             {isAuthenticated ? (
-                                <>
-                                    <Link
-                                        to="/dashboard"
-                                        className="text-gray-600 hover:text-gray-900 font-medium flex items-center space-x-2"
-                                    >
+                                <div className="flex items-center gap-3">
+                                    <Link to="/dashboard" className="text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-lg transition flex items-center gap-2">
                                         <User className="h-4 w-4" />
-                                        <span>{getFullName()}</span>
+                                        <span className="hidden sm:inline font-medium text-sm">{getFullName()}</span>
                                     </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex items-center space-x-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition font-medium"
-                                    >
+                                    <button onClick={handleLogout} className="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition">
                                         <LogOut className="h-4 w-4" />
-                                        <span>Logout</span>
                                     </button>
-                                </>
+                                </div>
                             ) : (
                                 <>
-                                    <Link to="/login" className="text-gray-600 hover:text-gray-900 font-medium">Log in</Link>
-                                    <Link to="/company-registration" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                    <Link to="/login" className="text-gray-600 hover:text-gray-900 font-medium text-sm">Log in</Link>
+                                    <Link to="/company-registration" className="bg-blue-600 text-white px-5 py-2.5 rounded-full hover:bg-blue-700 shadow-lg  transition text-sm font-semibold">
                                         Get Started
                                     </Link>
                                 </>
@@ -60,94 +57,164 @@ const LandingPage = () => {
             </nav>
 
             {/* Hero Section */}
-            <div className="relative overflow-hidden">
-                <div className="max-w-7xl mx-auto">
-                    <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-                        <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-                            <div className="sm:text-center lg:text-left">
-                                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                                    <span className="block xl:inline">Manage your business</span>{' '}
-                                    <span className="block text-blue-600 xl:inline">with confidence</span>
-                                </h1>
-                                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                                    The all-in-one CRM solution for modern companies. Track sales, manage employees, and analyze performance in one beautiful dashboard.
-                                </p>
-                                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                                    <div className="rounded-md shadow">
-                                        <Link to="/company-registration" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg">
-                                            Start Free Trial
-                                        </Link>
-                                    </div>
-                                    <div className="mt-3 sm:mt-0 sm:ml-3">
-                                        <Link to="/login" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg">
-                                            Live Demo
-                                        </Link>
-                                    </div>
-                                </div>
+            <header className="relative pt-16 pb-24 overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+                        <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
+                            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6">
+                                <Zap className="w-3 h-3" /> New: AI Insights v2.0
+                            </div> */}
+                            <h1 className="text-5xl tracking-tight font-black text-gray-900 sm:text-6xl">
+                                Scale your business <br />
+                                <span className="text-blue-600 italic">faster than ever.</span>
+                            </h1>
+                            <p className="mt-6 text-lg text-gray-500 leading-relaxed">
+                                Experience the first CRM built for modern teams. Unified projects, automated payroll, and deep analytics—all in one place. No more switching tabs.
+                            </p>
+                            <div className="mt-10 flex flex-col sm:flex-row gap-4 sm:justify-center lg:justify-start">
+                                <Link to="/company-registration" className="flex items-center justify-center px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 group">
+                                    Start 14-day Trial <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
+                                </Link>
+                                <Link to="/login" className="flex items-center justify-center px-8 py-4 bg-gray-50 text-gray-900 rounded-xl font-bold hover:bg-gray-100 transition border border-gray-200">
+                                    Watch Demo
+                                </Link>
                             </div>
-                        </main>
+                        </div>
+                        <div className="mt-16 lg:mt-0 lg:col-span-6 relative">
+                            <div className="relative mx-auto w-full rounded-2xl shadow-2xl overflow-hidden border-8 border-gray-900/5">
+                                <img className="w-full object-cover" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80" alt="Dashboard" />
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-                    <img
-                        className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
-                        src="/crm_landing_hero.png"
-                        alt="CRM Dashboard"
-                    />
+            </header>
+
+            {/* Trust Bar */}
+            <section className="py-12 border-y border-gray-100 bg-gray-50/30">
+                <div className="max-w-7xl mx-auto px-4 text-center">
+                    <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-8">Trusted by over 2,000+ teams in India</p>
+                    <div className="flex flex-wrap justify-center gap-12 opacity-50 grayscale hover:grayscale-0 transition duration-500">
+                        {/* Placeholder logos */}
+                        <span className="text-2xl font-bold text-gray-800">BharatTech</span>
+                        <span className="text-2xl font-bold text-gray-800">IndoSoft</span>
+                        <span className="text-2xl font-bold text-gray-800">QuickCorp</span>
+                        <span className="text-2xl font-bold text-gray-800">SkyLink</span>
+                    </div>
+                </div>
+            </section>
+            {/* How It Works Section */}
+            <div className="bg-gray-50 py-20 border-y border-gray-100">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-20">
+                        <h2 className="text-4xl font-black text-gray-900 tracking-tight uppercase">Getting Started is Simple</h2>
+                        <p className="text-gray-500 mt-4 font-medium">Your entire workspace set up in less than 5 minutes.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+                        {/* Connecting Line (Desktop Only) */}
+                        <div className="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-blue-200 -z-0" />
+
+                        {/* Step 1 */}
+                        <div className="relative z-10 text-center space-y-6 group">
+                            <div className="w-24 h-24 bg-white border-4 border-black rounded-full flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                <span className="text-3xl font-black text-black">01</span>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900">Register Company</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed px-6">
+                                Create your organization profile and set up your unique domain on our secure NeonDB cloud.
+                            </p>
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="relative z-10 text-center space-y-6 group">
+                            <div className="w-24 h-24 border-4 border-black rounded-full flex items-center justify-center mx-auto shadow-xl shadow-blue-200 group-hover:scale-110 transition-transform duration-300">
+                                <span className="text-3xl font-black  text-black">02</span>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900">Onboard Team</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed px-6">
+                                Bulk upload employees or invite them via email. Define roles (Admin, Manager, Employee) in one click.
+                            </p>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="relative z-10 text-center space-y-6 group">
+                            <div className="w-24 h-24 bg-white border-4 border-black rounded-full flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                <span className="text-3xl font-black text-black">03</span>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900">Automate & Scale</h3>
+                            <p className="text-gray-500 text-sm leading-relaxed px-6">
+                                Start tracking attendance and generating payroll. Watch your business data turn into actionable insights.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Features Section */}
-            <div className="py-12 bg-gray-50">
+            {/* Main Features */}
+            <section className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="lg:text-center">
-                        <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Features</h2>
-                        <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                            Everything you need to grow
+                    <div className="text-center mb-20">
+                        <h2 className="text-blue-600 font-bold uppercase text-sm">Unified Power</h2>
+                        <p className="text-4xl font-black text-gray-900 mt-2">One platform, endless growth.</p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-12">
+                        {[
+                            { title: 'Project Tracking', desc: 'Manage add-projects and tasks with Gantt charts and Kanban boards.', icon: <Zap className="w-6 h-6" /> },
+                            { title: 'HRM & Payroll', desc: 'Seamlessly calculate attendance, leaves, and generate payroll logs.', icon: <Users className="w-6 h-6" /> },
+                            { title: 'Enterprise Security', desc: 'Advanced RBAC and Audit logs to keep your company data secure.', icon: <Shield className="w-6 h-6" /> }
+                        ].map((feat, idx) => (
+                            <div key={idx} className="group p-8 rounded-3xl border border-gray-100 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-50 transition duration-300">
+                                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                                    {feat.icon}
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">{feat.title}</h3>
+                                <p className="text-gray-500 leading-relaxed mb-6">{feat.desc}</p>
+                                <button className="text-blue-600 font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                    Learn more <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+
+            {/* Modern Footer */}
+            <footer className="bg-gray-900 text-gray-300 py-20">
+                <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12">
+                    <div className="col-span-2">
+                        <span className="text-2xl font-black text-white italic">DIFMO.</span>
+                        <p className="mt-4 text-gray-500 max-w-xs leading-relaxed">
+                            Revolutionizing business management for the next generation of Indian entrepreneurs.
                         </p>
                     </div>
-
-                    <div className="mt-10">
-                        <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-                            <div className="relative">
-                                <dt>
-                                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                                        <BarChart2 className="h-6 w-6" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Advanced Analytics</p>
-                                </dt>
-                                <dd className="mt-2 ml-16 text-base text-gray-500">
-                                    Gain insights into your business performance with real-time data visualization and reporting tools.
-                                </dd>
-                            </div>
-
-                            <div className="relative">
-                                <dt>
-                                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                                        <Users className="h-6 w-6" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Team Management</p>
-                                </dt>
-                                <dd className="mt-2 ml-16 text-base text-gray-500">
-                                    Manage your employees, assign tasks, and track attendance effortlessly from a single platform.
-                                </dd>
-                            </div>
-
-                            <div className="relative">
-                                <dt>
-                                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                                        <Shield className="h-6 w-6" aria-hidden="true" />
-                                    </div>
-                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Secure & Reliable</p>
-                                </dt>
-                                <dd className="mt-2 ml-16 text-base text-gray-500">
-                                    Your data is safe with us. We use enterprise-grade security to protect your company information.
-                                </dd>
-                            </div>
-                        </dl>
+                    <div>
+                        <h4 className="text-white font-bold mb-6">Product</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li><Link to="/features" className="hover:text-blue-400 transition">Features</Link></li>
+                            <li><Link to="/pricing" className="hover:text-blue-400 transition">Pricing</Link></li>
+                            <li><Link to="/demo" className="hover:text-blue-400 transition">Live Demo</Link></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="text-white font-bold mb-6">Legal</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li><button onClick={() => navigate('/privacy-policy')} className="hover:text-blue-400 transition">Privacy Policy</button></li>
+                            <li><Link to="/terms" className="hover:text-blue-400 transition">Terms of Use</Link></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="text-white font-bold mb-6">Support</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li><Link to="/contact" className="hover:text-blue-400 transition">Help Center</Link></li>
+                            <li><Link to="/contact" className="hover:text-blue-400 transition">Contact Us</Link></li>
+                        </ul>
                     </div>
                 </div>
-            </div>
+                <div className="max-w-7xl mx-auto px-4 mt-20 pt-8 border-t border-gray-800 text-sm text-center">
+                    © 2026 DIFMO Private Limited. Built with passion in Lucknow.
+                </div>
+            </footer>
         </div>
     );
 };

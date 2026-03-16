@@ -28,6 +28,10 @@ import AddProject from "./features/projects/pages/AddProjectPage";
 import Project from "./features/projects/pages/ProjectListPage";
 import ProjectDetails from "./features/projects/pages/ProjectDetailsPage";
 import ProjectEdit from "./features/projects/pages/ProjectEditPage";
+import PrivacyPolicy from "features/landing/pages/PrivacyPolicy";
+import FeaturesPage from "features/landing/pages/FeaturesPage";
+import Pricing from "features/landing/pages/Pricing";
+
 const Routes = () => {
   return (
     <BrowserRouter>
@@ -36,6 +40,9 @@ const Routes = () => {
         <RouterRoutes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/privacypolicy" element={<PrivacyPolicy/>}/>
+          <Route path="/pricing" element={<Pricing/>}/>
+          <Route path="/features" element={<FeaturesPage/>}/>
           <Route path="/login" element={<Login />} />
           <Route path="/company-registration" element={<CompanyRegistration />} />
 

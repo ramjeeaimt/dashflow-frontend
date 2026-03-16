@@ -133,28 +133,55 @@ const EmployeeModal = ({
   }, [isOpen, currentUser]);
 
   //  File Handling Logic
-  const handleFileChange = (e, type) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+  const handleFileChange = async (e, type) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
 
-    if (type === 'avatar') {
+  setIsLoading(true); // Show a loader while uploading
+
+  try {
+    if (type === "avatar") {
       const file = files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        handleInputChange('avatar', reader.result); 
-      };
-      reader.readAsDataURL(file);
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+      
+      // Use your existing apiClient instead of raw axios
+      const res = await apiClient.post(API_ENDPOINTS.UPLOAD.IMAGE, formDataUpload);
+      
+      // Use the URL from your backend response
+      const imageUrl = res.data.url || res.data.secure_url;
+      handleInputChange("avatar", imageUrl);
+      
     } else {
-      // Append new documents to existing list
-      const newDocs = files.map(file => ({
-        name: file.name,
-        size: (file.size / 1024).toFixed(1) + ' KB',
-        type: file.type,
-        file: file 
+      // Logic for multiple documents
+      const uploadPromises = files.map(async (file) => {
+        const docData = new FormData();
+        docData.append("file", file);
+        
+        const res = await apiClient.post(API_ENDPOINTS.UPLOAD.DOCUMENT, docData);
+        
+        return {
+          name: file.name,
+          size: (file.size / 1024).toFixed(1) + " KB",
+          type: file.type,
+          url: res.data.url, // The URL returned from your server
+        };
+      });
+
+      const uploadedDocs = await Promise.all(uploadPromises);
+
+      setFormData((prev) => ({
+        ...prev,
+        documents: [...prev.documents, ...uploadedDocs],
       }));
-      setFormData(prev => ({ ...prev, documents: [...prev.documents, ...newDocs] }));
     }
-  };
+  } catch (error) {
+    console.error(`${type} upload failed:`, error);
+    // You should add a toast notification here
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const removeDocument = (index) => {
     setFormData(prev => ({
@@ -212,6 +239,8 @@ const EmployeeModal = ({
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
+
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -274,9 +303,8 @@ const EmployeeModal = ({
               <button
                 key={tab?.id}
                 onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center space-x-2 py-4 border-b-2 text-sm font-medium transition-colors ${
-                  activeTab === tab?.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-                }`}
+                className={`flex items-center space-x-2 py-4 border-b-2 text-sm font-medium transition-colors ${activeTab === tab?.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 <Icon name={tab?.icon} size={16} />
                 <span>{tab?.label}</span>
@@ -292,24 +320,24 @@ const EmployeeModal = ({
               <div className="flex items-center space-x-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
                   <Image
-                    src={formData?.avatar || '/default-avatar.png'} 
+                    src={formData?.avatar || '/default-avatar.png'}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 {!isReadOnly && (
                   <div>
-                    <input 
-                      type="file" 
-                      ref={avatarInputRef} 
-                      hidden 
-                      accept="image/*" 
-                      onChange={(e) => handleFileChange(e, 'avatar')} 
+                    <input
+                      type="file"
+                      ref={avatarInputRef}
+                      hidden
+                      accept="image/*"
+                      onChange={(e) => handleFileChange(e, 'avatar')}
                     />
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      iconName="Upload" 
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      iconName="Upload"
                       onClick={() => avatarInputRef.current.click()}
                     >
                       Change Photo
@@ -333,15 +361,15 @@ const EmployeeModal = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Select label="Department" options={departments} value={formData?.department} onChange={(value) => handleInputChange('department', value)} error={errors?.department} required disabled={isReadOnly} />
                 <Select label="Designation" options={designations} value={formData?.designationId} onChange={(value) => handleInputChange('designationId', value)} error={errors?.designationId} required disabled={isReadOnly} placeholder="Select a designation" />
-                <Select 
-                  label="System Roles" 
-                  options={roles.map(r => ({ value: r.id, label: r.name }))} 
-                  value={formData?.roleIds} 
-                  onChange={(value) => handleInputChange('roleIds', value)} 
-                  error={errors?.roleIds} 
-                  required 
-                  disabled={isReadOnly} 
-                  placeholder="Select roles" 
+                <Select
+                  label="System Roles"
+                  options={roles.map(r => ({ value: r.id, label: r.name }))}
+                  value={formData?.roleIds}
+                  onChange={(value) => handleInputChange('roleIds', value)}
+                  error={errors?.roleIds}
+                  required
+                  disabled={isReadOnly}
+                  placeholder="Select roles"
                   multiple={true}
                 />
                 <Select label="Employment Type" options={employmentTypeOptions} value={formData?.employmentType} onChange={(value) => handleInputChange('employmentType', value)} disabled={isReadOnly} />
@@ -428,7 +456,7 @@ const EmployeeModal = ({
                         </div>
                         <h4 className="font-bold text-sm capitalize">{resource} Management</h4>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         {perms.sort((a, b) => a.action.localeCompare(b.action)).map((perm) => {
                           const isInherited = inheritedPermIds.includes(perm.id);
@@ -436,15 +464,14 @@ const EmployeeModal = ({
                           const isActive = isInherited || isDirect;
 
                           return (
-                            <label 
-                              key={perm.id} 
-                              className={`flex items-center p-2 rounded-lg border transition-all cursor-pointer ${
-                                isInherited 
-                                  ? 'bg-primary/5 border-primary/20 cursor-not-allowed opacity-80' 
-                                  : isDirect 
-                                    ? 'bg-primary/10 border-primary/40' 
+                            <label
+                              key={perm.id}
+                              className={`flex items-center p-2 rounded-lg border transition-all cursor-pointer ${isInherited
+                                  ? 'bg-primary/5 border-primary/20 cursor-not-allowed opacity-80'
+                                  : isDirect
+                                    ? 'bg-primary/10 border-primary/40'
                                     : 'hover:bg-muted/50 border-transparent'
-                              }`}
+                                }`}
                             >
                               <div className="relative flex items-center">
                                 <input
@@ -495,9 +522,9 @@ const EmployeeModal = ({
                   <p className="text-sm text-muted-foreground/70 max-w-xs mx-auto mt-2 mb-6">
                     The system's permission table is currently empty. Please seed the permissions or contact your system administrator.
                   </p>
-                  <Button 
-                    variant="outline" 
-                    iconName="Database" 
+                  <Button
+                    variant="outline"
+                    iconName="Database"
                     onClick={async () => {
                       try {
                         await apiClient.post(API_ENDPOINTS.ACCESS_CONTROL.BASE + '/seed');
@@ -531,30 +558,30 @@ const EmployeeModal = ({
 
           {activeTab === 'documents' && (
             <div className="space-y-6">
-                {!isReadOnly && (
-                  <div 
-                    className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer"
-                    onClick={() => docInputRef.current.click()}
-                  >
-                    <input 
-                      type="file" 
-                      multiple 
-                      hidden 
-                      ref={docInputRef} 
-                      onChange={(e) => handleFileChange(e, 'doc')} 
-                    />
-                    <Icon name="UploadCloud" className="mx-auto mb-2 text-muted-foreground" size={32} />
-                    <h3 className="text-sm font-medium">Click to upload documents</h3>
-                    <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, or Images up to 10MB</p>
-                  </div>
-                )}
+              {!isReadOnly && (
+                <div
+                  className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => docInputRef.current.click()}
+                >
+                  <input
+                    type="file"
+                    multiple
+                    hidden
+                    ref={docInputRef}
+                    onChange={(e) => handleFileChange(e, 'doc')}
+                  />
+                  <Icon name="UploadCloud" className="mx-auto mb-2 text-muted-foreground" size={32} />
+                  <h3 className="text-sm font-medium">Click to upload documents</h3>
+                  <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, or Images up to 10MB</p>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold flex items-center gap-2">
                   <Icon name="Files" size={16} />
                   Attached Documents ({formData.documents.length})
                 </h4>
-                
+
                 {formData.documents.length === 0 && (
                   <div className="text-center py-6 bg-muted/20 rounded-lg border border-border">
                     <p className="text-sm text-muted-foreground italic">No documents uploaded yet.</p>
@@ -578,10 +605,10 @@ const EmployeeModal = ({
                           <Icon name="Download" size={16} />
                         </Button>
                         {!isReadOnly && (
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-destructive hover:bg-destructive/10" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:bg-destructive/10"
                             onClick={() => removeDocument(idx)}
                           >
                             <Icon name="Trash2" size={16} />
@@ -604,8 +631,8 @@ const EmployeeModal = ({
               Read-Only Mode
             </div>
           )}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => {
               const currentIndex = tabs.findIndex(t => t.id === activeTab);
               if (currentIndex > 0 && !isReadOnly) {
@@ -634,8 +661,8 @@ const EmployeeModal = ({
               iconName={tabs.findIndex(t => t.id === activeTab) === tabs.length - 1 ? "Save" : "ArrowRight"}
               iconPosition={tabs.findIndex(t => t.id === activeTab) === tabs.length - 1 ? "left" : "right"}
             >
-              {tabs.findIndex(t => t.id === activeTab) < tabs.length - 1 
-                ? 'Next' 
+              {tabs.findIndex(t => t.id === activeTab) < tabs.length - 1
+                ? 'Next'
                 : (mode === 'add' ? 'Add Employee' : 'Save Changes')
               }
             </Button>
