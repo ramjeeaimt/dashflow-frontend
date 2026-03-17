@@ -25,7 +25,16 @@ const financeService = {
     createExpense: async (data) => {
         const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/expenses`, data);
         return response.data;
-    }
+    },
+
+    //create a payroll
+    createPayroll: async (data) => {
+        const response = await apiClient.post(
+            `${API_ENDPOINTS.FINANCE.BASE}/payroll`,
+            data
+        );
+        return response.data.data || response.data;
+    },
 };
 
 export default financeService;

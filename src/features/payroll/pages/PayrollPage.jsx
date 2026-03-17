@@ -31,6 +31,67 @@ const PayrollPage = () => {
         { value: 12, label: 'December' },
     ];
 
+   const generatePayroll = async () => {
+    try {
+        setIsLoading(true);
+
+        // 🔹 1. Check already generated
+        const existing = await financeService.getPayroll(
+            user.company.id,
+            selectedMonth,
+            selectedYear
+        );
+
+        if (existing.length > 0) {
+            alert("Payroll already generated for this month ");
+            return;
+        }
+
+        // 🔹 2. Get employees
+        const employees = await employeeService.getAll({
+            companyId: user.company.id
+        });
+
+        if (!employees.length) {
+            alert("No employees found ");
+            return;
+        }
+
+        // 🔹 3. Generate payroll
+        const requests = employees.map(emp => {
+            const basicSalary = emp.salary || 20000;
+            const allowances = 3000;
+            const deductions = 1000;
+
+            return financeService.createPayroll({
+                employeeId: emp.id,
+                companyId: user.company.id,
+                basicSalary,
+                allowances,
+                deductions,
+                netSalary: basicSalary + allowances - deductions,
+                month: selectedMonth,
+                year: selectedYear,
+                status: "pending"
+            });
+        });
+
+        // Parallel API calls (FAST)
+        await Promise.all(requests);
+
+        alert("Payroll generated successfully ");
+
+        //  Refresh
+        fetchPayroll();
+
+    } catch (error) {
+        console.error("Payroll generation failed:", error);
+        alert("Error generating payroll ");
+    } finally {
+        setIsLoading(false);
+    }
+};
+
     const fetchPayroll = async () => {
         setIsLoading(true);
         try {
@@ -85,7 +146,7 @@ const PayrollPage = () => {
                             >
                                 {[2023, 2024, 2025].map(y => <option key={y} value={y}>{y}</option>)}
                             </select>
-                            <Button onClick={() => { }} iconName="Plus">Generate Payroll</Button>
+                            <Button onClick={generatePayroll} iconName="Plus">Generate Payroll</Button>
                         </div>
                     </div>
 

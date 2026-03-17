@@ -29,8 +29,9 @@ import Project from "./features/projects/pages/ProjectListPage";
 import ProjectDetails from "./features/projects/pages/ProjectDetailsPage";
 import ProjectEdit from "./features/projects/pages/ProjectEditPage";
 import PrivacyPolicy from "features/landing/pages/PrivacyPolicy";
-import FeaturesPage from "features/landing/pages/FeaturesPage";
+
 import Pricing from "features/landing/pages/Pricing";
+import FeaturesPage from "features/landing/pages/FeaturesPage";
 
 const Routes = () => {
   return (
