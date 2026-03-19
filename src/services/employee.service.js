@@ -4,6 +4,7 @@ import { API_ENDPOINTS } from '../api/endpoints';
 export const employeeService = {
     // Get all employees with optional filters
     async getAll(filters = {}) {
+           console.log("Employee filters:", filters);
         let params = {};
         if (typeof filters === 'string' || typeof filters === 'number') {
             params = { companyId: filters };

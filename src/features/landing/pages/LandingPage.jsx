@@ -285,18 +285,18 @@ const LandingPage = () => {
                     <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
                         <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
                             {/* Live Stats Badge */}
-                            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium mb-6 border border-green-200">
+                            {/* <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium mb-6 border border-green-200">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                 </span>
                                 Live: 1,847 active users right now
-                            </div>
+                            </div> */}
 
                             <h1 className="text-5xl tracking-tight font-black text-gray-900 sm:text-6xl lg:text-7xl">
                                 {isAuthenticated ? (
- <>Continue where you <br />
-                                <span className="text-blue-600">left off</span></>
+ <>Grow Your Bussiness <br />
+                                <span className="text-blue-600">With Us</span></>
                                 ) : (
  <>Scale your business <br />
                                 <span className="text-blue-600">faster than ever</span></>
@@ -403,9 +403,9 @@ const LandingPage = () => {
                                 </div>
 
                                 {/* Badge */}
-                                <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full shadow-xl">
+                                {/* <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full shadow-xl">
                                     <span className="font-bold">✨ New: AI Analytics</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>
