@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
-import api from '../../../utils/api';
+import api from '../../../api/client';
 
 const LeaveModal = ({ isOpen, onClose, employeeId, onSave }) => {
     const [formData, setFormData] = useState({
         startDate: '',
         endDate: '',
         reason: '',
-        type: 'sick' // sick, casual, etc.
+        type: 'sick'
     });
     const [loading, setLoading] = useState(false);
 
@@ -23,8 +23,7 @@ const LeaveModal = ({ isOpen, onClose, employeeId, onSave }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // Assuming we have a leaves endpoint. If not, we might need to create one or use a generic one.
-            // For now, let's assume POST /leaves
+
             await api.post('/leaves', {
                 employeeId,
                 ...formData

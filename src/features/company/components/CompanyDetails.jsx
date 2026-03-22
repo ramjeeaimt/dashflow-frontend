@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useAuthStore from '../../../store/useAuthStore';
-import api from '../../../utils/api';
+import api from '../../../api/client';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
@@ -30,7 +30,7 @@ const CompanyDetails = () => {
 
             // Fetch by ID
             const response = await api.get(`/company/id/${user.company.id}`);
-            const company = response.data;
+            const company = response.data?.data || response.data;
             setFormData({
                 name: company.name || '',
                 website: company.website || '',

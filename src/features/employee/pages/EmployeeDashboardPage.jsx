@@ -53,14 +53,11 @@ const EmployeeDashboard = () => {
         if (!isAuthenticated || !user?.id) return;
         try {
             setLoading(true);
-            // Get employee record for current user
             const employees = await employeeService.getAll({ userId: user.id });
 
             if (Array.isArray(employees) && employees.length > 0) {
                 const emp = employees[0];
                 setEmployee(emp);
-
-                // Get today's attendance
                 const attendance = await attendanceService.getTodayAttendance(emp.id);
                 setTodayAttendance(attendance);
 
@@ -90,9 +87,7 @@ const EmployeeDashboard = () => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
-                // Ideally we would reverse geocode here, but for now we'll just format it
-                // Or if the backend accepts lat/long, we send that.
-                // We'll update the text field with coordinates or a placeholder
+
                 setLocation(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
                 setGeoLoading(false);
             },
@@ -110,10 +105,14 @@ const EmployeeDashboard = () => {
             return;
         }
 
+        if (!location) {
+            alert('Please click "Get GPS" or provide your location before Checking In.');
+            return;
+        }
+
         try {
             setLoading(true);
-            // If location contains coordinates, we might want to split them for the API
-            // explicit lat/long fields if available
+
             let lat = null;
             let lng = null;
             if (location && location.includes(',')) {
@@ -140,6 +139,11 @@ const EmployeeDashboard = () => {
     const handleCheckOut = async () => {
         if (!todayAttendance) {
             alert('No check-in record found for today');
+            return;
+        }
+
+        if (!location) {
+            alert('Please click "Get GPS" or provide your location before Checking Out.');
             return;
         }
 
@@ -399,10 +403,10 @@ const EmployeeDashboard = () => {
                                                         {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                     </div>
                                                     <div className={`text-xs px-2 py-0.5 rounded-full ${record.status === 'present' ? 'bg-green-100 text-green-700' :
-                                                            record.status === 'late' ? 'bg-yellow-100 text-yellow-700' :
-                                                                record.status === 'early_departure' ? 'bg-orange-100 text-orange-700' :
-                                                                    record.status === 'absent' ? 'bg-red-100 text-red-700' :
-                                                                        'bg-gray-100 text-gray-700'
+                                                        record.status === 'late' ? 'bg-yellow-100 text-yellow-700' :
+                                                            record.status === 'early_departure' ? 'bg-orange-100 text-orange-700' :
+                                                                record.status === 'absent' ? 'bg-red-100 text-red-700' :
+                                                                    'bg-gray-100 text-gray-700'
                                                         }`}>
                                                         {record.status?.replace('_', ' ').toUpperCase() || 'PRESENT'}
                                                     </div>
@@ -410,11 +414,13 @@ const EmployeeDashboard = () => {
                                                 <div className="flex items-center justify-between text-xs text-gray-500">
                                                     <div className="flex items-center">
                                                         <Icon name="LogIn" size={12} className="mr-1" />
+                                                        <span className="font-medium mr-1">In:</span>
                                                         {formatTime12h(record.checkInTime)}
                                                     </div>
                                                     {record.checkOutTime && (
                                                         <div className="flex items-center">
                                                             <Icon name="LogOut" size={12} className="mr-1" />
+                                                            <span className="font-medium mr-1">Out:</span>
                                                             {formatTime12h(record.checkOutTime)}
                                                         </div>
                                                     )}

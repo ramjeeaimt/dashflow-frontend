@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useAuthStore from '../../../store/useAuthStore';
-import api from '../../../utils/api';
+import api from '../../../api/client';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 
