@@ -12,7 +12,9 @@ export const employeeService = {
             params = filters;
         }
         const response = await apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, { params });
-        const data = response.data.data || response.data;
+        const resData = response.data;
+        const data = resData?.data !== undefined ? resData.data : resData;
+        
         // Ensure we always return an array
         return Array.isArray(data) ? data : [];
     },
@@ -20,19 +22,22 @@ export const employeeService = {
     // Get single employee by ID
     async getById(id) {
         const response = await apiClient.get(API_ENDPOINTS.EMPLOYEES.BY_ID(id));
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Create new employee
     async create(employeeData) {
         const response = await apiClient.post(API_ENDPOINTS.EMPLOYEES.BASE, employeeData);
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Update employee
     async update(id, employeeData) {
         const response = await apiClient.put(API_ENDPOINTS.EMPLOYEES.BY_ID(id), employeeData);
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Delete employee
@@ -46,7 +51,8 @@ export const employeeService = {
         const response = await apiClient.get(`${API_ENDPOINTS.EMPLOYEES.BASE}/stats/count`, {
             params: { companyId }
         });
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Search employees
@@ -54,7 +60,8 @@ export const employeeService = {
         const response = await apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, {
             params: { search: searchTerm, ...filters }
         });
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     }
 };
 

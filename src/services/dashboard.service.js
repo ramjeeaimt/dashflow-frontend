@@ -6,7 +6,8 @@ const dashboardService = {
         const response = await apiClient.get(`${API_ENDPOINTS.DASHBOARD.STATS}/metrics`, {
             params: { companyId }
         });
-        return response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     }
 };
 

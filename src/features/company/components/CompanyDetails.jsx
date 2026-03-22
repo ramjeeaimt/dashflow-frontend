@@ -30,7 +30,14 @@ const CompanyDetails = () => {
 
             // Fetch by ID
             const response = await api.get(`/company/id/${user.company.id}`);
-            const company = response.data?.data || response.data;
+            const data = response.data;
+            const company = data?.data || data;
+
+            if (!company || (data && data.data === null)) {
+                console.warn('Company data not found or is null');
+                return;
+            }
+
             setFormData({
                 name: company.name || '',
                 website: company.website || '',

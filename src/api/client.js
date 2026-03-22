@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: "https://difmo-crm-backend.vercel.app",
-    // baseURL: 'http://localhost:3000',
+    // baseURL: "https://difmo-crm-backend.vercel.app",
+    baseURL: 'http://localhost:3000',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -21,7 +21,17 @@ apiClient.interceptors.request.use(
 );
 
 apiClient.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        // If the backend has wrapped the data in a 'data' property (via TransformInterceptor), unwrap it
+        // Check if data is present and its the standard wrapper format
+        if (response.data && response.data.data !== undefined && response.data.statusCode && response.data.message) {
+            return {
+                ...response,
+                data: response.data.data
+            };
+        }
+        return response;
+    },
     (error) => {
         if (error.response?.status === 401) {
             const isLoginPage = window.location.pathname.includes('/login');

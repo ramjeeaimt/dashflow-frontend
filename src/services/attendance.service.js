@@ -11,7 +11,8 @@ export const attendanceService = {
             latitude,
             longitude
         });
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Bulk Check-in
@@ -20,7 +21,8 @@ export const attendanceService = {
             employeeIds,
             notes
         });
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Check out
@@ -31,41 +33,44 @@ export const attendanceService = {
             latitude,
             longitude
         });
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Get all attendance records with filters
     async getAll(filters = {}) {
         const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.BASE, { params: filters });
-        const data = response.data.data || response.data;
+        const resData = response.data;
+        const data = resData?.data !== undefined ? resData.data : resData;
         return Array.isArray(data) ? data : [];
     },
 
     // Get attendance by ID
     async getById(id) {
         const response = await apiClient.get(`${API_ENDPOINTS.ATTENDANCE.BASE}/${id}`);
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Get today's attendance for an employee
     async getTodayAttendance(employeeId) {
         const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.TODAY(employeeId));
-        if (response.data && response.data.data !== undefined) {
-            return response.data.data;
-        }
-        return response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Get attendance analytics
     async getAnalytics(filters = {}) {
         const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.ANALYTICS, { params: filters });
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Create manual attendance record
     async create(attendanceData) {
         const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.BASE, attendanceData);
-        return response.data.data || response.data;
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     },
 
     // Get attendance for date range
@@ -75,7 +80,8 @@ export const attendanceService = {
             params.employeeId = employeeId;
         }
         const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.BASE, { params });
-        const data = response.data.data || response.data;
+        const resData = response.data;
+        const data = resData?.data !== undefined ? resData.data : resData;
         return Array.isArray(data) ? data : [];
     }
 };
