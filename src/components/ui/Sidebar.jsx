@@ -66,8 +66,14 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       {
         label: 'Payroll',
         path: '/payroll',
-        icon: 'DollarSign',
+        icon: 'Calculator',
         tooltip: 'Financial processing'
+      },
+      {
+        label: 'Finance',
+        path: '/finance',
+        icon: 'DollarSign',
+        tooltip: 'Revenue and Expense tracking'
       },
       {
         label: 'Company Profile',

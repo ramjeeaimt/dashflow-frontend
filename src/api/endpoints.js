@@ -32,7 +32,7 @@ export const API_ENDPOINTS = {
     },
     DASHBOARD: {
         BASE: '/dashboard',
-        STATS: '/dashboard/stats',
+        STATS: '/dashboard',
     },
     FINANCE: {
         BASE: '/finance',
