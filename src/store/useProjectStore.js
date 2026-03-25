@@ -35,7 +35,7 @@ const useProjectStore = create((set, get) => ({
     computeStatus: (projectsArray) => {
         const counts = {
             "Completed": 0,
-            "In Progress": 0,
+            "Progress": 0,
             "Pending": 0
         };
 
@@ -50,7 +50,7 @@ const useProjectStore = create((set, get) => ({
 
         return [
             { name: "Completed", value: counts["Completed"], color: "#22c55e" },
-            { name: "In Progress", value: counts["In Progress"], color: "#3b82f6" },
+            { name: " Progress", value: counts[" Progress"], color: "#3b82f6" },
             { name: "Pending", value: counts["Pending"], color: "#f59e0b" },
         ];
     },

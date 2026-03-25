@@ -141,10 +141,10 @@ const Piegraph = () => {
                             <Tooltip content={<CustomTooltip total={total} />} />
                             
                             {/* Center labels */}
-                            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-3xl font-bold fill-gray-800">
+                            {/* <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-3xl font-bold fill-gray-800">
                                 {visibleTotal}
-                            </text>
-                            <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" className="text-[10px] uppercase tracking-widest fill-gray-400 font-bold">
+                            </text> */}
+                            <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" className="text-[10px] uppercase  tracking-widest fill-gray-400 font-bold">
                                 projects
                             </text>
                         </PieChart>
