@@ -18,6 +18,7 @@ import Icon from '../../../components/AppIcon';
 import { formatTime12h } from '../../../utils/dateUtils';
 import AttendanceHistoryModal from '../../attendance/components/AttendanceHistoryModal';
 import EmployeePayrollPage from 'features/payroll/pages/EmployeePayrollPage';
+import LeaveForm from './LeaveForm';
 
 const EmployeeDashboard = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -32,6 +33,8 @@ const EmployeeDashboard = () => {
 
     const { user, isAuthenticated } = useAuthStore();
     const [currentTime, setCurrentTime] = useState(new Date());
+
+    
 
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/dashboard' }
@@ -182,6 +185,7 @@ const EmployeeDashboard = () => {
             <Header />
             <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={handleToggleSidebar} />
 
+
             <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
                 } pt-16 pb-20 lg:pb-8`}>
                 <div className="p-6 max-w-7xl mx-auto">
@@ -194,9 +198,9 @@ const EmployeeDashboard = () => {
                                 Welcome back, {user?.firstName || 'Employee'}!
                             </p>
                         </div>
-                        <div>
+                        {/* <div>
                             <EmployeePayrollPage/>
-                        </div>
+                        </div> */}
 
                         <div className="flex items-center space-x-4 mt-4 lg:mt-0 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
                             <Clock className="w-5 h-5 text-primary" />

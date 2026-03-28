@@ -84,7 +84,7 @@ const NavigationControls = ({
           </button>
           {' '}or call{' '}
           <button className="text-primary hover:text-primary/80 font-medium">
-            +1 (555) 123-4567
+            +91 (5995) 123-4567
           </button>
         </p>
       </div>

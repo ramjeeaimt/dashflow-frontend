@@ -1,42 +1,57 @@
-import payrollService from "services/payroll.service";
+import apiClient from "api/client";
+import financeService from "services/finance.service"; // Service name fix kiya
 import { create } from "zustand";
 
-
 export const usePayrollStore = create((set) => ({
-
   payrolls: [],
   selectedPayroll: null,
   loading: false,
+  error: null, // Error state add ki
 
-  fetchPayrolls: async (employeeId) => {
-    set({ loading: true });
+  // usePayrollStore.js
+  fetchEmployeePayrolls: async (employeeId) => {
 
+  try {
+
+    console.log("Sending employeeId:", employeeId);
+
+    const res = await apiClient.get("/finance/payroll", {
+      params: { employeeId }
+    });
+
+    console.log("FULL API RESPONSE:", res.data);
+
+    set({
+      payrolls: res.data?.data || [],
+      loading: false
+    });
+
+  } catch (error) {
+
+    console.error("Payroll API Error:", error);
+
+    set({
+      payrolls: [],
+      loading: false
+    });
+
+  }
+
+},
+
+  fetchPayrollById: async (id) => {
+    set({ loading: true, error: null });
     try {
-      const data = await payrollService.getEmployeePayrolls(employeeId);
-
+      const data = await financeService.getPayrollById(id);
       set({
-        payrolls: data,
+        selectedPayroll: data,
         loading: false
       });
-
     } catch (error) {
-      console.error(error);
-      set({ loading: false });
+      set({ error: "Failed to fetch details", loading: false });
     }
   },
 
-  fetchPayrollById: async (id) => {
-
-    try {
-      const data = await payrollService.getPayrollById(id);
-
-      set({
-        selectedPayroll: data
-      });
-
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
+  // State clear karne ke liye helper (Useful for logouts or tab switch)
+  clearSelectedPayroll: () => set({ selectedPayroll: null })
 }));

@@ -17,7 +17,6 @@ const ProjectDetails = () => {
         try {
             const res = await apiClient.get(`${API_ENDPOINTS.PROJECTS.BASE}/${id}`);
             const data = res.data.data || res.data;
-            // Parse assignedPeople if it's a string
             let assignedPeople = data.assignedPeople;
             if (typeof assignedPeople === 'string') {
                 assignedPeople = assignedPeople.replace(/[{}"]/g, "").split(",").map(p => p.trim());
@@ -37,126 +36,176 @@ const ProjectDetails = () => {
     const breadcrumbItems = [
         { label: "Dashboard", path: "/dashboard" },
         { label: "Projects", path: "/projects" },
-        { label: "Project Details", path: `/project-details/${id}` }
+        { label: project?.projectName || "Details", path: "#" }
     ];
 
-    if (loading) return (
-        <div className="min-h-screen bg-background">
-            <Header />
-            <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-                <div className="p-6 flex flex-col items-center justify-center h-[70vh]">
-                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-4 text-muted-foreground font-medium">Loading project details...</p>
-                </div>
-            </main>
-        </div>
-    );
-
-    if (!project) return <div className="p-10 text-center text-muted-foreground">No project found</div>;
-
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950">
             <Header />
             <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-                <div className="p-6">
-                    <BreadcrumbNavigation items={breadcrumbItems} />
-
-                    <div className="max-w-4xl mx-auto mt-6">
-                        <div className="bg-card rounded-2xl shadow-lg p-8 border border-border">
-                            <div className="flex justify-between items-start mb-8">
+            
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} pt-20 pb-10 px-4 lg:px-8`}>
+                <div className="max-w-7xl mx-auto">
+                    
+                    {/* Yahan logic change ki hai: Loading sirf yahan dikhega, structure same rahega */}
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                            <div className="relative">
+                                <div className="w-12 h-12 border-4 border-indigo-100 rounded-full"></div>
+                                <div className="absolute top-0 w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                            <p className="mt-4 text-slate-500 font-medium animate-pulse">Building View...</p>
+                        </div>
+                    ) : !project ? (
+                        <div className="p-10 text-center text-slate-500">Project not found</div>
+                    ) : (
+                        <>
+                            {/* TOP ACTION BAR */}
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-foreground mb-2">{project.projectName}</h1>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                        project.phase === 'Completed' ? 'bg-green-100 text-green-700' :
-                                        project.phase === 'Development' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-muted text-muted-foreground'
-                                    }`}>
-                                        {project.phase}
-                                    </span>
+                                    <BreadcrumbNavigation items={breadcrumbItems} />
+                                    <div className="flex items-center gap-3 mt-2">
+                                        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                                            {project.projectName}
+                                        </h1>
+                                        <StatusBadge phase={project.phase} />
+                                    </div>
                                 </div>
-                                <button
-                                    onClick={() => navigate(`/edit-project/${id}`)}
-                                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition"
-                                >
-                                    Edit Project
-                                </button>
+                                <div className="flex gap-3">
+                                    <button onClick={() => navigate("/projects")} className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+                                        Back
+                                    </button>
+                                    <button onClick={() => navigate(`/edit-project/${id}`)} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200 dark:shadow-none">
+                                        Edit Project
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-foreground">
-                                <Detail label="Client Name" value={project.clientName} />
-                                <Detail label="Contact Info" value={project.contactInfo} />
-                                <Detail label="Email" value={project.clientEmail} />
-                                <Detail label="Deadline" value={project.deadline} />
-                                <Detail label="Assigning Date" value={project.assigningDate} />
-                                <Detail label="Total Payment" value={`₹${project.totalPayment}`} />
-                                <Detail label="Payment Received" value={`₹${project.paymentReceived}`} />
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* LEFT COLUMN */}
+                                <div className="lg:col-span-2 space-y-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <StatCard label="Total Budget" value={`₹${project.totalPayment}`} color="blue" />
+                                        <StatCard label="Collected" value={`₹${project.paymentReceived}`} color="green" />
+                                        <StatCard label="Deadline" value={project.deadline} color="orange" />
+                                    </div>
 
-                                <div className="md:col-span-2">
-                                    <p className="text-sm text-muted-foreground font-medium mb-1">GitHub Link</p>
-                                    <a
-                                        href={project.githubLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline break-all"
-                                    >
-                                        {project.githubLink || "N/A"}
-                                    </a>
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                                        <h3 className="text-lg font-bold mb-6 text-slate-800 dark:text-slate-100">Project Overview</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+                                            <DetailItem label="Assigning Date" value={project.assigningDate} />
+                                            <DetailItem label="Current Phase" value={project.phase} />
+                                            <div className="md:col-span-2">
+                                                <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Links</p>
+                                                <div className="space-y-3">
+                                                    <LinkItem label="GitHub Repository" url={project.githubLink} />
+                                                    <LinkItem label="Live Deployment" url={project.deploymentLink} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                                        <h3 className="text-lg font-bold mb-4 text-slate-800 dark:text-slate-100">Team Members</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {project.assignedPeople?.map((person, i) => (
+                                                <div key={i} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-700">
+                                                    <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
+                                                        {person.charAt(0)}
+                                                    </div>
+                                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{person}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="md:col-span-2">
-                                    <p className="text-sm text-muted-foreground font-medium mb-1">Deployment Link</p>
-                                    <a
-                                        href={project.deploymentLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline break-all"
-                                    >
-                                        {project.deploymentLink || "N/A"}
-                                    </a>
-                                </div>
+                                {/* RIGHT COLUMN */}
+                                <div className="lg:col-span-1 space-y-6">
+                                    <div className="bg-white rounded-2xl p-6 text-black shadow-xl shadow-indigo-100 dark:shadow-none border border-slate-100">
+                                        <h3 className="text-lg font-bold mb-4 opacity-90">Client Details</h3>
+                                        <div className="space-y-6">
+                                            <div>
+                                                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Client Name:</p>
+                                                <p className="text-xl font-medium mt-1">{project.clientName}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Contact Information:</p>
+                                                <p className="mt-1">{project.contactInfo}</p>
+                                                <p className="mt-1 opacity-80">{project.clientEmail}</p>
+                                            </div>
+                                            <div className="pt-4 border-t border-slate-100">
+                                                <button className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 py-2 rounded-lg transition text-sm font-medium">
+                                                    Email Client
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <div className="md:col-span-2">
-                                    <p className="text-sm text-muted-foreground font-medium mb-2">Team Members</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {project.assignedPeople && project.assignedPeople.length > 0 ? (
-                                            project.assignedPeople.map((person, idx) => (
-                                                <span
-                                                    key={idx}
-                                                    className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
-                                                >
-                                                    {person}
-                                                </span>
-                                            ))
-                                        ) : (
-                                            <span className="text-muted-foreground italic text-sm">No members assigned</span>
-                                        )}
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+                                        <h3 className="text-sm font-bold text-slate-400 uppercase mb-4">Payment Progress</h3>
+                                        <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+                                            <div 
+                                                className="bg-green-500 h-full transition-all duration-1000" 
+                                                style={{ width: `${(project.paymentReceived / project.totalPayment) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-2 font-medium">
+                                            {Math.round((project.paymentReceived / project.totalPayment) * 100)}% of total budget collected
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="mt-10 flex justify-center">
-                                <button
-                                    onClick={() => navigate("/projects")}
-                                    className="px-6 py-2 border border-border rounded-lg text-foreground hover:bg-muted transition"
-                                >
-                                    Back to Projects
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </div>
             </main>
         </div>
     );
 };
 
-const Detail = ({ label, value }) => (
-    <div className="bg-muted/30 p-4 rounded-lg border border-border">
-        <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">{label}</p>
-        <p className="font-medium text-foreground">{value || "-"}</p>
+// Sub-components
+const StatCard = ({ label, value, color }) => {
+    const colors = {
+        blue: "bg-blue-50 text-blue-700 border-blue-100",
+        green: "bg-emerald-50 text-emerald-700 border-emerald-100",
+        orange: "bg-orange-50 text-orange-700 border-orange-100"
+    };
+    return (
+        <div className={`${colors[color]} p-4 rounded-2xl border flex flex-col items-center justify-center text-center shadow-sm`}>
+            <p className="text-[10px] font-bold uppercase tracking-tighter opacity-70 mb-1">{label}</p>
+            <p className="text-lg font-bold tracking-tight">{value || "-"}</p>
+        </div>
+    );
+};
+
+const DetailItem = ({ label, value }) => (
+    <div>
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+        <p className="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">{value || "Not set"}</p>
     </div>
 );
+
+const LinkItem = ({ label, url }) => (
+    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{label}</span>
+        <a href={url} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:underline truncate max-w-[200px]">
+            {url ? "View Link ↗" : "N/A"}
+        </a>
+    </div>
+);
+
+const StatusBadge = ({ phase }) => {
+    const styles = {
+        'Completed': "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        'Development': "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        'default': "bg-slate-100 text-slate-600"
+    };
+    return (
+        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${styles[phase] || styles.default}`}>
+            {phase}
+        </span>
+    );
+};
 
 export default ProjectDetails;

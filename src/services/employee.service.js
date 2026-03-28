@@ -55,6 +55,8 @@ export const employeeService = {
         return resData?.data !== undefined ? resData.data : resData;
     },
 
+    
+
     // Search employees
     async search(searchTerm, filters = {}) {
         const response = await apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, {

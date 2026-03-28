@@ -7,7 +7,6 @@ import useAuthStore from "../../../store/useAuthStore";
 import BreadcrumbNavigation from "../../../components/ui/BreadcrumbNavigation";
 import { ImCross } from "react-icons/im";
 import { IoMdAddCircle } from "react-icons/io";
-import { motion, AnimatePresence } from "framer-motion";
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -17,11 +16,10 @@ const AddProject = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Dynamic fields for each section (row-wise)
-  const [extraProjects, setExtraProjects] = useState([]);
-  const [extraClients, setExtraClients] = useState([]);
-  const [extraLinks, setExtraLinks] = useState([]);
-  const [extraTeamMembers, setExtraTeamMembers] = useState([]);
+  // --- Dynamic Extra Fields State ---
+  const [dynamicFields, setDynamicFields] = useState({
+    1: [], 2: [], 3: [], 4: []
+  });
 
   const [formData, setFormData] = useState({
     projectName: "",
@@ -32,532 +30,237 @@ const AddProject = () => {
     clientName: "",
     clientEmail: "",
     contactInfo: "",
-    clientDetails: {
-      companyName: "",
-      clientAddress: "",
-      clientWebsite: ""
-    },
-    links: {
-      github: "",
-      deployment: "",
-      figma: "",
-      drive: "",
-      documentation: ""
-    },
+    clientDetails: { companyName: "", clientAddress: "", clientWebsite: "" },
+    links: { github: "", deployment: "", figma: "", drive: "", documentation: "" },
     totalPayment: "",
     paymentReceived: "",
+    tasks: [{ taskName: "", assignedTo: "", status: "Pending" }],
     notes: ""
   });
 
-  const nextStep = () => {
-    setStep((prev) => prev + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  const prevStep = () => {
-    setStep((prev) => prev - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // --- Clickable Progress Bar Component ---
+  const ProgressBar = () => {
+    const steps = [
+      { id: 1, label: "Info" },
+      { id: 2, label: "Client" },
+      { id: 3, label: "Finance" },
+      { id: 4, label: "Notes" },
+    ];
+
+    return (
+      <div className="mb-10 relative">
+        <div className="flex justify-between items-center relative z-10">
+          {steps.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setStep(s.id)}
+              className={`flex flex-col items-center gap-2 transition-all duration-300 ${step === s.id ? "scale-110" : "opacity-60 hover:opacity-100"
+                }`}
+            >
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 shadow-sm ${step >= s.id
+                    ? "bg-primary border-primary text-white"
+                    : "bg-background border-muted text-muted-foreground"
+                  }`}
+              >
+                {s.id}
+              </div>
+              <span className={`text-[10px] font-bold uppercase tracking-tighter ${step === s.id ? "text-primary" : "text-muted-foreground"}`}>
+                {s.label}
+              </span>
+            </button>
+          ))}
+        </div>
+        {/* Background Line */}
+        <div className="absolute top-5 left-0 w-full h-[2px] bg-muted -z-0">
+          <div
+            className="h-full bg-primary transition-all duration-500"
+            style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+    );
   };
 
+  // --- Handlers ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleNestedChange = (section, field, value) => {
-    setFormData((prev) => ({
+    setFormData((prev) => ({ ...prev, [section]: { ...prev[section], [field]: value } }));
+  };
+
+  const addDynamicInput = (stepNumber) => {
+    const label = prompt("Enter field label (e.g. Alternative Email,Name):");
+    if (!label) return;
+    const type = prompt("Enter input type (text, date, number, email):", "text");
+    const newField = { id: Date.now(), label, type, value: "" };
+    setDynamicFields(prev => ({ ...prev, [stepNumber]: [...prev[stepNumber], newField] }));
+  };
+
+  const handleDynamicInputChange = (stepNumber, id, value) => {
+    setDynamicFields(prev => ({
       ...prev,
-      [section]: { ...prev[section], [field]: value }
+      [stepNumber]: prev[stepNumber].map(f => f.id === id ? { ...f, value } : f)
     }));
   };
 
-  // --- Extra Projects Handlers ---
-  const addExtraProject = () => {
-    setExtraProjects([...extraProjects, ""]);
-  };
-
-  const handleExtraProjectChange = (index, value) => {
-    const updated = [...extraProjects];
-    updated[index] = value;
-    setExtraProjects(updated);
-  };
-
-  const removeExtraProject = (index) => {
-    setExtraProjects(extraProjects.filter((_, i) => i !== index));
-  };
-
-  // --- Extra Clients Handlers ---
-  const addExtraClient = () => {
-    setExtraClients([...extraClients, { name: "", email: "", phone: "" }]);
-  };
-
-  const handleExtraClientChange = (index, field, value) => {
-    const updated = [...extraClients];
-    updated[index][field] = value;
-    setExtraClients(updated);
-  };
-
-  const removeExtraClient = (index) => {
-    setExtraClients(extraClients.filter((_, i) => i !== index));
-  };
-
-  // --- Extra Links Handlers ---
-  const addExtraLink = () => {
-    setExtraLinks([...extraLinks, { type: "github", url: "" }]);
-  };
-
-  const handleExtraLinkChange = (index, field, value) => {
-    const updated = [...extraLinks];
-    updated[index][field] = value;
-    setExtraLinks(updated);
-  };
-
-  const removeExtraLink = (index) => {
-    setExtraLinks(extraLinks.filter((_, i) => i !== index));
-  };
-
-  // --- Extra Team Members Handlers ---
-  const addExtraTeamMember = () => {
-    setExtraTeamMembers([...extraTeamMembers, ""]);
-  };
-
-  const handleExtraTeamMemberChange = (index, value) => {
-    const updated = [...extraTeamMembers];
-    updated[index] = value;
-    setExtraTeamMembers(updated);
-  };
-
-  const removeExtraTeamMember = (index) => {
-    setExtraTeamMembers(extraTeamMembers.filter((_, i) => i !== index));
+  const removeDynamicInput = (stepNumber, id) => {
+    setDynamicFields(prev => ({ ...prev, [stepNumber]: prev[stepNumber].filter(f => f.id !== id) }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.company?.id) return alert("Company ID missing! Please login again.");
+
     setLoading(true);
     try {
       const payload = {
-        ...formData,
-        additionalProjects: extraProjects,
-        additionalClients: extraClients,
-        additionalLinks: extraLinks,
-        additionalTeamMembers: extraTeamMembers,
-        companyId: user?.company?.id,
-        totalPayment: Number(formData.totalPayment),
-        paymentReceived: Number(formData.paymentReceived),
-        assignedPeople: formData.assignedPeople.split(",").map((p) => p.trim()),
+        // --- Basic Fields ---
+        projectName: formData.projectName,
+        clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
+        contactInfo: formData.contactInfo,
+        phase: formData.phase || "Planning",
+        assigningDate: formData.assigningDate,
+        deadline: formData.deadline,
+        companyId: user.company.id,
+
+        // --- Backend expects these as FLAT columns (based on your null response) ---
+        githubLink: formData.links.github || "",
+        deploymentLink: formData.links.deployment || "",
+        // Agar backend description dhoond raha hai toh notes ko wahan bhej do
+        description: formData.notes || "",
+
+        // --- Finance (Keep them same) ---
+        totalPayment: Number(formData.totalPayment) || 0,
+        paymentReceived: Number(formData.paymentReceived) || 0,
+
+        // --- Extra Data (Backend might ignore these for now, but keeping structure) ---
+        assignedPeople: formData.assignedPeople ? formData.assignedPeople.split(",").map(p => p.trim()) : [],
+        notes: formData.notes || "",
+
+        // JSON Objects (Inko bhi bhej do agar backend update ho gaya ho)
+        links: {
+          github: formData.links.github || "",
+          deployment: formData.links.deployment || "",
+          figma: formData.links.figma || "",
+          drive: formData.links.drive || "",
+          documentation: formData.links.documentation || ""
+        },
+        clientDetails: {
+          companyName: formData.clientDetails.companyName || "",
+          clientAddress: formData.clientDetails.clientAddress || "",
+          clientWebsite: formData.clientDetails.clientWebsite || ""
+        }
       };
-      await createProject(payload, user?.company?.id);
-      alert("Project Added Successfully!");
+
+      console.log("Sending Flattened Payload:", payload);
+      await createProject(payload);
+      alert("Project saved successfully!");
       navigate("/projects");
     } catch (error) {
-      console.error(error);
-      alert("Error adding project");
+      console.error("Save Error:", error);
+      alert("Backend Error!");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  const breadcrumbItems = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Projects", path: "/projects" },
-    { label: "Add Project", path: "/add-project" }
-  ];
-
-  // Animation variants
-  const stepVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" } },
-    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-    exit: { opacity: 0, x: -100, transition: { duration: 0.2 } }
-  };
-
-  const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.2 } },
-    tap: { scale: 0.95 }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground text-[13px]">
+    <div className="min-h-screen bg-background text-foreground text-sm">
       <Header />
       <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
       <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
         <div className="p-6">
-          <BreadcrumbNavigation items={breadcrumbItems} />
+          <BreadcrumbNavigation items={[{ label: "Dashboard", path: "/dashboard" }, { label: "Projects", path: "/projects" }, { label: "Add Project" }]} />
 
           <div className="max-w-4xl mx-auto">
-            <motion.div 
-              className="mb-8 text-center"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-2xl font-bold">Step {step}: {
-                step === 1 ? "Basic Information" :
-                step === 2 ? "Client & Team" :
-                step === 3 ? "Links & Finance" : "Final & Notes"
-              }</h1>
-            </motion.div>
+            {/* Clickable Progress Bar */}
+            <ProgressBar />
 
-            <form onSubmit={handleSubmit} className="space-y-6 bg-card p-6 rounded-xl border border-border shadow-sm">
-              <AnimatePresence mode="wait">
-                {/* STEP 1: PROJECT INFO & TIMELINE */}
-                {step === 1 && (
-                  <motion.div
-                    key="step1"
-                    variants={stepVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="space-y-6"
-                  >
-                    <SectionTitle title="Project Information" />
-                    
-                    <motion.div variants={itemVariants} className="space-y-2">
-                      <InputField 
-                        label="Project Name" 
-                        name="projectName" 
-                        value={formData.projectName} 
-                        onChange={handleChange} 
-                      />
-                      <motion.button 
-                        type="button" 
-                        onClick={addExtraProject}
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                        className="flex items-center gap-1 text-primary text-xs font-medium transition-all hover:gap-2"
-                      >
-                        {/* <IoMdAddCircle size={14} /> Add Another Project */}
-                      </motion.button>
-                    </motion.div>
+            <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-xl border border-border shadow-sm relative">
+              <div className="absolute -top-3 left-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+                Step {step}
+              </div>
 
-                    {/* Extra Projects List */}
-                    <AnimatePresence>
-                      {extraProjects.map((proj, index) => (
-                        <motion.div
-                          key={index}
-                          variants={itemVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          className="flex gap-2 items-end"
-                        >
-                          <div className="flex-1">
-                            <InputField 
-                              label={`Extra Project ${index + 2}`} 
-                              value={proj} 
-                              onChange={(e) => handleExtraProjectChange(index, e.target.value)} 
-                            />
-                          </div>
-                          <motion.button 
-                            type="button" 
-                            onClick={() => removeExtraProject(index)}
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 mb-1 text-red-500 hover:bg-red-50 rounded-md transition-all"
-                          >
-                            <ImCross size={10} />
-                          </motion.button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+              {/* STEP 1: PROJECT INFO */}
+              {step === 1 && (
+                <div className="space-y-6">
+                  <SectionHeader title="Project Information" />
+                  <Grid2>
+                    <InputField label="Project Name (Primary)" name="projectName" value={formData.projectName} onChange={handleChange} />
+                    <SelectField label="Project Phase" name="phase" value={formData.phase} onChange={handleChange} options={["Planning", "Development", "Testing", "Deployment", "Completed"]} />
+                    <InputField label="Assigning Date" type="date" name="assigningDate" value={formData.assigningDate} onChange={handleChange} />
+                    <InputField label="Deadline" type="date" name="deadline" value={formData.deadline} onChange={handleChange} />
+                  </Grid2>
+                  <DynamicInputsArea step={1} fields={dynamicFields[1]} onAdd={() => addDynamicInput(1)} onChange={handleDynamicInputChange} onRemove={removeDynamicInput} />
+                </div>
+              )}
 
-                    <SelectField 
-                      label="Project Phase" 
-                      name="phase" 
-                      value={formData.phase} 
-                      onChange={handleChange} 
-                      options={["Planning", "Development", "Testing", "Deployment", "Completed"]} 
-                    />
+              {/* STEP 2: CLIENT & TEAM */}
+              {step === 2 && (
+                <div className="space-y-6">
+                  <SectionHeader title="Client Details" />
+                  <Grid3>
+                    <InputField label="Client Name" name="clientName" value={formData.clientName} onChange={handleChange} />
+                    <InputField label="Client Email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} />
+                    <InputField label="Phone/Contact" name="contactInfo" value={formData.contactInfo} onChange={handleChange} />
+                  </Grid3>
+                  <SectionHeader title="Company Information" />
+                  <Grid2>
+                    <InputField label="Company Name" value={formData.clientDetails.companyName} onChange={(e) => handleNestedChange("clientDetails", "companyName", e.target.value)} />
+                    <InputField label="Website" value={formData.clientDetails.clientWebsite} onChange={(e) => handleNestedChange("clientDetails", "clientWebsite", e.target.value)} />
+                  </Grid2>
+                  <InputField label="Address" value={formData.clientDetails.clientAddress} onChange={(e) => handleNestedChange("clientDetails", "clientAddress", e.target.value)} />
+                  <SectionHeader title="Team Assignment" />
+                  <InputField label="Assigned People (Comma separated)" name="assignedPeople" value={formData.assignedPeople} onChange={handleChange} />
+                  <DynamicInputsArea step={2} fields={dynamicFields[2]} onAdd={() => addDynamicInput(2)} onChange={handleDynamicInputChange} onRemove={removeDynamicInput} />
+                </div>
+              )}
 
-                    <SectionTitle title="Timeline" />
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <InputField label="Assigning Date" type="date" name="assigningDate" value={formData.assigningDate} onChange={handleChange} />
-                      <InputField label="Deadline" type="date" name="deadline" value={formData.deadline} onChange={handleChange} />
-                    </div>
-                  </motion.div>
-                )}
+              {/* STEP 3: LINKS & FINANCE */}
+              {step === 3 && (
+                <div className="space-y-6">
+                  <SectionHeader title="Project Links" />
+                  <Grid2>
+                    <InputField label="GitHub" value={formData.links.github} onChange={(e) => handleNestedChange("links", "github", e.target.value)} />
+                    <InputField label="Live Site" value={formData.links.deployment} onChange={(e) => handleNestedChange("links", "deployment", e.target.value)} />
+                    {/* <InputField label="Figma" value={formData.links.figma} onChange={(e) => handleNestedChange("links", "figma", e.target.value)} /> */}
+                    {/* <InputField label="Google Drive" value={formData.links.drive} onChange={(e) => handleNestedChange("links", "drive", e.target.value)} /> */}
+                    <InputField label="Documentation" value={formData.links.documentation} onChange={(e) => handleNestedChange("links", "documentation", e.target.value)} />
+                  </Grid2>
+                  <SectionHeader title="Finance" />
+                  <Grid2>
+                    <InputField label="Total Budget" type="number" name="totalPayment" value={formData.totalPayment} onChange={handleChange} />
+                    <InputField label="Received Amount" type="number" name="paymentReceived" value={formData.paymentReceived} onChange={handleChange} />
+                  </Grid2>
+                  <DynamicInputsArea step={3} fields={dynamicFields[3]} onAdd={() => addDynamicInput(3)} onChange={handleDynamicInputChange} onRemove={removeDynamicInput} />
+                </div>
+              )}
 
-                {/* STEP 2: CLIENT & TEAM */}
-                {step === 2 && (
-                  <motion.div
-                    key="step2"
-                    variants={stepVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="space-y-6"
-                  >
-                    <SectionTitle title="Client Details" />
-                    
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <InputField label="Client Name" name="clientName" value={formData.clientName} onChange={handleChange} />
-                      <InputField label="Client Email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} />
-                      <InputField label="Phone/Contact" name="contactInfo" value={formData.contactInfo} onChange={handleChange} />
-                    </div>
-                    
-                    <motion.button 
-                      type="button" 
-                      onClick={addExtraClient}
-                      variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
-                      className="flex items-center gap-1 text-primary text-xs font-medium transition-all hover:gap-2"
-                    >
-                      {/* <IoMdAddCircle size={14} /> Add Another Client */}
-                    </motion.button>
+              {/* STEP 4: NOTES */}
+              {step === 4 && (
+                <div className="space-y-6">
+                  <SectionHeader title="Final Notes" />
+                  <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="w-full border border-input rounded-md p-4 bg-background text-sm focus:ring-1 focus:ring-primary outline-none min-h-[150px]" placeholder="Add instructions here..." />
+                  <DynamicInputsArea step={4} fields={dynamicFields[4]} onAdd={() => addDynamicInput(4)} onChange={handleDynamicInputChange} onRemove={removeDynamicInput} />
+                </div>
+              )}
 
-                    {/* Extra Clients List */}
-                    <AnimatePresence>
-                      {extraClients.map((client, index) => (
-                        <motion.div
-                          key={index}
-                          variants={itemVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          className="p-3 border rounded-md space-y-3 relative"
-                        >
-                          <div className="flex justify-between items-center mb-2">
-                            <h4 className="text-xs font-semibold text-muted-foreground">Extra Client {index + 2}</h4>
-                            <motion.button 
-                              type="button" 
-                              onClick={() => removeExtraClient(index)}
-                              whileHover={{ scale: 1.1, rotate: 90 }}
-                              whileTap={{ scale: 0.9 }}
-                              className="text-red-500"
-                            >
-                              <ImCross size={10} />
-                            </motion.button>
-                          </div>
-                          <div className="grid md:grid-cols-3 gap-4">
-                            <InputField 
-                              label="Client Name" 
-                              value={client.name} 
-                              onChange={(e) => handleExtraClientChange(index, "name", e.target.value)} 
-                            />
-                            <InputField 
-                              label="Client Email" 
-                              value={client.email} 
-                              onChange={(e) => handleExtraClientChange(index, "email", e.target.value)} 
-                            />
-                            <InputField 
-                              label="Phone/Contact" 
-                              value={client.phone} 
-                              onChange={(e) => handleExtraClientChange(index, "phone", e.target.value)} 
-                            />
-                          </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <InputField 
-                        label="Company Name" 
-                        value={formData.clientDetails.companyName} 
-                        onChange={(e) => handleNestedChange("clientDetails", "companyName", e.target.value)} 
-                      />
-                      <InputField 
-                        label="Client Website" 
-                        value={formData.clientDetails.clientWebsite} 
-                        onChange={(e) => handleNestedChange("clientDetails", "clientWebsite", e.target.value)} 
-                      />
-                    </div>
-                    <InputField 
-                      label="Client Address" 
-                      value={formData.clientDetails.clientAddress} 
-                      onChange={(e) => handleNestedChange("clientDetails", "clientAddress", e.target.value)} 
-                    />
-
-                    <SectionTitle title="Team Assignment" />
-                    <div className="space-y-2">
-                      <InputField 
-                        label="Assigned People (comma separated)" 
-                        name="assignedPeople" 
-                        value={formData.assignedPeople} 
-                        onChange={handleChange} 
-                      />
-                      <motion.button 
-                        type="button" 
-                        onClick={addExtraTeamMember}
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                        className="flex items-center gap-1 text-primary text-xs font-medium transition-all hover:gap-2"
-                      >
-                        {/* <IoMdAddCircle size={14} /> Add Team Member */}
-                      </motion.button>
-                    </div>
-
-                    {/* Extra Team Members List */}
-                    <AnimatePresence>
-                      {extraTeamMembers.map((member, index) => (
-                        <motion.div
-                          key={index}
-                          variants={itemVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          className="flex gap-2 items-end"
-                        >
-                          <div className="flex-1">
-                            <InputField 
-                              label={`Team Member ${index + 2}`} 
-                              value={member} 
-                              onChange={(e) => handleExtraTeamMemberChange(index, e.target.value)} 
-                            />
-                          </div>
-                          <motion.button 
-                            type="button" 
-                            onClick={() => removeExtraTeamMember(index)}
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 mb-1 text-red-500 hover:bg-red-50 rounded-md transition-all"
-                          >
-                            <ImCross size={10} />
-                          </motion.button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-
-                {/* STEP 3: LINKS & FINANCE */}
-                {step === 3 && (
-                  <motion.div
-                    key="step3"
-                    variants={stepVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="space-y-6"
-                  >
-                    <SectionTitle title="Project Links" />
-                    
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <InputField label="GitHub Repo" value={formData.links.github} onChange={(e) => handleNestedChange("links", "github", e.target.value)} />
-                      <InputField label="Deployment" value={formData.links.deployment} onChange={(e) => handleNestedChange("links", "deployment", e.target.value)} />
-                      <InputField label="Figma Design" value={formData.links.figma} onChange={(e) => handleNestedChange("links", "figma", e.target.value)} />
-                      <InputField label="Google Drive" value={formData.links.drive} onChange={(e) => handleNestedChange("links", "drive", e.target.value)} />
-                    </div>
-                    
-                    <motion.button 
-                      type="button" 
-                      onClick={addExtraLink}
-                      variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
-                      className="flex items-center gap-1 text-primary text-xs font-medium transition-all hover:gap-2"
-                    >
-                      {/* <IoMdAddCircle size={14} /> Add Another Link */}
-                    </motion.button>
-
-                    {/* Extra Links List */}
-                    <AnimatePresence>
-                      {extraLinks.map((link, index) => (
-                        <motion.div
-                          key={index}
-                          variants={itemVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          className="flex gap-2 items-end"
-                        >
-                          <div className="flex-1 space-y-2">
-                            <select
-                              value={link.type}
-                              onChange={(e) => handleExtraLinkChange(index, "type", e.target.value)}
-                              className="w-full border border-input rounded-md px-3 py-1.5 bg-background text-sm"
-                            >
-                              <option value="github">GitHub</option>
-                              <option value="deployment">Deployment</option>
-                              <option value="figma">Figma</option>
-                              <option value="drive">Drive</option>
-                              <option value="documentation">Documentation</option>
-                            </select>
-                            <InputField 
-                              label={`Link URL ${index + 2}`} 
-                              value={link.url} 
-                              onChange={(e) => handleExtraLinkChange(index, "url", e.target.value)} 
-                            />
-                          </div>
-                          <motion.button 
-                            type="button" 
-                            onClick={() => removeExtraLink(index)}
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 mb-1 text-red-500 hover:bg-red-50 rounded-md transition-all"
-                          >
-                            <ImCross size={10} />
-                          </motion.button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-
-                    <SectionTitle title="Finance" />
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <InputField label="Total Budget" type="number" name="totalPayment" value={formData.totalPayment} onChange={handleChange} />
-                      <InputField label="Initial Received" type="number" name="paymentReceived" value={formData.paymentReceived} onChange={handleChange} />
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* STEP 4: NOTES */}
-                {step === 4 && (
-                  <motion.div
-                    key="step4"
-                    variants={stepVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="space-y-6"
-                  >
-                    <SectionTitle title="Final Notes" />
-                    <motion.textarea 
-                      variants={itemVariants}
-                      value={formData.notes} 
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })} 
-                      className="w-full border rounded-md p-3 min-h-[150px] outline-none focus:ring-1 focus:ring-primary transition-all" 
-                      placeholder="Instructions..." 
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Navigation Buttons */}
-              <motion.div 
-                className="flex justify-between pt-6 border-t"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <motion.button 
-                  type="button" 
-                  onClick={step === 1 ? () => navigate("/projects") : prevStep}
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                  className="px-5 py-1.5 border rounded-lg transition-all hover:bg-muted"
-                >
+              {/* NAVIGATION BUTTONS */}
+              <div className="flex justify-between items-center pt-8 border-t">
+                <button type="button" onClick={step === 1 ? () => navigate("/projects") : () => setStep(step - 1)} className="px-6 py-2 border rounded-lg hover:bg-accent transition-colors">
                   {step === 1 ? "Cancel" : "Back"}
-                </motion.button>
-                <motion.button 
-                  type="button" 
-                  onClick={step < 4 ? nextStep : handleSubmit}
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                  className="bg-primary text-white px-8 py-1.5 rounded-lg transition-all hover:bg-primary/90"
-                  disabled={loading}
-                >
-                  {loading ? "Creating..." : step < 4 ? "Next Step" : "Finish"}
-                </motion.button>
-              </motion.div>
+                </button>
+                <button type="button" onClick={step === 4 ? handleSubmit : () => setStep(step + 1)} className={`${step === 4 ? 'bg-green-600' : 'bg-primary'} text-white px-8 py-2 rounded-lg hover:opacity-90`}>
+                  {step === 4 ? (loading ? "Creating..." : "Finish & Create") : "Next Step"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -566,69 +269,50 @@ const AddProject = () => {
   );
 };
 
-// Reusable Components with Animations
-const SectionTitle = ({ title }) => (
-  <motion.h2 
-    className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest border-b pb-1"
-    initial={{ opacity: 0, x: -20 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    {title}
-  </motion.h2>
+// --- HELPERS ---
+const SectionHeader = ({ title }) => <h2 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">{title}</h2>;
+const Grid2 = ({ children }) => <div className="grid md:grid-cols-2 gap-6">{children}</div>;
+const Grid3 = ({ children }) => <div className="grid md:grid-cols-3 gap-6">{children}</div>;
+
+const InputField = ({ label, ...props }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-[12px] font-semibold text-foreground/70">{label}</label>
+    <input {...props} className="w-full border border-input rounded-md px-3 py-2 bg-background text-sm focus:border-primary outline-none transition-all" />
+  </div>
 );
 
-const InputField = ({ label, onAdd, ...props }) => (
-  <motion.div 
-    className="flex flex-col gap-1"
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.2 }}
-  >
-    <div className="flex justify-between items-center">
-      <label className="text-[11px] font-semibold text-foreground/70">{label}</label>
-      {onAdd && (
-        <motion.button 
-          type="button" 
-          onClick={onAdd}
-          whileHover={{ scale: 1.1, rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
-          className="text-primary hover:scale-110 transition-all"
-        >
-          <IoMdAddCircle size={16} />
-        </motion.button>
-      )}
-    </div>
-    <input {...props} className="w-full border border-input rounded-md px-3 py-1.5 bg-background text-sm focus:border-primary outline-none transition-all focus:ring-1 focus:ring-primary" />
-  </motion.div>
-);
-
-const SelectField = ({ label, options, onAdd, ...props }) => (
-  <motion.div 
-    className="flex flex-col gap-1"
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.2 }}
-  >
-    <div className="flex justify-between items-center">
-      <label className="text-[11px] font-semibold text-foreground/70">{label}</label>
-      {onAdd && (
-        <motion.button 
-          type="button" 
-          onClick={onAdd}
-          whileHover={{ scale: 1.1, rotate: 90 }}
-          whileTap={{ scale: 0.9 }}
-          className="text-primary hover:scale-110 transition-all"
-        >
-          <IoMdAddCircle size={16} />
-        </motion.button>
-      )}
-    </div>
-    <select {...props} className="w-full border border-input rounded-md px-3 py-1.5 bg-background text-sm focus:border-primary outline-none transition-all focus:ring-1 focus:ring-primary">
+const SelectField = ({ label, options, ...props }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-[12px] font-semibold text-foreground/70">{label}</label>
+    <select {...props} className="w-full border border-input rounded-md px-3 py-2 bg-background text-sm focus:border-primary outline-none">
       <option value="">Select</option>
       {options.map((o, i) => <option key={i} value={o}>{o}</option>)}
     </select>
-  </motion.div>
+  </div>
+);
+
+const DynamicInputsArea = ({ step, fields, onAdd, onChange, onRemove }) => (
+  <div className="pt-4 mt-4">
+    {fields.length > 0 && (
+      <div className="grid md:grid-cols-2 gap-6 mb-4">
+        {fields.map((field) => (
+          <div key={field.id} className="flex items-end gap-2 group animate-in fade-in slide-in-from-top-1">
+            <div className="flex-1">
+              <InputField label={field.label} type={field.type} value={field.value} onChange={(e) => onChange(step, field.id, e.target.value)} />
+            </div>
+            <button type="button" onClick={() => onRemove(step, field.id)} className="p-2 mb-1 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+              <ImCross size={10} />
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+    <div className="flex justify-center">
+      <button type="button" onClick={onAdd} className="p-2 text-primary/80 hover:text-primary hover:scale-110 transition-all">
+        <IoMdAddCircle size={28} />
+      </button>
+    </div>
+  </div>
 );
 
 export default AddProject;

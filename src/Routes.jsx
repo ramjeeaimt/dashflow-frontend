@@ -34,6 +34,12 @@ import FinanceDashboard from './features/finance/pages/FinanceDashboardPage';
 import Pricing from "features/landing/pages/Pricing";
 import FeaturesPage from "features/landing/pages/FeaturesPage";
 import { EmployeeModal } from "features/employee";
+import LeaveForm from "features/employee/pages/LeaveForm";
+// import EmployeePayroll from "features/employee/pages/EmployeePayroll";
+import EmployeePayrollPage from "features/payroll/pages/EmployeePayrollPage";
+import AdminLeaveManagement from "features/employee/pages/AdminLeaveManagement";
+import ClientAdmin from "components/ClientAdmin";
+
 
 const Routes = () => {
   return (
@@ -59,7 +65,20 @@ const Routes = () => {
             <ProtectedRoute>
               <EmployeeDashboard />
             </ProtectedRoute>
+
           } />
+          <Route path="/employee/leaves" element={
+            <ProtectedRoute>
+              <LeaveForm/>
+            </ProtectedRoute>
+          }/>
+
+           <Route path="/employee/payroll" element={
+            <ProtectedRoute>
+              <EmployeePayrollPage/>
+            </ProtectedRoute>
+          }/>
+
           <Route path="/task-management" element={
             <ProtectedRoute>
               <TaskManagement />
@@ -70,6 +89,22 @@ const Routes = () => {
               <EmployeeManagement />
             </ProtectedRoute>
           } />
+
+           <Route path="/employee-leave" element={
+            <ProtectedRoute>
+              <AdminLeaveManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/client-management" element={
+            <ProtectedRoute>
+              <ClientAdmin />
+            </ProtectedRoute>
+          } />
+
+          
+
+
           <Route path="/add-new-employee" element={
             <ProtectedRoute>
               <EmployeeModal />

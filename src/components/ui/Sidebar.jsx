@@ -34,10 +34,24 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
         tooltip: 'Workforce management'
       },
       {
+        label: 'Employee-Leave',
+        path: '/employee-leave',
+        icon: 'Users',
+        tooltip: 'Workforce management'
+      },
+
+      {
         label: 'Attendance',
         path: '/attendance-management',
         icon: 'CalendarCheck',
         tooltip: 'Daily check-in/out'
+      },
+
+       {
+        label: 'Client',
+        path: '/client-management',
+        icon: 'CalendarCheck',
+        
       },
       {
         label: 'Tasks',
@@ -96,9 +110,27 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
         icon: 'LayoutDashboard',
         tooltip: 'My Dashboard'
       },
-      // Add other employee specific links here if needed
-      // For now, just Dashboard as requested
+      {
+        label: 'My Leaves',
+        path: '/employee/leaves',
+        icon: 'EmployeeDashboardLayout', // Leave form/status ke liye
+        tooltip: 'Apply and track leaves'
+      },
+      {
+        label: 'My Payroll',
+        path: '/employee/payroll',
+        icon: 'EmployeeDashboardLayout', // Salary/Payslip ke liye
+        tooltip: 'View my payslips and salary'
+      },
+      {
+        label: 'Attendance',
+        path: '/attendance-management',
+        icon: 'CalendarCheck',
+        tooltip: 'My daily attendance'
+      },
+      //if needed add another field
     ];
+  
   } else {
     // Default/Fallback (Full menu for now if no role matches, or handle as guest/error)
     navigationItems = [
