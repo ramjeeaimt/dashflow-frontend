@@ -26,7 +26,7 @@ const AddClientModal = ({ isOpen, onClose, onAdd }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input 
-              required
+             
               className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />

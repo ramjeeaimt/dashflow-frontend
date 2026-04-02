@@ -21,11 +21,23 @@ const Projects = () => {
   const { projects, loading, fetchProjects, deleteProject, updateProject } = useProjectStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
+useEffect(() => {
+  const loadInitialData = async () => {
+    // Check karein ki user load ho chuka hai aur company ID hai
     if (isAuthenticated && user?.company?.id) {
-      fetchProjects(user.company.id);
+      console.log("Fetching projects for Admin with ID:", user.company.id);
+      
+      // Parallel fetch karein taaki time bache
+      await Promise.all([
+        fetchProjects(user.company.id),
+        fetchClients()
+      ]);
     }
-  }, [user, isAuthenticated, fetchProjects]);
+  };
+
+  loadInitialData();
+}, [isAuthenticated, user?.company?.id]);
+console.log("Projects Data in Store:", projects);
 
   const parsePeople = (str) => {
     if (!str) return [];

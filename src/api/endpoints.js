@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     PROJECTS: {
         BASE: '/projects',
         BY_ID: (id) => `/projects/${id}`,
+        CLIENTS: '/projects/clients'
     },
     DESIGNATIONS: {
         BASE: '/designations',

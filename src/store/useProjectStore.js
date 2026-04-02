@@ -65,12 +65,12 @@ const useProjectStore = create((set, get) => ({
             
             // Calculate BOTH datasets once to maintain stable references
             const newGrowthData = get().computeGrowth(projectsArray);
-            const newStatusData = get().computeStatus(projectsArray); // <-- Added
+            const newStatusData = get().computeStatus(projectsArray); 
 
             set({ 
                 projects: projectsArray, 
                 growthData: newGrowthData,
-                statusData: newStatusData, // <-- Added
+                statusData: newStatusData, 
                 loading: false 
             });
         } catch (error) {

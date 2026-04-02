@@ -1,389 +1,831 @@
-import React, { useEffect, useState } from 'react';
-import { Send, Search, Plus, X, Loader2, Trash2, Users, TrendingUp, ChevronDown, ChevronUp, Mail, Briefcase } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { 
+  Send, Search, Plus, X, Loader2, Trash2, Users, TrendingUp, 
+  ChevronRight, Mail, Briefcase, PlusCircle, CheckCircle2,
+  Globe, Phone, MapPin, Building2, DollarSign, ArrowRight, ArrowLeft,
+  ShieldCheck, CreditCard, Layers, LayoutGrid, Calendar, Clock, FileText
+} from 'lucide-react';
 import { useClientStore } from '../store/useClientStore';
 import Sidebar from './ui/Sidebar';
 import Header from './ui/Header';
+import useProjectStore from 'store/useProjectStore';
+import useAuthStore from 'store/useAuthStore';
 import { FaRupeeSign } from "react-icons/fa";
 
 const ClientAdmin = () => {
   const { clients, fetchClients, processInvoice, addClient } = useClientStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const { projects, fetchProjects } = useProjectStore();
 
+  // --- UI CONTROLS ---
   const [searchTerm, setSearchTerm] = useState('');
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const [expandedClientId, setExpandedClientId] = useState(null); // For Dropdown
-
+  const [expandedId, setExpandedId] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
-  const [gstNumber, setGstNumber] = useState('');
-
-  const [currency, setCurrency] = useState({ code: 'INR', symbol: '₹' });
-  const [invoiceItems, setInvoiceItems] = useState([
-    { service: 'Web Development', phase: 'Phase 1', quantity: 1, price: 21000 }
-  ]);
-
-  const currencies = [
-    { code: 'INR', symbol: '₹' },
-    { code: 'USD', symbol: '$' },
-    { code: 'EUR', symbol: '€' },
-    { code: 'GBP', symbol: '£' }
-  ];
-
-  const [newClient, setNewClient] = useState({ name: '', email: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [step, setStep] = useState(1);
+
+  // --- FORM STATES ---
+  const [newClient, setNewClient] = useState({
+    name: '', email: '', phone: '', company: '',
+    address: '', city: '', state: '', pincode: '', country: 'India',
+    status: 'Lead', source: 'LinkedIn', priority: 'Medium',
+    budget: '', currency: 'INR', notes: ''
+  });
+
+  const [invoiceItems, setInvoiceItems] = useState([
+    { service: '', isCustom: false, phase: 'Phase 1', quantity: 1, price: 0 }
+  ]);
+  const [gstNumber, setGstNumber] = useState('');
+  const [invoiceCurrency, setInvoiceCurrency] = useState({ code: 'INR', symbol: '₹' });
 
   useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
+    if (isAuthenticated && user?.company?.id) {
+      fetchClients();
+      fetchProjects(user.company.id);
+    }
+  }, [isAuthenticated, user?.company?.id]);
 
-  const safeClients = Array.isArray(clients) ? clients : [];
+  // --- SEARCH & MERGE LOGIC ---
+  const combinedData = useMemo(() => {
+    const safeClients = Array.isArray(clients) ? clients : [];
+    const clientList = safeClients.map(c => ({ 
+      ...c, 
+      type: 'Client', 
+      searchKey: (c.name + c.email + c.company).toLowerCase(),
+      projectDetails: null
+    }));
+    const projectList = (projects || []).map(p => ({ 
+      ...p, 
+      type: 'Project', 
+      name: p.projectName, 
+      email: p.clientEmail,
+      company: p.clientDetails?.companyName || 'Contractual',
+      searchKey: (p.projectName + p.clientEmail).toLowerCase(),
+      projectDetails: {
+        description: p.description,
+        assigningDate: p.assigningDate,
+        deadline: p.deadline,
+        phase: p.phase,
+        status: p.status,
+        totalPayment: p.totalPayment,
+        paymentReceived: p.paymentReceived,
+        budget: p.budget,
+        githubLink: p.githubLink,
+        deploymentLink: p.deploymentLink,
+        contactInfo: p.contactInfo,
+        assignedPeople: p.assignedPeople
+      }
+    }));
+    return [...clientList, ...projectList].filter(item => item.searchKey.includes(searchTerm.toLowerCase()));
+  }, [clients, projects, searchTerm]);
 
-  const filteredClients = safeClients.filter(c =>
-    (c?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c?.email || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // --- HANDLERS ---
+  const handleNextStep = () => setStep(prev => prev + 1);
+  const handlePrevStep = () => setStep(prev => prev - 1);
 
-  // --- Dashboard Stats ---
-  const totalClients = safeClients.length;
-  const totalRevenue = safeClients.reduce((acc, client) => {
-    const clientTotal = client.invoices?.reduce((s, i) => s + Number(i.amount), 0) || 0;
-    return acc + clientTotal;
-  }, 0);
-  const activeProjects = safeClients.filter(c => (c.invoices?.length || 0) > 0).length;
-
-  // --- Calculations ---
-  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-  const cgst = subtotal * 0.09;
-  const sgst = subtotal * 0.09;
-  const grandTotal = subtotal + cgst + sgst;
-
-  const handleAddClient = async (e) => {
+  const handleCreateClient = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       await addClient(newClient);
-      alert("Naya Client Add Ho Gaya!");
       setIsClientModalOpen(false);
-      setNewClient({ name: '', email: '' });
+      setStep(1);
+      setNewClient({ 
+        name: '', email: '', phone: '', company: '', 
+        address: '', city: '', state: '', pincode: '', country: 'India', 
+        status: 'Lead', source: 'LinkedIn', priority: 'Medium', 
+        budget: '', currency: 'INR', notes: '' 
+      });
       fetchClients();
-    } catch (err) {
-      alert("Error: Client add nahi ho paya.");
-    } finally {
-      setIsSubmitting(false);
+    } catch (err) { 
+      console.error(err); 
+      alert("Error adding client");
+    } finally { 
+      setIsSubmitting(false); 
     }
   };
 
-  const handleCreateInvoice = async () => {
+  const handleSendInvoice = async () => {
     if (!selectedClient) return;
     setIsSubmitting(true);
     try {
       await processInvoice(selectedClient.id, {
         items: invoiceItems,
         total: subtotal,
-        currencySymbol: currency.symbol,
+        currency: invoiceCurrency.code,
         gstNumber: gstNumber,
-        cgst,
-        sgst,
-        grandTotal
+        clientEmail: selectedClient.email
       });
-      alert("Invoice Sent Successfully!");
+      alert("Invoice sent successfully!");
       setIsInvoiceModalOpen(false);
+      setInvoiceItems([{ service: '', isCustom: false, phase: 'Phase 1', quantity: 1, price: 0 }]);
       setGstNumber('');
     } catch (err) {
-      alert("Failed to send invoice.");
+      console.error(err);
+      alert("Failed to send invoice");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const updateItem = (index, field, value) => {
-    const newItems = [...invoiceItems];
-    newItems[index][field] = value;
-    setInvoiceItems(newItems);
+  const updateInvItem = (idx, field, val) => {
+    const updated = [...invoiceItems];
+    if (field === 'service' && val === 'CUSTOM_ENTRY') {
+      updated[idx].isCustom = true;
+      updated[idx].service = '';
+    } else {
+      updated[idx][field] = val;
+    }
+    setInvoiceItems(updated);
   };
 
-  const toggleExpand = (id) => {
-    setExpandedClientId(expandedClientId === id ? null : id);
+  const addInvoiceItem = () => {
+    setInvoiceItems([...invoiceItems, { service: '', isCustom: false, phase: 'Phase 1', quantity: 1, price: 0 }]);
   };
+
+  const removeInvoiceItem = (idx) => {
+    setInvoiceItems(invoiceItems.filter((_, i) => i !== idx));
+  };
+
+  const subtotal = invoiceItems.reduce((acc, i) => acc + (i.quantity * i.price), 0);
+  const taxAmount = subtotal * 0.18;
+  const grandTotal = subtotal + taxAmount;
+
+  // Stats values
+  const totalEntities = combinedData.length;
+  const estimatedRevenue = subtotal;
+  const activeWorkflows = projects?.length || 0;
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden font-sans">
+    <div className="flex h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
         <Header />
-        <main className="flex-1 lg:ml-64 mt-16 overflow-y-auto p-6 lg:p-10">
-
-          {/* Stats Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div className="bg-white p-6 border border-gray-100 shadow-sm flex items-center gap-5">
-              <div className="bg-orange-50 p-4 rounded-2xl"><Users size={24} /></div>
-              <div>
-                <p className="text-sm text-gray-500 font-bold">Total Clients</p>
-                <h3 className="text-2xl font-black">{totalClients}</h3>
+        
+        <main className="flex-1 mt-16 overflow-y-auto px-6 py-8">
+          
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Network Entities</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalEntities}</p>
+                </div>
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Users size={20} className="text-blue-600" />
+                </div>
               </div>
             </div>
-            <div className="bg-white p-6 border border-gray-100 shadow-sm flex items-center gap-5">
-              <div className="bg-green-50 p-4 rounded-2xl text-green-600"><FaRupeeSign size={24} /></div>
-              <div>
-                <p className="text-sm text-gray-500 font-bold">Total Revenue</p>
-                <h3 className="text-2xl font-black">₹{totalRevenue.toLocaleString()}</h3>
+            
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Estimated Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900">₹{estimatedRevenue.toLocaleString()}</p>
+                </div>
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <FaRupeeSign size={20} className="text-emerald-600" />
+                </div>
               </div>
             </div>
-            <div className="bg-white p-6 border border-gray-100 flex items-center gap-5">
-              <div className="bg-blue-50 p-4 rounded-2xl text-blue-600"><TrendingUp size={24} /></div>
-              <div>
-                <p className="text-sm text-gray-500 font-bold">Active Clients</p>
-                <h3 className="text-2xl font-black">{activeProjects}</h3>
+            
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Active Workflows</p>
+                  <p className="text-2xl font-bold text-gray-900">{activeWorkflows}</p>
+                </div>
+                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp size={20} className="text-indigo-600" />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Action Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-4 top-3.5 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search clients..."
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 rounded-2xl border-none outline-none transition-all"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">CRM Engine</h1>
+              <p className="text-sm text-gray-500 mt-1">Managing all your clients and projects</p>
             </div>
-            <button
-              onClick={() => setIsClientModalOpen(true)}
-              className="w-full md:w-auto bg-blue-800 text-white px-8 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition"
-            >
-              <Plus size={20} /> Add New Client
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <input 
+                  type="text" 
+                  placeholder="Filter entities..." 
+                  className="pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                  value={searchTerm} 
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <button 
+                onClick={() => { setStep(1); setIsClientModalOpen(true); }}
+                className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-800 transition-colors"
+              >
+                <Plus size={16} /> Register Entity
+              </button>
+            </div>
           </div>
 
-          {/* Table */}
-          <div className="bg-white border border-gray-100 overflow-hidden rounded-2xl">
-            <table className="w-full text-left">
-              <thead className="bg-gray-50/50 border-b border-gray-100">
-                <tr>
-                  <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Client Name (Click to view)</th>
-                  <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Revenue</th>
-                  <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {filteredClients.map((client) => (
-                  <React.Fragment key={client.id}>
-                    <tr className="hover:bg-blue-50/20 transition-all group cursor-pointer" onClick={() => toggleExpand(client.id)}>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center font-bold text-gray-500 group-hover:bg-blue-800 group-hover:text-white transition-all">
-                            {client.name.charAt(0)}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                                <p className="font-bold text-gray-900">{client.name}</p>
-                                {expandedClientId === client.id ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+          {/* List Section */}
+          <div className="space-y-1">
+            {combinedData.map((item) => (
+              <div 
+                key={item.id}
+                className={`bg-white border rounded-lg transition-all ${
+                    expandedId === item.id ? 'border-blue-300 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                }`}
+              >
+                <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base ${
+                        item.type === 'Project' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                        {item.type === 'Project' ? <LayoutGrid size={20}/> : item.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-gray-900 text-sm">{item.name}</h3>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.type === 'Project' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>
+                          {item.type}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">{item.company || 'Direct Organization'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="hidden lg:block text-right">
+                      <p className="text-xs text-gray-400">Active Since</p>
+                      <p className="text-xs font-medium text-gray-600">
+                        {item.assigningDate ? new Date(item.assigningDate).toLocaleDateString() : 'Mar 2026'}
+                      </p>
+                    </div>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${expandedId === item.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                      <ChevronRight size={16} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* EXPANDED DETAILS SECTION */}
+                {expandedId === item.id && (
+                  <div className="px-4 pb-4 pt-2 border-t border-gray-100">
+                    {item.type === 'Project' && item.projectDetails ? (
+                      // PROJECT DETAILS
+                      <div className="space-y-4 mt-3">
+                        <h4 className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">Project Details</h4>
+                        
+                        {/* Description */}
+                        {item.projectDetails.description && (
+                          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <div className="flex items-start gap-2">
+                              <FileText size={14} className="text-blue-500 mt-0.5" />
+                              <div>
+                                <p className="text-xs font-medium text-gray-700">Description</p>
+                                <p className="text-sm text-gray-600 mt-1">{item.projectDetails.description}</p>
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-400">{client.email}</p>
+                          </div>
+                        )}
+
+                        {/* Dates */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {item.projectDetails.assigningDate && (
+                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <div className="flex items-center gap-2">
+                                <Calendar size={14} className="text-blue-500" />
+                                <div>
+                                  <p className="text-xs text-gray-500">Start Date</p>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {new Date(item.projectDetails.assigningDate).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          {item.projectDetails.deadline && (
+                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <div className="flex items-center gap-2">
+                                <Clock size={14} className="text-orange-500" />
+                                <div>
+                                  <p className="text-xs text-gray-500">Deadline</p>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {new Date(item.projectDetails.deadline).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Financial Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          {item.projectDetails.budget > 0 && (
+                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <p className="text-xs text-gray-500">Budget</p>
+                              <p className="text-lg font-bold text-gray-900">₹{item.projectDetails.budget.toLocaleString()}</p>
+                            </div>
+                          )}
+                          {item.projectDetails.totalPayment > 0 && (
+                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <p className="text-xs text-gray-500">Total Value</p>
+                              <p className="text-lg font-bold text-gray-900">₹{item.projectDetails.totalPayment.toLocaleString()}</p>
+                            </div>
+                          )}
+                          {item.projectDetails.paymentReceived > 0 && (
+                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <p className="text-xs text-gray-500">Received</p>
+                              <p className="text-lg font-bold text-green-600">₹{item.projectDetails.paymentReceived.toLocaleString()}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Status & Phase */}
+                        <div className="flex flex-wrap gap-4">
+                          {item.projectDetails.status && (
+                            <div>
+                              <p className="text-xs text-gray-500">Status</p>
+                              <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1 ${
+                                item.projectDetails.status === 'active' ? 'bg-green-100 text-green-700' :
+                                item.projectDetails.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                                'bg-yellow-100 text-yellow-700'
+                              }`}>
+                                {item.projectDetails.status}
+                              </span>
+                            </div>
+                          )}
+                          {item.projectDetails.phase && (
+                            <div>
+                              <p className="text-xs text-gray-500">Phase</p>
+                              <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 mt-1">
+                                {item.projectDetails.phase}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Contact Info */}
+                        {item.projectDetails.contactInfo && (
+                          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <div className="flex items-center gap-2">
+                              <Phone size={14} className="text-blue-500" />
+                              <div>
+                                <p className="text-xs text-gray-500">Contact Number</p>
+                                <p className="text-sm font-medium text-gray-900">{item.projectDetails.contactInfo}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Links */}
+                        {(item.projectDetails.githubLink || item.projectDetails.deploymentLink) && (
+                          <div className="flex gap-3 pt-2">
+                            {item.projectDetails.githubLink && (
+                              <a href={item.projectDetails.githubLink} target="_blank" className="text-gray-600 hover:text-gray-900 text-sm flex items-center gap-1">
+                                <Github size={14} /> GitHub
+                              </a>
+                            )}
+                            {item.projectDetails.deploymentLink && (
+                              <a href={item.projectDetails.deploymentLink} target="_blank" className="text-gray-600 hover:text-gray-900 text-sm flex items-center gap-1">
+                                <ExternalLink size={14} /> Deployment
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // CLIENT DETAILS
+                      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-3">
+                        <div>
+                          <h4 className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">Contact Points</h4>
+                          <div className="space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                              <Mail size={12} className="text-blue-500" />
+                              <span className="truncate">{item.email || 'N/A'}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                              <Phone size={12} className="text-blue-500" />
+                              <span>{item.phone || '+91 XXXXX-XXXXX'}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                              <MapPin size={12} className="text-blue-500" />
+                              <span>{item.city || 'Remote'}</span>
+                            </div>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className="font-bold text-gray-700">₹{(client.invoices?.reduce((s, i) => s + Number(i.amount), 0) || 0).toLocaleString()}</span>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setSelectedClient(client); setIsInvoiceModalOpen(true); }}
-                          className="p-3 text-blue-800 hover:bg-blue-50 rounded-xl border transition-all"
-                        >
-                          <Send size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                    
-                    {/* DROPDOWN CONTENT */}
-                    {expandedClientId === client.id && (
-                      <tr className="bg-gray-50/50 animate-in fade-in slide-in-from-top-1 duration-200">
-                        <td colSpan="3" className="px-12 py-8">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Project Info */}
+                        <div className="lg:col-span-3">
+                          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Operations</h4>
+                          <div className="flex flex-wrap gap-2">
+                            <button 
+                              onClick={() => { setSelectedClient(item); setIsInvoiceModalOpen(true); }} 
+                              className="bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-medium flex items-center gap-2 hover:bg-blue-600 transition-colors"
+                            >
+                              <Send size={14}/> Initiate Billing
+                            </button>
+                            <button className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-xs font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors">
+                              <Mail size={14}/> Send Briefing
+                            </button>
+                          </div>
+                          <div className="mt-4 flex items-center gap-4 pt-3 border-t border-gray-100">
                             <div>
-                                <h4 className="flex items-center gap-2 text-sm font-black text-blue-900 uppercase mb-4 tracking-tighter">
-                                    <Briefcase size={16} /> Active Projects & Phase
-                                </h4>
-                                <div className="space-y-3">
-                                    {client.invoices && client.invoices.length > 0 ? (
-                                        client.invoices.map((inv, idx) => (
-                                            <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
-                                                <div>
-                                                    <p className="font-bold text-gray-800 text-sm">{inv.items?.[0]?.service || "Project Task"}</p>
-                                                    <p className="text-xs text-gray-400">{inv.items?.[0]?.phase || "Ongoing Phase"}</p>
-                                                </div>
-                                                <span className="text-xs font-bold bg-green-50 text-green-600 px-2 py-1 rounded">Paid</span>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-gray-400 text-sm">No active projects yet.</p>
-                                    )}
-                                </div>
+                              <p className="text-xs text-gray-400">Status</p>
+                              <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
                             </div>
-                            {/* Client Message/Contact Detail */}
                             <div>
-                                <h4 className="flex items-center gap-2 text-sm font-black text-blue-900 uppercase mb-4 tracking-tighter">
-                                    <Mail size={16} /> Client Message History
-                                </h4>
-                                <div className="bg-white p-5 rounded-2xl border border-dashed border-gray-200">
-                                    <p className="text-sm text-gray-600 italic">"Client preferred INR for the last transaction. Noted for Phase 2."</p>
-                                    <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Status: Connected</span>
-                                        <button className="text-xs font-bold text-blue-800 hover:underline">View All Logs</button>
-                                    </div>
-                                </div>
+                              <p className="text-xs text-gray-400">Priority</p>
+                              <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{item.priority || 'Medium'}</span>
                             </div>
                           </div>
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </main>
       </div>
 
-      {/* Add Client Modal (Logic from 1st Code) */}
+      {/* REGISTER CLIENT MODAL - Same as before */}
       {isClientModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-white w-full max-w-md p-10 shadow-2xl relative rounded-3xl">
-            <button onClick={() => setIsClientModalOpen(false)} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full"><X size={24} /></button>
-            <h3 className="text-2xl font-black mb-6">Create New Client</h3>
-            <form onSubmit={handleAddClient} className="space-y-5">
-              <input
-                type="text" required placeholder="Client Name"
-                className="w-full bg-gray-50 border-none p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-100"
-                value={newClient.name}
-                onChange={e => setNewClient({ ...newClient, name: e.target.value })}
-              />
-              <input
-                type="email" required placeholder="Email Address"
-                className="w-full bg-gray-50 border-none p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-100"
-                value={newClient.email}
-                onChange={e => setNewClient({ ...newClient, email: e.target.value })}
-              />
-              <button type="submit" disabled={isSubmitting} className="w-full bg-blue-800 text-white py-4 font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95">
-                {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Save Client"}
-              </button>
+        // ... (same modal code as previous)
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-5 py-4 bg-gray-50 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Register Client</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">3-step registration process</p>
+                </div>
+                <button onClick={() => setIsClientModalOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg transition-colors">
+                  <X size={18}/>
+                </button>
+              </div>
+              
+              {/* Progress Steps */}
+              <div className="flex items-center justify-between mt-5">
+                {[1, 2, 3].map((s) => (
+                  <React.Fragment key={s}>
+                    <div className="flex flex-col items-center">
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${
+                        step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                      }`}>
+                        {step > s ? <CheckCircle2 size={14} /> : s}
+                      </div>
+                      <span className="text-xs text-gray-500 mt-1">
+                        {s === 1 ? 'Identity' : s === 2 ? 'Business' : 'Location'}
+                      </span>
+                    </div>
+                    {s < 3 && (
+                      <div className={`flex-1 h-0.5 mx-2 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateClient}>
+              <div className="p-5">
+                {step === 1 && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Full Name *</label>
+                      <input 
+                        type="text" 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        required 
+                        value={newClient.name} 
+                        onChange={e => setNewClient({...newClient, name: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
+                      <input 
+                        type="email" 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        required 
+                        value={newClient.email} 
+                        onChange={e => setNewClient({...newClient, email: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+                      <input 
+                        type="tel" 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        value={newClient.phone} 
+                        onChange={e => setNewClient({...newClient, phone: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Lead Source</label>
+                      <select 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newClient.source} 
+                        onChange={e => setNewClient({...newClient, source: e.target.value})}
+                      >
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Website">Website</option>
+                        <option value="Referral">Referral</option>
+                        <option value="Cold Call">Cold Call</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Company</label>
+                      <input 
+                        type="text" 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        value={newClient.company} 
+                        onChange={e => setNewClient({...newClient, company: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Budget</label>
+                      <input 
+                        type="text" 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        value={newClient.budget} 
+                        onChange={e => setNewClient({...newClient, budget: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Currency</label>
+                      <select 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newClient.currency} 
+                        onChange={e => setNewClient({...newClient, currency: e.target.value})}
+                      >
+                        <option value="INR">INR (₹)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
+                      <select 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newClient.priority} 
+                        onChange={e => setNewClient({...newClient, priority: e.target.value})}
+                      >
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                      <select 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newClient.status} 
+                        onChange={e => setNewClient({...newClient, status: e.target.value})}
+                      >
+                        <option value="Lead">Lead</option>
+                        <option value="Negotiation">Negotiation</option>
+                        <option value="Active">Active</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
+                      <textarea 
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        rows="2"
+                        value={newClient.address} 
+                        onChange={e => setNewClient({...newClient, address: e.target.value})} 
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">City</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                          value={newClient.city} 
+                          onChange={e => setNewClient({...newClient, city: e.target.value})} 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">State</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                          value={newClient.state} 
+                          onChange={e => setNewClient({...newClient, state: e.target.value})} 
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Pincode</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                          value={newClient.pincode} 
+                          onChange={e => setNewClient({...newClient, pincode: e.target.value})} 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Country</label>
+                        <input 
+                          type="text" 
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                          value={newClient.country} 
+                          onChange={e => setNewClient({...newClient, country: e.target.value})} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 flex justify-between">
+                {step > 1 && (
+                  <button type="button" onClick={handlePrevStep} className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <ArrowLeft size={14} className="inline mr-1" /> Back
+                  </button>
+                )}
+                {step < 3 ? (
+                  <button type="button" onClick={handleNextStep} className="ml-auto px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Next <ArrowRight size={14} className="inline ml-1" />
+                  </button>
+                ) : (
+                  <button type="submit" disabled={isSubmitting} className="ml-auto px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+                    {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+                    {isSubmitting ? 'Registering...' : 'Register'}
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Invoice Modal (Logic from 1st Code) */}
-      {isInvoiceModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-white w-full max-w-4xl p-10 flex flex-col max-h-[90vh] relative rounded-3xl">
-            <button onClick={() => setIsInvoiceModalOpen(false)} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full z-10"><X size={24} /></button>
-
-            <div className="flex justify-between items-center mb-6">
+      {/* INVOICE MODAL */}
+      {isInvoiceModalOpen && selectedClient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
+          <div className="bg-white w-full max-w-4xl rounded-lg shadow-xl flex flex-col max-h-[90vh]">
+            <div className="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
               <div>
-                <h3 className="text-3xl font-black tracking-tight">Create Invoice</h3>
-                <p className="text-gray-400 text-sm font-medium">To: <span className="text-blue-800">{selectedClient?.name}</span></p>
+                <h2 className="text-lg font-bold text-gray-900">Create Invoice</h2>
+                <p className="text-xs text-gray-500 mt-0.5">To: <span className="text-blue-600 font-medium">{selectedClient.name}</span></p>
               </div>
-
-              <div className="flex items-center gap-4 mr-12">
-                <div className="flex flex-col">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">GST Number</label>
-                  <input
-                    type="text"
-                    placeholder="Enter GST"
-                    className="bg-gray-100 border-none rounded-lg px-3 py-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500"
-                    value={gstNumber}
-                    onChange={(e) => setGstNumber(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg">
-                  <span className="text-xs font-bold text-gray-500 pl-2">Currency:</span>
-                  <select
-                    value={currency.code}
-                    onChange={(e) => setCurrency(currencies.find(c => c.code === e.target.value))}
-                    className="bg-transparent border-none font-bold text-blue-800 outline-none cursor-pointer"
-                  >
-                    {currencies.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-              {invoiceItems.map((item, index) => (
-                <div key={index} className="grid grid-cols-12 gap-4 items-end bg-gray-50 p-5 rounded-2xl border border-gray-100">
-                  <div className="col-span-4">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Service</label>
-                    <input
-                      type="text" value={item.service}
-                      onChange={(e) => updateItem(index, 'service', e.target.value)}
-                      className="w-full bg-white border-none rounded-xl p-3 text-sm font-bold outline-none"
-                    />
-                  </div>
-                  <div className="col-span-3">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Description / Phase</label>
-                    <input
-                      type="text" placeholder="e.g. Phase 3 or Backend" value={item.phase}
-                      onChange={(e) => updateItem(index, 'phase', e.target.value)}
-                      className="w-full bg-white border-none rounded-xl p-3 text-sm font-bold outline-none"
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Qty</label>
-                    <input
-                      type="number" value={item.quantity}
-                      onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
-                      className="w-full bg-white border-none rounded-xl p-3 text-sm font-bold outline-none text-center"
-                    />
-                  </div>
-                  <div className="col-span-3">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Price ({currency.symbol})</label>
-                    <input
-                      type="number" value={item.price}
-                      onChange={(e) => updateItem(index, 'price', Number(e.target.value))}
-                      className="w-full bg-white border-none rounded-xl p-3 text-sm font-bold outline-none"
-                    />
-                  </div>
-                  <div className="col-span-1 flex justify-center">
-                    <button onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))} className="p-3 text-blue-800 hover:text-red-500 transition-colors">
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button onClick={() => setInvoiceItems([...invoiceItems, { service: '', phase: '', quantity: 1, price: 0 }])} className="text-blue-800 font-black text-xs flex items-center gap-2 hover:translate-x-1 transition-transform">
-                <Plus size={16} /> ADD ANOTHER SERVICE
+              <button onClick={() => setIsInvoiceModalOpen(false)} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg transition-colors">
+                <X size={18}/>
               </button>
             </div>
+             
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-5">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">GST Number</label>
+                    <input 
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="27XXXXXXXXXXXXZ1" 
+                      value={gstNumber} 
+                      onChange={e => setGstNumber(e.target.value)} 
+                    />
+                  </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
-              <div className="flex justify-between text-sm font-medium text-gray-500">
-                <span>Subtotal</span>
-                <span className="font-bold text-gray-700">{currency.symbol}{subtotal.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-sm font-medium text-gray-400">
-                <span>GST (CGST 9% + SGST 9%)</span>
-                <span>{currency.symbol}{(cgst + sgst).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Grand Total</p>
-                  <h2 className="text-4xl font-black text-blue-900">
-                    <span className="text-xl mr-1 opacity-70">{currency.code}</span>
-                    {currency.symbol}{grandTotal.toLocaleString()}
-                  </h2>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="text-sm font-medium text-gray-700">Invoice Items</h4>
+                      <button 
+                        onClick={addInvoiceItem} 
+                        className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                      >
+                        <PlusCircle size={14}/> Add Item
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {invoiceItems.map((item, idx) => (
+                        <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                          <div className="grid grid-cols-12 gap-2">
+                            <div className="col-span-5">
+                              {item.isCustom ? (
+                                <input 
+                                  className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg" 
+                                  placeholder="Describe service..." 
+                                  value={item.service} 
+                                  onChange={(e) => updateInvItem(idx, 'service', e.target.value)} 
+                                />
+                              ) : (
+                                <select 
+                                  className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg"
+                                  value={item.service} 
+                                  onChange={(e) => updateInvItem(idx, 'service', e.target.value)}
+                                >
+                                  <option value="">Select Service</option>
+                                  {projects?.map(p => <option key={p.id} value={p.projectName}>{p.projectName}</option>)}
+                                  <option value="Consultancy">Consultancy</option>
+                                  <option value="Development">Development</option>
+                                  <option value="Maintenance">Maintenance</option>
+                                  <option value="CUSTOM_ENTRY" className="text-blue-600">+ Custom Service</option>
+                                </select>
+                              )}
+                              <input 
+                                className="w-full mt-1 px-2 py-1 text-xs border border-gray-200 rounded-lg" 
+                                placeholder="Phase/Milestone" 
+                                value={item.phase} 
+                                onChange={(e) => updateInvItem(idx, 'phase', e.target.value)} 
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <label className="text-xs text-gray-500">Qty</label>
+                              <input 
+                                type="number" 
+                                className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg mt-1" 
+                                value={item.quantity} 
+                                onChange={(e) => updateInvItem(idx, 'quantity', parseInt(e.target.value) || 0)} 
+                              />
+                            </div>
+                            <div className="col-span-3">
+                              <label className="text-xs text-gray-500">Price ({invoiceCurrency.symbol})</label>
+                              <input 
+                                type="number" 
+                                className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg mt-1" 
+                                value={item.price} 
+                                onChange={(e) => updateInvItem(idx, 'price', parseInt(e.target.value) || 0)} 
+                              />
+                            </div>
+                            <div className="col-span-1 flex items-end justify-end pb-1">
+                              <button onClick={() => removeInvoiceItem(idx)} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                                <Trash2 size={14}/>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <button
-                  disabled={isSubmitting}
-                  onClick={handleCreateInvoice}
-                  className="bg-black text-white px-10 py-4 font-bold flex items-center gap-3 hover:bg-gray-900 transition-all active:scale-95 disabled:opacity-50 rounded-2xl"
-                >
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : <><Send size={18} /><span>Send Invoice</span></>}
-                </button>
+
+                <div className="bg-white rounded-lg p-5 h-fit sticky top-5">
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Summary</h4>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Subtotal</span>
+                      <span className="font-medium text-white">{invoiceCurrency.symbol}{subtotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">GST (18%)</span>
+                      <span className="font-medium text-white">{invoiceCurrency.symbol}{taxAmount.toLocaleString()}</span>
+                    </div>
+                    <div className="pt-3 mt-3 border-t border-gray-700 flex justify-between items-end">
+                      <span className="text-sm font-semibold text-gray-300">Grand Total</span>
+                      <span className="text-xl font-bold text-white">{invoiceCurrency.symbol}{grandTotal.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-xs font-medium text-gray-400 mb-1">Currency</label>
+                    <div className="flex gap-1.5">
+                      <button 
+                        onClick={() => setInvoiceCurrency({ code: 'INR', symbol: '₹' })}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'INR' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                      >
+                        INR
+                      </button>
+                      <button 
+                        onClick={() => setInvoiceCurrency({ code: 'USD', symbol: '$' })}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'USD' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                      >
+                        USD
+                      </button>
+                      <button 
+                        onClick={() => setInvoiceCurrency({ code: 'EUR', symbol: '€' })}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'EUR' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                      >
+                        EUR
+                      </button>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={handleSendInvoice}
+                    disabled={isSubmitting}
+                    className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {isSubmitting ? <Loader2 size={16} className="animate-spin"/> : <Send size={16}/>}
+                    {isSubmitting ? 'Sending...' : 'Send Invoice'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
