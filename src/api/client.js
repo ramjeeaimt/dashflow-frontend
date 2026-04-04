@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-   // baseURL: "https://difmo-crm-backend.vercel.app",
-     baseURL: 'http://localhost:3000',
+   baseURL: "https://difmo-crm-backend.vercel.app",
+     // baseURL: 'http://localhost:3000',
     headers: {
         'Content-Type': 'application/json',
     },
