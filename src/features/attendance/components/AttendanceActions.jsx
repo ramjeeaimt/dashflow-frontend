@@ -194,26 +194,7 @@ const AttendanceActions = ({
       </div>
 
       {/* Quick Stats Row */}
-      <div className="mt-4 pt-4 border-t border-border">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-success">92%</div>
-            <div className="text-xs text-muted-foreground">Attendance Rate</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-warning">5.2%</div>
-            <div className="text-xs text-muted-foreground">Late Rate</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-primary">8h 15m</div>
-            <div className="text-xs text-muted-foreground">Avg Work Time</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-blue-500">87%</div>
-            <div className="text-xs text-muted-foreground">Productivity</div>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 };

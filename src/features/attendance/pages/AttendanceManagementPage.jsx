@@ -244,14 +244,14 @@ const AttendanceManagement = () => {
           {/* Policy Violation Alerts */}
 
 
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {/* Filters Panel */}
-            <div className="xl:col-span-1">
+            {/* <div className="xl:col-span-1">
               <AttendanceFilters
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 attendanceData={attendanceData} />
-            </div>
+            </div> */}
 
             {/* Main Content */}
             <div className="xl:col-span-3 space-y-6">

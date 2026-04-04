@@ -73,16 +73,16 @@ const handleStatusUpdate = async (id, status) => {
     }), [leaves]);
 
     return (
-        <div className="flex h-screen bg-[#F1F5F9] overflow-hidden">
+        <div className="flex h-screen bg-white overflow-hidden">
             <Sidebar />
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 <Header />
                 <main className="flex-1 ml-56 overflow-y-auto p-4 md:p-8 space-y-6 mt-14">
                     
                     {/* Stats Header */}
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 bg-white p-6 ">
                         <div>
-                            <div className="flex items-center gap-2 mb-1 text-indigo-600 font-bold text-xs uppercase tracking-widest">
+                            <div className="flex items-center gap-2 mb-1 text-indigo-900 font-bold text-xs uppercase tracking-widest">
                                 <ShieldAlert size={14} /> Admin Control Panel
                             </div>
                             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Leave & Attendance</h1>
@@ -97,12 +97,12 @@ const handleStatusUpdate = async (id, status) => {
 
                     {/* Filter Toolbar */}
                     <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="flex bg-white p-1  border">
                             {["ALL", "PENDING", "APPROVED", "REJECTED"].map((s) => (
                                 <button
                                     key={s}
                                     onClick={() => setFilterStatus(s)}
-                                    className={`px-5 py-2 rounded-xl text-[11px] font-black transition-all ${
+                                    className={`px-5 py-2  text-[11px] font-black transition-all ${
                                         filterStatus === s ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-500 hover:text-slate-800"
                                     }`}
                                 >
@@ -116,7 +116,7 @@ const handleStatusUpdate = async (id, status) => {
                                 <input 
                                     type="text" 
                                     placeholder="Search by employee..." 
-                                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200  text-sm focus:ring-2  outline-none transition-all"
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
@@ -124,7 +124,7 @@ const handleStatusUpdate = async (id, status) => {
                     </div>
 
                     {/* Decision Table */}
-                    <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden mb-10">
+                    <div className="bg-white border border-slate-200  overflow-hidden mb-10">
                         <table className="w-full text-left">
                             <thead className="bg-slate-50/80 border-b border-slate-100">
                                 <tr className="text-slate-400 text-[10px] uppercase font-black tracking-[0.15em]">
@@ -166,7 +166,7 @@ const LeaveRow = ({ leave, onUpdate, isExpanded, onToggle, adminNote, setAdminNo
             <tr className={`group transition-all ${isExpanded ? 'bg-indigo-50/40' : 'hover:bg-slate-50/60'}`}>
                 <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 bg-slate-800 text-white rounded-2xl flex items-center justify-center font-black text-xs">
+                        <div className="w-11 h-11 bg-slate-800 text-white rounded-xl flex items-center justify-center font-black text-xs">
                             {leave.employeeName?.substring(0, 2).toUpperCase()}
                         </div>
                         <p className="font-bold text-slate-900 text-sm leading-none">{leave.employeeName}</p>
@@ -240,7 +240,7 @@ const LeaveRow = ({ leave, onUpdate, isExpanded, onToggle, adminNote, setAdminNo
 };
 
 const StatBox = ({ label, value, color, icon }) => (
-    <div className={`bg-white border-l-4 border-${color}-500 px-4 py-2 rounded-xl shadow-sm min-w-[120px]`}>
+    <div className={`bg-white border-l-4 border-${color}-500 px-4 py-2 min-w-[120px]`}>
         <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase">
             {icon} {label}
         </div>
@@ -251,7 +251,7 @@ const StatBox = ({ label, value, color, icon }) => (
 const SkeletonRows = () => (
     [1,2,3].map(i => (
         <tr key={i} className="animate-pulse">
-            <td colSpan="5" className="px-8 py-10"><div className="h-10 bg-slate-100 rounded-2xl w-full" /></td>
+            <td colSpan="5" className="px-8 py-10"><div className="h-10 bg-slate-100 w-full" /></td>
         </tr>
     ))
 );

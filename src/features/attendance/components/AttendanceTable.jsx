@@ -3,6 +3,67 @@ import Icon from '../../../components/AppIcon';
 import AppImage from '../../../components/AppImage';
 import AttendanceModal from './AttendanceModal';
 
+// Avatar Component with fallback logic
+const EmployeeAvatar = ({ employee, size = 'md' }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  const getInitials = () => {
+    const name = employee?.employeeName || '';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const getColorFromName = () => {
+    const colors = [
+      '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', 
+      '#ef4444', '#f97316', '#f59e0b', '#eab308',
+      '#84cc16', '#10b981', '#14b8a6', '#06b6d4',
+      '#0ea5e9', '#3b82f6', '#6366f1'
+    ];
+    
+    const name = employee?.employeeName || '';
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = ((hash << 5) - hash) + name.charCodeAt(i);
+      hash |= 0;
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-12 h-12 text-base'
+  };
+
+  const avatarUrl = employee?.profileImage || employee?.avatar;
+  
+  if (avatarUrl && !imageError) {
+    return (
+      <div className={`${sizeClasses[size]} rounded-full overflow-hidden bg-gray-100 flex-shrink-0`}>
+        <img
+          src={avatarUrl}
+          alt={employee?.employeeName || 'Employee'}
+          className="w-full h-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-medium text-white flex-shrink-0 shadow-sm`}
+      style={{ backgroundColor: getColorFromName() }}
+    >
+      {getInitials() || '?'}
+    </div>
+  );
+};
+
 const AttendanceTable = ({
   attendanceData,
   loading,
@@ -30,7 +91,7 @@ const AttendanceTable = ({
     if (selectedEmployees?.length === attendanceData?.length) {
       onSelectionChange([]);
     } else {
-      onSelectionChange(attendanceData?.map(emp => emp?.id));
+      onSelectionChange(attendanceData?.map(emp => emp?.id || emp?.employeeId));
     }
   };
 
@@ -49,33 +110,33 @@ const AttendanceTable = ({
 
   const getStatusBadge = (status, reason) => {
     const statusConfig = {
-      present: { color: 'bg-success text-success-foreground', label: 'Present', icon: 'Check' },
-      absent: { color: 'bg-error text-error-foreground', label: 'Absent', icon: 'X' },
-      late: { color: 'bg-warning text-warning-foreground', label: 'Late', icon: 'Clock' },
-      early_departure: { color: 'bg-orange-500 text-white', label: 'Early Out', icon: 'LogOut' },
-      not_checked_in: { color: 'bg-muted text-muted-foreground', label: 'Not Checked In', icon: 'MinusCircle' }
+      present: { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Present', icon: 'CheckCircle', iconColor: 'text-emerald-500' },
+      absent: { color: 'bg-red-50 text-red-700 border-red-200', label: 'Absent', icon: 'XCircle', iconColor: 'text-red-500' },
+      late: { color: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Late', icon: 'Clock', iconColor: 'text-amber-500' },
+      early_departure: { color: 'bg-orange-50 text-orange-700 border-orange-200', label: 'Early Out', icon: 'LogOut', iconColor: 'text-orange-500' },
+      not_checked_in: { color: 'bg-gray-50 text-gray-600 border-gray-200', label: 'Not Checked In', icon: 'MinusCircle', iconColor: 'text-gray-400' }
     };
 
     const config = statusConfig?.[status] || statusConfig?.absent;
 
     return (
-      <div className="flex flex-col items-start">
-        <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${config?.color}`}>
-          <Icon name={config?.icon} size={12} />
+      <div className="flex flex-col items-start gap-1">
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${config?.color}`}>
+          <Icon name={config?.icon} size={12} className={config?.iconColor} />
           <span>{config?.label}</span>
         </span>
         {reason && (
-          <span className="text-xs text-muted-foreground mt-1">{reason}</span>
+          <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md">{reason}</span>
         )}
       </div>
     );
   };
 
   const getProductivityBadge = (productivity) => {
-    if (productivity >= 90) return 'bg-success text-success-foreground';
-    if (productivity >= 75) return 'bg-warning text-warning-foreground';
-    if (productivity >= 60) return 'bg-orange-500 text-white';
-    return 'bg-error text-error-foreground';
+    if (productivity >= 90) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (productivity >= 75) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (productivity >= 60) return 'bg-orange-50 text-orange-700 border-orange-200';
+    return 'bg-red-50 text-red-700 border-red-200';
   };
 
   const sortedData = [...(attendanceData || [])]?.sort((a, b) => {
@@ -96,15 +157,17 @@ const AttendanceTable = ({
 
   const SortableHeader = ({ field, children }) => (
     <th
-      className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:bg-accent transition-colors duration-150"
+      className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-150 group"
       onClick={() => handleSort(field)}
     >
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center gap-1.5">
         <span>{children}</span>
         <Icon
           name={sortField === field && sortDirection === 'desc' ? 'ChevronDown' : 'ChevronUp'}
           size={14}
-          className={sortField === field ? 'text-primary' : 'text-muted-foreground/50'}
+          className={`transition-opacity duration-150 ${
+            sortField === field ? 'text-blue-600 opacity-100' : 'text-gray-400 opacity-0 group-hover:opacity-100'
+          }`}
         />
       </div>
     </th>
@@ -124,11 +187,11 @@ const AttendanceTable = ({
 
   if (loading) {
     return (
-      <div className="bg-card border border-border rounded-lg">
-        <div className="flex items-center justify-center py-12">
-          <div className="flex items-center space-x-3">
-            <Icon name="Loader2" size={20} className="animate-spin text-primary" />
-            <span className="text-muted-foreground">Loading attendance data...</span>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent"></div>
+            <span className="text-sm text-gray-500">Loading attendance data...</span>
           </div>
         </div>
       </div>
@@ -137,17 +200,17 @@ const AttendanceTable = ({
 
   return (
     <>
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
-            <thead className="bg-muted/50">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
                     checked={selectedEmployees?.length === attendanceData?.length && attendanceData?.length > 0}
                     onChange={handleSelectAll}
-                    className="rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                 </th>
                 <SortableHeader field="employeeName">Employee</SortableHeader>
@@ -158,91 +221,88 @@ const AttendanceTable = ({
                 <SortableHeader field="status">Status</SortableHeader>
                 <SortableHeader field="location">Location</SortableHeader>
                 <SortableHeader field="productivity">Productivity</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-card divide-y divide-border">
+            <tbody className="bg-white divide-y divide-gray-100">
               {sortedData?.map((employee, index) => (
                 <tr
-                  key={employee?.id || `attendance-row-${index}`}
-                  className="hover:bg-accent/50 transition-colors duration-150 cursor-pointer"
+                  key={employee?.id || employee?.employeeId || `attendance-row-${index}`}
+                  className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
                   onClick={() => handleEmployeeClick(employee)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e?.stopPropagation()}>
                     <input
                       type="checkbox"
-                      checked={selectedEmployees?.includes(employee?.id)}
-                      onChange={() => handleSelectEmployee(employee?.id)}
-                      className="rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                      checked={selectedEmployees?.includes(employee?.id || employee?.employeeId)}
+                      onChange={() => handleSelectEmployee(employee?.id || employee?.employeeId)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <AppImage
-                          src={employee?.profileImage}
-                          alt={employee?.alt}
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-foreground">{employee?.employeeName}</div>
-                        <div className="text-sm text-muted-foreground">{employee?.employeeCode || employee?.employeeId}</div>
+                    <div className="flex items-center gap-3">
+                      <EmployeeAvatar employee={employee} size="md" />
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{employee?.employeeName || '—'}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{employee?.employeeCode || employee?.employeeId || '—'}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-foreground">{employee?.department}</div>
+                    <span className="text-sm text-gray-700">{employee?.department || '—'}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-foreground font-mono">
+                    <div className="text-sm text-gray-900 font-mono">
                       {formatTime(employee?.checkInTime)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-foreground font-mono">
+                    <div className="text-sm text-gray-900 font-mono">
                       {formatTime(employee?.checkOutTime)}
                     </div>
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-foreground font-mono">
-                      {employee?.workDuration}
+                    <div className="text-sm font-medium text-gray-900">
+                      {employee?.workDuration || '—'}
                     </div>
-                    {employee?.overtime !== '0m' && employee?.overtime !== '--' && (
-                      <div className="text-xs text-orange-500">+{employee?.overtime} OT</div>
+                    {employee?.overtime && employee?.overtime !== '0m' && employee?.overtime !== '--' && (
+                      <div className="text-xs text-orange-600 flex items-center gap-0.5 mt-0.5">
+                        <Icon name="Clock" size={10} />
+                        +{employee?.overtime} OT
+                      </div>
                     )}
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(employee?.status, employee?.reason)}
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1.5">
                       <Icon
                         name={employee?.location === 'Office' ? 'Building' : employee?.location === 'WFH' ? 'Home' : 'MapPin'}
                         size={14}
-                        className="text-muted-foreground"
+                        className="text-gray-400"
                       />
-                      <span className="text-sm text-foreground">{employee?.location}</span>
+                      <span className="text-sm text-gray-700">{employee?.location || '—'}</span>
                     </div>
-                  </td>
+                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {employee?.productivity > 0 && (
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProductivityBadge(employee?.productivity)}`}>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border ${getProductivityBadge(employee?.productivity)}`}>
                         {employee?.productivity}%
                       </span>
                     )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e?.stopPropagation()}>
-                    <div className="flex items-center justify-end space-x-2">
+                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e?.stopPropagation()}>
+                    <div className="flex items-center gap-2">
                       {!employee.hasRecord ? (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onCheckIn(employee.employeeId);
+                            onCheckIn(employee.employeeId || employee.id);
                           }}
-                          className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded hover:bg-primary/90 transition-colors"
+                          className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow"
                         >
                           Check In
                         </button>
@@ -250,39 +310,42 @@ const AttendanceTable = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onCheckOut(employee.id);
+                            onCheckOut(employee.id || employee.employeeId);
                           }}
-                          className="text-xs bg-warning text-warning-foreground px-2 py-1 rounded hover:bg-warning/90 transition-colors"
+                          className="px-3 py-1.5 text-xs font-medium bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all shadow-sm hover:shadow"
                         >
                           Check Out
                         </button>
                       ) : (
-                        <span className="text-xs text-muted-foreground">Completed</span>
+                        <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">Completed</span>
                       )}
 
                       <button
                         onClick={() => onViewHistory(employee)}
-                        className="text-muted-foreground hover:text-foreground transition-colors duration-150"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
                         title="View History"
                       >
                         <Icon name="Eye" size={16} />
                       </button>
                     </div>
-                  </td>
-                </tr>
+                   </td>
+                 </tr>
               ))}
             </tbody>
           </table>
 
           {attendanceData?.length === 0 && (
-            <div className="text-center py-12">
-              <Icon name="Users" size={48} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">No attendance records found</h3>
-              <p className="text-muted-foreground">Try adjusting your filters or check back later.</p>
+            <div className="text-center py-16">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Icon name="Users" size={32} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No attendance records found</h3>
+              <p className="text-sm text-gray-500">Try adjusting your filters or check back later.</p>
             </div>
           )}
         </div>
       </div>
+
       {/* Attendance Modal */}
       {showModal && (
         <AttendanceModal
