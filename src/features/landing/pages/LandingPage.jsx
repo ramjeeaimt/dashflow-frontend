@@ -967,20 +967,8 @@ const LandingPage = () => {
                 </button>
             </div>
 
-            {/* Cookie Consent (Simplified) */}
-            <div className="fixed bottom-6 left-6 bg-white rounded-lg shadow-2xl p-4 max-w-sm border border-gray-200 z-50 hidden md:block">
-                <p className="text-sm text-gray-600 mb-3">
-                    We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.
-                </p>
-                <div className="flex gap-2">
-                    <button className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition">
-                        Accept
-                    </button>
-                    <button className="flex-1 bg-gray-100 text-gray-700 text-sm py-2 rounded-lg hover:bg-gray-200 transition">
-                        Decline
-                    </button>
-                </div>
-            </div>
+         
+            
         </div>
     );
 };
