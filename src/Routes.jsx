@@ -13,6 +13,9 @@ import EmployeeManagement from './features/employee/pages/EmployeeManagementPage
 import TimeTrackingPage from './features/time-tracking/pages/TimeTrackingPage';
 import MonitoringDashboard from './features/monitoring/pages/MonitoringPage';
 import AttendanceManagement from './features/attendance/pages/AttendanceManagementPage';
+import JobPostPage from './features/jobs/pages/JobPostPage';
+import JobApplicationsPage from './features/jobs/pages/JobApplicationsPage';
+import MessagesPage from './features/jobs/pages/MessagesPage';
 import EmployeeCheckInCheckOut from './features/employee/pages/CheckInCheckOutPage';
 import AttendanceAnalytics from './features/attendance/pages/AttendanceAnalyticsPage';
 import ScrollToTop from "./components/ScrollToTop";
@@ -41,6 +44,7 @@ import AdminLeaveManagement from "features/employee/pages/AdminLeaveManagement";
 import ClientAdmin from "components/ClientAdmin";
 import EmployeeAttendanceHistoryPage from "features/attendance/components/EmployeeAttandece";
 import IndividualEmployeeAttendance from "features/attendance/components/EmployeeAttandece";
+import NotificationsPage from "features/notifications/pages/NotificationsPage";
 
 
 const Routes = () => {
@@ -168,6 +172,21 @@ const Routes = () => {
             </ProtectedRoute>
           }
           />
+          <Route path="/jobs" element={
+            <ProtectedRoute>
+              <JobPostPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/jobs/applications" element={
+            <ProtectedRoute>
+              <JobApplicationsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <MessagesPage />
+            </ProtectedRoute>
+          } />
           <Route path="/add-project" element={
             <ProtectedRoute>
               <AddProject/>
@@ -198,6 +217,12 @@ const Routes = () => {
             </ProtectedRoute>
           } />
           
+          <Route path="/notifications" element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          } />
+
           <Route path="*" element={<NotFound />} />
         </RouterRoutes>
       </ErrorBoundary>

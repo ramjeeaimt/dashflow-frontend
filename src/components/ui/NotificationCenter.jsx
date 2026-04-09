@@ -1,68 +1,34 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../AppIcon';
+import { useNotificationStore } from '../../store/useNotificationStore';
+import { formatDistanceToNow } from 'date-fns';
+import notificationService from '../../services/notification.service';
 
 const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'task',
-      title: 'New task assigned',
-      message: 'Review Q4 performance reports for Marketing team',
-      time: '2 minutes ago',
-      read: false,
-      priority: 'high',
-      actionUrl: '/task-management'
-    },
-    {
-      id: 2,
-      type: 'approval',
-      title: 'Leave request pending',
-      message: 'John Smith requested 3 days leave starting Dec 15',
-      time: '15 minutes ago',
-      read: false,
-      priority: 'medium',
-      actionUrl: '/employee-management'
-    },
-    {
-      id: 3,
-      type: 'system',
-      title: 'Payroll processing complete',
-      message: 'November payroll has been processed successfully',
-      time: '1 hour ago',
-      read: true,
-      priority: 'low',
-      actionUrl: '/payroll'
-    },
-    {
-      id: 4,
-      type: 'reminder',
-      title: 'Team meeting reminder',
-      message: 'Weekly standup meeting starts in 30 minutes',
-      time: '2 hours ago',
-      read: false,
-      priority: 'medium',
-      actionUrl: '/dashboard'
-    },
-    {
-      id: 5,
-      type: 'alert',
-      title: 'System maintenance scheduled',
-      message: 'Planned maintenance window: Dec 20, 2:00 AM - 4:00 AM',
-      time: '1 day ago',
-      read: true,
-      priority: 'low',
-      actionUrl: '/settings'
+  const { notifications, clearNotifications } = useNotificationStore();
+
+  const getTimeAgo = (timestamp) => {
+    try {
+      if (!timestamp) return 'just now';
+      return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+    } catch (e) {
+      return 'just now';
     }
-  ]);
+  };
 
   const dropdownRef = useRef(null);
   const unreadCount = notifications?.filter(n => !n?.read)?.length;
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (notification) => {
+    // Prefer the domain event type over the generic channel strategy string
+    const type = notification?.metadata?.type || notification?.type;
     const iconMap = {
-      task: 'CheckSquare',
-      approval: 'Clock',
+      TASK_ASSIGNED: 'CheckSquare',
+      LEAVE_REQUEST: 'Clock',
+      LEAVE_STATUS: 'Clock',
+      PAYROLL_GENERATED: 'CreditCard',
+      WELCOME: 'UserPlus',
       system: 'Settings',
       reminder: 'Bell',
       alert: 'AlertTriangle'
@@ -70,37 +36,52 @@ const NotificationCenter = () => {
     return iconMap?.[type] || 'Bell';
   };
 
-  const getNotificationColor = (type, priority) => {
-    if (priority === 'high') return 'text-error';
-    if (type === 'approval') return 'text-warning';
-    if (type === 'system') return 'text-primary';
+  const getNotificationColor = (notification) => {
+    const type = notification?.metadata?.type || notification?.type;
+    const priority = notification?.metadata?.priority || notification?.priority;
+    if (priority === 'high' || priority === 'HIGH') return 'text-error';
+    if (type === 'LEAVE_REQUEST') return 'text-warning';
+    if (type === 'PAYROLL_GENERATED') return 'text-success';
+    if (type === 'TASK_ASSIGNED') return 'text-primary';
     return 'text-muted-foreground';
   };
 
   const handleNotificationClick = (notification) => {
-    // Mark as read
-    setNotifications(prev => 
-      prev?.map(n => 
-        n?.id === notification?.id ? { ...n, read: true } : n
-      )
-    );
+    const type = notification?.metadata?.type || notification?.type;
     
     // Navigate to relevant page
     if (notification?.actionUrl) {
       window.location.href = notification?.actionUrl;
+    } else if (type === 'LEAVE_REQUEST') {
+      window.location.href = '/employee-leave'; // Admin view
+    } else if (type === 'LEAVE_STATUS') {
+      window.location.href = '/employee/leaves'; // Employee view
+    } else if (type === 'PAYROLL_GENERATED') {
+      window.location.href = '/employee/payroll';
+    } else if (type === 'TASK_ASSIGNED') {
+      window.location.href = '/projects';
     }
     
     setIsOpen(false);
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev?.map(n => ({ ...n, read: true }))
-    );
+  const markAllAsRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      // Firestore onSnapshot will automatically update local state
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+    }
   };
 
-  const clearAllNotifications = () => {
-    setNotifications([]);
+  const clearAllNotifications = async () => {
+    try {
+      if (window.confirm('Are you sure you want to clear all notifications?')) {
+        await notificationService.clearAll();
+      }
+    } catch (err) {
+      console.error('Failed to clear notifications:', err);
+    }
   };
 
   const toggleDropdown = () => {
@@ -189,6 +170,12 @@ const NotificationCenter = () => {
                 <p className="text-xs text-muted-foreground mt-1">
                   You're all caught up!
                 </p>
+                <button 
+                  onClick={() => { window.location.href = '/notifications'; setIsOpen(false); }}
+                  className="mt-3 text-xs text-primary hover:text-primary/80 font-medium transition-colors duration-150"
+                >
+                  View all notifications
+                </button>
               </div>
             ) : (
               <div className="py-2">
@@ -200,8 +187,8 @@ const NotificationCenter = () => {
                       !notification?.read ? 'bg-muted/50' : ''
                     }`}
                   >
-                    <div className={`mt-1 ${getNotificationColor(notification?.type, notification?.priority)}`}>
-                      <Icon name={getNotificationIcon(notification?.type)} size={16} />
+                    <div className={`mt-1 ${getNotificationColor(notification)}`}>
+                      <Icon name={getNotificationIcon(notification)} size={16} />
                     </div>
                     
                     <div className="flex-1 min-w-0">
@@ -222,7 +209,7 @@ const NotificationCenter = () => {
                       
                       <div className="flex items-center justify-between mt-2">
                         <p className="text-xs text-muted-foreground">
-                          {notification?.time}
+                          {getTimeAgo(notification?.timestamp)}
                         </p>
                         {notification?.priority === 'high' && (
                           <span className="text-xs bg-error/10 text-error px-2 py-0.5 rounded-full font-medium">

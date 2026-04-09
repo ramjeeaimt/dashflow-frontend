@@ -128,7 +128,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                             </span>
                                         ) : (
                                             <div className="flex space-x-2">
-                                                {['present', 'absent', 'late', 'leave'].map(status => (
+                                                {['present', 'absent', 'late', 'early_checkin', 'leave'].map(status => (
                                                     <button
                                                         key={status}
                                                         onClick={() => handleStatusChange(emp.id, status)}

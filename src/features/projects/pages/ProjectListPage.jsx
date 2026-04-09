@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { Briefcase, Plus } from "lucide-react";
 import Header from "../../../components/ui/Header";
 import Sidebar from "../../../components/ui/Sidebar";
 import { ProjectFilter, ActionDropdown, useProjectStore } from "features/projects";
@@ -21,23 +22,12 @@ const Projects = () => {
   const { projects, loading, fetchProjects, deleteProject, updateProject } = useProjectStore();
   const navigate = useNavigate();
 
-useEffect(() => {
-  const loadInitialData = async () => {
-    // Check karein ki user load ho chuka hai aur company ID hai
+  useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
-      console.log("Fetching projects for Admin with ID:", user.company.id);
-      
-      // Parallel fetch karein taaki time bache
-      await Promise.all([
-        fetchProjects(user.company.id),
-        fetchClients()
-      ]);
+      fetchProjects(user.company.id);
     }
-  };
+  }, [isAuthenticated, user?.company?.id]);
 
-  loadInitialData();
-}, [isAuthenticated, user?.company?.id]);
-console.log("Projects Data in Store:", projects);
 
   const parsePeople = (str) => {
     if (!str) return [];
@@ -52,6 +42,7 @@ console.log("Projects Data in Store:", projects);
     return projects.map((p) => ({
       ...p,
       assignedPeople: parsePeople(p.assignedPeople),
+      status: p.phase === 'Completed' ? 'completed' : (p.status || 'active'),
     }));
   }, [projects]);
 
@@ -127,16 +118,35 @@ console.log("Projects Data in Store:", projects);
         <div className="p-6">
           <BreadcrumbNavigation items={breadcrumbItems} />
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div>
-              <h1 className="text-3xl font-semibold text-foreground mb-2">Projects</h1>
-              <p className="text-muted-foreground">Manage and track your company projects and milestones.</p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-6">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Projects
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Manage and track your company projects and milestones
+              </p>
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  {filteredProjects.length} Projects
+                </span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  {filteredProjects.filter(p => p.status === 'active').length} Active
+                </span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  {filteredProjects.filter(p => p.phase === 'Completed').length} Completed
+                </span>
+              </div>
             </div>
             <button
               onClick={() => navigate("/add-project")}
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-lg shadow hover:bg-primary/90 transition"
+              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
-              + Add Project
+              <Plus size={20} />
+              Add New Project
             </button>
           </div>
 
@@ -154,64 +164,172 @@ console.log("Projects Data in Store:", projects);
             />
 
             {loading ? (
-              <div className="p-10 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p className="mt-2 text-muted-foreground">Loading projects...</p>
+              <div className="flex flex-col items-center justify-center py-16 px-6">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin animation-delay-300"></div>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Loading Projects</h3>
+                <p className="text-gray-500 text-center max-w-md">Please wait while we fetch your project data...</p>
               </div>
             ) : filteredProjects.length === 0 ? (
-              <div className="text-center py-20 text-muted-foreground font-semibold text-xl">
-                No Projects Found
+              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mb-6">
+                  <Briefcase size={40} className="text-blue-500" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">No Projects Found</h3>
+                <p className="text-gray-600 mb-8 max-w-md leading-relaxed">
+                  {search || phase || budget || deadlineStatus ? 
+                    "No projects match your current filters. Try adjusting your search criteria." :
+                    "Get started by creating your first project to track progress and manage your team."
+                  }
+                </p>
+                <button
+                  onClick={() => navigate("/add-project")}
+                  className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                >
+                  <Plus size={20} />
+                  Create Your First Project
+                </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-border">
-                  <thead className="bg-muted/50">
-                    <tr className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      <th className="px-4 py-3 border-b">Project</th>
-                      <th className="px-4 py-3 border-b">Client</th>
-                      <th className="px-4 py-3 border-b">Deadline</th>
-                      <th className="px-4 py-3 border-b">Phase</th>
-                      <th className="px-4 py-3 border-b">Assigning Date</th>
-                      <th className="px-4 py-3 border-b">Payment</th>
-                      <th className="px-4 py-3 border-b">Team</th>
-                      <th className="px-4 py-3 border-b text-center">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredProjects.map((project, index) => (
-                      <tr key={project?.id || `project-${index}`} className="hover:bg-muted/30 transition-colors text-sm">
-                        <td className="px-4 py-3 font-medium text-foreground">{project.projectName}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{project.clientName}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{project.deadline}</td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            project.phase === 'Completed' ? 'bg-green-100 text-green-700' :
-                            project.phase === 'Development' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {project.phase}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">{project.assigningDate}</td>
-                        <td className="px-4 py-3 font-medium text-foreground">
-                          ₹{project.paymentReceived} / ₹{project.totalPayment}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {project.assignedPeople.slice(0, 2).join(", ")}
-                          {project.assignedPeople.length > 2 && ` +${project.assignedPeople.length - 2}`}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <ActionDropdown
-                            project={project}
-                            onDelete={handleDelete}
-                            onEdit={(id) => navigate(`/edit-project/${id}`)}
-                            onStatusChange={handleStatusChange}
-                            onView={(id) => navigate(`/project-details/${id}`)}
-                          />
-                        </td>
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Project Name</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Client</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Phase</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Deadline</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Budget</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Progress</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filteredProjects.map((project, index) => (
+                        <tr key={project?.id || `project-${index}`} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <Briefcase size={20} className="text-blue-600" />
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-semibold text-gray-900 line-clamp-1">{project.projectName}</div>
+                                <div className="text-sm text-gray-500">ID: {project.id}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 font-medium">{project.clientName}</div>
+                            <div className="text-sm text-gray-500">{project.clientEmail}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              project.phase === 'Completed' ? 'bg-green-100 text-green-800' :
+                              project.phase === 'Development' ? 'bg-blue-100 text-blue-800' :
+                              project.phase === 'Testing' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-purple-100 text-purple-800'
+                            }`}>
+                              {project.phase}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              project.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
+                              project.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              'bg-orange-100 text-orange-800'
+                            }`}>
+                              {project.status || 'active'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 font-medium">
+                              {new Date(project.deadline).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </div>
+                            <div className={`text-xs font-medium ${
+                              Math.ceil((new Date(project.deadline) - new Date()) / (1000 * 60 * 60 * 24)) < 0
+                                ? 'text-red-600'
+                                : Math.ceil((new Date(project.deadline) - new Date()) / (1000 * 60 * 60 * 24)) <= 7
+                                ? 'text-orange-600'
+                                : 'text-green-600'
+                            }`}>
+                              {Math.ceil((new Date(project.deadline) - new Date()) / (1000 * 60 * 60 * 24))} days left
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 font-semibold">
+                              ₹{project.totalPayment?.toLocaleString() || '0'}
+                            </div>
+                            <div className="text-sm text-green-600 font-medium">
+                              ₹{project.paymentReceived?.toLocaleString() || '0'} received
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center">
+                              <div className="flex-1 mr-4">
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                    style={{
+                                      width: `${project.totalPayment > 0 ? Math.min((project.paymentReceived / project.totalPayment) * 100, 100) : 0}%`
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-sm font-medium text-gray-900">
+                                {project.totalPayment > 0 ? Math.round((project.paymentReceived / project.totalPayment) * 100) : 0}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {project.assignedPeople && project.assignedPeople.length > 0 ? (
+                              <div className="flex items-center">
+                                <div className="flex -space-x-2">
+                                  {project.assignedPeople.slice(0, 3).map((person, idx) => (
+                                    <div key={idx} className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white">
+                                      {person.split(' ')[0][0]}{person.split(' ')[1]?.[0] || ''}
+                                    </div>
+                                  ))}
+                                </div>
+                                {project.assignedPeople.length > 3 && (
+                                  <span className="ml-2 text-sm font-medium text-gray-500">
+                                    +{project.assignedPeople.length - 3}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">No team assigned</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => navigate(`/project-details/${project.id}`)}
+                                className="text-blue-600 hover:text-blue-900 text-sm font-medium transition-colors"
+                              >
+                                View
+                              </button>
+                              <button
+                                onClick={() => navigate(`/edit-project/${project.id}`)}
+                                className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>

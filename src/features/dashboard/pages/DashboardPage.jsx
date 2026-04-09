@@ -11,6 +11,7 @@ import {
   RecentActivityFeed,
   PendingApprovals,
   UpcomingEvents,
+  FinancialSummaryCard,
   useDashboardStore
 } from 'features/dashboard';
 import useAuthStore from '../../../store/useAuthStore';
@@ -28,14 +29,18 @@ const Dashboard = () => {
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
 
   const { user } = useAuthStore();
-  const { metrics, loading, fetchMetrics, refreshDashboard } = useDashboardStore();
+  const { metrics, charts, feed, financials, loading, fetchDashboardData, refreshDashboard } = useDashboardStore();
   const navigate = useNavigate();
+
+  const isAdmin = user?.roles?.some(role => 
+    ['admin', 'owner', 'super-admin', 'manager'].includes(role.name.toLowerCase())
+  );
 
   useEffect(() => {
     if (user?.company?.id) {
-      fetchMetrics(user.company.id);
+      fetchDashboardData(user.company.id, isAdmin, user.id);
     }
-  }, [user, fetchMetrics]);
+  }, [user, fetchDashboardData, isAdmin]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -89,31 +94,29 @@ const Dashboard = () => {
       description: 'Register new team member with complete profile',
       icon: 'UserPlus',
       color: 'primary',
-
-      // ✅ NAVIGATION CHANGED → OPEN MODAL
       onClick: () => setIsEmployeeModalOpen(true)
     },
     {
-      title: 'Create Announcement',
-      description: 'Share important updates with all employees',
-      icon: 'Megaphone',
-      color: 'warning',
-      onClick: () => window.location.href = '/announcements?action=create'
-    },
-    {
-      title: 'Generate Reports',
-      description: 'Export attendance, productivity and payroll data',
-      icon: 'FileText',
+      title: 'Post a Job',
+      description: 'Create and manage new career opportunities',
+      icon: 'Briefcase',
       color: 'success',
-      onClick: () => window.location.href = '/reports'
+      onClick: () => navigate('/jobs')
     },
     {
-      title: 'Process Payroll',
-      description: 'Calculate and generate monthly salary payments',
-      icon: 'DollarSign',
+      title: 'Review Applications',
+      description: 'Check latest candidate applications and status',
+      icon: 'ClipboardList',
+      color: 'warning',
+      onClick: () => navigate('/jobs/applications')
+    },
+    {
+      title: 'Check Messages',
+      description: 'View and respond to recruitment inquiries',
+      icon: 'MessageSquare',
       color: 'primary',
-      badge: 'Due Soon',
-      onClick: () => window.location.href = '/payroll?action=process'
+      badge: 'New',
+      onClick: () => navigate('/messages')
     }
   ];
 
@@ -123,104 +126,141 @@ const Dashboard = () => {
 
   const handleRefreshData = () => {
     if (user?.company?.id) {
-      refreshDashboard(user.company.id);
+      refreshDashboard(user.company.id, isAdmin, user.id);
     }
     setCurrentTime(new Date());
   };
 
-  // ✅ SAVE HANDLER FOR MODAL
   const handleSaveEmployee = async (employeeData) => {
-    console.log('Employee Saved:', employeeData);
     setIsEmployeeModalOpen(false);
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
       <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={handleToggleSidebar} />
 
       <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-8`}>
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="p-6 max-w-[1600px] mx-auto">
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-            <div>
-              <BreadcrumbNavigation items={breadcrumbItems} />
-              <h1 className="text-3xl font-semibold text-foreground mb-2">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Welcome back! Here's what's happening with your team today.
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-4 mt-4 lg:mt-0">
-              <div className="text-right">
-                <p className="text-sm font-medium text-foreground">
-                  {currentTime?.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {currentTime?.toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                  })}
+          {/* Premium Welcome Header */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#1E40AF] to-[#3B82F6] rounded-3xl p-8 mb-10 shadow-xl shadow-blue-500/20 animate-in fade-in slide-in-from-top-4 duration-700">
+            {/* Decorative background elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/20 rounded-full -ml-16 -mb-16 blur-2xl"></div>
+            
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="text-white">
+                <div className="flex items-center gap-2 mb-2 opacity-80">
+                  <Icon name="Briefcase" size={16} />
+                  <span className="text-sm font-medium tracking-wide uppercase">Admin Overview</span>
+                </div>
+                <h1 className="text-4xl font-bold mb-2 tracking-tight">Good Morning, {user?.name?.split(' ')[0] || 'Admin'} 👋</h1>
+                <p className="text-blue-100 text-lg max-w-xl">
+                  Ready to manage your team? You have <span className="font-bold text-white underline decoration-white/30">12 pending applications</span> and 3 interviews scheduled for today.
                 </p>
               </div>
 
-              <button
-                onClick={handleRefreshData}
-                className="flex items-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150"
-              >
-                <Icon name="RefreshCw" size={16} />
-                <span className="hidden sm:inline">Refresh</span>
-              </button>
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:flex flex-col items-end text-white/90 mr-2">
+                  <p className="font-bold text-lg">
+                    {currentTime?.toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
+                  </p>
+                  <p className="text-xs font-medium opacity-70">
+                    {currentTime?.toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+                <button
+                  onClick={handleRefreshData}
+                  className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-2xl hover:bg-white/20 transition-all active:scale-95 group"
+                  title="Sync Data"
+                >
+                  <Icon name="RefreshCw" size={20} className={loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'} />
+                </button>
+                <button
+                  onClick={() => setIsEmployeeModalOpen(true)}
+                  className="bg-white text-blue-600 px-6 py-3 rounded-2xl font-bold shadow-lg shadow-white/10 hover:shadow-white/20 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  <Icon name="Plus" size={20} />
+                  Hire New Talent
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {metricsData?.map((metric, index) => (
-              <MetricsCard
-                key={index}
-                title={metric?.title}
-                value={metric?.value}
-                change={metric?.change}
-                changeType={metric?.changeType}
-                icon={metric?.icon}
-                color={metric?.color}
-              />
+              <div key={index} className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: `${index * 100}ms` }}>
+                <MetricsCard
+                  title={metric?.title}
+                  value={metric?.value}
+                  change={metric?.change}
+                  changeType={metric?.changeType}
+                  icon={metric?.icon}
+                  color={metric?.color}
+                />
+              </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
-            <AttendanceChart />
-            <ProductivityChart />
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 mb-10">
+            <div className="xl:col-span-3 animate-in fade-in translate-y-4 duration-1000 delay-200 fill-mode-both">
+               <AttendanceChart data={charts?.attendance} loading={loading} />
+            </div>
+            <div className="xl:col-span-2 animate-in fade-in translate-y-4 duration-1000 delay-300 fill-mode-both">
+               <ProductivityChart data={charts?.productivity} loading={loading} />
+            </div>
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
+          {isAdmin && financials && (
+            <div className="mb-10 animate-in fade-in translate-y-4 duration-1000 delay-400 fill-mode-both">
+              <FinancialSummaryCard data={financials} loading={loading} />
+            </div>
+          )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight flex items-center gap-2">
+                <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                Command Center
+              </h2>
+              <p className="text-sm text-muted-foreground font-medium">Quick access to essential tools</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {quickActions?.map((action, index) => (
-                <QuickActionCard
-                  key={index}
-                  title={action?.title}
-                  description={action?.description}
-                  icon={action?.icon}
-                  color={action?.color}
-                  badge={action?.badge}
-                  onClick={action?.onClick}
-                />
+                <div key={index} className="animate-in fade-in zoom-in-95 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                  <QuickActionCard
+                    title={action?.title}
+                    description={action?.description}
+                    icon={action?.icon}
+                    color={action?.color}
+                    badge={action?.badge}
+                    onClick={action?.onClick}
+                  />
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <RecentActivityFeed />
-            <PendingApprovals />
-            <UpcomingEvents />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in translate-y-4 duration-1000 delay-500 fill-mode-both px-1">
+            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden group">
+              <RecentActivityFeed activities={feed?.recentActivity} loading={loading} />
+            </div>
+            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden group">
+              <PendingApprovals approvals={feed?.pendingApprovals} loading={loading} />
+            </div>
+            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden group">
+              <UpcomingEvents events={feed?.upcomingEvents} loading={loading} />
+            </div>
           </div>
 
         </div>
@@ -240,4 +280,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

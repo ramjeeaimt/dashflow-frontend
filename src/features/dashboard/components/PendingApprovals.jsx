@@ -1,174 +1,116 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/Button';
 
-const PendingApprovals = () => {
-//   const approvals = [
-//   {
-//     id: 1,
-//     type: 'leave',
-//     employee: 'Jennifer Wilson',
-//     avatar: "https://images.unsplash.com/photo-1684262855358-88f296a2cfc2",
-//     avatarAlt: 'Professional blonde woman in navy blazer with confident smile in office setting',
-//     request: 'Annual Leave Request',
-//     details: 'Dec 23-30, 2024 (8 days)',
-//     department: 'Sales',
-//     priority: 'medium',
-//     submittedDate: '2024-10-18',
-//     icon: 'Calendar',
-//     color: 'warning'
-//   },
-//   {
-//     id: 2,
-//     type: 'expense',
-//     employee: 'Robert Martinez',
-//     avatar: "https://images.unsplash.com/photo-1537318848571-b1c44804662a",
-//     avatarAlt: 'Hispanic man with beard in white dress shirt smiling warmly in professional environment',
-//     request: 'Travel Expense Claim',
-//     details: '$2,450 - Client Meeting NYC',
-//     department: 'Business Development',
-//     priority: 'high',
-//     submittedDate: '2024-10-17',
-//     icon: 'Receipt',
-//     color: 'error'
-//   },
-//   {
-//     id: 3,
-//     type: 'overtime',
-//     employee: 'Lisa Thompson',
-//     avatar: "https://images.unsplash.com/photo-1684262855358-88f296a2cfc2",
-//     avatarAlt: 'African American woman with natural hair in professional burgundy blazer smiling confidently',
-//     request: 'Overtime Authorization',
-//     details: '15 hours - Project Deadline',
-//     department: 'Engineering',
-//     priority: 'medium',
-//     submittedDate: '2024-10-19',
-//     icon: 'Clock',
-//     color: 'primary'
-//   }];
+const PendingApprovals = ({ approvals, loading }) => {
+  if (loading) {
+    return (
+      <div className="bg-white border border-slate-200/60 rounded-[2rem] p-8 h-[500px] animate-pulse">
+        <div className="h-6 w-40 bg-slate-100 rounded-full mb-8"></div>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-slate-50/50 rounded-2xl p-5 mb-4">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-12 h-12 bg-slate-100 rounded-full"></div>
+              <div className="h-4 w-32 bg-slate-100 rounded-full"></div>
+            </div>
+            <div className="h-3 w-content bg-slate-100 rounded-full"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
+  const handleApprove = (approvalId) => {
+    console.log('Approving request:', approvalId);
+  };
 
-//   const getPriorityBadge = (priority) => {
-//     const badges = {
-//       high: 'bg-error/10 text-error border-error/20',
-//       medium: 'bg-warning/10 text-warning border-warning/20',
-//       low: 'bg-success/10 text-success border-success/20'
-//     };
-//     return badges?.[priority] || badges?.medium;
-//   };
+  const handleReject = (approvalId) => {
+    console.log('Rejecting request:', approvalId);
+  };
 
-//   const handleApprove = (approvalId) => {
-//     console.log('Approving request:', approvalId);
-//     // Handle approval logic
-//   };
+  return (
+    <div className="bg-white border border-slate-200/60 rounded-[2rem] p-8 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 group">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <div className="flex items-center space-x-3">
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">Pending Approvals</h3>
+            {approvals?.length > 0 && (
+              <span className="px-2.5 py-0.5 bg-rose-500 text-white text-[10px] font-black rounded-full shadow-lg shadow-rose-500/20">
+                {approvals.length}
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-slate-500 font-medium">Review pending requests</p>
+        </div>
+        <button
+          onClick={() => window.location.href = '/approvals'}
+          className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-500/5 rounded-xl transition-all duration-300"
+          title="View All"
+        >
+          <Icon name="ArrowUpRight" size={20} />
+        </button>
+      </div>
 
-//   const handleReject = (approvalId) => {
-//     console.log('Rejecting request:', approvalId);
-//     // Handle rejection logic
-//   };
+      <div className="space-y-5">
+        {approvals?.length > 0 ? (
+          approvals.map((approval) => (
+            <div key={approval.id} className="relative bg-slate-50/30 border border-slate-200/40 rounded-2xl p-5 hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 transition-all duration-500 group/card">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/10 overflow-hidden ring-4 ring-white group-hover/card:ring-blue-100 transition-all">
+                    {approval.avatar ? <Image src={approval.avatar} className="w-full h-full object-cover" /> : <Icon name="User" size={24} strokeWidth={2.5} />}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-black text-slate-900 truncate tracking-tight">{approval.subtitle}</h4>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600/70">{approval.title}</span>
+                  </div>
+                </div>
+              </div>
 
-//   const handleViewDetails = (approvalId) => {
-//     window.location.href = `/approvals/${approvalId}`;
-//   };
+              <div className="flex items-center gap-2 mb-6 text-xs text-slate-400 font-bold px-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                <span>Submitted Oct 18, 2026</span>
+              </div>
 
-//   return (
-//     <div className="bg-card border border-border rounded-lg p-6 card-shadow">
-//       <div className="flex items-center justify-between mb-6">
-//         <div>
-//           <h3 className="text-lg font-semibold text-foreground">Pending Approvals</h3>
-//           <p className="text-sm text-muted-foreground">Requests awaiting your review</p>
-//         </div>
-//         <div className="flex items-center space-x-2">
-//           <span className="px-2 py-1 bg-error/10 text-error text-xs font-medium rounded-full border border-error/20">
-//             {approvals?.length} Pending
-//           </span>
-//           <button
-//             onClick={() => window.location.href = '/approvals'}
-//             className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/10 rounded-md transition-colors duration-150">
+              <div className="flex items-center gap-2 pt-4 border-t border-slate-200/50">
+                <button
+                  onClick={() => handleReject(approval.id)}
+                  className="flex-1 py-2 text-xs font-black text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all uppercase tracking-widest"
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={() => handleApprove(approval.id)}
+                  className="flex-1 py-2 text-xs font-black bg-blue-600 text-white hover:bg-blue-700 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95 uppercase tracking-widest"
+                >
+                  Approve
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-700">
+            <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+              <Icon name="CheckCircle" size={40} className="text-emerald-500 opacity-30" strokeWidth={3} />
+            </div>
+            <h4 className="text-lg font-black text-slate-900 mb-1 tracking-tight">Good as Gold!</h4>
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">No pending requests</p>
+          </div>
+        )}
+      </div>
 
-//             <span>View All</span>
-//             <Icon name="ArrowRight" size={14} />
-//           </button>
-//         </div>
-//       </div>
-//       <div className="space-y-4">
-//         {approvals?.map((approval) =>
-//         <div key={approval?.id} className="border border-border rounded-lg p-4 hover:bg-muted/30 transition-colors duration-150">
-//             <div className="flex items-start justify-between mb-3">
-//               <div className="flex items-center space-x-3">
-//                 <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
-//                   <Image
-//                   src={approval?.avatar}
-//                   alt={approval?.avatarAlt}
-//                   className="w-full h-full object-cover" />
-
-//                 </div>
-//                 <div>
-//                   <h4 className="font-semibold text-foreground">{approval?.employee}</h4>
-//                   <p className="text-sm text-muted-foreground">{approval?.department}</p>
-//                 </div>
-//               </div>
-//               <div className="flex items-center space-x-2">
-//                 <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityBadge(approval?.priority)}`}>
-//                   {approval?.priority?.charAt(0)?.toUpperCase() + approval?.priority?.slice(1)}
-//                 </span>
-//                 <Icon name={approval?.icon} size={16} className="text-muted-foreground" />
-//               </div>
-//             </div>
-
-//             <div className="mb-4">
-//               <p className="font-medium text-foreground mb-1">{approval?.request}</p>
-//               <p className="text-sm text-muted-foreground">{approval?.details}</p>
-//               <p className="text-xs text-muted-foreground mt-1">
-//                 Submitted: {new Date(approval.submittedDate)?.toLocaleDateString()}
-//               </p>
-//             </div>
-
-//             <div className="flex items-center justify-between">
-//               <button
-//               onClick={() => handleViewDetails(approval?.id)}
-//               className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
-
-//                 <Icon name="Eye" size={14} />
-//                 <span>View Details</span>
-//               </button>
-              
-//               <div className="flex items-center space-x-2">
-//                 <Button
-//                 variant="outline"
-//                 size="sm"
-//                 onClick={() => handleReject(approval?.id)}
-//                 iconName="X"
-//                 iconPosition="left"
-//                 iconSize={14}>
-
-//                   Reject
-//                 </Button>
-//                 <Button
-//                 variant="default"
-//                 size="sm"
-//                 onClick={() => handleApprove(approval?.id)}
-//                 iconName="Check"
-//                 iconPosition="left"
-//                 iconSize={14}>
-
-//                   Approve
-//                 </Button>
-//               </div>
-//             </div>
-//           </div>
-//         )}
-//       </div>
-//       {approvals?.length === 0 &&
-//       <div className="text-center py-8">
-//           <Icon name="CheckCircle" size={32} className="text-success mx-auto mb-2" />
-//           <p className="text-sm text-muted-foreground">No pending approvals</p>
-//           <p className="text-xs text-muted-foreground mt-1">All requests have been processed</p>
-//         </div>
-//       }
-//     </div>);
-
- };
+      {approvals?.length > 0 && (
+        <div className="mt-8 pt-6 border-t border-slate-200/40">
+          <button 
+            className="w-full py-4 text-xs font-black text-blue-600 bg-blue-500/5 hover:bg-blue-500/10 rounded-2xl transition-all border border-blue-500/10 uppercase tracking-widest active:scale-95"
+            onClick={() => window.location.href = '/approvals'}
+          >
+            Review All Requests
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default PendingApprovals;

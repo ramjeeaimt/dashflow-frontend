@@ -968,7 +968,7 @@ const LandingPage = () => {
             </div>
 
             {/* Cookie Consent (Simplified) */}
-            <div className="fixed bottom-6 left-6 bg-white rounded-lg shadow-2xl p-4 max-w-sm border border-gray-200 z-50 hidden md:block">
+            {/* <div className="fixed bottom-6 left-6 bg-white rounded-lg shadow-2xl p-4 max-w-sm border border-gray-200 z-50 hidden md:block">
                 <p className="text-sm text-gray-600 mb-3">
                     We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.
                 </p>
@@ -980,7 +980,7 @@ const LandingPage = () => {
                         Decline
                     </button>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

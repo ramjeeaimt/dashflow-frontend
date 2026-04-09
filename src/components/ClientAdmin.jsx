@@ -615,114 +615,134 @@ const ClientAdmin = () => {
         <Header />
 
         <main className="flex-1 mt-16 overflow-y-auto px-6 py-8">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-            <div className="bg-white rounded-lg border border-gray-200 p-5">
+          {/* Stats Cards with Enhanced Design */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Network Entities Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Network Entities</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalEntities}</p>
+                  <p className="text-sm font-semibold text-blue-600 mb-2 uppercase tracking-wide">Network Entities</p>
+                  <p className="text-3xl font-bold text-blue-900">{totalEntities}</p>
+                  <p className="text-xs text-blue-600 mt-1">Clients & Projects</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users size={20} className="text-blue-600" />
+                <div className="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Users size={24} className="text-white" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-5">
+            {/* Estimated Revenue Card */}
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl border border-emerald-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Estimated Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">₹{estimatedRevenue.toLocaleString()}</p>
+                  <p className="text-sm font-semibold text-emerald-600 mb-2 uppercase tracking-wide">Revenue (MTD)</p>
+                  <p className="text-3xl font-bold text-emerald-900">₹{estimatedRevenue.toLocaleString()}</p>
+                  <p className="text-xs text-emerald-600 mt-1">From Invoices</p>
                 </div>
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <FaRupeeSign size={20} className="text-emerald-600" />
+                <div className="w-14 h-14 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <FaRupeeSign size={24} className="text-white" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-5">
+            {/* Active Workflows Card */}
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Active Workflows</p>
-                  <p className="text-2xl font-bold text-gray-900">{activeWorkflows}</p>
+                  <p className="text-sm font-semibold text-purple-600 mb-2 uppercase tracking-wide">Active Workflows</p>
+                  <p className="text-3xl font-bold text-purple-900">{activeWorkflows}</p>
+                  <p className="text-xs text-purple-600 mt-1">Running Projects</p>
                 </div>
-                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp size={20} className="text-indigo-600" />
+                <div className="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <TrendingUp size={24} className="text-white" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">CRM Engine</h1>
-              <p className="text-sm text-gray-500 mt-1">Managing all your clients and projects</p>
+          {/* Header Section with Enhanced Styling */}
+          <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-6">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900">CRM Dashboard</h1>
+              <p className="text-base text-gray-500 mt-2">Manage and track all your clients, projects, and business relationships in one place</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+              <div className="relative flex-1 sm:flex-none sm:w-80">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Filter entities..."
-                  className="pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                  placeholder="Search clients, projects, emails..."
+                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <button
                 onClick={() => { setStep(1); setIsClientModalOpen(true); }}
-                className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-gray-800 transition-colors"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
               >
-                <Plus size={16} /> Register Entity
+                <Plus size={18} /> Add Client / Project
               </button>
             </div>
           </div>
 
-          {/* List Section */}
-          <div className="space-y-3">
-            {combinedData.map((item) => (
-              <div
-                key={item.id}
-                className={`bg-white border rounded-lg transition-all ${expandedId === item.id ? 'border-blue-300 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                  }`}
+          {/* List Section with Enhanced Cards */}
+          {combinedData.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+              <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <Users size={32} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Entities Found</h3>
+              <p className="text-gray-500 mb-6">Get started by adding your first client or project</p>
+              <button
+                onClick={() => { setStep(1); setIsClientModalOpen(true); }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
-                <div className="p-4 flex items-center justify-between cursor-pointer" onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base ${item.type === 'Project' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                      {item.type === 'Project' ? <LayoutGrid size={20} /> : item.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-gray-900 text-sm">{item.name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.type === 'Project' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>
-                          {item.type}
-                        </span>
+                <Plus size={16} /> Add First Entity
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {combinedData.map((item) => (
+                <div
+                  key={item.id}
+                  className={`bg-white rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-lg ${expandedId === item.id ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-gray-300 shadow-sm'
+                    }`}
+                >
+                  <div className="p-5 flex items-center justify-between" onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base shadow-md ${item.type === 'Project' ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white' : 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+                        }`}>
+                        {item.type === 'Project' ? <Briefcase size={22} /> : item.name?.charAt(0).toUpperCase()}
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{item.company || 'Direct Organization'}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-1">
+                          <h3 className="font-bold text-gray-900">{item.name}</h3>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${item.type === 'Project' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                            {item.type}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500">{item.company || 'Direct Organization'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="hidden lg:block text-right">
+                        <p className="text-xs font-semibold text-gray-500 uppercase">Projects</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {item.type === 'Client' ? (item.clientProjects?.length || 0) : '1'}
+                        </p>
+                      </div>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${expandedId === item.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                        <ChevronRight size={20} className={`transition-transform duration-300 ${expandedId === item.id ? 'rotate-90' : ''}`} />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="hidden lg:block text-right">
-                      <p className="text-xs text-gray-400">Projects</p>
-                      <p className="text-xs font-medium text-gray-600">
-                        {item.type === 'Client' ? (item.clientProjects?.length || 0) : '1'}
-                      </p>
-                    </div>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${expandedId === item.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                      <ChevronRight size={16} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* EXPANDED DETAILS SECTION */}
-                {expandedId === item.id && (
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-100">
-                    {item.type === 'Project' && item.projectDetails ? (
-                      // PROJECT DETAILS SECTION
-                      <div className="space-y-4 mt-3">
+                  {/* EXPANDED DETAILS SECTION */}
+                  {expandedId === item.id && (
+                    <div className="px-5 pb-5 pt-3 border-t border-gray-200 bg-gradient-to-b from-white to-gray-50">
+                      {item.type === 'Project' && item.projectDetails ? (
+                        // PROJECT DETAILS SECTION
+                        <div className="space-y-4 mt-3">
                         <div className="flex justify-between items-center">
                           <h4 className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Complete Project Details</h4>
                           <div className="flex gap-2">
@@ -767,34 +787,34 @@ const ClientAdmin = () => {
                         </div>
 
                         {/* Basic Project Info */}
-                        <div className="bg-blue-50 p-3 rounded-lg">
-                          <h5 className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1">
-                            <FolderOpen size={12} /> Project Information
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-2xl border border-blue-200">
+                          <h5 className="text-sm font-bold text-blue-900 mb-4 flex items-center gap-2">
+                            <FolderOpen size={16} className="text-blue-600" /> Project Information
                           </h5>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <p className="text-xs text-gray-500">Project Name</p>
-                              <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                              <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Project Name</p>
+                              <p className="text-base font-bold text-blue-900">{item.name}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-500">Phase</p>
-                              <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                              <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Phase</p>
+                              <span className="inline-flex px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-700">
                                 {item.projectDetails.phase || 'Planning'}
                               </span>
                             </div>
                             {item.projectDetails.assigningDate && (
                               <div>
-                                <p className="text-xs text-gray-500">Start Date</p>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {new Date(item.projectDetails.assigningDate).toLocaleDateString()}
+                                <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Start Date</p>
+                                <p className="text-base font-bold text-blue-900">
+                                  {new Date(item.projectDetails.assigningDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </p>
                               </div>
                             )}
                             {item.projectDetails.deadline && (
                               <div>
-                                <p className="text-xs text-gray-500">Deadline</p>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {new Date(item.projectDetails.deadline).toLocaleDateString()}
+                                <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Deadline</p>
+                                <p className="text-base font-bold text-red-600">
+                                  {new Date(item.projectDetails.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </p>
                               </div>
                             )}
@@ -841,27 +861,27 @@ const ClientAdmin = () => {
                         
 
                         {/* Financial Details */}
-                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                          <h5 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                            <DollarSign size={12} /> Financial Information
+                        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-2xl border border-emerald-200">
+                          <h5 className="text-sm font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                            <DollarSign size={16} className="text-emerald-600" /> Financial Summary
                           </h5>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {item.projectDetails.budget > 0 && (
-                              <div>
-                                <p className="text-xs text-gray-500">Budget</p>
-                                <p className="text-lg font-bold text-gray-900">₹{item.projectDetails.budget.toLocaleString()}</p>
+                              <div className="bg-white rounded-xl p-3 border border-emerald-100">
+                                <p className="text-xs font-semibold text-emerald-600 uppercase mb-1">Budget</p>
+                                <p className="text-xl font-bold text-emerald-900">₹{item.projectDetails.budget.toLocaleString()}</p>
                               </div>
                             )}
                             {item.projectDetails.totalPayment > 0 && (
-                              <div>
-                                <p className="text-xs text-gray-500">Total Payment</p>
-                                <p className="text-lg font-bold text-gray-900">₹{item.projectDetails.totalPayment.toLocaleString()}</p>
+                              <div className="bg-white rounded-xl p-3 border border-emerald-100">
+                                <p className="text-xs font-semibold text-emerald-600 uppercase mb-1">Total Payment</p>
+                                <p className="text-xl font-bold text-emerald-900">₹{item.projectDetails.totalPayment.toLocaleString()}</p>
                               </div>
                             )}
                             {item.projectDetails.paymentReceived > 0 && (
-                              <div>
-                                <p className="text-xs text-gray-500">Payment Received</p>
-                                <p className="text-lg font-bold text-green-600">₹{item.projectDetails.paymentReceived.toLocaleString()}</p>
+                              <div className="bg-white rounded-xl p-3 border border-emerald-100">
+                                <p className="text-xs font-semibold text-green-600 uppercase mb-1">Payment Received</p>
+                                <p className="text-xl font-bold text-green-700">₹{item.projectDetails.paymentReceived.toLocaleString()}</p>
                               </div>
                             )}
                           </div>
@@ -892,7 +912,7 @@ const ClientAdmin = () => {
                         )}
                         {/* Assigned Employees in Edit Modal */}
                         <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                          <label className="block text-xs font-semibold text-purple-800 mb-2 flex items-center gap-1">
+                          <label className="flex text-xs font-semibold text-purple-800 mb-2 items-center gap-1">
                             <Users size={12} /> Assigned Team Members
                           </label>
                           <div className="space-y-2">
@@ -1021,181 +1041,7 @@ const ClientAdmin = () => {
                           </div>
                         </div>
 
-                        {/* Basic Information Section */}
-                        <div className="bg-blue-50 p-3 rounded-lg">
-                          <h5 className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1">
-                            <Users size={12} /> Basic Information
-                          </h5>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Mail size={14} className="text-blue-500" />
-                              <span className="text-gray-600">Email:</span>
-                              <span className="font-medium text-gray-800">{item.email || 'N/A'}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Phone size={14} className="text-blue-500" />
-                              <span className="text-gray-600">Phone:</span>
-                              <span className="font-medium text-gray-800">{item.phone || 'N/A'}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Building2 size={14} className="text-blue-500" />
-                              <span className="text-gray-600">Company:</span>
-                              <span className="font-medium text-gray-800">{item.company || 'N/A'}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <Tag size={14} className="text-blue-500" />
-                              <span className="text-gray-600">Lead Source:</span>
-                              <span className="font-medium text-gray-800">{item.source || 'N/A'}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Address Section */}
-                        {(item.address || item.city || item.state || item.pincode || item.country) && (
-                          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <h5 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                              <MapPin size={12} /> Address Information
-                            </h5>
-                            <div className="space-y-2">
-                              {item.address && (
-                                <p className="text-sm text-gray-600">
-                                  <span className="font-medium">Address:</span> {item.address}
-                                </p>
-                              )}
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                                {item.city && (
-                                  <p><span className="font-medium text-gray-600">City:</span> {item.city}</p>
-                                )}
-                                {item.state && (
-                                  <p><span className="font-medium text-gray-600">State:</span> {item.state}</p>
-                                )}
-                                {item.pincode && (
-                                  <p><span className="font-medium text-gray-600">Pincode:</span> {item.pincode}</p>
-                                )}
-                                {item.country && (
-                                  <p><span className="font-medium text-gray-600">Country:</span> {item.country}</p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Business Details Section */}
-                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                          <h5 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                            <Briefcase size={12} /> Business Details
-                          </h5>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                              <p className="text-xs text-gray-500">Status</p>
-                              <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1 ${item.status === 'Active' ? 'bg-green-100 text-green-700' :
-                                item.status === 'Lead' ? 'bg-yellow-100 text-yellow-700' :
-                                  'bg-gray-100 text-gray-700'
-                                }`}>
-                                {item.status || 'Lead'}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500">Priority</p>
-                              <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium mt-1 ${item.priority === 'High' ? 'bg-red-100 text-red-700' :
-                                item.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                  'bg-green-100 text-green-700'
-                                }`}>
-                                {item.priority || 'Medium'}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500">Budget & Currency</p>
-                              <p className="text-sm font-medium text-gray-800 mt-1">
-                                {item.budget ? `${item.currency || 'INR'} ${item.budget}` : 'N/A'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Multiple Projects Section */}
-                        {item.clientProjects && item.clientProjects.length > 0 && (
-                          <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
-                            <h5 className="text-xs font-semibold text-indigo-800 mb-3 flex items-center gap-1">
-                              <FolderOpen size={12} /> Projects ({item.clientProjects.length})
-                            </h5>
-                            <div className="space-y-2">
-                              {item.clientProjects.map((project, idx) => (
-                                <div key={project.id} className="bg-white p-3 rounded-lg border border-indigo-200 hover:shadow-sm transition-shadow">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2">
-                                        <p className="font-semibold text-gray-900 text-sm">{project.projectName}</p>
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${project.status === 'active' ? 'bg-green-100 text-green-700' :
-                                          project.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                                            'bg-yellow-100 text-yellow-700'
-                                          }`}>
-                                          {project.status || 'active'}
-                                        </span>
-                                      </div>
-                                      {project.phase && (
-                                        <p className="text-xs text-gray-500 mt-1">Phase: {project.phase}</p>
-                                      )}
-                                      {project.deadline && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                          Deadline: {new Date(project.deadline).toLocaleDateString()}
-                                        </p>
-                                      )}
-                                      {project.totalPayment > 0 && (
-                                        <p className="text-xs font-medium text-gray-700 mt-1">
-                                          Value: ₹{project.totalPayment.toLocaleString()}
-                                        </p>
-                                      )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                      <button
-                                        onClick={() => {
-                                          setSelectedEntity(project);
-                                          setIsInvoiceModalOpen(true);
-                                        }}
-                                        className="text-green-600 hover:text-green-700 text-xs flex items-center gap-1"
-                                        title="Send Invoice"
-                                      >
-                                        <Send size={12} />
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          setEditData({
-                                            id: project.id,
-                                            projectName: project.projectName,
-                                            description: project.description || '',
-                                            assigningDate: project.assigningDate || '',
-                                            deadline: project.deadline || '',
-                                            phase: project.phase || 'Planning',
-                                            status: project.status || 'active',
-                                            totalPayment: project.totalPayment || 0,
-                                            paymentReceived: project.paymentReceived || 0,
-                                            budget: project.budget || 0,
-                                            githubLink: project.githubLink || '',
-                                            deploymentLink: project.deploymentLink || '',
-                                            contactInfo: project.contactInfo || '',
-                                            clientEmail: project.clientEmail || '',
-                                            clientName: project.clientName || '',
-                                            links: project.links || {},
-                                            tasks: project.tasks || [],
-                                            notes: project.notes || ''
-                                          });
-                                          setIsEditing(true);
-                                        }}
-                                        className="text-blue-600 hover:text-blue-700 text-xs flex items-center gap-1"
-                                        title="Edit Project"
-                                      >
-                                        <Edit2 size={12} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Notes Section */}
+                        {/* Notes Section for Clients */}
                         {item.notes && (
                           <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100">
                             <div className="flex items-start gap-2">
@@ -1214,7 +1060,8 @@ const ClientAdmin = () => {
               </div>
             ))}
           </div>
-        </main>
+        )}
+      </main>
       </div>
 
       {/* INLINE PROJECT FORM MODAL */}

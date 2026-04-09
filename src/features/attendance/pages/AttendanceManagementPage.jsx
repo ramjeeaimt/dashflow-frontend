@@ -130,6 +130,7 @@ const AttendanceManagement = () => {
     presentToday: attendanceData?.filter((emp) => emp?.status === 'present')?.length || 0,
     absentToday: attendanceData?.filter((emp) => emp?.status === 'absent')?.length || 0,
     lateArrivals: attendanceData?.filter((emp) => emp?.status === 'late')?.length || 0,
+    earlyCheckins: attendanceData?.filter((emp) => emp?.status === 'early_checkin')?.length || 0,
     earlyDepartures: attendanceData?.filter((emp) => emp?.status === 'early_departure')?.length || 0,
     avgProductivity: 0 // Placeholder
   };

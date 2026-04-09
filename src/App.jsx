@@ -1,15 +1,26 @@
 import React, { useEffect } from "react";
 import Routes from "./Routes";
 import useAuthStore from "./store/useAuthStore";
+import useNotificationStore from "./store/useNotificationStore";
 
 function App() {
   const { fetchProfile, token, user, isLoading } = useAuthStore();
+  const { listen, stopListening } = useNotificationStore();
 
   useEffect(() => {
     if (token && !user) {
       fetchProfile();
     }
   }, [token, user, fetchProfile]);
+
+  useEffect(() => {
+    if (user?.id) {
+      listen(user.id);
+    }
+    return () => {
+      stopListening();
+    };
+  }, [user?.id, listen, stopListening]);
 
   // Show loading screen while fetching profile on initial load
   if (token && !user && isLoading) {

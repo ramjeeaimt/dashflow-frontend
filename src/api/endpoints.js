@@ -33,7 +33,10 @@ export const API_ENDPOINTS = {
     },
     DASHBOARD: {
         BASE: '/dashboard',
-        STATS: '/dashboard',
+        STATS: '/dashboard/metrics',
+        CHARTS: '/dashboard/charts',
+        FEED: '/dashboard/feed',
+        FINANCIALS: '/dashboard/financials',
     },
     FINANCE: {
         BASE: '/finance',
@@ -68,4 +71,19 @@ export const API_ENDPOINTS = {
         UPDATE_STATUS: (id) => `/leaves/${id}/status`,
         BY_EMPLOYEE: (employeeId) => `/leaves/employee/${employeeId}`,
     },
+    NOTIFICATIONS: {
+        BASE: '/notifications',
+        MINE: '/notifications/mine',
+        MARK_READ: '/notifications/mark-read',
+        CLEAR: '/notifications/clear',
+        FCM_TOKEN: '/notifications/fcm-token',
+    }
+    ,
+    JOBS: {
+        BASE: '/public/jobs',
+        BY_ID: (id) => `/public/jobs/${id}`,
+        CREATE_APPLICATION: (jobId) => `/public/jobs/${jobId}/applications`,
+        APPLICATIONS: '/public/jobs/applications',
+        MESSAGES: '/jobs/messages',
+    }
 };

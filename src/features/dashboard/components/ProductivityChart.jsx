@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -11,157 +9,111 @@ import {
   AreaChart
 } from "recharts";
 import Icon from "../../../components/AppIcon";
-import productivityService from "services/productivity.service";
 
-const ProductivityChart = () => {
-  const [chartType, setChartType] = useState("line");
-  const [productivityData, setProductivityData] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchProductivity = async () => {
-      try {
-        setLoading(true);
-
-        const res = await productivityService.getAnalytics();
-
-        const mapped = res.map((item) => ({
-          time: item.time,
-          productivity: Number(item.productivity),
-          tasks: Number(item.tasks),
-          screenTime: Number(item.screenTime)
-        }));
-
-        setProductivityData(mapped);
-      } catch (err) {
-        console.error("Productivity API Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProductivity();
-  }, []);
-
-  const toggleChartType = () => {
-    setChartType((prev) => (prev === "line" ? "area" : "line"));
-  };
-
-  const avgProductivity =
-    productivityData.reduce((acc, cur) => acc + cur.productivity, 0) /
-      productivityData.length || 0;
-
-  const totalTasks =
-    productivityData.reduce((acc, cur) => acc + cur.tasks, 0) || 0;
-
-  const avgScreen =
-    productivityData.reduce((acc, cur) => acc + cur.screenTime, 0) /
-      productivityData.length || 0;
+const ProductivityChart = ({ data, loading }) => {
+  const [chartType, setChartType] = useState("area");
 
   if (loading) {
-    return <div className="p-6 text-center">Loading Chart...</div>;
+    return (
+      <div className="bg-card border border-border/50 rounded-xl p-6 h-[450px] animate-pulse">
+        <div className="h-6 w-48 bg-muted rounded mb-2"></div>
+        <div className="h-4 w-64 bg-muted rounded mb-8"></div>
+        <div className="h-64 w-full bg-muted/50 rounded-lg"></div>
+      </div>
+    );
   }
 
+  const chartData = data || [];
+
+  const avgProductivity =
+    chartData.reduce((acc, cur) => acc + (cur.value || 0), 0) /
+      chartData.length || 0;
+
   return (
-    <div className="bg-card border border-border rounded-lg p-6 card-shadow">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-card border border-border/50 rounded-xl p-6 transition-all duration-300 hover:shadow-md">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">
-            Productivity Trends
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Real-time productivity metrics and task completion
+          <h3 className="text-lg font-bold text-foreground">Productivity Trends</h3>
+          <p className="text-sm text-muted-foreground/80">
+            Performance metrics across the team
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-          <button
-            onClick={toggleChartType}
-            className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md"
+          <button 
+            onClick={() => setChartType(prev => prev === 'area' ? 'line' : 'area')}
+            className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors border border-transparent hover:border-primary/20"
+            title="Toggle View"
           >
-            <Icon name={chartType === "line" ? "AreaChart" : "TrendingUp"} size={16} />
-            <span>{chartType === "line" ? "Area View" : "Line View"}</span>
+            <Icon name={chartType === "area" ? "TrendingUp" : "AreaChart"} size={18} />
           </button>
-
-          <button className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md">
-            <Icon name="Download" size={16} />
-            <span>Export</span>
+          <button className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-colors border border-transparent hover:border-primary/20" title="Export">
+            <Icon name="Download" size={18} />
           </button>
         </div>
       </div>
 
-      <div className="h-80">
+      <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          {chartType === "line" ? (
-            <LineChart data={productivityData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="time" fontSize={12} />
-              <YAxis fontSize={12} />
-              <Tooltip />
-
-              <Line
-                type="monotone"
-                dataKey="productivity"
-                stroke="var(--color-primary)"
-                strokeWidth={3}
-                name="Productivity %"
-              />
-
-              <Line
-                type="monotone"
-                dataKey="screenTime"
-                stroke="var(--color-success)"
-                strokeWidth={2}
-                name="Screen Time %"
-              />
-            </LineChart>
-          ) : (
-            <AreaChart data={productivityData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="time" fontSize={12} />
-              <YAxis fontSize={12} />
-              <Tooltip />
-
-              <Area
-                type="monotone"
-                dataKey="productivity"
-                stroke="var(--color-primary)"
-                fill="var(--color-primary)"
-                fillOpacity={0.6}
-                name="Productivity %"
-              />
-
-              <Area
-                type="monotone"
-                dataKey="screenTime"
-                stroke="var(--color-success)"
-                fill="var(--color-success)"
-                fillOpacity={0.4}
-                name="Screen Time %"
-              />
-            </AreaChart>
-          )}
+          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorProd" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--color-success)" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="var(--color-success)" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" opacity={0.5} />
+            <XAxis 
+              dataKey="date" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 500 }}
+              dy={10}
+            />
+            <YAxis 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 500 }}
+              domain={[0, 100]}
+            />
+            <Tooltip
+              cursor={{ stroke: 'var(--color-success)', strokeWidth: 1 }}
+              contentStyle={{
+                backgroundColor: 'var(--color-card)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '12px',
+                padding: '8px 12px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="value" 
+              name="Productivity"
+              stroke="var(--color-success)" 
+              strokeWidth={3}
+              fillOpacity={1} 
+              fill="url(#colorProd)" 
+              animationDuration={1500}
+            />
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-border">
-        <div className="text-center">
-          <p className="text-2xl font-semibold text-foreground">
-            {avgProductivity.toFixed(0)}%
-          </p>
-          <p className="text-sm text-muted-foreground">Avg Productivity</p>
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/40">
+        <div className="flex flex-col">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Average Growth</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-2xl font-bold text-foreground">{avgProductivity.toFixed(1)}%</span>
+            <div className="flex items-center text-success text-xs font-bold bg-success/10 px-1.5 py-0.5 rounded-md">
+              <Icon name="TrendingUp" size={12} className="mr-0.5" />
+              +2.4%
+            </div>
+          </div>
         </div>
-
-        <div className="text-center">
-          <p className="text-2xl font-semibold text-foreground">{totalTasks}</p>
-          <p className="text-sm text-muted-foreground">Tasks Completed</p>
-        </div>
-
-        <div className="text-center">
-          <p className="text-2xl font-semibold text-foreground">
-            {avgScreen.toFixed(0)}%
-          </p>
-          <p className="text-sm text-muted-foreground">Screen Activity</p>
+        <div className="text-xs font-bold text-primary group cursor-pointer flex items-center hover:opacity-80 transition-opacity">
+          Analysis Details
+          <Icon name="ChevronRight" size={14} className="ml-1" />
         </div>
       </div>
     </div>

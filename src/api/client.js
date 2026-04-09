@@ -2,7 +2,6 @@ import axios from 'axios';
 // Create an Axios instance with the base URL of the backend API
 const apiClient = axios.create({
     baseURL: "https://difmo-crm-backend.vercel.app",
-    // baseURL: 'http://localhost:3000',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -23,8 +22,10 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => {
         // If the backend has wrapped the data in a 'data' property (via TransformInterceptor), unwrap it
-        // Check if data is present and its the standard wrapper format
-        if (response.data && response.data.data !== undefined && response.data.statusCode && response.data.message) {
+        // Backend wraps as: { data: <actual data>, statusCode, message }
+        // We need to extract response.data.data (the actual array or object)
+        if (response.data && typeof response.data === 'object' && response.data.statusCode && response.data.message) {
+            // This is a wrapped response, unwrap the data property
             return {
                 ...response,
                 data: response.data.data

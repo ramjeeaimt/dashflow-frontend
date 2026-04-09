@@ -36,6 +36,7 @@ const EmployeeModal = ({
     skills: [],
     avatar: '',
     profileImage:'',
+    checkInTime: '',
     documents: [] // Added for document management
   });
 
@@ -76,6 +77,7 @@ const EmployeeModal = ({
         emergencyPhone: employee?.emergencyPhone || '',
         skills: employee?.skills || [],
         profileImage: employee?.profileImage || '',
+        checkInTime: employee?.checkInTime || '',
         documents: employee?.documents || [] // Load existing docs
       });
     } else if (mode === 'add') {
@@ -99,6 +101,9 @@ const EmployeeModal = ({
         skills: [],
         avatar: '',
         profileImage:'',
+        checkInTime: '',
+        employeeType: 'office',
+        workFromHome: false,
         documents: []
       });
     }
@@ -407,6 +412,14 @@ const EmployeeModal = ({
                 <Select label="Manager" options={managerOptions} value={formData?.manager} onChange={(value) => handleInputChange('manager', value)} disabled={isReadOnly} />
                 <Select label="Branch" options={branchOptions} value={formData?.branch} onChange={(value) => handleInputChange('branch', value)} disabled={isReadOnly} />
                 <Input label="Salary" type="number" value={formData?.salary} onChange={(e) => handleInputChange('salary', e?.target?.value)} disabled={isReadOnly} placeholder="Annual salary" />
+                <Input label="Check-in Timing" type="time" value={formData?.checkInTime} onChange={(e) => handleInputChange('checkInTime', e?.target?.value)} disabled={isReadOnly} />
+                <Select label="Employee Type" options={[{value:'office',label:'Office'},{value:'remote',label:'Remote'},{value:'hybrid',label:'Hybrid'}]} value={formData?.employeeType} onChange={(value) => handleInputChange('employeeType', value)} disabled={isReadOnly} />
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={!!formData.workFromHome} onChange={(e) => handleInputChange('workFromHome', e.target.checked)} disabled={isReadOnly} />
+                    <span className="text-sm">Working From Home</span>
+                  </label>
+                </div>
               </div>
 
               {/* Permissions Preview */}

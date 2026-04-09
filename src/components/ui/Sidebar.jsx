@@ -101,6 +101,24 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
         icon: 'Shield',
         tooltip: 'System configuration'
       },
+      {
+        label: 'Jobs',
+        path: '/jobs',
+        icon: 'Briefcase',
+        tooltip: 'Manage job postings'
+      },
+      {
+        label: 'Applications',
+        path: '/jobs/applications',
+        icon: 'ClipboardList',
+        tooltip: 'Candidate applications'
+      },
+      {
+        label: 'Messages',
+        path: '/messages',
+        icon: 'MessageSquare',
+        tooltip: 'Recruitment & inquiries'
+      },
     ];
   } else if (isEmployee) {
     navigationItems = [

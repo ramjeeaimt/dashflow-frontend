@@ -79,17 +79,41 @@ const FinanceDashboardPage = () => {
     const fetchFinanceData = async () => {
         setIsLoading(true);
         try {
-            const [summaryRes, expensesRes] = await Promise.all([
-                financeService.getSummary(user.company.id),
-                financeService.getExpenses(user.company.id)
-            ]);
-            
-            // Handle unwrapped data from response interceptor
-            const summaryData = summaryRes.data || summaryRes;
-            const expensesData = expensesRes.data || expensesRes;
-            
-            setSummary(summaryData);
-            setExpenses(Array.isArray(expensesData) ? expensesData : []);
+                const [summaryRes, expensesRes, payrollsRes] = await Promise.all([
+                    financeService.getSummary(user.company.id),
+                    financeService.getExpenses(user.company.id),
+                    financeService.getPayroll(user.company.id)
+                ]);
+
+                const summaryData = summaryRes?.data || summaryRes || {};
+                const expensesData = expensesRes?.data || expensesRes || [];
+                const payrollsData = Array.isArray(payrollsRes) ? payrollsRes : (payrollsRes?.data || payrollsRes || []);
+
+                // Calculate credits and debits from expenses list
+                const totalCredit = (expensesData || []).reduce((acc, e) => acc + (e.type === 'credit' ? Number(e.amount || 0) : 0), 0);
+                const totalDebit = (expensesData || []).reduce((acc, e) => acc + (e.type === 'credit' ? 0 : Number(e.amount || 0)), 0);
+
+                // Payroll total from payrolls endpoint (each payroll item may have `amount`)
+                const totalPayroll = (payrollsData || []).reduce((acc, p) => acc + Number(p.amount || p.total || 0), 0);
+
+                // Determine turnover: prefer server value, else use credits sum
+                const turnover = summaryData.turnover || totalCredit;
+
+                // Total expenses (excluding payroll) are debits
+                const totalExpensesCalculated = totalDebit;
+
+                // Merge computed fields with server summary (server wins when present)
+                const mergedSummary = {
+                    ...summaryData,
+                    turnover,
+                    totalCredit,
+                    totalDebit,
+                    totalExpenses: summaryData.totalExpenses || totalExpensesCalculated,
+                    totalPayroll: summaryData.totalPayroll || totalPayroll,
+                };
+
+                setSummary(mergedSummary);
+                setExpenses(Array.isArray(expensesData) ? expensesData : []);
         } catch (error) {
             console.error('Failed to fetch finance data:', error);
             toast.error('Failed to load financial data');

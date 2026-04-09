@@ -5,4 +5,5 @@ export { default as RecentActivityFeed } from './components/RecentActivityFeed';
 export { default as PendingApprovals } from './components/PendingApprovals';
 export { default as UpcomingEvents } from './components/UpcomingEvents';
 export { default as ProductivityChart } from './components/ProductivityChart';
+export { default as FinancialSummaryCard } from './components/FinancialSummaryCard';
 export { default as useDashboardStore } from '../../store/useDashboardStore';
