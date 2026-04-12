@@ -19,7 +19,7 @@ const EmployeeStatus = {
 // Avatar Component with fallback logic
 const EmployeeAvatar = ({ employee, size = 'md' }) => {
   const [imageError, setImageError] = useState(false);
-  
+
   const getInitials = () => {
     const name = employee?.name || '';
     const parts = name.split(' ');
@@ -31,12 +31,12 @@ const EmployeeAvatar = ({ employee, size = 'md' }) => {
 
   const getColorFromName = () => {
     const colors = [
-      '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', 
+      '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e',
       '#ef4444', '#f97316', '#f59e0b', '#eab308',
       '#84cc16', '#10b981', '#14b8a6', '#06b6d4',
       '#0ea5e9', '#3b82f6', '#6366f1'
     ];
-    
+
     const name = employee?.name || '';
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -53,7 +53,7 @@ const EmployeeAvatar = ({ employee, size = 'md' }) => {
   };
 
   const avatarUrl = employee?.profileImage || employee?.avatar;
-  
+
   if (avatarUrl && !imageError) {
     return (
       <div className={`${sizeClasses[size]} rounded-full overflow-hidden bg-gray-100 flex-shrink-0`}>
@@ -68,7 +68,7 @@ const EmployeeAvatar = ({ employee, size = 'md' }) => {
   }
 
   return (
-    <div 
+    <div
       className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-medium text-white flex-shrink-0`}
       style={{ backgroundColor: getColorFromName() }}
     >
@@ -165,7 +165,7 @@ const EmployeeTable = ({
       [EmployeeStatus.ON_LEAVE]: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500' },
       [EmployeeStatus.TERMINATED]: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', dot: 'bg-red-500' },
     };
-    
+
     const config = statusConfig[employee.status] || statusConfig[EmployeeStatus.ACTIVE];
 
     return (

@@ -30,15 +30,15 @@ const EmployeeManagement = () => {
   });
 
   const { user, isAuthenticated } = useAuthStore();
-  const { 
-    employees, 
-    loading, 
-    error, 
-    fetchEmployees, 
-    createEmployee, 
-    updateEmployee, 
+  const {
+    employees,
+    loading,
+    error,
+    fetchEmployees,
+    createEmployee,
+    updateEmployee,
     deleteEmployee,
-    setEmployees 
+    setEmployees
   } = useEmployeeStore();
   const { bulkCheckIn } = useAttendanceStore();
 
@@ -75,7 +75,7 @@ const EmployeeManagement = () => {
     });
     return filtered;
   }, [employees, searchTerm, sortConfig]);
-  
+
   const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,

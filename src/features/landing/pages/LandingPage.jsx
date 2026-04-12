@@ -5,7 +5,7 @@ import {
     LogOut, User, Zap, Globe, MessageSquare, ChevronRight,
     Clock, Target, TrendingUp, Briefcase, Calendar,
     Download, Mail, Phone, Star, Play, Settings,
-    Bell, PieChart, Activity, Award, Rocket, DollarSign,
+    Bell, PieChart, Activity, Award, Rocket, IndianRupee,
     Eye, EyeOff, Lock, Fingerprint, Heart, Share2,
     Twitter, Linkedin, Facebook, Youtube, Menu, X
 } from 'lucide-react';
@@ -46,7 +46,7 @@ const LandingPage = () => {
             metrics: [
                 { label: 'Total Companies', value: '24', change: '+3', icon: <Briefcase className="w-4 h-4" /> },
                 { label: 'Active Users', value: '1,847', change: '+12%', icon: <Users className="w-4 h-4" /> },
-                { label: 'Revenue (MTD)', value: '₹84.2L', change: '+8%', icon: <DollarSign className="w-4 h-4" /> },
+                { label: 'Revenue (MTD)', value: '₹84.2L', change: '+8%', icon: <IndianRupee className="w-4 h-4" /> },
                 { label: 'System Health', value: '98.5%', change: 'Stable', icon: <Activity className="w-4 h-4" /> }
             ],
             quickActions: [
@@ -60,12 +60,12 @@ const LandingPage = () => {
                 { label: 'Total Employees', value: '156', change: '+8', icon: <Users className="w-4 h-4" /> },
                 { label: 'Projects Active', value: '23', change: '5 due', icon: <Briefcase className="w-4 h-4" /> },
                 { label: 'Pending Approvals', value: '12', change: 'Urgent: 3', icon: <Clock className="w-4 h-4" /> },
-                { label: 'This Month Payroll', value: '₹42.5L', change: 'Processing', icon: <DollarSign className="w-4 h-4" /> }
+                { label: 'This Month Payroll', value: '₹42.5L', change: 'Processing', icon: <IndianRupee className="w-4 h-4" /> }
             ],
             quickActions: [
                 { label: 'Add Employee', icon: <User className="w-4 h-4" />, path: '/employees/add' },
                 { label: 'Create Project', icon: <Target className="w-4 h-4" />, path: '/projects/create' },
-                { label: 'Run Payroll', icon: <DollarSign className="w-4 h-4" />, path: '/payroll/run' }
+                { label: 'Run Payroll', icon: <IndianRupee className="w-4 h-4" />, path: '/payroll/run' }
             ]
         },
         MANAGER: {
@@ -91,7 +91,7 @@ const LandingPage = () => {
             quickActions: [
                 { label: 'Mark Attendance', icon: <Clock className="w-4 h-4" />, path: '/attendance/mark' },
                 { label: 'Apply Leave', icon: <Calendar className="w-4 h-4" />, path: '/leaves/apply' },
-                { label: 'View Payslip', icon: <DollarSign className="w-4 h-4" />, path: '/payroll/payslips' }
+                { label: 'View Payslip', icon: <IndianRupee className="w-4 h-4" />, path: '/payroll/payslips' }
             ]
         }
     };
@@ -593,9 +593,9 @@ const LandingPage = () => {
                                 Automated attendance, leave management, and payroll processing with TDS, PF, and ESI calculations.
                             </p>
                             <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Auto attendance</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> Compliance ready</span>
+                                \u003cspan className="flex items-center gap-1"\u003e\u003cClock className="w-3 h-3" /\u003e Auto attendance\u003c/span\u003e
+                                \u003cspan\u003e•\u003c/span\u003e
+                                \u003cspan className="flex items-center gap-1"\u003e\u003cIndianRupee className="w-3 h-3" /\u003e Compliance ready\u003c/span\u003e
                             </div>
                         </div>
 

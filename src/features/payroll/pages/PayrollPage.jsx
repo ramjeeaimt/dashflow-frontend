@@ -335,10 +335,10 @@ const PayrollPage = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-sm">${record.basicSalary}</td>
-                                                <td className="px-6 py-4 text-sm text-green-600">+${record.allowances}</td>
-                                                <td className="px-6 py-4 text-sm text-red-600">-${record.deductions}</td>
-                                                <td className="px-6 py-4 text-sm font-bold text-foreground">${record.netSalary}</td>
+                                                <td className="px-6 py-4 text-sm">₹{record.basicSalary}</td>
+                                                <td className="px-6 py-4 text-sm text-green-600">+₹{record.allowances}</td>
+                                                <td className="px-6 py-4 text-sm text-red-600">-₹{record.deductions}</td>
+                                                <td className="px-6 py-4 text-sm font-bold text-foreground">₹{record.netSalary}</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                                                         }`}>

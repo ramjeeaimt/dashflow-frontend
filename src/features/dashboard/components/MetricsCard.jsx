@@ -41,7 +41,7 @@ const MetricsCard = ({ title, value, change, changeType, icon, color = "primary"
   };
 
   return (
-    <div className="group relative bg-white border border-slate-200/60 rounded-[2rem] p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1.5 overflow-hidden">
+    <div className="group relative bg-white border border-slate-200/60  p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1.5 overflow-hidden">
       {/* Subtle background glow on hover */}
       <div className={`absolute -right-8 -bottom-8 w-32 h-32 rounded-full opacity-0 group-hover:opacity-10 transition-opacity duration-700 blur-3xl ${config.bg}`}></div>
       

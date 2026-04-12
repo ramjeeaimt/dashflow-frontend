@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    DollarSign, 
+    IndianRupee, 
     TrendingUp, 
     TrendingDown, 
     PieChart, 
@@ -185,9 +185,6 @@ const FinanceDashboardPage = () => {
                                 className="bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
                             >
                                 <option value="INR">INR (₹)</option>
-                                <option value="USD">USD ($)</option>
-                                <option value="EUR">EUR (€)</option>
-                                <option value="GBP">GBP (£)</option>
                             </select>
                             <Button className="shadow-lg shadow-primary/20" iconName="Plus" onClick={() => setIsExpenseModalOpen(true)}>
                                 Add Expense
@@ -244,7 +241,7 @@ const FinanceDashboardPage = () => {
                         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="p-2.5 bg-green-500/10 rounded-xl text-green-500">
-                                    <DollarSign size={24} />
+                                    <IndianRupee size={24} />
                                 </div>
                                 <span className="flex items-center text-xs font-semibold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
                                     Healthy

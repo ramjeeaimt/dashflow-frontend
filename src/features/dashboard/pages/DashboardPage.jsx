@@ -8,9 +8,6 @@ import {
   AttendanceChart,
   ProductivityChart,
   QuickActionCard,
-  RecentActivityFeed,
-  PendingApprovals,
-  UpcomingEvents,
   FinancialSummaryCard,
   useDashboardStore
 } from 'features/dashboard';
@@ -32,7 +29,7 @@ const Dashboard = () => {
   const { metrics, charts, feed, financials, loading, fetchDashboardData, refreshDashboard } = useDashboardStore();
   const navigate = useNavigate();
 
-  const isAdmin = user?.roles?.some(role => 
+  const isAdmin = user?.roles?.some(role =>
     ['admin', 'owner', 'super-admin', 'manager'].includes(role.name.toLowerCase())
   );
 
@@ -144,13 +141,13 @@ const Dashboard = () => {
         <div className="p-6 max-w-[1600px] mx-auto">
 
           {/* Premium Welcome Header */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-[#1E40AF] to-[#3B82F6] rounded-3xl p-8 mb-10 shadow-xl shadow-blue-500/20 animate-in fade-in slide-in-from-top-4 duration-700">
+          {/* <div className="relative overflow-hidden bg-gradient-to-br from-[#1E40AF] to-[#3B82F6] rounded-3xl p-8 mb-10 shadow-xl shadow-blue-500/20 animate-in fade-in slide-in-from-top-4 duration-700"> */}
             {/* Decorative background elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/20 rounded-full -ml-16 -mb-16 blur-2xl"></div>
-            
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10  -mr-20 -mt-20 blur-3xl"></div>
+            {/* <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/20 rounded-full -ml-16 -mb-16 blur-2xl"></div> */}
+
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="text-white">
+              {/* <div className="text-white">
                 <div className="flex items-center gap-2 mb-2 opacity-80">
                   <Icon name="Briefcase" size={16} />
                   <span className="text-sm font-medium tracking-wide uppercase">Admin Overview</span>
@@ -159,9 +156,9 @@ const Dashboard = () => {
                 <p className="text-blue-100 text-lg max-w-xl">
                   Ready to manage your team? You have <span className="font-bold text-white underline decoration-white/30">12 pending applications</span> and 3 interviews scheduled for today.
                 </p>
-              </div>
+              </div> */}
 
-              <div className="flex items-center gap-4">
+              {/* <div className="flex items-center gap-4">
                 <div className="hidden sm:flex flex-col items-end text-white/90 mr-2">
                   <p className="font-bold text-lg">
                     {currentTime?.toLocaleTimeString('en-US', {
@@ -192,8 +189,8 @@ const Dashboard = () => {
                   <Icon name="Plus" size={20} />
                   Hire New Talent
                 </button>
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -213,10 +210,10 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 mb-10">
             <div className="xl:col-span-3 animate-in fade-in translate-y-4 duration-1000 delay-200 fill-mode-both">
-               <AttendanceChart data={charts?.attendance} loading={loading} />
+              <AttendanceChart data={charts?.attendance} loading={loading} />
             </div>
             <div className="xl:col-span-2 animate-in fade-in translate-y-4 duration-1000 delay-300 fill-mode-both">
-               <ProductivityChart data={charts?.productivity} loading={loading} />
+              <ProductivityChart data={charts?.productivity} loading={loading} />
             </div>
           </div>
 
@@ -251,22 +248,11 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in translate-y-4 duration-1000 delay-500 fill-mode-both px-1">
-            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden group">
-              <RecentActivityFeed activities={feed?.recentActivity} loading={loading} />
-            </div>
-            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden group">
-              <PendingApprovals approvals={feed?.pendingApprovals} loading={loading} />
-            </div>
-            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden group">
-              <UpcomingEvents events={feed?.upcomingEvents} loading={loading} />
-            </div>
-          </div>
 
         </div>
       </main>
 
-      {/* ✅ EMPLOYEE MODAL */}
+      {/*  EMPLOYEE MODAL */}
       <EmployeeModal
         isOpen={isEmployeeModalOpen}
         onClose={() => setIsEmployeeModalOpen(false)}

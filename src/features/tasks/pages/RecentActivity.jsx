@@ -94,7 +94,7 @@ const RecentActivity = ({ activities, employees, onActivityClick }) => {
         ) : (
           <div className="p-8 text-center">
             <Icon name="Activity" size={40} className="text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No recent activity</p>
+            <p className="text-sm text-muted-foreground">No recent activi</p>
           </div>
         )}
       </div>

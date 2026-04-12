@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, DollarSign, Tag, FileText, Calendar, Loader2 } from 'lucide-react';
+import { X, IndianRupee, Tag, FileText, Calendar, Loader2 } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 import financeService from '../../../services/finance.service';
@@ -81,7 +81,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
                     {/* Amount Input with Currency */}
                     <div className="space-y-1.5">
                         <label className="text-sm font-semibold flex items-center gap-2">
-                            <DollarSign size={14} className="text-primary" /> Amount *
+                            <IndianRupee size={14} className="text-primary" /> Amount *
                         </label>
                         <div className="relative group">
                             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
