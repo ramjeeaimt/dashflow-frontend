@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, IndianRupee, Tag, FileText, Calendar, Loader2 } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
@@ -6,7 +6,7 @@ import financeService from '../../../services/finance.service';
 import useAuthStore from '../../../store/useAuthStore';
 import { toast } from 'react-hot-toast';
 
-const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
+const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
     const { user } = useAuthStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
@@ -27,8 +27,41 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
         'Infrastructure',
         'Maintenance',
         'Tax',
-        'Misc'
+        'Misc',
+        'Glocery',
+        'Electricity',
+        'Water',
+        'Internet',
+        'Travel',
+        'Other'
     ];
+
+    // Initialize form with expense data when editing
+    useEffect(() => {
+        if (expenseToEdit) {
+            setFormData({
+                title: expenseToEdit.title || '',
+                description: expenseToEdit.description || '',
+                amount: expenseToEdit.amount || '',
+                category: expenseToEdit.category || 'Operating',
+                date: expenseToEdit.date ? expenseToEdit.date.split('T')[0] : new Date().toISOString().split('T')[0],
+                type: expenseToEdit.type || 'debit',
+                currency: expenseToEdit.currency || 'INR',
+                status: expenseToEdit.status || 'approved'
+            });
+        } else {
+            setFormData({
+                title: '',
+                description: '',
+                amount: '',
+                category: 'Operating',
+                date: new Date().toISOString().split('T')[0],
+                type: 'debit',
+                currency: 'INR',
+                status: 'approved'
+            });
+        }
+    }, [expenseToEdit, isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,17 +74,28 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
 
         setIsSubmitting(true);
         try {
-            await financeService.createExpense({
-                ...formData,
-                companyId: user.company.id,
-                amount: parseFloat(formData.amount)
-            });
-            toast.success('Expense recorded successfully');
+            if (expenseToEdit?.id) {
+                // Update existing expense
+                await financeService.updateExpense(expenseToEdit.id, {
+                    ...formData,
+                    companyId: user.company.id,
+                    amount: parseFloat(formData.amount)
+                });
+                toast.success('Expense updated successfully');
+            } else {
+                // Create new expense
+                await financeService.createExpense({
+                    ...formData,
+                    companyId: user.company.id,
+                    amount: parseFloat(formData.amount)
+                });
+                toast.success('Expense recorded successfully');
+            }
             onSuccess();
             onClose();
         } catch (error) {
-            console.error('Failed to create expense:', error);
-            toast.error(error.response?.data?.message || 'Failed to record expense');
+            console.error('Failed to save expense:', error);
+            toast.error(error.response?.data?.message || 'Failed to save expense');
         } finally {
             setIsSubmitting(false);
         }
@@ -59,17 +103,21 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
 
     if (!isOpen) return null;
 
+    const isEditing = !!expenseToEdit?.id;
+
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity" onClick={onClose} />
-            
+
             <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <div>
-                        <h2 className="text-xl font-bold">Add New Expense</h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">Record a company outflow or credit.</p>
+                        <h2 className="text-xl font-bold">{isEditing ? 'Edit Expense' : 'Add New Expense'}</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            {isEditing ? 'Update the expense details and correct any errors.' : 'Record a company outflow or credit.'}
+                        </p>
                     </div>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
                     >
@@ -172,18 +220,16 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
                                 <button
                                     type="button"
                                     onClick={() => setFormData(p => ({ ...p, type: 'debit' }))}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                                        formData.type === 'debit' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
-                                    }`}
+                                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${formData.type === 'debit' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                                        }`}
                                 >
                                     DEBIT (Out)
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setFormData(p => ({ ...p, type: 'credit' }))}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                                        formData.type === 'credit' ? 'bg-card text-green-500 shadow-sm' : 'text-muted-foreground'
-                                    }`}
+                                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${formData.type === 'credit' ? 'bg-card text-green-500 shadow-sm' : 'text-muted-foreground'
+                                        }`}
                                 >
                                     CREDIT (In)
                                 </button>
@@ -206,25 +252,25 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess }) => {
 
                     {/* Actions */}
                     <div className="flex items-center gap-3 pt-4">
-                        <Button 
-                            type="button" 
-                            variant="outline" 
+                        <Button
+                            type="button"
+                            variant="outline"
                             onClick={onClose}
                             className="flex-1 rounded-xl"
                         >
                             Cancel
                         </Button>
-                        <Button 
-                            type="submit" 
+                        <Button
+                            type="submit"
                             disabled={isSubmitting}
                             className="flex-1 rounded-xl shadow-lg shadow-primary/20"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">
-                                    <Loader2 size={16} className="animate-spin" /> Recording...
+                                    <Loader2 size={16} className="animate-spin" /> {isEditing ? 'Updating...' : 'Recording...'}
                                 </span>
                             ) : (
-                                'Record Expense'
+                                isEditing ? 'Update Expense' : 'Record Expense'
                             )}
                         </Button>
                     </div>

@@ -101,24 +101,26 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
         icon: 'Shield',
         tooltip: 'System configuration'
       },
+      // 
+      
       {
-        label: 'Jobs',
-        path: '/jobs',
+        label: 'Difmo Jobs',
+        path: '/difmo-jobs',
         icon: 'Briefcase',
-        tooltip: 'Manage job postings'
+        tooltip: 'Manage difmo jobs'
       },
-      {
-        label: 'Applications',
-        path: '/jobs/applications',
-        icon: 'ClipboardList',
-        tooltip: 'Candidate applications'
-      },
-      {
-        label: 'Messages',
-        path: '/messages',
-        icon: 'MessageSquare',
-        tooltip: 'Recruitment & inquiries'
-      },
+      // {
+      //   label: 'Applications',
+      //   path: '/jobs/applications',
+      //   icon: 'ClipboardList',
+      //   tooltip: 'Candidate applications'
+      // },
+      // {
+      //   label: 'Messages',
+      //   path: '/messages',
+      //   icon: 'MessageSquare',
+      //   tooltip: 'Recruitment & inquiries'
+      // },
     ];
   } else if (isEmployee) {
     navigationItems = [
@@ -249,14 +251,14 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
         <div className="p-4 border-t border-border">
           <div className={`flex items-center space-x-3 ${isCollapsed ? 'justify-center' : ''}`}>
             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-              <Icon name="User" size={16} className="text-muted-foreground" />
+              {/* <Icon name="User" size={16} className="text-muted-foreground" /> */}
             </div>
-            {!isCollapsed && (
+            {/* {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">Admin User</p>
                 <p className="text-xs text-muted-foreground truncate">admin@company.com</p>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </aside>

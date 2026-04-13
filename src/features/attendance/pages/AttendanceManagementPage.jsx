@@ -127,12 +127,12 @@ const AttendanceManagement = () => {
 
   const attendanceStats = {
     totalEmployees: attendanceData?.length || 0,
-    presentToday: attendanceData?.filter((emp) => emp?.status === 'present')?.length || 0,
-    absentToday: attendanceData?.filter((emp) => emp?.status === 'absent')?.length || 0,
+    presentToday: attendanceData?.filter((emp) => ['present', 'late', 'early_checkin', 'early_departure'].includes(emp?.status))?.length || 0,
+    absentToday: attendanceData?.filter((emp) => ['absent', 'not_checked_in'].includes(emp?.status))?.length || 0,
     lateArrivals: attendanceData?.filter((emp) => emp?.status === 'late')?.length || 0,
     earlyCheckins: attendanceData?.filter((emp) => emp?.status === 'early_checkin')?.length || 0,
     earlyDepartures: attendanceData?.filter((emp) => emp?.status === 'early_departure')?.length || 0,
-    avgProductivity: 0 // Placeholder
+    checkedOutTotal: attendanceData?.filter((emp) => emp?.checkOutTime && emp?.checkOutTime !== '--')?.length || 0,
   };
 
   return (
@@ -173,7 +173,7 @@ const AttendanceManagement = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 mb-6">
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center space-x-2">
                 <Icon name="Users" size={20} className="text-primary" />
@@ -226,10 +226,20 @@ const AttendanceManagement = () => {
 
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center space-x-2">
-                <Icon name="TrendingUp" size={20} className="text-blue-500" />
+                <Icon name="Sun" size={20} className="text-sky-500" />
                 <div>
-                  <p className="text-2xl font-semibold text-blue-500">--</p>
-                  <p className="text-xs text-muted-foreground">Avg Productivity</p>
+                  <p className="text-2xl font-semibold text-sky-500">{attendanceStats?.earlyCheckins}</p>
+                  <p className="text-xs text-muted-foreground">Early In</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <Icon name="LogOut" size={20} className="text-gray-500" />
+                <div>
+                  <p className="text-2xl font-semibold text-gray-500">{attendanceStats?.checkedOutTotal}</p>
+                  <p className="text-xs text-muted-foreground">Checked Out</p>
                 </div>
               </div>
             </div>

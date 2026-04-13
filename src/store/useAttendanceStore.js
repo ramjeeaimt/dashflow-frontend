@@ -90,6 +90,8 @@ const useAttendanceStore = create((set, get) => ({
         if (filters.status !== 'all') {
             if (filters.status === 'absent') {
                 filtered = filtered.filter((emp) => emp.status === 'absent' || emp.status === 'not_checked_in');
+            } else if (filters.status === 'present') {
+                filtered = filtered.filter((emp) => ['present', 'late', 'early_checkin', 'early_departure'].includes(emp.status));
             } else {
                 filtered = filtered.filter((emp) => emp.status === filters.status);
             }

@@ -11,18 +11,18 @@ const LocationVerification = ({ location, onRefreshLocation, workMode }) => {
     {
       id: 1,
       name: 'Main Office',
-      address: '123 Business District, Tech City',
-      latitude: 40.7128,
-      longitude: -74.0060,
-      radius: 100 // meters
+      address: '4/37 KV House vibhaavkhand gomti nagar lucknow',
+      latitude: 26.8611498,
+      longitude: 81.0175873,
+      radius: 250 // meters
     },
     {
       id: 2,
-      name: 'Branch Office',
-      address: '456 Innovation Hub, Tech Valley',
-      latitude: 37.7749,
-      longitude: -122.4194,
-      radius: 150
+      name: 'main office',
+      address: '4/37 KV House vibhaavkhand gomti nagar lucknow',
+      latitude: 26.8611498,
+      longitude: 81.0175873,
+      radius: 350
     }
   ];
 

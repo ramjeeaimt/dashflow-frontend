@@ -5,6 +5,8 @@ import { API_ENDPOINTS } from "../../../api/endpoints";
 import Header from "../../../components/ui/Header";
 import Sidebar from "../../../components/ui/Sidebar";
 import BreadcrumbNavigation from "../../../components/ui/BreadcrumbNavigation";
+import { X } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const ProjectEdit = () => {
     const { id } = useParams();
@@ -24,8 +26,23 @@ const ProjectEdit = () => {
         totalPayment: "",
         paymentReceived: "",
         assignedPeople: "",
+        assignedEmployeeIds: [],
     });
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployees, setSelectedEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
+
+    const fetchEmployees = async () => {
+        try {
+            const res = await apiClient.get(`${API_ENDPOINTS.EMPLOYEES.BASE}`);
+            const data = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
+            setEmployees(data);
+        } catch (err) {
+            console.error("Error fetching employees:", err);
+            toast.error("Failed to load employees");
+        }
+    };
 
     const fetchProject = async () => {
         try {
@@ -36,15 +53,22 @@ const ProjectEdit = () => {
                 ? (Array.isArray(data.assignedPeople) ? data.assignedPeople.join(", ") : data.assignedPeople.replace(/["{}]/g, "").split(",").join(", "))
                 : "";
 
-            setProject({ ...data, assignedPeople });
+            const assignedEmployeeIds = data.assignedEmployees
+                ? data.assignedEmployees.map(emp => emp.id)
+                : (data.assignedEmployeeIds || []);
+
+            setProject({ ...data, assignedPeople, assignedEmployeeIds });
+            setSelectedEmployees(assignedEmployeeIds);
         } catch (err) {
             console.error("Error fetching project:", err);
+            toast.error("Failed to load project");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
+        fetchEmployees();
         fetchProject();
     }, [id]);
 
@@ -53,22 +77,39 @@ const ProjectEdit = () => {
         setProject({ ...project, [name]: value });
     };
 
+    const handleEmployeeToggle = (employeeId) => {
+        setSelectedEmployees(prev =>
+            prev.includes(employeeId)
+                ? prev.filter(id => id !== employeeId)
+                : [...prev, employeeId]
+        );
+    };
+
+    const handleRemoveEmployee = (employeeId) => {
+        setSelectedEmployees(prev => prev.filter(id => id !== employeeId));
+    };
+
+    const getSelectedEmployeesDetails = () => {
+        return employees.filter(emp => selectedEmployees.includes(emp.id));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const payload = {
                 ...project,
+                assignedEmployeeIds: selectedEmployees,
                 assignedPeople: project.assignedPeople
                     .split(",")
                     .map((p) => p.trim()),
             };
 
             await apiClient.put(`${API_ENDPOINTS.PROJECTS.BASE}/${id}`, payload);
-            alert("Project updated successfully!");
+            toast.success("Project updated successfully!");
             navigate("/projects");
         } catch (err) {
             console.error("Error updating project:", err);
-            alert("Failed to update project.");
+            toast.error("Failed to update project.");
         }
     };
 
@@ -176,12 +217,73 @@ const ProjectEdit = () => {
                                         onChange={handleChange}
                                     />
                                     <InputField
-                                        label="Assigned People"
+                                        label="Assigned People (Legacy)"
                                         name="assignedPeople"
                                         value={project.assignedPeople}
                                         onChange={handleChange}
                                         placeholder="Comma separated team members"
                                     />
+                                </div>
+
+                                {/* Multi-Select Employees Section */}
+                                <div className="mt-8 pt-6 border-t border-border">
+                                    <h2 className="text-lg font-semibold mb-4">Assign Team Members</h2>
+
+                                    {/* Selected Employees Display */}
+                                    {getSelectedEmployeesDetails().length > 0 && (
+                                        <div className="mb-4 p-4 bg-muted/30 border border-border rounded-lg">
+                                            <p className="text-sm font-semibold mb-3 text-foreground">Selected Team Members ({selectedEmployees.length})</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {getSelectedEmployeesDetails().map(emp => (
+                                                    <div key={emp.id} className="bg-primary/20 border border-primary/50 rounded-full px-3 py-1 flex items-center gap-2 text-sm font-medium">
+                                                        {emp.user?.firstName} {emp.user?.lastName}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveEmployee(emp.id)}
+                                                            className="hover:bg-primary/30 rounded-full p-0.5 transition"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Dropdown to Select Employees */}
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowEmployeeDropdown(!showEmployeeDropdown)}
+                                            className="w-full p-3 bg-background border border-input rounded-lg text-left font-medium text-foreground hover:bg-muted/50 transition flex justify-between items-center"
+                                        >
+                                            <span>{selectedEmployees.length > 0 ? `${selectedEmployees.length} selected` : 'Select employees...'}</span>
+                                            <span className="text-xl">{showEmployeeDropdown ? '▲' : '▼'}</span>
+                                        </button>
+
+                                        {showEmployeeDropdown && (
+                                            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl z-10 max-h-64 overflow-y-auto">
+                                                {employees.length === 0 ? (
+                                                    <div className="p-4 text-center text-muted-foreground text-sm">No employees found</div>
+                                                ) : (
+                                                    employees.map(emp => (
+                                                        <label key={emp.id} className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b border-border last:border-b-0 transition">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedEmployees.includes(emp.id)}
+                                                                onChange={() => handleEmployeeToggle(emp.id)}
+                                                                className="w-4 h-4 rounded cursor-pointer"
+                                                            />
+                                                            <div className="flex-1">
+                                                                <p className="font-medium text-sm">{emp.user?.firstName} {emp.user?.lastName}</p>
+                                                                <p className="text-xs text-muted-foreground">{emp.designation || 'N/A'}</p>
+                                                            </div>
+                                                        </label>
+                                                    ))
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="flex justify-center space-x-4 pt-6">

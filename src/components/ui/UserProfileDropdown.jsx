@@ -102,7 +102,7 @@ const UserProfileDropdown = () => {
 
         <div className="hidden sm:block text-left">
           <p className="text-xs font-bold text-slate-800 leading-none">{userProfile?.name}</p>
-          <p className="text-[10px] text-slate-400 font-medium mt-1">{userProfile?.role}</p>
+          {/* <p className="text-[10px] text-slate-400 font-medium mt-1">{userProfile?.role}</p> */}
         </div>
 
         <Icon

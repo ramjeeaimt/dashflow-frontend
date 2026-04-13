@@ -28,18 +28,18 @@ const financeService = {
         }
     },
 
-  updateLeaveStatus: async (leaveId, status, adminComment = "") => {
+    updateLeaveStatus: async (leaveId, status, adminComment = "") => {
         try {
             if (!leaveId) throw new Error("Leave ID is missing!");
 
             //  FIX: Aapka naya endpoint logic use kar rahe hain
             // Ye banna chahiye: /leaves/123-abc/status
             const url = API_ENDPOINTS.LEAVES.UPDATE_STATUS(leaveId);
-            
+
             console.log(" Calling API:", url);
 
-            const response = await apiClient.patch(url, { 
-                status: status.toUpperCase(), 
+            const response = await apiClient.patch(url, {
+                status: status.toUpperCase(),
                 adminComment: adminComment // Backend DTO mein ye hona chahiye
             });
 
@@ -49,7 +49,7 @@ const financeService = {
             throw error;
         }
     },
-    
+
     getExpenses: async (companyId) => {
         const response = await apiClient.get(`${API_ENDPOINTS.FINANCE.BASE}/expenses`, {
             params: { companyId }
@@ -58,9 +58,14 @@ const financeService = {
         return Array.isArray(data) ? data : [];
     },
 
-    
+
     createExpense: async (data) => {
         const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/expenses`, data);
+        return response.data;
+    },
+
+    updateExpense: async (expenseId, data) => {
+        const response = await apiClient.patch(`${API_ENDPOINTS.FINANCE.BASE}/expenses/${expenseId}`, data);
         return response.data;
     },
 
@@ -73,26 +78,26 @@ const financeService = {
         return response.data.data || response.data;
     },
 
-   getEmployeePayrolls: async (employeeId) => {
+    getEmployeePayrolls: async (employeeId) => {
 
-  const res = await apiClient.get("/finance/payroll", {
-    params: { employeeId }
-  });
-  console.log("USER ID", user.id)
+        const res = await apiClient.get("/finance/payroll", {
+            params: { employeeId }
+        });
+        console.log("USER ID", user.id)
 
-console.log("EMPLOYEE ID", employeeId)
+        console.log("EMPLOYEE ID", employeeId)
 
-  return res.data.data || res.data;
-},
+        return res.data.data || res.data;
+    },
 
- 
-  
 
-  getPayrollById: async (id) => {
-    const res = await apiClient.get(`/payroll/${id}`);
-    return res.data;
-  },
-  
+
+
+    getPayrollById: async (id) => {
+        const res = await apiClient.get(`/payroll/${id}`);
+        return res.data;
+    },
+
 };
 
 export default financeService;

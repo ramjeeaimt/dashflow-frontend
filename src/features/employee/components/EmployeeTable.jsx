@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import apiClient from '../../../api/client';
 import Icon from '../../../components/AppIcon';
@@ -89,10 +89,60 @@ const EmployeeTable = ({
   sortConfig,
   onSort
 }) => {
+  const [roles, setRoles] = useState([]);
+  const [rolesMap, setRolesMap] = useState({});
 
   /**
-   * 2. API HANDLERS
+   * 1. FETCH ROLES ON MOUNT
    */
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await apiClient.get('/access-control/roles');
+        if (response.data && Array.isArray(response.data)) {
+          setRoles(response.data);
+          // Create a map of role ID to role name for quick lookup
+          const map = {};
+          response.data.forEach(role => {
+            map[role.id] = role.name;
+            map[role._id] = role.name;
+          });
+          setRolesMap(map);
+        }
+      } catch (error) {
+        console.error('Failed to fetch roles:', error);
+      }
+    };
+    fetchRoles();
+  }, []);
+
+  /**
+   * GET ROLE NAME FROM ID OR OBJECT
+   */
+  const getRoleName = (role) => {
+    if (!role) return 'Employee';
+
+    // If role is an object with name property
+    if (typeof role === 'object' && role.name) {
+      return role.name;
+    }
+
+    // If role is an object with title property
+    if (typeof role === 'object' && role.title) {
+      return role.title;
+    }
+
+    // If role is a string ID, look it up in the map
+    if (typeof role === 'string') {
+      const roleName = rolesMap[role];
+      if (roleName) return roleName;
+
+      // If it's not an ID (less than 24 chars), return as is
+      if (role.length < 24) return role;
+    }
+
+    return 'Employee';
+  };
 
   const handlePermissionToggle = async (employeeId) => {
     const toastId = toast.loading("Updating verification...");
@@ -250,7 +300,9 @@ const EmployeeTable = ({
                   <span className="text-sm text-gray-700">{employee.department || '—'}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-sm text-gray-700">{employee.role || '—'}</span>
+                  <span className="text-sm text-gray-700">
+                    {getRoleName(employee.role)}
+                  </span>
                 </td>
                 <td className="px-4 py-3">
                   {renderStatusDropdown(employee)}
@@ -349,7 +401,7 @@ const EmployeeTable = ({
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Role</p>
-                <p className="text-sm text-gray-900 font-medium">{employee.role || '—'}</p>
+                <p className="text-sm text-gray-900 font-medium">{getRoleName(employee.role)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Status</p>

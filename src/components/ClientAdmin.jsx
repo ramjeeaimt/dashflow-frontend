@@ -1053,6 +1053,62 @@ const ClientAdmin = () => {
                             </div>
                           </div>
                         )}
+
+                        {/* Associated Projects Section */}
+                        {item.clientProjects && item.clientProjects.length > 0 && (
+                          <div className="mt-6 border-t border-gray-200 pt-4">
+                            <h5 className="text-xs font-semibold text-purple-700 mb-3 flex items-center gap-1 uppercase tracking-wide">
+                              <Briefcase size={14} /> Client Projects
+                            </h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {item.clientProjects.map(proj => (
+                                <div key={proj.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <h6 className="font-bold text-gray-900 text-sm">{proj.projectName}</h6>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                      proj.status === 'active' ? 'bg-green-100 text-green-700' :
+                                      proj.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                                      'bg-yellow-100 text-yellow-700'
+                                    }`}>
+                                      {proj.status || 'Active'}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 mb-3 line-clamp-2 min-h-[32px]">
+                                    {proj.description || 'No description provided.'}
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="bg-gray-50 p-2 rounded border border-gray-100">
+                                      <p className="text-gray-500 font-medium">Phase</p>
+                                      <p className="font-semibold text-gray-800">{proj.phase || 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-2 rounded border border-gray-100">
+                                      <p className="text-gray-500 font-medium">Budget</p>
+                                      <p className="font-semibold text-gray-800">₹{proj.budget?.toLocaleString() || '0'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-2 rounded border border-gray-100 flex flex-col justify-center">
+                                      <p className="text-gray-500 font-medium">Deadline</p>
+                                      <p className={`font-semibold ${new Date(proj.deadline) < new Date() ? 'text-red-600' : 'text-gray-800'}`}>
+                                        {proj.deadline ? new Date(proj.deadline).toLocaleDateString() : 'N/A'}
+                                      </p>
+                                    </div>
+                                    <div className="bg-gray-50 p-2 rounded border border-gray-100 flex flex-col items-center justify-center">
+                                       <button 
+                                          onClick={(e) => {
+                                             e.stopPropagation();
+                                             setExpandedId(proj.id);
+                                             window.scrollTo({ top: 0, behavior: 'smooth' });
+                                          }}
+                                          className="text-blue-600 hover:text-blue-800 font-medium hover:underline text-center w-full"
+                                       >
+                                         View Full Details <ArrowRight size={12} className="inline ml-1"/>
+                                       </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -19,6 +19,9 @@ const AddProject = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
+  const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
 
   const [dynamicFields, setDynamicFields] = useState({
     1: [], 2: [], 3: [], 4: []
@@ -30,6 +33,7 @@ const AddProject = () => {
     assigningDate: "",
     deadline: "",
     assignedPeople: "",
+    assignedEmployeeIds: [],
     clientName: "",
     clientEmail: "",
     contactInfo: "",
@@ -40,6 +44,26 @@ const AddProject = () => {
     tasks: [{ taskName: "", assignedTo: "", status: "Pending" }],
     notes: ""
   });
+
+  // Fetch employees from API
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/employees', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setEmployees(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch employees:', error);
+      }
+    };
+    fetchEmployees();
+  }, []);
 
   useEffect(() => {
     if (user?.company?.id && projects.length === 0) {
@@ -101,7 +125,10 @@ const AddProject = () => {
         companyId: user.company.id,
         totalPayment: Number(formData.totalPayment),
         paymentReceived: Number(formData.paymentReceived),
-        assignedPeople: formData.assignedPeople ? formData.assignedPeople.split(",") : [],
+        assignedPeople: selectedEmployeeIds.length > 0
+          ? selectedEmployeeIds
+          : (formData.assignedPeople ? formData.assignedPeople.split(",") : []),
+        assignedEmployeeIds: selectedEmployeeIds,
         description: formData.notes
       };
       await createProject(payload);
@@ -162,17 +189,15 @@ const AddProject = () => {
                     <button
                       type="button"
                       onClick={() => setStep(s.num)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                        isActive
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
                           ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
                           : isCompleted
-                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                          : "bg-slate-50 text-slate-400 border border-slate-200"
-                      }`}
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-slate-50 text-slate-400 border border-slate-200"
+                        }`}
                     >
-                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                        isActive ? "bg-white/20" : isCompleted ? "bg-emerald-100" : "bg-slate-100"
-                      }`}>
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isActive ? "bg-white/20" : isCompleted ? "bg-emerald-100" : "bg-slate-100"
+                        }`}>
                         {isCompleted ? <Check size={16} className="text-emerald-600" /> : <StepIcon size={16} />}
                       </div>
                       <div className="hidden md:block text-left">
@@ -181,9 +206,8 @@ const AddProject = () => {
                       </div>
                     </button>
                     {i < steps.length - 1 && (
-                      <div className={`flex-1 h-0.5 mx-2 rounded-full ${
-                        step > s.num ? "bg-emerald-400" : "bg-slate-200"
-                      }`} />
+                      <div className={`flex-1 h-0.5 mx-2 rounded-full ${step > s.num ? "bg-emerald-400" : "bg-slate-200"
+                        }`} />
                     )}
                   </React.Fragment>
                 );
@@ -213,7 +237,85 @@ const AddProject = () => {
                   <InputField label="Start Date" type="date" name="assigningDate" value={formData.assigningDate} onChange={handleChange} icon={<Calendar size={14} />} />
                   <InputField label="Deadline" type="date" name="deadline" value={formData.deadline} onChange={handleChange} icon={<Clock size={14} />} />
                   <div className="md:col-span-2">
-                    <InputField label="Assigned People" name="assignedPeople" value={formData.assignedPeople} onChange={handleChange} placeholder="Comma separated names" icon={<Users size={14} />} />
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <Users size={14} /> Assigned People
+                      </label>
+                      <div className="relative">
+                        <div
+                          onClick={() => setShowEmployeeDropdown(!showEmployeeDropdown)}
+                          className="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all cursor-pointer hover:border-slate-300"
+                        >
+                          {selectedEmployeeIds.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                              {selectedEmployeeIds.map(empId => {
+                                const emp = employees.find(e => e.id === empId);
+                                return (
+                                  <span key={empId} className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2">
+                                    {emp?.name || 'Unknown'}
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedEmployeeIds(selectedEmployeeIds.filter(id => id !== empId));
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          assignedEmployeeIds: prev.assignedEmployeeIds.filter(id => id !== empId)
+                                        }));
+                                      }}
+                                      className="hover:text-indigo-900"
+                                    >
+                                      <X size={12} />
+                                    </button>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <span className="text-slate-400">Select employees...</span>
+                          )}
+                        </div>
+                        {showEmployeeDropdown && (
+                          <div className="absolute top-full left-0 w-full bg-white border border-slate-200 mt-1 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto">
+                            {Array.isArray(employees) && employees.map(emp => (
+                              <label key={emp.id} className="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b last:border-none flex items-center gap-3 transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedEmployeeIds.includes(emp.id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      const newIds = [...selectedEmployeeIds, emp.id];
+                                      setSelectedEmployeeIds(newIds);
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        assignedEmployeeIds: newIds
+                                      }));
+                                    } else {
+                                      const newIds = selectedEmployeeIds.filter(id => id !== emp.id);
+                                      setSelectedEmployeeIds(newIds);
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        assignedEmployeeIds: newIds
+                                      }));
+                                    }
+                                  }}
+                                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                />
+                                <div className="flex-1">
+                                  <p className="text-sm font-semibold text-slate-800">{emp.name}</p>
+                                  <p className="text-xs text-slate-500">{emp.department || 'N/A'}</p>
+                                </div>
+                              </label>
+                            ))}
+                            {(!Array.isArray(employees) || employees.length === 0) && (
+                              <div className="px-4 py-8 text-center text-slate-500 text-sm">
+                                No employees available
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <DynamicInputsArea step={1} fields={dynamicFields[1]} onAdd={() => addDynamicInput(1)} onChange={handleDynamicInputChange} onRemove={removeDynamicInput} />
@@ -358,11 +460,10 @@ const AddProject = () => {
               <button
                 type="button"
                 onClick={step === 4 ? handleSubmit : () => setStep(step + 1)}
-                className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-lg ${
-                  step === 4
+                className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-lg ${step === 4
                     ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-200 hover:shadow-emerald-300"
                     : "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-indigo-200 hover:shadow-indigo-300"
-                }`}
+                  }`}
               >
                 {step === 4 ? (loading ? "Creating..." : "Create Project") : "Next Step"}
                 {step === 4 ? <Check size={16} /> : <ChevronRight size={16} />}

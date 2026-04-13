@@ -1,28 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    IndianRupee, 
-    TrendingUp, 
-    TrendingDown, 
-    PieChart, 
-    Plus, 
-    Calendar, 
-    Filter, 
-    ArrowUpRight, 
+import {
+    DollarSign,
+    TrendingUp,
+    TrendingDown,
+    PieChart,
+    Plus,
+    Calendar,
+    Filter,
+    ArrowUpRight,
     ArrowDownRight,
     CreditCard,
     Wallet,
     Receipt,
-    Download
+    Download,
+    Edit2
 } from 'lucide-react';
-import { 
-    BarChart, 
-    Bar, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    ResponsiveContainer, 
-    AreaChart, 
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    AreaChart,
     Area,
     PieChart as RePieChart,
     Pie,
@@ -36,6 +37,7 @@ import useAuthStore from '../../../store/useAuthStore';
 import financeService from '../../../services/finance.service';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import ExpenseModal from '../components/ExpenseModal';
+import ExpenseViewModal from '../components/ExpenseViewModal';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
@@ -45,30 +47,17 @@ const FinanceDashboardPage = () => {
     const [expenses, setExpenses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+    const [editingExpense, setEditingExpense] = useState(null);
+    const [viewingExpense, setViewingExpense] = useState(null);
     const { user } = useAuthStore();
     const [selectedCurrency, setSelectedCurrency] = useState('INR');
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('All');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    
-    // Charts Data (Fake for now, will connect to backend summary once data exists)
-    const trendData = [
-        { month: 'Jan', revenue: 450000, expenses: 320000 },
-        { month: 'Feb', revenue: 520000, expenses: 380000 },
-        { month: 'Mar', revenue: 480000, expenses: 410000 },
-        { month: 'Apr', revenue: 610000, expenses: 420000 },
-        { month: 'May', revenue: 590000, expenses: 390000 },
-        { month: 'Jun', revenue: 720000, expenses: 450000 },
-    ];
 
-    const categoryData = [
-        { name: 'Rent', value: 45000, color: '#6366f1' },
-        { name: 'Salaries', value: 250000, color: '#10b981' },
-        { name: 'Utilities', value: 15000, color: '#f59e0b' },
-        { name: 'Marketing', value: 35000, color: '#ef4444' },
-        { name: 'Misc', value: 12000, color: '#8b5cf6' },
-    ];
+    const [trendData, setTrendData] = useState([]);
+    const [categoryData, setCategoryData] = useState([]);
 
     useEffect(() => {
         if (user?.company?.id) {
@@ -79,41 +68,99 @@ const FinanceDashboardPage = () => {
     const fetchFinanceData = async () => {
         setIsLoading(true);
         try {
-                const [summaryRes, expensesRes, payrollsRes] = await Promise.all([
-                    financeService.getSummary(user.company.id),
-                    financeService.getExpenses(user.company.id),
-                    financeService.getPayroll(user.company.id)
-                ]);
+            const [summaryRes, expensesRes, payrollsRes] = await Promise.all([
+                financeService.getSummary(user.company.id),
+                financeService.getExpenses(user.company.id),
+                financeService.getPayroll(user.company.id)
+            ]);
 
-                const summaryData = summaryRes?.data || summaryRes || {};
-                const expensesData = expensesRes?.data || expensesRes || [];
-                const payrollsData = Array.isArray(payrollsRes) ? payrollsRes : (payrollsRes?.data || payrollsRes || []);
+            const summaryData = summaryRes?.data || summaryRes || {};
+            const expensesData = expensesRes?.data || expensesRes || [];
+            const payrollsData = Array.isArray(payrollsRes) ? payrollsRes : (payrollsRes?.data || payrollsRes || []);
 
-                // Calculate credits and debits from expenses list
-                const totalCredit = (expensesData || []).reduce((acc, e) => acc + (e.type === 'credit' ? Number(e.amount || 0) : 0), 0);
-                const totalDebit = (expensesData || []).reduce((acc, e) => acc + (e.type === 'credit' ? 0 : Number(e.amount || 0)), 0);
+            // Calculate credits and debits from expenses list
+            const totalCredit = (expensesData || []).reduce((acc, e) => acc + (e.type === 'credit' ? Number(e.amount || 0) : 0), 0);
+            const totalDebit = (expensesData || []).reduce((acc, e) => acc + (e.type === 'credit' ? 0 : Number(e.amount || 0)), 0);
 
-                // Payroll total from payrolls endpoint (each payroll item may have `amount`)
-                const totalPayroll = (payrollsData || []).reduce((acc, p) => acc + Number(p.amount || p.total || 0), 0);
+            // Payroll total from payrolls endpoint (each payroll item may have `netSalary` or `amount`)
+            const totalPayroll = (payrollsData || []).reduce((acc, p) => acc + Number(p.netSalary || p.amount || p.total || 0), 0);
 
-                // Determine turnover: prefer server value, else use credits sum
-                const turnover = summaryData.turnover || totalCredit;
+            // Determine turnover: prefer server value, else use credits sum
+            const turnover = summaryData.turnover || totalCredit;
 
-                // Total expenses (excluding payroll) are debits
-                const totalExpensesCalculated = totalDebit;
+            // Total expenses (excluding payroll) are debits
+            const totalExpensesCalculated = totalDebit;
 
-                // Merge computed fields with server summary (server wins when present)
-                const mergedSummary = {
-                    ...summaryData,
-                    turnover,
-                    totalCredit,
-                    totalDebit,
-                    totalExpenses: summaryData.totalExpenses || totalExpensesCalculated,
-                    totalPayroll: summaryData.totalPayroll || totalPayroll,
+            // Merge computed fields with server summary (server wins when present)
+            const mergedSummary = {
+                ...summaryData,
+                turnover,
+                totalCredit,
+                totalDebit,
+                totalExpenses: summaryData.totalExpenses || totalExpensesCalculated,
+                totalPayroll: summaryData.totalPayroll || totalPayroll,
+            };
+
+            setSummary(mergedSummary);
+            setExpenses(Array.isArray(expensesData) ? expensesData : []);
+
+            // Compute Chart Data dynamically
+            const categoryMap = {};
+            const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899'];
+            let colorIdx = 0;
+
+            (expensesData || []).forEach(exp => {
+                if (exp.type !== 'credit') {
+                    const cat = exp.category || 'Misc';
+                    if (!categoryMap[cat]) {
+                        categoryMap[cat] = { name: cat, value: 0, color: colors[colorIdx % colors.length] };
+                        colorIdx++;
+                    }
+                    categoryMap[cat].value += Number(exp.amount || 0);
+                }
+            });
+            setCategoryData(Object.values(categoryMap).sort((a, b) => b.value - a.value));
+
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const trendMap = {};
+            const today = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                const monthStr = months[d.getMonth()];
+                trendMap[`${d.getFullYear()}-${d.getMonth()}`] = {
+                    month: monthStr,
+                    revenue: 0,
+                    expenses: 0,
+                    year: d.getFullYear(),
+                    monthNum: d.getMonth()
                 };
+            }
 
-                setSummary(mergedSummary);
-                setExpenses(Array.isArray(expensesData) ? expensesData : []);
+            (expensesData || []).forEach(exp => {
+                const d = exp.date ? new Date(exp.date) : new Date();
+                const key = `${d.getFullYear()}-${d.getMonth()}`;
+                if (trendMap[key]) {
+                    if (exp.type === 'credit') {
+                        trendMap[key].revenue += Number(exp.amount || 0);
+                    } else {
+                        trendMap[key].expenses += Number(exp.amount || 0);
+                    }
+                }
+            });
+
+            payrollsData.forEach(p => {
+                const pMonth = p.month ? p.month - 1 : new Date(p.createdAt || new Date()).getMonth();
+                const pYear = p.year || new Date(p.createdAt || new Date()).getFullYear();
+                const key = `${pYear}-${pMonth}`;
+                if (trendMap[key]) {
+                    trendMap[key].expenses += Number(p.netSalary || p.amount || p.total || 0);
+                }
+            });
+
+            setTrendData(Object.values(trendMap).sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.monthNum - b.monthNum;
+            }).map(t => ({ month: t.month, revenue: t.revenue, expenses: t.expenses })));
         } catch (error) {
             console.error('Failed to fetch finance data:', error);
             toast.error('Failed to load financial data');
@@ -136,15 +183,15 @@ const FinanceDashboardPage = () => {
     };
 
     const filteredExpenses = expenses.filter(expense => {
-        const matchesSearch = 
+        const matchesSearch =
             (expense.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
             (expense.category?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
             (expense.employee?.user?.firstName?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-        
+
         const matchesCategory = filterCategory === 'All' || expense.category === filterCategory;
-        
+
         const expenseDate = new Date(expense.date);
-        const matchesDate = 
+        const matchesDate =
             (!startDate || expenseDate >= new Date(startDate)) &&
             (!endDate || expenseDate <= new Date(endDate));
 
@@ -158,18 +205,32 @@ const FinanceDashboardPage = () => {
         setEndDate('');
     };
 
+    const handleEditExpense = (expense) => {
+        setEditingExpense(expense);
+        setIsExpenseModalOpen(true);
+    };
+
+    const handleViewExpense = (expense) => {
+        setViewingExpense(expense);
+    };
+
+    const handleCloseModal = () => {
+        setIsExpenseModalOpen(false);
+        setEditingExpense(null);
+    };
+
     return (
         <div className="min-h-screen bg-background text-foreground">
             <Header />
-            <Sidebar 
-                isCollapsed={sidebarCollapsed} 
-                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            <Sidebar
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
             />
-            
+
             <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-12 flex flex-col min-h-screen`}>
                 <div className="p-6 max-w-7xl mx-auto w-full">
                     <BreadcrumbNavigation items={breadcrumbItems} />
-                    
+
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
@@ -179,14 +240,20 @@ const FinanceDashboardPage = () => {
                             <p className="text-muted-foreground mt-1">Track your company's financial health and expenses.</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <select 
+                            <select
                                 value={selectedCurrency}
                                 onChange={(e) => setSelectedCurrency(e.target.value)}
                                 className="bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
                             >
                                 <option value="INR">INR (₹)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
                             </select>
-                            <Button className="shadow-lg shadow-primary/20" iconName="Plus" onClick={() => setIsExpenseModalOpen(true)}>
+                            <Button className="shadow-lg shadow-primary/20" iconName="Plus" onClick={() => {
+                                setEditingExpense(null);
+                                setIsExpenseModalOpen(true);
+                            }}>
                                 Add Expense
                             </Button>
                         </div>
@@ -206,7 +273,7 @@ const FinanceDashboardPage = () => {
                                 </span>
                             </div>
                             <h3 className="text-sm font-medium text-muted-foreground">Est. Turnover</h3>
-                            <p className="text-2xl font-bold mt-1">{formatCurrency(summary?.turnover || 5000000)}</p>
+                            <p className="text-2xl font-bold mt-1">{formatCurrency(summary?.turnover || 0)}</p>
                         </div>
 
                         {/* Total Expenses */}
@@ -241,7 +308,7 @@ const FinanceDashboardPage = () => {
                         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="p-2.5 bg-green-500/10 rounded-xl text-green-500">
-                                    <IndianRupee size={24} />
+                                    <DollarSign size={24} />
                                 </div>
                                 <span className="flex items-center text-xs font-semibold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
                                     Healthy
@@ -249,7 +316,7 @@ const FinanceDashboardPage = () => {
                             </div>
                             <h3 className="text-sm font-medium text-muted-foreground">Net Profit</h3>
                             <p className="text-2xl font-bold mt-1 text-green-500">
-                                {formatCurrency((summary?.turnover || 5000000) + (summary?.totalCredit || 0) - (summary?.totalDebit || 0) - (summary?.totalPayroll || 0))}
+                                {formatCurrency((summary?.turnover || 0) - (summary?.totalExpenses || 0) - (summary?.totalPayroll || 0))}
                             </p>
                         </div>
                     </div>
@@ -277,28 +344,28 @@ const FinanceDashboardPage = () => {
                                     <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                         <defs>
                                             <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                             </linearGradient>
                                             <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/>
-                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.2} />
+                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                                        <XAxis 
-                                            dataKey="month" 
-                                            axisLine={false} 
-                                            tickLine={false} 
-                                            tick={{ fill: '#888', fontSize: 12 }} 
+                                        <XAxis
+                                            dataKey="month"
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fill: '#888', fontSize: 12 }}
                                         />
-                                        <YAxis 
-                                            axisLine={false} 
-                                            tickLine={false} 
-                                            tick={{ fill: '#888', fontSize: 12 }} 
+                                        <YAxis
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fill: '#888', fontSize: 12 }}
                                             tickFormatter={(val) => `₹${val / 1000}k`}
                                         />
-                                        <Tooltip 
+                                        <Tooltip
                                             contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '12px' }}
                                             itemStyle={{ fontSize: '13px' }}
                                         />
@@ -326,8 +393,8 @@ const FinanceDashboardPage = () => {
                                                 <Cell key={`cell-${index}`} fill={entry.color} />
                                             ))}
                                         </Pie>
-                                        <Tooltip 
-                                             contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '12px' }}
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '12px' }}
                                         />
                                     </RePieChart>
                                 </ResponsiveContainer>
@@ -353,13 +420,13 @@ const FinanceDashboardPage = () => {
                                 <h3 className="text-xl font-bold">Recent Transactions</h3>
                                 <p className="text-xs text-muted-foreground mt-0.5">Lateast expenses and incoming credits</p>
                             </div>
-                             <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4">
                                 <div className="flex flex-wrap items-center gap-3">
                                     <div className="relative">
                                         <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                        <input 
-                                            type="text" 
-                                            placeholder="Search records..." 
+                                        <input
+                                            type="text"
+                                            placeholder="Search records..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             className="bg-background border border-border rounded-lg pl-9 pr-4 py-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-primary/50"
@@ -379,18 +446,18 @@ const FinanceDashboardPage = () => {
                                         <option value="Tax">Tax</option>
                                         <option value="Misc">Misc</option>
                                     </select>
-                                    
+
                                     <div className="flex items-center gap-2 bg-muted/30 px-3 py-1.5 rounded-lg border border-border">
                                         <Calendar size={14} className="text-muted-foreground" />
-                                        <input 
-                                            type="date" 
+                                        <input
+                                            type="date"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
                                             className="bg-transparent text-xs focus:outline-none"
                                         />
                                         <span className="text-muted-foreground text-xs">to</span>
-                                        <input 
-                                            type="date" 
+                                        <input
+                                            type="date"
                                             value={endDate}
                                             onChange={(e) => setEndDate(e.target.value)}
                                             className="bg-transparent text-xs focus:outline-none"
@@ -398,7 +465,7 @@ const FinanceDashboardPage = () => {
                                     </div>
 
                                     {(searchTerm || filterCategory !== 'All' || startDate || endDate) && (
-                                        <button 
+                                        <button
                                             onClick={resetFilters}
                                             className="text-xs font-semibold text-primary hover:underline"
                                         >
@@ -407,7 +474,7 @@ const FinanceDashboardPage = () => {
                                     )}
 
                                     <div className="flex-1" />
-                                    
+
                                     <button className="p-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
                                         <Download size={18} />
                                     </button>
@@ -424,6 +491,7 @@ const FinanceDashboardPage = () => {
                                         <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Date</th>
                                         <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Status</th>
                                         <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-right">Amount</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border/50">
@@ -469,14 +537,32 @@ const FinanceDashboardPage = () => {
                                                     {format(new Date(expense.date), 'MMM dd, yyyy')}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                                        expense.status === 'approved' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-                                                    }`}>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${expense.status === 'approved' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+                                                        }`}>
                                                         {expense.status || 'Verified'}
                                                     </span>
                                                 </td>
                                                 <td className={`px-6 py-4 text-sm font-bold text-right ${expense.type === 'credit' ? 'text-green-500' : 'text-foreground'}`}>
                                                     {expense.type === 'credit' ? '+' : '-'}{formatCurrency(expense.amount)}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <button
+                                                            onClick={() => handleViewExpense(expense)}
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/10 rounded-lg transition-colors border border-blue-500/30 hover:border-blue-500/50"
+                                                            title="View details"
+                                                        >
+                                                            👁️ View
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleEditExpense(expense)}
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 rounded-lg transition-colors border border-primary/30 hover:border-primary/50"
+                                                            title="Edit details"
+                                                        >
+                                                            <Edit2 size={14} />
+                                                            Edit
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -487,10 +573,16 @@ const FinanceDashboardPage = () => {
                     </div>
                 </div>
 
-                <ExpenseModal 
+                <ExpenseModal
                     isOpen={isExpenseModalOpen}
-                    onClose={() => setIsExpenseModalOpen(false)}
+                    onClose={handleCloseModal}
                     onSuccess={fetchFinanceData}
+                    expenseToEdit={editingExpense}
+                />
+                <ExpenseViewModal
+                    isOpen={!!viewingExpense}
+                    onClose={() => setViewingExpense(null)}
+                    expense={viewingExpense}
                 />
             </main>
         </div>

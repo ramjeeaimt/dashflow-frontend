@@ -59,14 +59,16 @@ const Dashboard = () => {
       icon: 'Users',
       color: 'primary'
     },
-    {
-      title: 'Present Today',
-      value: (metrics?.presentToday ?? 0).toString(),
-      change: '+5.2%',
-      changeType: 'positive',
-      icon: 'UserCheck',
-      color: 'success'
-    },
+    // {
+    //   title: 'Present Today',
+    //   value: `${metrics?.presentToday ?? 0} / ${metrics?.totalEmployees ?? 0}`,
+    //   change: metrics?.attendanceBreakdown > 0 
+    //     ? `${metrics.attendanceBreakdown.early} Early, ${metrics.attendanceBreakdown.late} Late` 
+    //     : `${metrics?.attendanceBreakdown?.early || 0} Early`,
+    //   changeType: metrics?.attendanceBreakdown?.late > 0 ? 'negative' : 'positive',
+    //   icon: 'UserCheck',
+    //   color: 'success'
+    // },
     {
       title: 'Tasks Completed',
       value: (metrics?.tasksCompleted ?? 0).toString(),
