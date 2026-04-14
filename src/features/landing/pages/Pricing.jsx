@@ -56,7 +56,7 @@ const Pricing = () => {
                             <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
                                 <Link to="/features" className="hover:text-blue-600 transition">Features</Link>
                                 <Link to="/pricing" className="text-blue-600 font-bold border-b-2 border-blue-600">Pricing</Link>
-                                <Link to="/privacypolicy" className="hover:text-blue-600 transition">Privacy</Link>
+                                <Link to="/privacy-policy" className="hover:text-blue-600 transition">Privacy</Link>
                             </div>
                         </div>
 

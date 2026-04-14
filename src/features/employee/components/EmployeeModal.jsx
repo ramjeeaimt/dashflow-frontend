@@ -312,403 +312,407 @@ const EmployeeModal = ({
   const modalTitle = mode === 'add' ? 'Add New Employee' : mode === 'edit' ? 'Edit Employee' : 'Employee Details';
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden text-foreground">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white border border-slate-900 rounded-none w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden text-slate-900 shadow-[20px_20px_0px_rgba(15,23,42,0.1)]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Icon name="User" size={20} className="text-primary" />
+        <div className="flex items-center justify-between p-8 bg-slate-900 text-white">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-none bg-white/10 flex items-center justify-center border border-white/20">
+              <Icon name="User" size={24} className="text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">{modalTitle}</h2>
-              {employee && <p className="text-sm text-muted-foreground">ID: {employee?.id}</p>}
+              <h2 className="text-xl font-black uppercase tracking-widest">{modalTitle}</h2>
+              {employee && <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] mt-1 italic">OBJECT_REFERENCE: {employee?.id || employee?._id}</p>}
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <Icon name="X" size={20} />
-          </Button>
+          <button onClick={onClose} className="p-2 hover:bg-white/10 transition-colors rounded-none border border-transparent hover:border-white/20">
+            <Icon name="X" size={24} />
+          </button>
         </div>
 
-        {/* Tabs */}
-        <div className="border-b border-border">
-          <nav className="flex space-x-8 px-6">
-            {tabs?.map((tab) => (
-              <button
-                key={tab?.id}
-                onClick={() => setActiveTab(tab?.id)}
-                className={`flex items-center space-x-2 py-4 border-b-2 text-sm font-medium transition-colors ${activeTab === tab?.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+        <div className="flex flex-1 overflow-hidden">
+          {/* Side Tabs - Industrial Style */}
+          <div className="w-64 bg-slate-50 border-r border-slate-200 flex flex-col">
+            <div className="p-4 border-b border-slate-200 bg-slate-100/50">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Navigation Layers</p>
+            </div>
+            <nav className="flex-1">
+              {tabs?.map((tab) => (
+                <button
+                  key={tab?.id}
+                  onClick={() => setActiveTab(tab?.id)}
+                  className={`w-full flex items-center space-x-3 px-6 py-4 text-left text-xs font-black uppercase tracking-widest transition-all border-b border-slate-100 ${
+                    activeTab === tab?.id 
+                    ? 'bg-white border-r-4 border-r-slate-900 text-slate-900 shadow-sm' 
+                    : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
                   }`}
-              >
-                <Icon name={tab?.icon} size={16} />
-                <span>{tab?.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">
-          {activeTab === 'basic' && (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
-                  <Image
-                    src={formData?.avatar || '/default-avatar.png'}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {!isReadOnly && (
-                  <div>
-                    <input
-                      type="file"
-                      ref={avatarInputRef}
-                      hidden
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e, 'profileImage')}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      iconName="Upload"
-                      onClick={() => avatarInputRef.current.click()}
-                    >
-                      Change Photo
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG or GIF. Max size 2MB.</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="First Name" value={formData?.firstName} onChange={(e) => handleInputChange('firstName', e?.target?.value)} error={errors?.firstName} required disabled={isReadOnly} />
-                <Input label="Last Name" value={formData?.lastName} onChange={(e) => handleInputChange('lastName', e?.target?.value)} error={errors?.lastName} required disabled={isReadOnly} />
-                <Input label="Email Address" type="email" value={formData?.email} onChange={(e) => handleInputChange('email', e?.target?.value)} error={errors?.email} required disabled={isReadOnly} />
-                <Input label="Phone Number" type="tel" value={formData?.phone} onChange={(e) => handleInputChange('phone', e?.target?.value)} disabled={isReadOnly} />
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'employment' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Select label="Department" options={departments} value={formData?.department} onChange={(value) => handleInputChange('department', value)} error={errors?.department} required disabled={isReadOnly} />
-                <Select label="Designation" options={designations} value={formData?.designationId} onChange={(value) => handleInputChange('designationId', value)} error={errors?.designationId} required disabled={isReadOnly} placeholder="Select a designation" />
-                <Select
-                  label="System Roles"
-                  options={roles.map(r => ({ value: r.id, label: r.name }))}
-                  value={formData?.roleIds}
-                  onChange={(value) => handleInputChange('roleIds', value)}
-                  error={errors?.roleIds}
-                  required
-                  disabled={isReadOnly}
-                  placeholder="Select roles"
-                  multiple={true}
-                />
-                <Select label="Employment Type" options={employmentTypeOptions} value={formData?.employmentType} onChange={(value) => handleInputChange('employmentType', value)} disabled={isReadOnly} />
-                <Select label="Status" options={statusOptions} value={formData?.status} onChange={(value) => handleInputChange('status', value)} disabled={isReadOnly} />
-                <Input label="Hire Date" type="date" value={formData?.hireDate} onChange={(e) => handleInputChange('hireDate', e?.target?.value)} error={errors?.hireDate} required disabled={isReadOnly} />
-                <Select label="Manager" options={managerOptions} value={formData?.manager} onChange={(value) => handleInputChange('manager', value)} disabled={isReadOnly} />
-                <Select label="Branch" options={branchOptions} value={formData?.branch} onChange={(value) => handleInputChange('branch', value)} disabled={isReadOnly} />
-                <Input label="Salary" type="number" value={formData?.salary} onChange={(e) => handleInputChange('salary', e?.target?.value)} disabled={isReadOnly} placeholder="Annual salary" />
-                <Input label="Check-in Timing" type="time" value={formData?.checkInTime} onChange={(e) => handleInputChange('checkInTime', e?.target?.value)} disabled={isReadOnly} />
-                <Select label="Employee Type" options={[{value:'office',label:'Office'},{value:'remote',label:'Remote'},{value:'hybrid',label:'Hybrid'}]} value={formData?.employeeType} onChange={(value) => handleInputChange('employeeType', value)} disabled={isReadOnly} />
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={!!formData.workFromHome} onChange={(e) => handleInputChange('workFromHome', e.target.checked)} disabled={isReadOnly} />
-                    <span className="text-sm">Working From Home</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Permissions Preview */}
-              <div className="mt-6 p-4 bg-muted/30 rounded-lg border border-border">
-                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <Icon name="Shield" size={16} className="text-primary" />
-                  Granted Permissions
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {formData.roleIds.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic">No roles selected. No permissions granted.</p>
-                  ) : (
-                    // Extract unique permissions from selected roles
-                    Array.from(new Set(
-                      roles
-                        .filter(r => formData.roleIds.includes(r.id))
-                        .flatMap(r => r.permissions || [])
-                        .map(p => `${p.action}:${p.resource}`)
-                    )).map((permStr, idx) => {
-                      const [action, resource] = permStr.split(':');
-                      return (
-                        <span key={idx} className="inline-flex items-center px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tight">
-                          {action} {resource}
-                        </span>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'permissions' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">Custom Access Rights</h3>
-                  <p className="text-sm text-muted-foreground">Assign specific permissions directly to this employee, in addition to their roles.</p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {formData.permissionIds.length} Direct
-                  </div>
-                  <div className="bg-muted text-muted-foreground px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {Array.from(new Set(
-                      roles
-                        .filter(r => formData.roleIds.includes(r.id))
-                        .flatMap(r => r.permissions || [])
-                        .map(p => p.id)
-                    )).length} From Roles
-                  </div>
-                </div>
-              </div>
-
-              {/* Group permissions by resource */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(
-                  availablePermissions.reduce((acc, perm) => {
-                    if (!acc[perm.resource]) acc[perm.resource] = [];
-                    acc[perm.resource].push(perm);
-                    return acc;
-                  }, {})
-                ).map(([resource, perms], idx) => {
-                  // Get permissions inherited from roles for this resource
-                  const inheritedPermIds = roles
-                    .filter(r => formData.roleIds.includes(r.id))
-                    .flatMap(r => r.permissions || [])
-                    .filter(p => p.resource === resource)
-                    .map(p => p.id);
-
-                  return (
-                    <div key={idx} className="p-5 border border-border rounded-xl bg-card shadow-sm">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="p-1.5 bg-primary/10 rounded-md text-primary">
-                          <Icon name="Database" size={16} />
-                        </div>
-                        <h4 className="font-bold text-sm capitalize">{resource} Management</h4>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        {perms.sort((a, b) => a.action.localeCompare(b.action)).map((perm) => {
-                          const isInherited = inheritedPermIds.includes(perm.id);
-                          const isDirect = formData.permissionIds.includes(perm.id);
-                          const isActive = isInherited || isDirect;
-
-                          return (
-                            <label
-                              key={perm.id}
-                              className={`flex items-center p-2 rounded-lg border transition-all cursor-pointer ${isInherited
-                                  ? 'bg-primary/5 border-primary/20 cursor-not-allowed opacity-80'
-                                  : isDirect
-                                    ? 'bg-primary/10 border-primary/40'
-                                    : 'hover:bg-muted/50 border-transparent'
-                                }`}
-                            >
-                              <div className="relative flex items-center">
-                                <input
-                                  type="checkbox"
-                                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                                  checked={isActive}
-                                  disabled={isInherited || isReadOnly}
-                                  onChange={(e) => {
-                                    const isChecked = e.target.checked;
-                                    handleInputChange('permissionIds', (prevIds = []) => {
-                                      if (isChecked) {
-                                        return [...new Set([...prevIds, perm.id])];
-                                      } else {
-                                        return prevIds.filter(id => id !== perm.id);
-                                      }
-                                    });
-                                  }}
-                                />
-                              </div>
-                              <div className="ml-3">
-                                <span className={`text-xs font-medium capitalize ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
-                                  {perm.action}
-                                </span>
-                                {isInherited && (
-                                  <p className="text-[9px] text-primary/70 leading-none mt-0.5">Via Role</p>
-                                )}
-                              </div>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {permissionsLoading && availablePermissions.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-12 text-center bg-muted/20 border border-dashed border-border rounded-2xl">
-                  <Icon name="Loader" size={32} className="text-muted-foreground animate-spin mb-4" />
-                  <h3 className="text-lg font-medium text-muted-foreground">Loading Permissions...</h3>
-                </div>
-              )}
-
-              {!permissionsLoading && availablePermissions.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-12 text-center bg-muted/20 border border-dashed border-border rounded-2xl">
-                  <Icon name="AlertCircle" size={48} className="text-muted-foreground/30 mb-4" />
-                  <h3 className="text-lg font-medium text-muted-foreground">No Permissions Found</h3>
-                  <p className="text-sm text-muted-foreground/70 max-w-xs mx-auto mt-2 mb-6">
-                    The system's permission table is currently empty. Please seed the permissions or contact your system administrator.
-                  </p>
-                  <Button
-                    variant="outline"
-                    iconName="Database"
-                    onClick={async () => {
-                      try {
-                        await apiClient.post(API_ENDPOINTS.ACCESS_CONTROL.BASE + '/seed');
-                        // Refresh data
-                        const res = await apiClient.get(API_ENDPOINTS.ACCESS_CONTROL.PERMISSIONS);
-                        setAvailablePermissions(res.data?.data || res.data || []);
-                        toast.success("Permissions seeded successfully!");
-                      } catch (err) {
-                        console.error('Seed failed:', err);
-                      }
-                    }}
-                  >
-                    Seed Default Permissions
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'contact' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 gap-4">
-                <Input label="Address" value={formData?.address} onChange={(e) => handleInputChange('address', e?.target?.value)} disabled={isReadOnly} placeholder="Full address" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Emergency Contact Name" value={formData?.emergencyContact} onChange={(e) => handleInputChange('emergencyContact', e?.target?.value)} disabled={isReadOnly} />
-                  <Input label="Emergency Contact Phone" type="tel" value={formData?.emergencyPhone} onChange={(e) => handleInputChange('emergencyPhone', e?.target?.value)} disabled={isReadOnly} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'documents' && (
-            <div className="space-y-6">
-              {!isReadOnly && (
-                <div
-                  className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer"
-                  onClick={() => docInputRef.current.click()}
                 >
-                  <input
-                    type="file"
-                    multiple
-                    hidden
-                    ref={docInputRef}
-                    onChange={(e) => handleFileChange(e, 'doc')}
-                  />
-                  <Icon name="UploadCloud" className="mx-auto mb-2 text-muted-foreground" size={32} />
-                  <h3 className="text-sm font-medium">Click to upload documents</h3>
-                  <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, or Images up to 10MB</p>
+                  <Icon name={tab?.icon} size={14} />
+                  <span>{tab?.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-white">
+            <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+              {activeTab === 'basic' && (
+                <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-start space-x-8 pb-10 border-b border-slate-100">
+                    <div className="relative group">
+                      <div className="w-32 h-32 rounded-none overflow-hidden bg-slate-100 flex-shrink-0 border-2 border-slate-900 p-1">
+                        <div className="w-full h-full border border-slate-200 overflow-hidden">
+                           <img
+                            src={formData?.profileImage || formData?.avatar || 'https://via.placeholder.com/150'}
+                            alt="Profile"
+                            className="w-full h-full object-cover grayscale"
+                          />
+                        </div>
+                      </div>
+                      {!isReadOnly && (
+                         <button 
+                          onClick={() => avatarInputRef.current.click()}
+                          className="absolute -bottom-2 -right-2 bg-slate-900 text-white p-2 rounded-none hover:bg-slate-800 transition-all border border-white"
+                         >
+                           <Icon name="Camera" size={14} />
+                         </button>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Identity Configuration</h3>
+                      {!isReadOnly && (
+                        <div className="space-y-3">
+                          <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={(e) => handleFileChange(e, 'profileImage')} />
+                          <button
+                            onClick={() => avatarInputRef.current.click()}
+                            className="px-4 py-2 bg-slate-100 border border-slate-200 text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-colors"
+                          >
+                            Upload New Manifest
+                          </button>
+                          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Supported formats: RAW, JPG, PNG (Max 2MB)</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">First Name</label>
+                      <input 
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-bold focus:ring-1 focus:ring-slate-900 outline-none rounded-none"
+                        value={formData?.firstName} onChange={(e) => handleInputChange('firstName', e?.target?.value)} disabled={isReadOnly} 
+                      />
+                      {errors?.firstName && <p className="text-[10px] text-rose-600 font-bold uppercase">{errors.firstName}</p>}
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Last Name</label>
+                      <input 
+                         className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-bold focus:ring-1 focus:ring-slate-900 outline-none rounded-none"
+                         value={formData?.lastName} onChange={(e) => handleInputChange('lastName', e?.target?.value)} disabled={isReadOnly} 
+                      />
+                      {errors?.lastName && <p className="text-[10px] text-rose-600 font-bold uppercase">{errors.lastName}</p>}
+                    </div>
+                    <div className="space-y-1.5 overflow-hidden">
+                       <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Email</label>
+                       <input 
+                        type="email"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-mono focus:ring-1 focus:ring-slate-900 outline-none rounded-none"
+                        value={formData?.email} onChange={(e) => handleInputChange('email', e?.target?.value)} disabled={isReadOnly} 
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                       <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Phone Number</label>
+                       <input 
+                        type="tel"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-mono focus:ring-1 focus:ring-slate-900 outline-none rounded-none"
+                        value={formData?.phone} onChange={(e) => handleInputChange('phone', e?.target?.value)} disabled={isReadOnly} 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Skills Section */}
+                  <div className="pt-6 border-t border-slate-100">
+                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2 block">Skills & Competencies</label>
+                    <textarea
+                      placeholder="Enter skills separated by commas..."
+                      className="w-full px-4 py-3 bg-white border border-slate-200 text-sm font-bold focus:ring-1 focus:ring-slate-900 outline-none rounded-none min-h-[80px] resize-none"
+                      value={formData?.skills?.join(', ')}
+                      onChange={(e) => handleInputChange('skills', e.target.value.split(',').map(s => s.trim()))}
+                      disabled={isReadOnly}
+                    />
+                  </div>
                 </div>
               )}
 
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <Icon name="Files" size={16} />
-                  Attached Documents ({formData.documents.length})
-                </h4>
-
-                {formData.documents.length === 0 && (
-                  <div className="text-center py-6 bg-muted/20 rounded-lg border border-border">
-                    <p className="text-sm text-muted-foreground italic">No documents uploaded yet.</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 gap-2">
-                  {formData.documents.map((doc, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 border border-border rounded-md bg-card hover:border-primary/50 transition-colors">
-                      <div className="flex items-center space-x-3 overflow-hidden">
-                        <div className="p-2 bg-primary/10 rounded">
-                          <Icon name="FileText" size={18} className="text-primary" />
+              {activeTab === 'employment' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      {[
+                        { label: 'Department', key: 'department', options: departments },
+                        { label: 'Designation', key: 'designationId', options: designations },
+                        { label: 'Employment Type', key: 'employmentType', options: employmentTypeOptions },
+                        { label: 'Status', key: 'status', options: statusOptions },
+                        { label: 'Branch', key: 'branch', options: branchOptions },
+                        { label: 'Manager', key: 'manager', options: managerOptions }
+                      ].map((f, i) => (
+                        <div key={i} className="space-y-1.5">
+                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{f.label}</label>
+                           <div className="relative">
+                             <select
+                               value={formData[f.key]}
+                               onChange={(e) => handleInputChange(f.key, e.target.value)}
+                               disabled={isReadOnly}
+                               className="w-full appearance-none px-4 py-2.5 bg-white border border-slate-200 text-xs font-bold uppercase tracking-wider focus:ring-1 focus:ring-slate-900 outline-none rounded-none"
+                             >
+                               <option value="">SELECT {f.label.toUpperCase()}</option>
+                               {f.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label.toUpperCase()}</option>)}
+                             </select>
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                               <Icon name="ChevronDown" size={14} />
+                             </div>
+                           </div>
                         </div>
-                        <div className="truncate">
-                          <p className="text-sm font-medium truncate">{doc.name}</p>
-                          <p className="text-xs text-muted-foreground">{doc.size}</p>
+                      ))}
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Hire Date</label>
+                         <input type="date" value={formData?.hireDate} onChange={(e) => handleInputChange('hireDate', e?.target?.value)} disabled={isReadOnly} className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-mono focus:ring-1 focus:ring-slate-900 outline-none rounded-none" />
+                      </div>
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Salary</label>
+                         <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">INR</span>
+                            <input type="number" value={formData?.salary} onChange={(e) => handleInputChange('salary', e?.target?.value)} disabled={isReadOnly} className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-200 text-sm font-mono focus:ring-1 focus:ring-slate-900 outline-none rounded-none" />
+                         </div>
+                      </div>
+
+                      {/* Employee Type & WFH */}
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Employee Type</label>
+                         <div className="flex space-x-4 pt-2">
+                           {['office', 'field', 'remote'].map((type) => (
+                             <label key={type} className="flex items-center space-x-2 cursor-pointer">
+                               <input 
+                                 type="radio" 
+                                 name="employeeType" 
+                                 value={type} 
+                                 checked={formData.employeeType === type}
+                                 onChange={(e) => handleInputChange('employeeType', e.target.value)}
+                                 disabled={isReadOnly}
+                                 className="rounded-none border-slate-400 text-slate-900 focus:ring-0" 
+                               />
+                               <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">{type}</span>
+                             </label>
+                           ))}
+                         </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Work From Home</label>
+                         <div className="flex items-center space-x-3 pt-2">
+                           <button
+                             disabled={isReadOnly}
+                             onClick={() => handleInputChange('workFromHome', !formData.workFromHome)}
+                             className={`relative inline-flex h-5 w-11 items-center rounded-none transition-all duration-300 border ${formData.workFromHome ? 'bg-slate-900 border-slate-900' : 'bg-slate-100 border-slate-300'}`}
+                           >
+                              <span className={`inline-block h-3 w-3 transform rounded-none transition-transform duration-300 ${formData.workFromHome ? 'translate-x-6 bg-white' : 'translate-x-1.5 bg-slate-400'}`} />
+                           </button>
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">{formData.workFromHome ? 'Enabled' : 'Disabled'}</span>
+                         </div>
+                      </div>
+
+                      {formData.checkInTime && (
+                        <div className="space-y-1.5">
+                           <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Last Check-in</label>
+                           <div className="p-2.5 bg-slate-50 border border-slate-200 text-[10px] font-mono font-bold text-slate-600">
+                             {new Date(formData.checkInTime).toLocaleString()}
+                           </div>
                         </div>
+                      )}
+                   </div>
+
+                   {/* System Roles - MultiSelect Hardened */}
+                   <div className="pt-6 border-t border-slate-100">
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 block">System Authorization Roles</label>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                         {roles.map(role => {
+                           const isSelected = formData.roleIds.includes(role.id);
+                           return (
+                             <button
+                               key={role.id}
+                               onClick={() => {
+                                 if (isReadOnly) return;
+                                 const newRoles = isSelected ? formData.roleIds.filter(id => id !== role.id) : [...formData.roleIds, role.id];
+                                 handleInputChange('roleIds', newRoles);
+                               }}
+                               className={`flex items-center space-x-3 p-3 border transition-all rounded-none text-left ${
+                                 isSelected ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
+                               }`}
+                             >
+                                 <div className={`w-3 h-3 rounded-none border ${isSelected ? 'bg-white border-white' : 'bg-transparent border-slate-300'}`}></div>
+                                 <span className="text-[10px] font-black uppercase tracking-widest">{role.name}</span>
+                             </button>
+                           );
+                         })}
                       </div>
-                      <div className="flex items-center space-x-1 ml-4">
-                        <Button variant="ghost" size="icon" onClick={() => window.open(doc.url || '#')}>
-                          <Icon name="Download" size={16} />
-                        </Button>
-                        {!isReadOnly && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:bg-destructive/10"
-                            onClick={() => removeDocument(idx)}
-                          >
-                            <Icon name="Trash2" size={16} />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
+              )}
 
-        {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 p-6 border-t border-border">
-          {isReadOnly && (
-            <div className="flex-1 text-sm text-amber-600 font-medium flex items-center gap-2">
-              <Icon name="Lock" size={14} />
-              Read-Only Mode
-            </div>
-          )}
-          <Button
-            variant="outline"
-            onClick={() => {
-              const currentIndex = tabs.findIndex(t => t.id === activeTab);
-              if (currentIndex > 0 && !isReadOnly) {
-                setActiveTab(tabs[currentIndex - 1].id);
-              } else {
-                onClose();
-              }
-            }}
-          >
-            {isReadOnly ? 'Close' : (tabs.findIndex(t => t.id === activeTab) > 0 ? 'Back' : 'Cancel')}
-          </Button>
+              {activeTab === 'permissions' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                   <div className="flex items-center justify-between p-6 bg-slate-900 text-white border-none mb-6">
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-[0.3em]">Access Privilege Matrix</h4>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Direct system overrides and role-inherited permissions</p>
+                      </div>
+                      <div className="bg-white/10 px-4 py-2 border border-white/20">
+                         <span className="text-xl font-black font-mono tracking-tighter">{formData.permissionIds.length.toString().padStart(2, '0')}</span>
+                         <span className="text-[9px] font-black uppercase ml-2 text-slate-400">Manual Overrides</span>
+                      </div>
+                   </div>
 
-          {!isReadOnly && (
-            <Button
-              variant="default"
-              onClick={() => {
-                const currentIndex = tabs.findIndex(t => t.id === activeTab);
-                const isLastTab = currentIndex === tabs.length - 1;
-                if (isLastTab) {
-                  handleSave();
-                } else {
-                  setActiveTab(tabs[currentIndex + 1].id);
-                }
-              }}
-              loading={isLoading}
-              iconName={tabs.findIndex(t => t.id === activeTab) === tabs.length - 1 ? "Save" : "ArrowRight"}
-              iconPosition={tabs.findIndex(t => t.id === activeTab) === tabs.length - 1 ? "left" : "right"}
-            >
-              {tabs.findIndex(t => t.id === activeTab) < tabs.length - 1
-                ? 'Next'
-                : (mode === 'add' ? 'Add Employee' : 'Save Changes')
-              }
-            </Button>
-          )}
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {Object.entries(
+                        availablePermissions.reduce((acc, perm) => {
+                          if (!acc[perm.resource]) acc[perm.resource] = [];
+                          acc[perm.resource].push(perm);
+                          return acc;
+                        }, {})
+                      ).map(([resource, perms], idx) => {
+                        const inheritedPermIds = roles
+                          .filter(r => formData.roleIds.includes(r.id))
+                          .flatMap(r => r.permissions || [])
+                          .filter(p => p.resource === resource)
+                          .map(p => p.id);
+
+                        return (
+                          <div key={idx} className="border border-slate-200 bg-slate-50 overflow-hidden rounded-none shadow-sm hover:shadow-md transition-shadow">
+                            <div className="px-4 py-2 bg-slate-100 border-b border-slate-200 flex justify-between items-center">
+                              <span className="text-[10px] font-black uppercase text-slate-900 tracking-widest">{resource} LAYER</span>
+                              <Icon name="Database" size={12} className="text-slate-400" />
+                            </div>
+                            <div className="p-4 grid grid-cols-2 gap-2">
+                              {perms.sort((a, b) => a.action.localeCompare(b.action)).map((perm) => {
+                                const isInherited = inheritedPermIds.includes(perm.id);
+                                const isDirect = formData.permissionIds.includes(perm.id);
+                                return (
+                                  <button
+                                    key={perm.id}
+                                    disabled={isInherited || isReadOnly}
+                                    onClick={() => {
+                                      const newPerms = isDirect ? formData.permissionIds.filter(id => id !== perm.id) : [...formData.permissionIds, perm.id];
+                                      handleInputChange('permissionIds', newPerms);
+                                    }}
+                                    className={`flex items-center space-x-2 px-2 py-1.5 border transition-all text-left ${
+                                      isInherited ? 'bg-emerald-50 border-emerald-100 opacity-80' : 
+                                      isDirect ? 'bg-slate-900 border-slate-900 text-white' : 
+                                      'bg-white border-slate-200 grayscale text-slate-400 hover:grayscale-0 hover:border-slate-400'
+                                    }`}
+                                  >
+                                    <div className={`w-1.5 h-1.5 ${isInherited ? 'bg-emerald-500' : isDirect ? 'bg-white' : 'bg-slate-300'}`}></div>
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{perm.action}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                   </div>
+                </div>
+              )}
+
+              {activeTab === 'contact' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                   <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Address</label>
+                      <textarea 
+                        className="w-full px-4 py-3 bg-white border border-slate-200 text-sm font-bold focus:ring-1 focus:ring-slate-900 outline-none rounded-none min-h-[100px] resize-none"
+                        value={formData?.address} onChange={(e) => handleInputChange('address', e?.target?.value)} disabled={isReadOnly} 
+                        placeholder="ENTER FULL STREET, CITY, AND ZIP CODE..."
+                      />
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-100">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Emergency Contact</label>
+                         <input className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-bold focus:ring-1 focus:ring-slate-900 outline-none rounded-none" value={formData?.emergencyContact} onChange={(e) => handleInputChange('emergencyContact', e?.target?.value)} disabled={isReadOnly} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Emergency Phone</label>
+                         <input className="w-full px-4 py-2.5 bg-white border border-slate-200 text-sm font-mono focus:ring-1 focus:ring-slate-900 outline-none rounded-none" value={formData?.emergencyPhone} onChange={(e) => handleInputChange('emergencyPhone', e?.target?.value)} disabled={isReadOnly} />
+                      </div>
+                   </div>
+                </div>
+              )}
+
+              {activeTab === 'documents' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                   {!isReadOnly && (
+                      <div 
+                        onClick={() => docInputRef.current.click()}
+                        className="border-2 border-dashed border-slate-200 bg-slate-50 p-12 text-center group cursor-pointer hover:bg-slate-100 hover:border-slate-900 transition-all"
+                      >
+                         <input type="file" multiple hidden ref={docInputRef} onChange={(e) => handleFileChange(e, 'doc')} />
+                         <Icon name="UploadCloud" size={48} className="mx-auto mb-4 text-slate-300 group-hover:text-slate-900 transition-colors" />
+                         <span className="block text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 group-hover:text-slate-900">Upload Documents</span>
+                         <p className="text-[9px] text-slate-300 font-bold uppercase mt-2 group-hover:text-slate-500">MAX 10MB PER FILE</p>
+                      </div>
+                   )}
+
+                   <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b-2 border-slate-900 pb-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest">ARCHIVED RECORDINGS ({formData.documents.length})</span>
+                        <Icon name="Files" size={14} className="text-slate-900" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         {formData.documents.map((doc, idx) => (
+                           <div key={idx} className="flex items-center justify-between p-4 bg-white border border-slate-200 hover:shadow-lg transition-shadow group">
+                              <div className="flex items-center space-x-4 overflow-hidden">
+                                 <div className="w-10 h-10 bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                                    <Icon name="FileText" size={18} />
+                                 </div>
+                                 <div className="truncate">
+                                    <p className="text-[10px] font-black uppercase text-slate-900 truncate tracking-tight">{doc.name}</p>
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase">{doc.size} | READY_FOR_SYNC</p>
+                                 </div>
+                              </div>
+                              <div className="flex space-x-1">
+                                 <button onClick={() => window.open(doc.url)} className="p-2 border border-slate-100 hover:bg-slate-900 hover:text-white transition-all"><Icon name="Download" size={12} /></button>
+                                 {!isReadOnly && <button onClick={() => removeDocument(idx)} className="p-2 border border-slate-100 text-rose-600 hover:bg-rose-600 hover:text-white transition-all"><Icon name="Trash2" size={12} /></button>}
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sharp Footer */}
+            <div className="p-8 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+               <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-emerald-500 animate-pulse"></span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">SESSION_ACTIVE: SYSTEM_ADMIN_ENCRYPTED</span>
+               </div>
+               <div className="flex space-x-4">
+                  <button 
+                  onClick={onClose}
+                  className="px-6 py-2.5 bg-white border border-slate-300 text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all active:translate-y-0.5"
+                  >
+                    DISCARD CHANGES
+                  </button>
+                  {!isReadOnly && (
+                    <button 
+                      onClick={handleSave}
+                      className="px-8 py-2.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-[4px_4px_0px_rgba(15,23,42,0.2)] active:translate-y-0.5 active:shadow-none"
+                    >
+                      COMMIT TO MANIFEST
+                    </button>
+                  )}
+               </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

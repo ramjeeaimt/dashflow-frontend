@@ -18,15 +18,15 @@ const CustomTooltip = ({ active, payload, label, growthData }) => {
         const diff = value - previousValue;
 
         return (
-            <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-xl shadow-xl p-3 animate-in fade-in zoom-in-95 duration-200">
-                <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
-                <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-emerald-600">{value}</span>
-                    <span className="text-xs text-gray-500">projects</span>
+            <div className="bg-slate-900 border-none p-4 shadow-[8px_8px_0px_rgba(15,23,42,0.1)]">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">{label}_CHRONO_POINT</p>
+                <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-white font-mono italic">{value}</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Units</span>
                 </div>
-                <div className="mt-2 pt-2 border-t border-gray-100">
-                    <p className={`text-xs ${diff >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
-                        {diff >= 0 ? "↑" : "↓"} {Math.abs(diff)} vs previous
+                <div className="mt-3 pt-3 border-t border-slate-800">
+                    <p className={`text-[9px] font-black uppercase tracking-widest ${diff >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                        {diff >= 0 ? "VECTOR: POSITIVE" : "VECTOR: NEGATIVE"} [ {Math.abs(diff)} ]
                     </p>
                 </div>
             </div>
@@ -40,17 +40,14 @@ const CustomCursor = (props) => {
     if (!points || !points[0]) return null;
     const { x } = points[0];
     return (
-        <line x1={x} y1={0} x2={x} y2={height} stroke="#10b981" strokeWidth={1.5} strokeDasharray="4 4" />
+        <line x1={x} y1={0} x2={x} y2={height} stroke="#0f172a" strokeWidth={2} strokeDasharray="0 0" />
     );
 };
 
 const ProjectLineGraph = () => {
-    // 1. Grab STATIC data and loading state from Store
-    // DO NOT call getGrowthData() here. Use the variable we save in fetchProjects.
     const growthData = useProjectStore((state) => state.growthData) || [];
     const loading = useProjectStore((state) => state.loading);
 
-    // 2. Memoize calculations so they only run when growthData actually changes
     const stats = useMemo(() => {
         if (!growthData.length) return { total: 0, pct: "0.0", avg: 0, peak: null };
 
@@ -71,52 +68,57 @@ const ProjectLineGraph = () => {
         return { total, pct, avg, peak };
     }, [growthData]);
 
-    // 3. Show a skeleton/loader if fetching
     if (loading && growthData.length === 0) {
-        return <div className="w-full h-[400px] bg-gray-50 animate-pulse rounded-2xl border border-gray-100" />;
+        return <div className="w-full h-[400px] bg-white border-2 border-slate-900 animate-pulse flex items-center justify-center font-black text-[10px] text-slate-400 uppercase tracking-widest">Initializing_Growth_Stream...</div>;
     }
 
     return (
-        <div className="w-full h-[400px] bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all hover:shadow-xl">
-            <div className="px-6 pt-6 pb-2 border-b border-gray-100">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h3 className="text-xl font-bold text-gray-800">Project Growth</h3>
-                        <p className="text-sm text-gray-500 mt-0.5">Live workspace analytics</p>
+        <div className="w-full bg-white border-2 border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] overflow-hidden group">
+            <div className="px-8 pt-8 pb-4 border-b border-slate-100 flex justify-between items-start">
+                <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                        <span className="w-1.5 h-6 bg-slate-900"></span>
+                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Project Growth</h3>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="text-right">
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Total</p>
-                            <p className="text-xl font-black text-gray-800">{stats.total}</p>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Growth</p>
-                            <p className={`text-xl font-black ${Number(stats.pct) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                                {Number(stats.pct) >= 0 ? '+' : ''}{stats.pct}%
-                            </p>
-                        </div>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">Feed: EXPANSION_METRICS</p>
+                </div>
+                <div className="flex gap-8">
+                    <div className="text-right">
+                        <p className="text-[9px] text-slate-400 uppercase tracking-[0.3em] font-black mb-1">Cumulative</p>
+                        <p className="text-2xl font-black text-slate-900 font-mono italic">{stats.total}</p>
+                    </div>
+                    <div className="text-right border-l border-slate-100 pl-8">
+                        <p className="text-[9px] text-slate-400 uppercase tracking-[0.3em] font-black mb-1">Variance</p>
+                        <p className={`text-2xl font-black font-mono italic ${Number(stats.pct) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {Number(stats.pct) >= 0 ? '+' : ''}{stats.pct}%
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div className="p-4 pt-2 h-[300px]">
+            <div className="p-4 pt-2 h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={growthData} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
                         <defs>
                             <linearGradient id="projectGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
-                                <stop offset="100%" stopColor="#10b981" stopOpacity={0.05} />
+                                <stop offset="0%" stopColor="#0f172a" stopOpacity={0.05} />
+                                <stop offset="100%" stopColor="#0f172a" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
+                        <CartesianGrid vertical={false} strokeDasharray="0" stroke="#e2e8f0" />
                         <XAxis
                             dataKey="month"
-                            axisLine={false}
+                            axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
                             tickLine={false}
-                            tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                            tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
                             dy={10}
                         />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
+                        <YAxis 
+                            axisLine={{ stroke: '#0f172a', strokeWidth: 1 }} 
+                            tickLine={false} 
+                            tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }} 
+                            allowDecimals={false} 
+                        />
                         <Tooltip
                             content={<CustomTooltip growthData={growthData} />}
                             cursor={<CustomCursor />}
@@ -125,35 +127,26 @@ const ProjectLineGraph = () => {
                         <Area
                             type="monotone"
                             dataKey="projects"
-                            stroke="#10b981"
+                            stroke="#0f172a"
                             strokeWidth={3}
                             fill="url(#projectGradient)"
                             fillOpacity={1}
-                            activeDot={{ r: 6, strokeWidth: 2, stroke: '#ffffff', fill: '#10b981' }}
+                            activeDot={{ r: 4, strokeWidth: 4, stroke: '#ffffff', fill: '#0f172a' }}
                             animationDuration={1500}
                         />
                     </AreaChart>
                 </ResponsiveContainer>
-
-                <div className="px-6 py-3 bg-gray-50/50 border-t border-gray-100 text-xs text-gray-600 flex items-center justify-between font-medium">
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-green-500">📈</span>
-                        <span>
-                            Avg. monthly: {stats?.avg?.toFixed(1) || 0} projects
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-blue-500">🔝</span>
-                        <span>
-                            Peak: {stats?.peak?.projects || 0} in {stats?.peak?.month || "N/A"}
-                        </span>
-                    </div>
-
-                </div>
             </div>
 
+            <div className="px-8 py-4 bg-slate-900 text-white text-[9px] font-black uppercase tracking-[0.3em] flex items-center justify-between border-t border-slate-800">
+                <div className="flex items-center gap-4">
+                    <span className="w-2 h-2 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.4)]"></span>
+                    <span>Mean_Flow_Index: {stats?.avg?.toFixed(1) || 0} unit/mo</span>
+                </div>
+                <div className="flex items-center gap-4">
+                    <span>Performance_Peak: {stats?.peak?.projects || 0}_ARTF @ {stats?.peak?.month?.toUpperCase() || "NULL"}</span>
+                </div>
+            </div>
         </div>
     );
 };

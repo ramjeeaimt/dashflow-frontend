@@ -53,7 +53,7 @@ const Routes = () => {
         <RouterRoutes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/privacypolicy" element={<PrivacyPolicy/>}/>
+          <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
           <Route path="/pricing" element={<Pricing/>}/>
           <Route path="/features" element={<FeaturesPage/>}/>
           <Route path="/login" element={<Login />} />

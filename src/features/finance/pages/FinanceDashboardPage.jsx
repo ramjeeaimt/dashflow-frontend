@@ -40,6 +40,7 @@ import ExpenseModal from '../components/ExpenseModal';
 import ExpenseViewModal from '../components/ExpenseViewModal';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
+import { FaRupeeSign } from 'react-icons/fa';
 
 const FinanceDashboardPage = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -231,251 +232,322 @@ const FinanceDashboardPage = () => {
                 <div className="p-6 max-w-7xl mx-auto w-full">
                     <BreadcrumbNavigation items={breadcrumbItems} />
 
-                    {/* Header Section */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                        <div>
-                            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                                Financial Overview
+                    {/* Industrial Header Block */}
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between p-8 bg-blue-800 text-white border-b-4 border-blue-900 shadow-[12px_12px_0px_rgba(15,23,42,0.1)] group mb-10">
+                        <div className="space-y-3">
+                            <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.4em] text-blue-200">
+                                <span className="w-8 h-px bg-blue-600"></span>
+                                <span>FINANCE_PROTOCOL: OVERWATCH_ACTIVE</span>
+                            </div>
+                            <h1 className="text-5xl font-black uppercase tracking-tighter leading-none">
+                                Financial_Unit
                             </h1>
-                            <p className="text-muted-foreground mt-1">Track your company's financial health and expenses.</p>
+                            <p className="text-blue-100/60 text-xs font-bold uppercase tracking-[0.2em] max-w-xl">
+                                Comprehensive vector analysis of company solvency and expense allocation logs
+                            </p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <select
-                                value={selectedCurrency}
-                                onChange={(e) => setSelectedCurrency(e.target.value)}
-                                className="bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
+                        
+                        <div className="flex items-center gap-4 mt-8 lg:mt-0">
+                            <div className="flex flex-col">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] mb-2 text-blue-200 pl-1">Currency_Vector</label>
+                                <select
+                                    value={selectedCurrency}
+                                    onChange={(e) => setSelectedCurrency(e.target.value)}
+                                    className="bg-blue-900/40 border-2 border-blue-700/50 text-white rounded-none px-4 py-3 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-white transition-all cursor-pointer appearance-none min-w-[120px]"
+                                >
+                                    <option value="INR">INR (₹)</option>
+                                    <option value="USD">USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                </select>
+                            </div>
+                            <button 
+                                onClick={() => {
+                                    setEditingExpense(null);
+                                    setIsExpenseModalOpen(true);
+                                }}
+                                className="inline-flex items-center gap-4 px-8 py-4 bg-white text-blue-950 font-black uppercase tracking-[0.2em] text-[10px] shadow-[8px_8px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all active:scale-95 border-b-4 border-blue-200 self-end"
                             >
-                                <option value="INR">INR (₹)</option>
-                                <option value="USD">USD ($)</option>
-                                <option value="EUR">EUR (€)</option>
-                                <option value="GBP">GBP (£)</option>
-                            </select>
-                            <Button className="shadow-lg shadow-primary/20" iconName="Plus" onClick={() => {
-                                setEditingExpense(null);
-                                setIsExpenseModalOpen(true);
-                            }}>
-                                Add Expense
-                            </Button>
+                                <Plus size={18} strokeWidth={3} />
+                                Initiate_Expense_Entry
+                            </button>
                         </div>
                     </div>
 
-                    {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {/* Diagnostic Bar */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 bg-white border-2 border-slate-900 shadow-[8px_8px_0px_rgba(15,23,42,0.05)] divide-y md:divide-y-0 md:divide-x-2 divide-slate-900 mb-10">
                         {/* Overall Balance / Revenue */}
-                        <div className="relative group overflow-hidden bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
-                                    <TrendingUp size={24} />
+                        <div className="p-8 flex items-center justify-between group hover:bg-slate-50 transition-colors">
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Est._Turnover</p>
+                                <h3 className="text-3xl font-black text-slate-900 font-mono italic">{formatCurrency(summary?.turnover || 0)}</h3>
+                                <div className="flex items-center text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-2">
+                                    <ArrowUpRight size={14} className="mr-1" /> +12.5% [FLOW:POSITIVE]
                                 </div>
-                                <span className="flex items-center text-xs font-semibold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
-                                    <ArrowUpRight size={14} className="mr-0.5" /> +12.5%
-                                </span>
                             </div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Est. Turnover</h3>
-                            <p className="text-2xl font-bold mt-1">{formatCurrency(summary?.turnover || 0)}</p>
+                            <div className="p-3 bg-slate-900 text-white rounded-none shadow-[4px_4px_0px_rgba(15,23,42,0.1)]">
+                                <TrendingUp size={24} />
+                            </div>
                         </div>
 
                         {/* Total Expenses */}
-                        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="p-2.5 bg-orange-500/10 rounded-xl text-orange-500">
-                                    <TrendingDown size={24} />
+                        <div className="p-8 flex items-center justify-between group hover:bg-slate-50 transition-colors">
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Total_Expenses</p>
+                                <h3 className="text-3xl font-black text-slate-900 font-mono italic">{formatCurrency(summary?.totalExpenses || 0)}</h3>
+                                <div className="flex items-center text-[9px] font-black text-rose-600 uppercase tracking-widest mt-2">
+                                    <ArrowUpRight size={14} className="mr-1" /> +5.2% [VECTOR:RISING]
                                 </div>
-                                <span className="flex items-center text-xs font-semibold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full">
-                                    <ArrowUpRight size={14} className="mr-0.5" /> +5.2%
-                                </span>
                             </div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Total Expenses</h3>
-                            <p className="text-2xl font-bold mt-1">{formatCurrency(summary?.totalExpenses || 0)}</p>
+                            <div className="p-3 bg-slate-900 text-white rounded-none shadow-[4px_4px_0px_rgba(15,23,42,0.1)]">
+                                <TrendingDown size={24} />
+                            </div>
                         </div>
 
                         {/* Payroll Total */}
-                        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-500">
-                                    <Wallet size={24} />
-                                </div>
-                                <span className="flex items-center text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                    Current Month
-                                </span>
+                        <div className="p-8 flex items-center justify-between group hover:bg-slate-50 transition-colors">
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Total_Payroll</p>
+                                <h3 className="text-3xl font-black text-slate-900 font-mono italic">{formatCurrency(summary?.totalPayroll || 0)}</h3>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 border border-slate-200 px-2 py-0.5 inline-block">Cycle: CURRENT_MONTH</p>
                             </div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Total Payroll</h3>
-                            <p className="text-2xl font-bold mt-1">{formatCurrency(summary?.totalPayroll || 0)}</p>
+                            <div className="p-3 bg-slate-900 text-white rounded-none shadow-[4px_4px_0px_rgba(15,23,42,0.1)]">
+                                <Wallet size={24} />
+                            </div>
                         </div>
 
                         {/* Net Margin/Profit */}
-                        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="p-2.5 bg-green-500/10 rounded-xl text-green-500">
-                                    <DollarSign size={24} />
+                        <div className="p-8 flex items-center justify-between group bg-slate-900 transition-colors">
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Net_Profit_Vector</p>
+                                <h3 className="text-3xl font-black text-emerald-400 font-mono italic">
+                                    {formatCurrency((summary?.turnover || 0) - (summary?.totalExpenses || 0) - (summary?.totalPayroll || 0))}
+                                </h3>
+                                <div className="flex items-center text-[9px] font-black text-emerald-500 uppercase tracking-widest mt-2">
+                                    <span className="w-1.5 h-1.5 bg-emerald-500 mr-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                                    STATUS: HEALTHY
                                 </div>
-                                <span className="flex items-center text-xs font-semibold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
-                                    Healthy
-                                </span>
                             </div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Net Profit</h3>
-                            <p className="text-2xl font-bold mt-1 text-green-500">
-                                {formatCurrency((summary?.turnover || 0) - (summary?.totalExpenses || 0) - (summary?.totalPayroll || 0))}
-                            </p>
+                            <div className="p-3 bg-white text-slate-900 rounded-none shadow-[4px_4px_0px_rgba(255,255,255,0.1)]">
+                                <FaRupeeSign size={24} />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Charts Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    {/* Integrated Intelligence Center (Charts) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-10">
                         {/* Revenue vs Expenses Chart */}
-                        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6 shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <h3 className="text-lg font-semibold">Revenue vs Expenses</h3>
-                                    <p className="text-xs text-muted-foreground">Monthly performance comparison</p>
-                                </div>
-                                <div className="flex items-center gap-4 text-xs font-medium">
-                                    <div className="flex items-center gap-1.5 text-primary">
-                                        <div className="w-3 h-3 rounded-full bg-primary" /> Revenue
+                        <div className="lg:col-span-2 bg-white border-2 border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] overflow-hidden group">
+                            <div className="px-8 pt-8 pb-4 border-b border-slate-100 flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="w-1.5 h-6 bg-slate-900"></span>
+                                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Growth_Vector</h3>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-orange-500">
-                                        <div className="w-3 h-3 rounded-full bg-orange-500" /> Expenses
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">Analysis: SOLVENCY_TRENDS</p>
+                                </div>
+                                <div className="flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em]">
+                                    <div className="flex items-center gap-2 text-blue-800">
+                                        <div className="w-2.5 h-2.5 bg-blue-800" /> Revenue
+                                    </div>
+                                    <div className="flex items-center gap-2 text-slate-400">
+                                        <div className="w-2.5 h-2.5 bg-slate-200" /> Expenses
                                     </div>
                                 </div>
                             </div>
-                            <div className="h-[300px] w-full mt-4">
+                            <div className="p-8 h-[340px] w-full bg-slate-50/30">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                         <defs>
                                             <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                                            </linearGradient>
-                                            <linearGradient id="colorExp" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.2} />
-                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                                                <stop offset="5%" stopColor="#1e40af" stopOpacity={0.1} />
+                                                <stop offset="95%" stopColor="#1e40af" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e2e8f0" />
                                         <XAxis
                                             dataKey="month"
-                                            axisLine={false}
+                                            axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
                                             tickLine={false}
-                                            tick={{ fill: '#888', fontSize: 12 }}
+                                            tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+                                            dy={10}
                                         />
                                         <YAxis
-                                            axisLine={false}
+                                            axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
                                             tickLine={false}
-                                            tick={{ fill: '#888', fontSize: 12 }}
-                                            tickFormatter={(val) => `₹${val / 1000}k`}
+                                            tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+                                            tickFormatter={(val) => `₹${val / 1000}K`}
                                         />
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '12px' }}
-                                            itemStyle={{ fontSize: '13px' }}
+                                            content={({ active, payload, label }) => {
+                                                if (active && payload && payload.length) {
+                                                    return (
+                                                        <div className="bg-slate-900 p-4 shadow-[8px_8px_0px_rgba(15,23,42,0.1)]">
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">{label}_CHRONO_POINT</p>
+                                                            {payload.map((entry, index) => (
+                                                                <div key={index} className="flex items-center justify-between gap-8 mt-1">
+                                                                    <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{entry.name}</span>
+                                                                    <span className="text-sm font-black text-white font-mono italic">{formatCurrency(entry.value)}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                            cursor={{ stroke: '#0f172a', strokeWidth: 1 }}
                                         />
-                                        <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
-                                        <Area type="monotone" dataKey="expenses" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#colorExp)" />
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="revenue" 
+                                            stroke="#1e3a8a" 
+                                            strokeWidth={3} 
+                                            fillOpacity={1} 
+                                            fill="url(#colorRev)" 
+                                            activeDot={{ r: 4, strokeWidth: 4, stroke: '#ffffff', fill: '#1e3a8a' }}
+                                        />
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="expenses" 
+                                            stroke="#94a3b8" 
+                                            strokeWidth={2} 
+                                            fill="transparent"
+                                            strokeDasharray="5 5"
+                                        />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
                         </div>
 
                         {/* Expense Distribution */}
-                        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-6">Expense Categories</h3>
-                            <div className="h-[240px] w-full flex items-center justify-center">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <RePieChart>
-                                        <Pie
-                                            data={categoryData}
-                                            innerRadius={60}
-                                            outerRadius={80}
-                                            paddingAngle={8}
-                                            dataKey="value"
-                                        >
-                                            {categoryData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '12px' }}
-                                        />
-                                    </RePieChart>
-                                </ResponsiveContainer>
+                        <div className="bg-white border-2 border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] overflow-hidden">
+                            <div className="px-8 pt-8 pb-4 border-b border-slate-100 mb-6">
+                                <div className="flex items-center space-x-2">
+                                    <span className="w-1.5 h-6 bg-slate-900"></span>
+                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Cost_Split</h3>
+                                </div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">Metrics: CATEGORY_ALLOCATION</p>
                             </div>
-                            <div className="space-y-3 mt-4">
-                                {categoryData.map((item, id) => (
-                                    <div key={id} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                                            <span className="text-sm text-foreground/80">{item.name}</span>
+                            
+                            <div className="px-8 flex flex-col items-center">
+                                <div className="h-[220px] w-full mb-8">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RePieChart>
+                                            <Pie
+                                                data={categoryData}
+                                                innerRadius={65}
+                                                outerRadius={85}
+                                                paddingAngle={4}
+                                                dataKey="value"
+                                                stroke="none"
+                                            >
+                                                {categoryData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                content={({ active, payload }) => {
+                                                    if (active && payload && payload.length) {
+                                                        const data = payload[0].payload;
+                                                        return (
+                                                            <div className="bg-slate-900 p-3 shadow-[8px_8px_0px_rgba(15,23,42,0.1)]">
+                                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{data.name}_ALLOCATION</p>
+                                                                <p className="text-lg font-black text-white font-mono italic">{formatCurrency(data.value)}</p>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }}
+                                            />
+                                        </RePieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                
+                                <div className="w-full space-y-2 pb-8">
+                                    {categoryData.slice(0, 4).map((item, id) => (
+                                        <div key={id} className="flex items-center justify-between p-3 bg-slate-50 border-l-4" style={{ borderColor: item.color }}>
+                                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">{item.name}</span>
+                                            <span className="text-[10px] font-black font-mono italic text-slate-900">{formatCurrency(item.value)}</span>
                                         </div>
-                                        <span className="text-sm font-semibold">{formatCurrency(item.value)}</span>
-                                    </div>
-                                ))}
+                                    ))}
+                                    {categoryData.length > 4 && (
+                                        <p className="text-[8px] font-black text-slate-400 text-center uppercase tracking-widest pt-2">+{categoryData.length - 4}_MIN_CHANNELS_REMAINING</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* Recent Transactions Table */}
-                    <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
-                        <div className="p-6 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
-                                <h3 className="text-xl font-bold">Recent Transactions</h3>
-                                <p className="text-xs text-muted-foreground mt-0.5">Lateast expenses and incoming credits</p>
+                    {/* Transaction Audit Grid */}
+                    <div className="bg-white border-2 border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] overflow-hidden transition-all duration-300">
+                        <div className="p-8 border-b-2 border-slate-900 bg-slate-50 flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+                            <div className="space-y-1">
+                                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Transaction_Audit_Log</h3>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Sequence: REALTIME_FINANCIAL_STREAM</p>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex flex-wrap items-center gap-3">
+                            
+                            <div className="flex flex-wrap items-end gap-6">
+                                <div className="flex flex-col">
+                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] mb-2 text-slate-400 pl-1">Search_Criteria</label>
                                     <div className="relative">
-                                        <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                        <Icon name="Search" size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                         <input
                                             type="text"
-                                            placeholder="Search records..."
+                                            placeholder="SCAN_RECORDS..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="bg-background border border-border rounded-lg pl-9 pr-4 py-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-primary/50"
+                                            className="bg-white border-2 border-slate-200 rounded-none pl-12 pr-6 py-3 text-xs font-mono uppercase w-full sm:w-64 focus:outline-none focus:border-slate-900 transition-colors"
                                         />
                                     </div>
+                                </div>
+
+                                <div className="flex flex-col">
+                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] mb-2 text-slate-400 pl-1">Category_Filter</label>
                                     <select
                                         value={filterCategory}
                                         onChange={(e) => setFilterCategory(e.target.value)}
-                                        className="bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all cursor-pointer"
+                                        className="bg-white border-2 border-slate-200 rounded-none px-4 py-3 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-slate-900 transition-all cursor-pointer appearance-none min-w-[160px]"
                                     >
-                                        <option value="All">All Categories</option>
-                                        <option value="Operating">Operating</option>
-                                        <option value="Salaries">Salaries</option>
-                                        <option value="Marketing">Marketing</option>
-                                        <option value="Infrastructure">Infrastructure</option>
-                                        <option value="Maintenance">Maintenance</option>
-                                        <option value="Tax">Tax</option>
-                                        <option value="Misc">Misc</option>
+                                        <option value="All">ALL_CATEGORIES</option>
+                                        <option value="Operating">OPERATING</option>
+                                        <option value="Salaries">SALARIES</option>
+                                        <option value="Marketing">MARKETING</option>
+                                        <option value="Infrastructure">INFRASTRUCTURE</option>
+                                        <option value="Maintenance">MAINTENANCE</option>
+                                        <option value="Tax">TAX</option>
+                                        <option value="Misc">MISC</option>
                                     </select>
+                                </div>
 
-                                    <div className="flex items-center gap-2 bg-muted/30 px-3 py-1.5 rounded-lg border border-border">
-                                        <Calendar size={14} className="text-muted-foreground" />
+                                <div className="flex flex-col">
+                                    <label className="text-[9px] font-black uppercase tracking-[0.2em] mb-2 text-slate-400 pl-1">Temporal_Range</label>
+                                    <div className="flex items-center gap-2 bg-white border-2 border-slate-200 px-4 py-2.5 rounded-none">
+                                        <Calendar size={14} className="text-slate-400" />
                                         <input
                                             type="date"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
-                                            className="bg-transparent text-xs focus:outline-none"
+                                            className="bg-transparent text-[10px] font-mono uppercase focus:outline-none"
                                         />
-                                        <span className="text-muted-foreground text-xs">to</span>
+                                        <span className="text-slate-300 text-[10px] font-black mx-1 inline-block select-none font-mono">::</span>
                                         <input
                                             type="date"
                                             value={endDate}
                                             onChange={(e) => setEndDate(e.target.value)}
-                                            className="bg-transparent text-xs focus:outline-none"
+                                            className="bg-transparent text-[10px] font-mono uppercase focus:outline-none"
                                         />
                                     </div>
+                                </div>
 
+                                <div className="flex items-center gap-4">
                                     {(searchTerm || filterCategory !== 'All' || startDate || endDate) && (
                                         <button
                                             onClick={resetFilters}
-                                            className="text-xs font-semibold text-primary hover:underline"
+                                            className="text-[9px] font-black text-rose-500 uppercase tracking-[0.2em] hover:text-rose-700 hover:underline transition-colors pb-3"
                                         >
-                                            Reset Filters
+                                            Reset_Filters
                                         </button>
                                     )}
-
-                                    <div className="flex-1" />
-
-                                    <button className="p-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <button className="p-3 bg-slate-900 text-white rounded-none hover:bg-slate-800 transition-colors shadow-[4px_4px_0px_rgba(15,23,42,0.1)] mb-1">
                                         <Download size={18} />
                                     </button>
                                 </div>
@@ -485,82 +557,86 @@ const FinanceDashboardPage = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-muted/30 border-b border-border">
-                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Transaction</th>
-                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Category</th>
-                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Status</th>
-                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-right">Amount</th>
-                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground text-center">Actions</th>
+                                    <tr className="bg-slate-50 border-b-2 border-slate-900">
+                                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Transaction_identity</th>
+                                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Vector_Type</th>
+                                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-center">Protocol_Date</th>
+                                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-center">Status</th>
+                                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-right">Metric_Value</th>
+                                        <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-center">Exec_Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-border/50">
+                                <tbody className="divide-y divide-slate-100">
                                     {isLoading ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-12 text-center text-muted-foreground">
-                                                <div className="flex flex-col items-center">
-                                                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
-                                                    Loading transactions...
+                                            <td colSpan="6" className="px-8 py-20 text-center">
+                                                <div className="flex flex-col items-center gap-4">
+                                                    <div className="w-10 h-1 bg-slate-100 overflow-hidden relative">
+                                                        <div className="absolute inset-0 bg-slate-900 animate-[loading-bar_1.5s_infinite]"></div>
+                                                    </div>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">INITIALIZING_AUDIT_STREAM...</p>
                                                 </div>
                                             </td>
                                         </tr>
                                     ) : filteredExpenses.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-12 text-center">
-                                                <div className="flex flex-col items-center opacity-40">
-                                                    <Receipt size={48} className="mb-4" />
-                                                    <p className="text-foreground font-medium">No matches found</p>
-                                                    <p className="text-sm">Try adjusting your search or filters.</p>
+                                            <td colSpan="6" className="px-8 py-20 text-center">
+                                                <div className="flex flex-col items-center opacity-40 grayscale">
+                                                    <Receipt size={64} strokeWidth={1} className="mb-6 text-slate-300" />
+                                                    <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.4em]">NO_DATA_INTERCEPTED</p>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">Check filter parameters or temporal range</p>
                                                 </div>
                                             </td>
                                         </tr>
                                     ) : (
                                         filteredExpenses.map((expense, idx) => (
-                                            <tr key={expense.id || idx} className="hover:bg-muted/30 transition-all duration-200">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`p-2 rounded-lg ${expense.type === 'credit' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                                                            {expense.type === 'credit' ? <ArrowDownRight size={18} /> : <CreditCard size={18} />}
+                                            <tr key={expense.id || idx} className="hover:bg-slate-50/50 transition-all duration-200 group">
+                                                <td className="px-8 py-6 border-l-4 border-transparent group-hover:border-slate-900">
+                                                    <div className="flex items-center gap-5">
+                                                        <div className={`p-3 rounded-none shadow-[4px_4px_0px_rgba(15,23,42,0.05)] ${expense.type === 'credit' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                                            {expense.type === 'credit' ? <ArrowDownRight size={20} strokeWidth={3} /> : <CreditCard size={20} strokeWidth={2.5} />}
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm font-semibold">{expense.title}</p>
-                                                            <p className="text-[10px] text-muted-foreground uppercase">{expense.employee?.user?.firstName || 'Company'}</p>
+                                                            <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{expense.title}</p>
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1 italic">{expense.employee?.user?.firstName || 'SYSTEM_CORE'}</p>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="text-xs font-medium bg-muted px-2 py-1 rounded-md text-foreground/70">
-                                                        {expense.category || 'Maintenance'}
+                                                <td className="px-8 py-6">
+                                                    <span className="text-[9px] font-black bg-slate-100 border border-slate-200 px-3 py-1 text-slate-600 uppercase tracking-widest">
+                                                        {expense.category || 'MAINTENANCE'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-xs text-muted-foreground">
-                                                    {format(new Date(expense.date), 'MMM dd, yyyy')}
+                                                <td className="px-8 py-6 text-[10px] font-black font-mono text-slate-500 uppercase text-center">
+                                                    {format(new Date(expense.date), 'yyyy.MM.dd')}
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${expense.status === 'approved' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-                                                        }`}>
-                                                        {expense.status || 'Verified'}
+                                                <td className="px-8 py-6 text-center">
+                                                    <span className={`inline-flex items-center px-4 py-1 border-2 text-[9px] font-black uppercase tracking-widest ${
+                                                        expense.status === 'approved' 
+                                                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[4px_4px_0px_rgba(16,185,129,0.1)]' 
+                                                        : 'bg-amber-50 border-amber-500 text-amber-700 shadow-[4px_4px_0px_rgba(245,158,11,0.1)]'
+                                                    }`}>
+                                                        {expense.status === 'approved' ? '[ VERIFIED ]' : '[ PENDING ]'}
                                                     </span>
                                                 </td>
-                                                <td className={`px-6 py-4 text-sm font-bold text-right ${expense.type === 'credit' ? 'text-green-500' : 'text-foreground'}`}>
+                                                <td className={`px-8 py-6 text-sm font-black font-mono italic text-right ${expense.type === 'credit' ? 'text-emerald-600' : 'text-slate-900'}`}>
                                                     {expense.type === 'credit' ? '+' : '-'}{formatCurrency(expense.amount)}
                                                 </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    <div className="flex items-center justify-center gap-2">
+                                                <td className="px-8 py-6">
+                                                    <div className="flex items-center justify-center gap-3">
                                                         <button
                                                             onClick={() => handleViewExpense(expense)}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/10 rounded-lg transition-colors border border-blue-500/30 hover:border-blue-500/50"
-                                                            title="View details"
+                                                            className="p-2.5 text-blue-800 hover:bg-blue-50 border border-blue-100 transition-all uppercase text-[9px] font-black tracking-widest shadow-[3px_3px_0px_rgba(30,64,175,0.05)]"
+                                                            title="INSPECT_ENTRY"
                                                         >
-                                                            👁️ View
+                                                            Inspect
                                                         </button>
                                                         <button
                                                             onClick={() => handleEditExpense(expense)}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 rounded-lg transition-colors border border-primary/30 hover:border-primary/50"
-                                                            title="Edit details"
+                                                            className="p-2.5 text-slate-900 hover:bg-slate-900 hover:text-white border border-slate-900 transition-all shadow-[3px_3px_0px_rgba(15,23,42,0.1)]"
+                                                            title="MODIFY_ENTITY"
                                                         >
-                                                            <Edit2 size={14} />
-                                                            Edit
+                                                            <Edit2 size={14} strokeWidth={3} />
                                                         </button>
                                                     </div>
                                                 </td>

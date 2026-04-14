@@ -223,60 +223,68 @@ const EmployeeManagement = () => {
       <Header />
       <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-        <div className="p-6">
-          <BreadcrumbNavigation items={breadcrumbItems} />
-
-          <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-foreground mb-2">Employee Management</h1>
-            <p className="text-muted-foreground">
-              Manage your workforce, track employee information, and handle HR operations efficiently.
-            </p>
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6 bg-slate-50/50 min-h-screen`}>
+        <div className="p-8 max-w-[1600px] mx-auto">
+          <div className="mb-0 pb-6 border-b border-slate-200">
+            <BreadcrumbNavigation items={breadcrumbItems} />
+            <div className="mt-4">
+              <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2 uppercase">Employee Management</h1>
+              <p className="text-slate-500 max-w-2xl text-sm font-medium">
+                Enterprise-grade workforce orchestration and departmental synchronization.
+              </p>
+            </div>
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-              <p>{error}</p>
+            <div className="my-6 p-4 bg-red-50 border-l-4 border-red-600 text-red-800 rounded-none shadow-sm flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-red-600 p-1 rounded-none text-white">
+                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <p className="text-sm font-semibold">{error}</p>
+              </div>
               <button
                 onClick={() => fetchEmployees(user?.company?.id, filters)}
-                className="mt-2 text-sm underline"
+                className="bg-white px-3 py-1 border border-red-200 text-xs font-bold uppercase hover:bg-red-50 transition-colors"
               >
-                Try again
+                Reconnect
               </button>
             </div>
           )}
 
-          <EmployeeActions
-            employees={filteredAndSortedEmployees}
-            selectedEmployees={selectedEmployees}
-            onAddEmployee={handleAddEmployee}
-            onBulkAction={handleBulkAction}
-            onImportEmployees={handleImportEmployees}
-            onExportEmployees={handleExportEmployees}
-          />
+          <div className="mt-8 space-y-0 border-x border-t border-slate-200 shadow-sm bg-white">
+            <EmployeeActions
+              employees={filteredAndSortedEmployees}
+              selectedEmployees={selectedEmployees}
+              onAddEmployee={handleAddEmployee}
+              onBulkAction={handleBulkAction}
+              onImportEmployees={handleImportEmployees}
+              onExportEmployees={handleExportEmployees}
+            />
 
-          <EmployeeFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-            resultCount={filteredAndSortedEmployees?.length}
-          />
+            <EmployeeFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              resultCount={filteredAndSortedEmployees?.length}
+            />
 
-          <EmployeeTable
-            employees={filteredAndSortedEmployees}
-            setEmployees={setEmployees}
-            selectedEmployees={selectedEmployees}
-            onSelectEmployee={handleSelectEmployee}
-            onSelectAll={handleSelectAll}
-            onEditEmployee={handleEditEmployee}
-            onViewEmployee={handleViewEmployee}
-            onDeleteEmployee={handleDeleteEmployee}
-            sortConfig={sortConfig}
-            onSort={handleSort}
-            loading={loading}
-          />
+            <EmployeeTable
+              employees={filteredAndSortedEmployees}
+              setEmployees={setEmployees}
+              selectedEmployees={selectedEmployees}
+              onSelectEmployee={handleSelectEmployee}
+              onSelectAll={handleSelectAll}
+              onEditEmployee={handleEditEmployee}
+              onViewEmployee={handleViewEmployee}
+              onDeleteEmployee={handleDeleteEmployee}
+              sortConfig={sortConfig}
+              onSort={handleSort}
+              loading={loading}
+            />
+          </div>
 
           <EmployeeModal
             isOpen={modalState?.isOpen}

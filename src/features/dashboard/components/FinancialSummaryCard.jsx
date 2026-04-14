@@ -4,20 +4,20 @@ import Icon from '../../../components/AppIcon';
 const FinancialSummaryCard = ({ data, loading }) => {
   if (loading) {
     return (
-      <div className="bg-white border border-slate-200/60 rounded-[2rem] p-8 h-[280px] animate-pulse">
-        <div className="h-6 w-48 bg-slate-100 rounded-full mb-8"></div>
+      <div className="bg-white border border-slate-900 rounded-none p-8 h-[280px] animate-pulse">
+        <div className="h-6 w-48 bg-slate-100 rounded-none mb-8"></div>
         <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="h-24 bg-slate-50 rounded-3xl"></div>
-          <div className="h-24 bg-slate-50 rounded-3xl"></div>
+          <div className="h-24 bg-slate-50 rounded-none"></div>
+          <div className="h-24 bg-slate-50 rounded-none"></div>
         </div>
-        <div className="h-3 w-full bg-slate-50 rounded-full"></div>
+        <div className="h-3 w-full bg-slate-50 rounded-none"></div>
       </div>
     );
   }
 
   if (!data) return null;
 
-  const { totalPayroll, totalExpenses, currency, outgoingTotal } = data;
+  const { totalPayroll, totalExpenses, outgoingTotal, turnover, netProfit } = data;
   
   const payrollPct = outgoingTotal > 0 ? (totalPayroll / outgoingTotal) * 100 : 0;
   const expensesPct = outgoingTotal > 0 ? (totalExpenses / outgoingTotal) * 100 : 0;
@@ -31,77 +31,85 @@ const FinancialSummaryCard = ({ data, loading }) => {
   };
 
   return (
-    <div className="bg-white border border-slate-200/60 rounded-[2rem] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 group animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h3 className="text-2xl font-black text-slate-900 tracking-tight">Financial Health</h3>
-          <p className="text-sm text-slate-500 font-medium">Monthly outgoing analytics</p>
+    <div className="bg-white p-0 transition-all duration-300">
+      <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-900 border-b border-slate-900">
+        <div className="p-8 lg:w-1/3 space-y-2">
+            <div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                <span className="w-4 h-px bg-slate-300"></span>
+                <Icon name="Activity" size={14} />
+                <span>FISCAL_INTEGRITY_INDEX</span>
+            </div>
+            <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Financial Health</h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Real-time aggregate data stream</p>
         </div>
-        <div className="w-14 h-14 bg-blue-500/10 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-blue-500/5">
-          <Icon name="Activity" size={28} strokeWidth={2.5} />
+
+        <div className="p-8 flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 bg-slate-50/30">
+            {/* TURNOVER */}
+            <div className="p-4 space-y-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Est_Turnover</p>
+                <p className="text-2xl font-black text-slate-900 tracking-tighter font-mono">{formatCurrency(turnover || 0)}</p>
+            </div>
+
+            {/* NET PROFIT */}
+            <div className={`p-4 space-y-3 ${netProfit >= 0 ? '' : 'bg-rose-50'}`}>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Net_Profit_Margin</p>
+                <p className={`text-2xl font-black tracking-tighter font-mono ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    {formatCurrency(netProfit || 0)}
+                </p>
+            </div>
+
+            {/* PAYROLL */}
+            <div className="p-4 space-y-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Aggregate_Payroll</p>
+                <p className="text-2xl font-black text-slate-900 tracking-tighter font-mono">{formatCurrency(totalPayroll || 0)}</p>
+            </div>
+
+            {/* EXPENSES */}
+            <div className="p-4 space-y-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Operational_Exp</p>
+                <p className="text-2xl font-black text-slate-900 tracking-tighter font-mono">{formatCurrency(totalExpenses || 0)}</p>
+            </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        <div className="p-6 rounded-[1.5rem] bg-blue-50/50 border border-blue-100/50 transition-all hover:bg-blue-50 hover:scale-[1.02] duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
-              <span className="text-xs font-black uppercase tracking-widest text-blue-600/70">Payroll</span>
-            </div>
-            <Icon name="Users" size={16} className="text-blue-500/50" />
-          </div>
-          <p className="text-3xl font-black text-slate-900 tracking-tighter">{formatCurrency(totalPayroll)}</p>
-        </div>
-        
-        <div className="p-6 rounded-[1.5rem] bg-emerald-50/50 border border-emerald-100/50 transition-all hover:bg-emerald-50 hover:scale-[1.02] duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.4)]"></div>
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-600/70">Expenses</span>
-            </div>
-            <Icon name="ShoppingBag" size={16} className="text-emerald-500/50" />
-          </div>
-          <p className="text-3xl font-black text-slate-900 tracking-tighter">{formatCurrency(totalExpenses)}</p>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Budget Distribution</span>
-          <div className="flex items-center gap-1.5 bg-slate-900 text-white px-3 py-1 rounded-full text-[10px] font-black shadow-lg shadow-slate-900/20">
-            <Icon name="TrendingUp" size={10} strokeWidth={3} />
-            {formatCurrency(outgoingTotal)} TOTAL
+      <div className="p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Budget_Distribution_Architecture</span>
+          <div className="bg-slate-900 text-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0px_rgba(15,23,42,0.15)] flex items-center space-x-2">
+            <Icon name="TrendingUp" size={12} strokeWidth={3} />
+            <span>{formatCurrency(outgoingTotal)} OUTGOING</span>
           </div>
         </div>
         
-        <div className="h-5 w-full bg-slate-100/80 rounded-full overflow-hidden flex p-1 border border-slate-200/50 shadow-inner">
+        <div className="h-8 w-full bg-slate-50 border border-slate-900 p-1 flex">
           <div 
             style={{ width: `${payrollPct}%` }} 
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(37,99,235,0.3)]"
-            title={`Payroll: ${payrollPct.toFixed(1)}%`}
-          ></div>
+            className="h-full bg-slate-900 transition-all duration-1000 ease-out flex items-center justify-center overflow-hidden"
+          >
+             <span className="text-[8px] font-black text-white px-2">PAYROLL</span>
+          </div>
           <div 
             style={{ width: `${expensesPct}%` }} 
-            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-1000 ease-out ml-1 shadow-[0_0_12px_rgba(5,150,105,0.3)]"
-            title={`Expenses: ${expensesPct.toFixed(1)}%`}
-          ></div>
+            className="h-full bg-slate-400 transition-all duration-1000 ease-out ml-1 flex items-center justify-center overflow-hidden"
+          >
+             <span className="text-[8px] font-black text-white px-2">MARKETING/OPS</span>
+          </div>
         </div>
         
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200/40">
-            <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                    <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{payrollPct.toFixed(0)}% Payroll</span>
+        <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+            <div className="flex items-center space-x-8">
+                <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-slate-900"></div>
+                    <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{payrollPct.toFixed(0)}% Personnel Distribution</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-600"></div>
-                    <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{expensesPct.toFixed(0)}% Marketing/Ops</span>
+                <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-slate-400"></div>
+                    <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{expensesPct.toFixed(0)}% Resource Allocation</span>
                 </div>
             </div>
-            <button className="text-[11px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center group/link">
-                Review Details
-                <Icon name="ArrowRight" size={12} className="ml-1.5 transition-transform group-hover/link:translate-x-1" strokeWidth={3} />
+            <button className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] border-b-2 border-slate-900 pb-0.5 hover:opacity-70 transition-opacity flex items-center group">
+                Access Audit Logs
+                <Icon name="ArrowRight" size={12} className="ml-2 transition-transform group-hover:translate-x-1" strokeWidth={3} />
             </button>
         </div>
       </div>

@@ -19,13 +19,20 @@ import { formatTime12h } from '../../../utils/dateUtils';
 import AttendanceHistoryModal from '../../attendance/components/AttendanceHistoryModal';
 import EmployeePayrollPage from 'features/payroll/pages/EmployeePayrollPage';
 import LeaveForm from './LeaveForm';
+import LocationVerification from '../components/LocationVerification';
 
 const EmployeeDashboard = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [todayAttendance, setTodayAttendance] = useState(null);
     const [employee, setEmployee] = useState(null);
-    const [location, setLocation] = useState('');
+    const [locationData, setLocationData] = useState({
+        latitude: null,
+        longitude: null,
+        address: 'Fetching location...',
+        verified: false
+    });
+    const [location, setLocation] = useState(''); // Keep for manual override if needed
     const [notes, setNotes] = useState('');
     const [attendanceHistory, setAttendanceHistory] = useState([]);
     const [geoLoading, setGeoLoading] = useState(false);
@@ -92,12 +99,21 @@ const EmployeeDashboard = () => {
             (position) => {
                 const { latitude, longitude } = position.coords;
 
+                setLocationData({
+                    latitude,
+                    longitude,
+                    address: 'GPS coordinates retrieved.',
+                    verified: true
+                });
+                
+                // Also update the string location for backward compatibility
                 setLocation(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
                 setGeoLoading(false);
             },
             (error) => {
                 console.error('Error getting location:', error);
-                alert('Unable to retrieve your location. Please check your browser settings.');
+                // alert('Unable to retrieve your location. Please check your browser settings.');
+                setLocationData(prev => ({ ...prev, verified: false, address: 'Enable GPS to verify location' }));
                 setGeoLoading(false);
             }
         );
@@ -127,7 +143,10 @@ const EmployeeDashboard = () => {
                 }
             }
 
-            await attendanceService.checkIn(employee.id, location, notes, lat, lng);
+            const currentLat = locationData.latitude || lat;
+            const currentLng = locationData.longitude || lng;
+
+            await attendanceService.checkIn(employee.id, location || 'Office', notes, currentLat, currentLng);
             alert('Checked in successfully!');
             await fetchEmployeeAndData();
             setLocation('');
@@ -163,7 +182,10 @@ const EmployeeDashboard = () => {
                 }
             }
 
-            await attendanceService.checkOut(todayAttendance.id, notes, lat, lng);
+            const currentLat = locationData.latitude || lat;
+            const currentLng = locationData.longitude || lng;
+
+            await attendanceService.checkOut(todayAttendance.id, notes, currentLat, currentLng);
             alert('Checked out successfully!');
             await fetchEmployeeAndData();
             setNotes('');
@@ -371,19 +393,12 @@ const EmployeeDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Map Placeholder or Other Stats */}
-                            <div className="bg-card rounded-xl shadow-sm border border-border p-6">
-                                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                                    <Icon name="Map" size={20} className="mr-2 text-primary" />
-                                    My Location
-                                </h3>
-                                <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center border-2 border-dashed border-gray-200">
-                                    <div className="text-center text-gray-500">
-                                        <Icon name="MapPin" size={32} className="mx-auto mb-2 opacity-50" />
-                                        <p>{location ? `Current Location: ${location}` : "Location map will appear here"}</p>
-                                    </div>
-                                </div>
-                            </div>
+                            {/* Location Verification & Details */}
+                            <LocationVerification 
+                                location={locationData}
+                                onRefreshLocation={getUserLocation}
+                                workMode={employee?.employeeType || 'office'}
+                            />
                         </div>
 
                         {/* Attendance History Sidebar */}

@@ -137,7 +137,7 @@ const LandingPage = () => {
                                 <Link to="/pricing" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Pricing</Link>
                                 {/* <Link to="/enterprise" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Enterprise</Link> */}
                                 {/* <Link to="/customers" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Customers</Link> */}
-                                <button onClick={() => navigate('/privacypolicy')} className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Privacy</button>
+                                <button onClick={() => navigate('/privacy-policy')} className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Privacy</button>
                             </div>
                         </div>
 
@@ -939,7 +939,7 @@ const LandingPage = () => {
 
                     {/* Bottom Bar */}
                     <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                        <div>© 2024 DIFMO Private Limited. All rights reserved.</div>
+                        <div>© 2026 DIFMO-CRM. All rights reserved.</div>
                         <div className="flex gap-6 mt-4 md:mt-0">
                             <Link to="/privacy" className="hover:text-gray-300 transition">Privacy Policy</Link>
                             <Link to="/terms" className="hover:text-gray-300 transition">Terms of Service</Link>

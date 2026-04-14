@@ -26,6 +26,7 @@ export default function JobsTab({ setActiveTab }) {
   const [filterStatus, setFilterStatus] = useState('All');
   const [filterType, setFilterType] = useState('All');
   const [deleteId, setDeleteId] = useState(null);
+  const [editingJob, setEditingJob] = useState(null); // New: for edit mode
   useEffect(() => { fetchJobs(); }, []);
 
   async function fetchJobs() {
@@ -45,7 +46,7 @@ export default function JobsTab({ setActiveTab }) {
     return matchQ && matchS && matchT;
   });
 
-  async function createJob(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     try {
       const payload = {
@@ -54,21 +55,42 @@ export default function JobsTab({ setActiveTab }) {
         location: form.location,
         type: form.type,
         experience: form.experience,
+        salary: form.salary,
         description: form.description,
         slug: form.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''),
-        responsibilities: form.responsibilities ? form.responsibilities.split(',').map(s=>s.trim()) : [],
-        requirements: form.requirements ? form.requirements.split(',').map(s=>s.trim()) : [],
+        responsibilities: form.responsibilities ? (Array.isArray(form.responsibilities) ? form.responsibilities : form.responsibilities.split(',').map(s=>s.trim())) : [],
+        requirements: form.requirements ? (Array.isArray(form.requirements) ? form.requirements : form.requirements.split(',').map(s=>s.trim())) : [],
         applicationStartDate: form.applicationStartDate || null,
         applicationEndDate: form.applicationEndDate || null,
         isActive: !!form.isActive,
       };
-      await apiClient.post(API_ENDPOINTS.JOBS.BASE, payload);
+
+      if (editingJob) {
+        await apiClient.patch(API_ENDPOINTS.JOBS.BY_ID(editingJob.id || editingJob._id), payload);
+      } else {
+        await apiClient.post(API_ENDPOINTS.JOBS.BASE, payload);
+      }
+      
       await fetchJobs();
       setIsOpen(false);
+      setEditingJob(null);
       setForm(EMPTY_FORM);
     } catch (err) {
-      console.error('Create job failed', err);
+      console.error('Job submission failed', err);
     }
+  }
+
+  function handleEdit(job) {
+    setEditingJob(job);
+    setForm({
+      ...job,
+      responsibilities: Array.isArray(job.responsibilities) ? job.responsibilities.join(', ') : (job.responsibilities || ''),
+      requirements: Array.isArray(job.requirements) ? job.requirements.join(', ') : (job.requirements || ''),
+      applicationStartDate: job.applicationStartDate ? job.applicationStartDate.split('T')[0] : '',
+      applicationEndDate: job.applicationEndDate ? job.applicationEndDate.split('T')[0] : '',
+      isActive: job.isActive ?? true
+    });
+    setIsOpen(true);
   }
 
   async function toggleStatus(id) {
@@ -109,7 +131,7 @@ export default function JobsTab({ setActiveTab }) {
           <p className="text-gray-500 text-sm mt-0.5">Manage and track all active job listings</p>
         </div>
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => { setEditingJob(null); setForm(EMPTY_FORM); setIsOpen(true); }}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
         >
           <Icon name="Plus" size="16" />
@@ -235,20 +257,31 @@ export default function JobsTab({ setActiveTab }) {
                   <button
                     onClick={() => toggleStatus(job.id || job._id)}
                     className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors border border-transparent hover:border-gray-200"
+                    title={job.isActive ? 'Pause' : 'Activate'}
                   >
                     <Icon name={job.isActive ? 'PauseCircle' : 'PlayCircle'} size="12" />
                     {job.isActive ? 'Pause' : 'Activate'}
                   </button>
                   <button
-                    onClick={() => setActiveTab('applications')}
+                    onClick={() => handleEdit(job)}
                     className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-transparent hover:border-blue-200"
+                    title="Edit Job"
                   >
-                    <Icon name="Eye" size="12" />
-                    View Apps
+                    <Icon name="Edit" size="12" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('applications')}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-violet-50 hover:bg-violet-100 text-violet-600 transition-colors border border-transparent hover:border-violet-200"
+                    title="View Applications"
+                  >
+                    <Icon name="Users" size="12" />
+                    Apps
                   </button>
                   <button
                     onClick={() => confirmDelete(job.id || job._id)}
                     className="p-1.5 text-xs font-medium rounded-md bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors border border-transparent hover:border-red-100"
+                    title="Delete Job"
                   >
                     <Icon name="Trash2" size="12" />
                   </button>
@@ -265,14 +298,14 @@ export default function JobsTab({ setActiveTab }) {
           <div className="bg-white border border-gray-200 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300 shadow-xl">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">Post New Job</h3>
-                <p className="text-sm text-gray-500">Fill in the job details below</p>
+                <h3 className="text-lg font-semibold text-gray-800">{editingJob ? 'Update Job Posting' : 'Post New Job'}</h3>
+                <p className="text-sm text-gray-500">{editingJob ? 'Correct the job details below' : 'Fill in the job details below'}</p>
               </div>
-              <button type="button" onClick={() => { setIsOpen(false); setForm(EMPTY_FORM); }} className="p-1.5 hover:bg-gray-100 rounded-md transition-colors">
+              <button type="button" onClick={() => { setIsOpen(false); setForm(EMPTY_FORM); setEditingJob(null); }} className="p-1.5 hover:bg-gray-100 rounded-md transition-colors">
                 <Icon name="X" size="18" className="text-gray-500" />
               </button>
             </div>
-            <form onSubmit={createJob} className="p-5 space-y-4">
+            <form onSubmit={handleSubmit} className="p-5 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Job Title *</label>
@@ -366,11 +399,11 @@ export default function JobsTab({ setActiveTab }) {
               </div>
 
               <div className="flex justify-end gap-3 pt-3 mt-4 border-t border-gray-100">
-                <button type="button" onClick={() => { setIsOpen(false); setForm(EMPTY_FORM); }} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                <button type="button" onClick={() => { setIsOpen(false); setForm(EMPTY_FORM); setEditingJob(null); }} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                   Cancel
                 </button>
                 <button type="submit" className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                  Post Job
+                  {editingJob ? 'Update Job' : 'Post Job'}
                 </button>
               </div>
             </form>

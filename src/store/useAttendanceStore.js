@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import attendanceService from '../services/attendance.service';
 import employeeService from '../services/employee.service';
+import { getISTDateString } from '../utils/dateUtils';
 
 const useAttendanceStore = create((set, get) => ({
     attendanceData: [],
@@ -39,10 +40,10 @@ const useAttendanceStore = create((set, get) => ({
 
             // Merge logic
             const attendanceMap = new Map();
-            const todayDate = new Date().toISOString().split('T')[0];
+            const todayDate = getISTDateString();
 
             validAttendance.forEach(record => {
-                const recordDate = new Date(record.date).toISOString().split('T')[0];
+                const recordDate = getISTDateString(new Date(record.date));
                 if (recordDate === todayDate) {
                     attendanceMap.set(record.employee?.id, record);
                 }

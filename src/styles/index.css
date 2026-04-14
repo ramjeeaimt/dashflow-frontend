@@ -1,7 +1,8 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: Inter;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
 }
 
 * {
@@ -9,4 +10,55 @@ body {
   line-height: normal;
   font-family: inherit;
   margin: unset;
+}
+
+/* Industrial Precision Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0f172a;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* High-Contrast Selection */
+::selection {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+/* Industrial Alignment Utilities */
+.industrial-border {
+  border: 1px solid #e2e8f0;
+}
+
+.industrial-shadow {
+  shadow: 10px 10px 0px rgba(15, 23, 42, 0.05);
+}
+
+.font-mono-industrial {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+  letter-spacing: -0.05em;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

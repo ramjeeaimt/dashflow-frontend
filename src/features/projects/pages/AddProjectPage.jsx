@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useProjectStore } from "features/projects";
 import useAuthStore from "../../../store/useAuthStore";
 import BreadcrumbNavigation from "../../../components/ui/BreadcrumbNavigation";
+import apiClient from "../../../api/client";
 import {
   FolderPlus, User, CreditCard, FileText, ChevronRight, ChevronLeft,
   Check, X, Plus, Trash2, Link, Github, Globe, Palette, FileCode,
@@ -49,15 +50,10 @@ const AddProject = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://localhost:3000/employees', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setEmployees(data);
-        }
+        const response = await apiClient.get('/employees');
+        // apiClient unwraps data.data, but let's be double sure
+        const data = response.data;
+        setEmployees(Array.isArray(data) ? data : (data?.data || []));
       } catch (error) {
         console.error('Failed to fetch employees:', error);
       }
@@ -252,7 +248,7 @@ const AddProject = () => {
                                 const emp = employees.find(e => e.id === empId);
                                 return (
                                   <span key={empId} className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2">
-                                    {emp?.name || 'Unknown'}
+                                    {emp?.user?.name || emp?.name || 'Unknown'}
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -290,6 +286,7 @@ const AddProject = () => {
                                         ...prev,
                                         assignedEmployeeIds: newIds
                                       }));
+                                      setShowEmployeeDropdown(false);
                                     } else {
                                       const newIds = selectedEmployeeIds.filter(id => id !== emp.id);
                                       setSelectedEmployeeIds(newIds);
@@ -297,13 +294,14 @@ const AddProject = () => {
                                         ...prev,
                                         assignedEmployeeIds: newIds
                                       }));
+                                      setShowEmployeeDropdown(false);
                                     }
                                   }}
                                   className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                                 />
                                 <div className="flex-1">
-                                  <p className="text-sm font-semibold text-slate-800">{emp.name}</p>
-                                  <p className="text-xs text-slate-500">{emp.department || 'N/A'}</p>
+                                  <p className="text-sm font-semibold text-slate-800">{emp.user?.name || emp.name}</p>
+                                  <p className="text-xs text-slate-500">{emp.department?.name || emp.department || 'N/A'}</p>
                                 </div>
                               </label>
                             ))}

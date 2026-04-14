@@ -59,16 +59,18 @@ const Dashboard = () => {
       icon: 'Users',
       color: 'primary'
     },
-    // {
-    //   title: 'Present Today',
-    //   value: `${metrics?.presentToday ?? 0} / ${metrics?.totalEmployees ?? 0}`,
-    //   change: metrics?.attendanceBreakdown > 0 
-    //     ? `${metrics.attendanceBreakdown.early} Early, ${metrics.attendanceBreakdown.late} Late` 
-    //     : `${metrics?.attendanceBreakdown?.early || 0} Early`,
-    //   changeType: metrics?.attendanceBreakdown?.late > 0 ? 'negative' : 'positive',
-    //   icon: 'UserCheck',
-    //   color: 'success'
-    // },
+    {
+      title: 'Present Today',
+      value: `${metrics?.presentToday ?? 0} / ${metrics?.totalEmployees ?? 0}`,
+      change: metrics?.attendanceBreakdown 
+        ? (metrics.attendanceBreakdown.early > 0 || metrics.attendanceBreakdown.late > 0)
+          ? `${metrics.attendanceBreakdown.early > 0 ? `${metrics.attendanceBreakdown.early} Early` : ''}${metrics.attendanceBreakdown.early > 0 && metrics.attendanceBreakdown.late > 0 ? ', ' : ''}${metrics.attendanceBreakdown.late > 0 ? `${metrics.attendanceBreakdown.late} Late` : ''}`
+          : 'All on time'
+        : 'Calculating...',
+      changeType: metrics?.attendanceBreakdown?.late > 0 ? 'negative' : 'positive',
+      icon: 'UserCheck',
+      color: 'success'
+    },
     {
       title: 'Tasks Completed',
       value: (metrics?.tasksCompleted ?? 0).toString(),
@@ -135,69 +137,55 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-white">
       <Header />
       <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={handleToggleSidebar} />
 
       <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-8`}>
-        <div className="p-6 max-w-[1600px] mx-auto">
-
-          {/* Premium Welcome Header */}
-          {/* <div className="relative overflow-hidden bg-gradient-to-br from-[#1E40AF] to-[#3B82F6] rounded-3xl p-8 mb-10 shadow-xl shadow-blue-500/20 animate-in fade-in slide-in-from-top-4 duration-700"> */}
-            {/* Decorative background elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10  -mr-20 -mt-20 blur-3xl"></div>
-            {/* <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/20 rounded-full -ml-16 -mb-16 blur-2xl"></div> */}
-
-            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              {/* <div className="text-white">
-                <div className="flex items-center gap-2 mb-2 opacity-80">
-                  <Icon name="Briefcase" size={16} />
-                  <span className="text-sm font-medium tracking-wide uppercase">Admin Overview</span>
+        <div className="p-8 max-w-[1600px] mx-auto space-y-12">
+          
+          {/* Industrial Header Block */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between p-8 bg-blue-800 text-white border-b-4 border-slate-700 shadow-[8px_8px_0px_rgba(15,23,42,0.1)]">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+                <span className="w-8 h-px bg-slate-700"></span>
+                <Icon name="Briefcase" size={14} />
+                <span>COMMAND_MODULE_ACTIVE</span>
+              </div>
+              <h1 className="text-4xl font-black uppercase tracking-tighter">
+                HELLO, {user?.name?.split(' ')[0] || 'ADMIN'} <span className="text-slate-500 font-normal">/</span> DASHBOARD
+              </h1>
+              <div className="flex items-center space-x-4 pt-2">
+                <div className="flex items-center space-x-2 px-3 py-1 bg-white/10 text-[10px] font-black uppercase tracking-widest border border-white/10">
+                  <span className="w-2 h-2 bg-emerald-500 animate-pulse"></span>
+                  <span>System Synced</span>
                 </div>
-                <h1 className="text-4xl font-bold mb-2 tracking-tight">Good Morning, {user?.name?.split(' ')[0] || 'Admin'} 👋</h1>
-                <p className="text-blue-100 text-lg max-w-xl">
-                  Ready to manage your team? You have <span className="font-bold text-white underline decoration-white/30">12 pending applications</span> and 3 interviews scheduled for today.
-                </p>
-              </div> */}
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic opacity-60">ADMIN_ACCESS: GRANTED_SECURE_TOKEN</span>
+              </div>
+            </div>
 
-              {/* <div className="flex items-center gap-4">
-                <div className="hidden sm:flex flex-col items-end text-white/90 mr-2">
-                  <p className="font-bold text-lg">
-                    {currentTime?.toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true
-                    })}
+            <div className="flex items-center space-x-4 mt-6 lg:mt-0">
+               <div className="text-right pr-6 border-r border-white/10 hidden sm:block">
+                  <p className="text-xl font-black font-mono tracking-tighter uppercase whitespace-nowrap">
+                    {currentTime?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
                   </p>
-                  <p className="text-xs font-medium opacity-70">
-                    {currentTime?.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                    {currentTime?.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                   </p>
-                </div>
-                <button
+               </div>
+               <button
                   onClick={handleRefreshData}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-2xl hover:bg-white/20 transition-all active:scale-95 group"
-                  title="Sync Data"
+                  className="p-3 bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all active:translate-y-0.5 group"
                 >
-                  <Icon name="RefreshCw" size={20} className={loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'} />
+                  <Icon name="RefreshCw" size={18} className={loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'} />
                 </button>
-                <button
-                  onClick={() => setIsEmployeeModalOpen(true)}
-                  className="bg-white text-blue-600 px-6 py-3 rounded-2xl font-bold shadow-lg shadow-white/10 hover:shadow-white/20 active:scale-95 transition-all flex items-center gap-2"
-                >
-                  <Icon name="Plus" size={20} />
-                  Hire New Talent
-                </button>
-              </div> */}
-            {/* </div> */}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.05)]">
             {metricsData?.map((metric, index) => (
-              <div key={index} className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: `${index * 100}ms` }}>
+              <div key={index} className={`border-slate-900  ${index < metricsData.length - 1 ? 'lg:border-r' : ''} ${index % 2 === 0 && index < metricsData.length - 2 ? 'sm:border-r lg:border-r' : ''} ${index < 2 ? 'sm:border-b lg:border-b-0' : ''} ${index >= 2 ? 'border-t lg:border-t-0' : ''}`}>
                 <MetricsCard
                   title={metric?.title}
                   value={metric?.value}
@@ -210,33 +198,35 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 mb-10">
-            <div className="xl:col-span-3 animate-in fade-in translate-y-4 duration-1000 delay-200 fill-mode-both">
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-0 border border-slate-200">
+            <div className="xl:col-span-3 border-b xl:border-b-0 xl:border-r border-slate-200">
               <AttendanceChart data={charts?.attendance} loading={loading} />
             </div>
-            <div className="xl:col-span-2 animate-in fade-in translate-y-4 duration-1000 delay-300 fill-mode-both">
+            <div className="xl:col-span-2">
               <ProductivityChart data={charts?.productivity} loading={loading} />
             </div>
           </div>
 
           {isAdmin && financials && (
-            <div className="mb-10 animate-in fade-in translate-y-4 duration-1000 delay-400 fill-mode-both">
+            <div className="border border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.05)]">
               <FinancialSummaryCard data={financials} loading={loading} />
             </div>
           )}
 
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight flex items-center gap-2">
-                <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                Command Center
+          {/* Quick Actions / Command Center */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b-2 border-slate-900">
+              <h2 className="text-xl font-black uppercase tracking-widest text-slate-900 flex items-center gap-4">
+                <span className="w-12 h-1 bg-slate-900"></span>
+                Action Terminal
               </h2>
-              <p className="text-sm text-muted-foreground font-medium">Quick access to essential tools</p>
+              <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Operational Hotlinking v2.4</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {quickActions?.map((action, index) => (
-                <div key={index} className="animate-in fade-in zoom-in-95 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
+                <div key={index}>
                   <QuickActionCard
                     title={action?.title}
                     description={action?.description}
@@ -249,8 +239,6 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-
-
         </div>
       </main>
 

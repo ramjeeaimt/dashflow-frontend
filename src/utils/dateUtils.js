@@ -1,45 +1,37 @@
 /**
- * Utility functions for date and time formatting
+ * Helper to get the current date string in IST (Asia/Kolkata)
+ * format: YYYY-MM-DD
  */
-
-/**
- * Formats a 24-hour time string (HH:mm[:ss]) to a 12-hour format with AM/PM
- * @param {string} timeStr - The time string to format
- * @returns {string} - Formatted time (e.g., "10:30 AM")
- */
-export const formatTime12h = (timeStr) => {
-    if (!timeStr) return '--:--';
-    try {
-        const parts = timeStr.split(':');
-        if (parts.length < 2) return timeStr;
-
-        const hours = parseInt(parts[0]);
-        const minutes = parts[1];
-
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const h12 = hours % 12 || 12;
-
-        return `${h12}:${minutes} ${ampm}`;
-    } catch (e) {
-        console.error('Error formatting time:', e);
-        return timeStr;
-    }
+export const getISTDateString = (date = new Date()) => {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date);
 };
 
 /**
- * Formats a date string to a human-readable format
- * @param {string|Date} date - The date to format
- * @returns {string} - Formatted date (e.g., "Oct 15, 2023")
+ * Helper to check if a record date matches IST Today
  */
-export const formatDate = (date) => {
-    if (!date) return 'N/A';
-    try {
-        return new Date(date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    } catch (e) {
-        return date;
-    }
+export const isISTToday = (recordDate) => {
+  if (!recordDate) return false;
+  const today = getISTDateString();
+  const target = getISTDateString(new Date(recordDate));
+  return today === target;
+};
+
+/**
+ * Format time string (HH:mm:ss or HH:mm) to 12-hour format (h:mm AM/PM)
+ */
+export const formatTime12h = (timeString) => {
+  if (!timeString || timeString === '--') return '--';
+  try {
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  } catch (e) {
+    return timeString;
+  }
 };

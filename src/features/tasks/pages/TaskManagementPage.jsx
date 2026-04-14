@@ -217,32 +217,47 @@ const TaskManagement = () => {
             <>
               <BreadcrumbNavigation items={breadcrumbItems} />
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Task Management</h1>
-            <p className="text-muted-foreground mt-1">
-              Assign, track, and monitor project tasks with comprehensive analytics
-            </p>
-          </div>
-          <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-            <Button
-              variant="outline"
-              onClick={() => setShowAnalytics(!showAnalytics)}
-              iconName={showAnalytics ? "Table" : "BarChart3"}
-              iconPosition="left">
+          {/* Industrial Header Block */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between p-8 bg-blue-900 text-white border-b-4 border-slate-700 shadow-[8px_8px_0px_rgba(15,23,42,0.1)] mb-12">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+                <span className="w-8 h-px bg-slate-700"></span>
+                <Icon name="CheckSquare" size={14} />
+                <span>COMMAND_MODULE: TASK_TERMINAL_V1</span>
+              </div>
+              <h1 className="text-4xl font-black uppercase tracking-tighter">
+                Task Management
+              </h1>
+              <div className="flex items-center space-x-4 pt-2">
+                <div className="flex items-center space-x-2 px-3 py-1 bg-white/10 text-[10px] font-black uppercase tracking-widest border border-white/10">
+                  <span className="w-2 h-2 bg-emerald-500 animate-pulse"></span>
+                  <span>Oversight Mode Active</span>
+                </div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-2 border-l border-white/10">
+                   Assign, track, and monitor project tasks with comprehensive analytics
+                </p>
+              </div>
+            </div>
 
-              {showAnalytics ? 'Show Table' : 'Show Analytics'}
-            </Button>
-            <Button
-              onClick={handleCreateTask}
-              iconName="Plus"
-              iconPosition="left">
-
-              Create Task
-            </Button>
+            <div className="flex items-center space-x-3 mt-6 lg:mt-0">
+               <button
+                  onClick={() => setShowAnalytics(!showAnalytics)}
+                  className={`p-3 border transition-all active:translate-y-0.5 group ${
+                    showAnalytics ? 'bg-white text-slate-900 border-white' : 'bg-white/5 text-white border-white/10 hover:bg-white/10'
+                  }`}
+                  title="Toggle Analytics Matrix"
+                >
+                  <Icon name={showAnalytics ? "Table" : "BarChart3"} size={18} className="group-hover:scale-110 transition-transform" strokeWidth={3} />
+                </button>
+                <button
+                  onClick={handleCreateTask}
+                  className="px-6 py-3 bg-white text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center"
+                >
+                  <Icon name="Plus" size={16} className="mr-2" strokeWidth={3} />
+                  Provision Task
+                </button>
+            </div>
           </div>
-        </div>
 
         {/* Filters */}
         <TaskFilters

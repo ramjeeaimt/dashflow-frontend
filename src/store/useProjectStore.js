@@ -40,9 +40,11 @@ const useProjectStore = create((set, get) => ({
         };
 
         projectsArray.forEach(p => {
-            const status = p.status || "Pending"; 
-            if (counts.hasOwnProperty(status)) {
-                counts[status]++;
+            const phase = p.phase || "Pending";
+            if (phase === "Completed") {
+                counts["Completed"]++;
+            } else if (["Development", "Testing", "Deployment"].includes(phase)) {
+                counts["Progress"]++;
             } else {
                 counts["Pending"]++;
             }
@@ -50,7 +52,7 @@ const useProjectStore = create((set, get) => ({
 
         return [
             { name: "Completed", value: counts["Completed"], color: "#22c55e" },
-            { name: " Progress", value: counts[" Progress"], color: "#3b82f6" },
+            { name: "Progress", value: counts["Progress"], color: "#3b82f6" },
             { name: "Pending", value: counts["Pending"], color: "#f59e0b" },
         ];
     },

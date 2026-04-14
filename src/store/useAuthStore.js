@@ -51,58 +51,66 @@ const getInitialState = () => {
     };
 };
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
     ...getInitialState(),
     isLoading: false,
     error: null,
 
     login: async (email, password) => {
-    set({ isLoading: true, error: null });
+        // Prevent multiple clicks/requests while already loading
+        if (get().isLoading) return;
 
-    try {
-        console.log('[useAuthStore] Calling apiLogin...');
+        set({ isLoading: true, error: null });
 
-        const response = await authService.login(email, password);
+        // Create a timeout promise to prevent indefinite hanging (especially on mobile)
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Login timed out. Please check your internet or server.')), 10000)
+        );
 
-        console.log('[useAuthStore] apiLogin returned:', response);
+        try {
+            console.log(`[AuthFlow] Initiating login for: ${email}`);
 
-        // unwrap backend response
-        const payload = response.data || response;
+            // Race the login request against the 10-second timeout
+            const response = await Promise.race([
+                authService.login(email, password),
+                timeoutPromise
+            ]);
 
-        const accessToken = payload.access_token;
-        const sanitizedUser = sanitizeUser(payload.user) || { email };
+            console.log('[AuthFlow] Login response received:', response);
 
-        if (accessToken) {
-            localStorage.setItem('token', accessToken);
-            console.log('[useAuthStore] Token saved:', accessToken.substring(0,20)+'...');
-        } else {
-            console.error('[useAuthStore] No access_token in data!', payload);
-            throw new Error('Login failed: No access token received');
+            // unwrap backend response
+            const payload = response.data || response;
+            const accessToken = payload.access_token;
+            const sanitizedUser = sanitizeUser(payload.user) || { email };
+
+            if (accessToken) {
+                localStorage.setItem('token', accessToken);
+            } else {
+                throw new Error('Login failed: No access token received');
+            }
+
+            localStorage.setItem('user', JSON.stringify(sanitizedUser));
+
+            set({
+                user: sanitizedUser,
+                token: accessToken,
+                isAuthenticated: true,
+                isLoading: false
+            });
+
+            console.log('[AuthFlow] Login SUCCESS');
+
+        } catch (error) {
+            console.error('[AuthFlow] Login error:', error);
+
+            set({
+                error: error.response?.data?.message || error.message || 'Login failed',
+                isLoading: false
+            });
+
+            throw error;
         }
-
-        localStorage.setItem('user', JSON.stringify(sanitizedUser));
-
-        set({
-            user: sanitizedUser,
-            token: accessToken,
-            isAuthenticated: true,
-            isLoading: false
-        });
-
-        console.log('[useAuthStore] Login successful');
-
-    } catch (error) {
-
-        console.error('[useAuthStore] Login error:', error);
-
-        set({
-            error: error.response?.data?.message || 'Login failed',
-            isLoading: false
-        });
-
-        throw error;
-    }
-},
+    },
 
     register: async (companyData) => {
         set({ isLoading: true, error: null });

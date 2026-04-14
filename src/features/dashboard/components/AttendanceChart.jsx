@@ -16,10 +16,10 @@ const AttendanceChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-card border border-border/50 rounded-xl p-6 h-[450px] animate-pulse">
-        <div className="h-6 w-48 bg-muted rounded mb-2"></div>
-        <div className="h-4 w-64 bg-muted rounded mb-8"></div>
-        <div className="h-64 w-full bg-muted/50 rounded-lg"></div>
+      <div className="bg-card border border-border/50 rounded-none p-6 h-[450px] animate-pulse">
+        <div className="h-6 w-48 bg-muted rounded-none mb-2"></div>
+        <div className="h-4 w-64 bg-muted rounded-none mb-8"></div>
+        <div className="h-64 w-full bg-muted/50 rounded-none"></div>
       </div>
     );
   }
@@ -27,95 +27,103 @@ const AttendanceChart = ({ data, loading }) => {
   const chartData = data || [];
 
   return (
-    <div className="bg-card border border-border/50 rounded-xl p-6 transition-all duration-300 hover:shadow-md">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h3 className="text-lg font-bold text-foreground">Attendance Overview</h3>
-          <p className="text-sm text-muted-foreground/80">Daily presence trends for the current week</p>
+    <div className="bg-white border border-slate-200 p-8 transition-all duration-300 hover:shadow-[12px_12px_0px_rgba(15,23,42,0.03)] group h-full flex flex-col">
+      <div className="flex items-center justify-between mb-10">
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <span className="w-1.5 h-6 bg-slate-900"></span>
+            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Attendance Dynamics</h3>
+          </div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">System_Tracking: DAILY_PRESENCE_METRICS</p>
         </div>
-        <div className="flex items-center p-1 bg-muted/50 rounded-lg border border-border/20">
+        <div className="flex items-center p-1 bg-slate-50 border border-slate-200">
           <button
             onClick={() => setTimeRange('week')}
-            className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all duration-200 ${
+            className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all duration-200 ${
               timeRange === 'week' 
-                ? 'bg-card text-primary shadow-sm border border-border/50' 
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-slate-900 text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
-            Week
+            Terminal_Week
           </button>
           <button
             onClick={() => setTimeRange('month')}
-            className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all duration-200 ${
+            className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all duration-200 ${
               timeRange === 'month' 
-                ? 'bg-card text-primary shadow-sm border border-border/50' 
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-slate-900 text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
-            Month
+            Operational_Month
           </button>
         </div>
       </div>
 
-      <div className="h-72">
+      <div className="h-72 relative">
+        {/* Decorative corner markers */}
+        <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-slate-200"></div>
+        <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-slate-200"></div>
+        
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#0f172a" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="#0f172a" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" opacity={0.5} />
+            <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e2e8f0" />
             <XAxis 
               dataKey="date" 
-              axisLine={false}
+              axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
               tickLine={false}
-              tick={{ fill: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 500 }}
+              tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+              className="uppercase tracking-tighter"
               dy={10}
             />
             <YAxis 
-              axisLine={false}
+              axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
               tickLine={false}
-              tick={{ fill: 'var(--color-muted-foreground)', fontSize: 11, fontWeight: 500 }}
+              tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
             />
             <Tooltip
-              cursor={{ stroke: 'var(--color-primary)', strokeWidth: 1, strokeDasharray: '4 4' }}
+              cursor={{ stroke: '#0f172a', strokeWidth: 1 }}
               contentStyle={{
-                backgroundColor: 'var(--color-card)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '12px',
-                padding: '8px 12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                backgroundColor: '#0f172a',
+                border: 'none',
+                borderRadius: '0px',
+                padding: '12px',
+                boxShadow: '8px 8px 0px rgba(15,23,42,0.1)'
               }}
-              labelStyle={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '12px' }}
-              itemStyle={{ fontSize: '12px', padding: '2px 0' }}
+              labelStyle={{ color: '#94a3b8', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '10px', marginBottom: '8px' }}
+              itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase' }}
             />
             <Area 
-              type="monotone" 
+              type="stepAfter" 
               dataKey="present" 
-              name="Present"
-              stroke="var(--color-primary)" 
+              name="Present_Count"
+              stroke="#0f172a" 
               strokeWidth={3}
               fillOpacity={1} 
               fill="url(#colorPresent)" 
-              animationDuration={1500}
+              animationDuration={1000}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/40">
+      <div className="flex items-center justify-between mt-10 pt-6 border-t border-slate-100">
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
-            <div className="w-2.5 h-2.5 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--color-primary-rgb),0.5)]"></div>
-            <span className="text-xs font-medium text-muted-foreground">Present Employees</span>
+            <div className="w-3 h-3 bg-slate-900"></div>
+            <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Live_Personnel_Manifest</span>
           </div>
         </div>
-        <div className="text-xs font-bold text-primary group cursor-pointer flex items-center hover:opacity-80 transition-opacity">
-          View Detailed Logs
-          <Icon name="ChevronRight" size={14} className="ml-1" />
-        </div>
+        <button className="text-[10px] font-black text-slate-900 group flex items-center hover:opacity-70 transition-opacity uppercase tracking-[0.2em] border-b-2 border-slate-900 pb-0.5">
+          Access Detailed Logs
+          <Icon name="ChevronRight" size={12} className="ml-1 transition-transform group-hover:translate-x-1" />
+        </button>
       </div>
     </div>
   );

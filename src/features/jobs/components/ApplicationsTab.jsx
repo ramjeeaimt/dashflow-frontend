@@ -22,6 +22,7 @@ const EMPTY_CANDIDATE = { job: '', name: '', email: '', phone: '', experience: '
 
 export default function ApplicationsTab() {
   const [apps, setApps] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0, limit: 10 });
   const [filter, setFilter] = useState({ status: 'ALL', query: '' });
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [candidate, setCandidate] = useState(EMPTY_CANDIDATE);
@@ -38,13 +39,26 @@ export default function ApplicationsTab() {
     } catch (err) { console.error('Fetch jobs failed', err); }
   }
 
-  async function fetchApps() {
+  async function fetchApps(page = 1) {
     try {
-      const res = await apiClient.get(API_ENDPOINTS.JOB_APPLICATIONS.BASE);
-      const list = res.data?.applications || res.data || [];
-      setApps(Array.isArray(list) ? list : []);
+      const params = {
+        page,
+        limit: pagination.limit,
+        status: filter.status !== 'ALL' ? filter.status : undefined,
+      };
+      
+      const res = await apiClient.get(API_ENDPOINTS.JOB_APPLICATIONS.BASE, { params });
+      
+      const { applications, total, pages, page: currentPage } = res.data || {};
+      setApps(Array.isArray(applications) ? applications : []);
+      setPagination(prev => ({ ...prev, total, totalPages: pages, page: currentPage }));
     } catch (err) { console.error('Fetch applications failed', err); }
   }
+
+  // Trigger fetch on filter change or page change
+  useEffect(() => {
+    fetchApps(1);
+  }, [filter.status]); // We still filter by query client-side for now, or we could add it to backend too.
 
   const filtered = apps.filter(a => {
     const q = filter.query.toLowerCase();
@@ -105,8 +119,8 @@ export default function ApplicationsTab() {
   }
 
   const stats = [
-    { label: 'Total Applications', value: apps.length, color: 'bg-primary/10 text-primary', icon: 'ClipboardList' },
-    { label: 'Shortlisted', value: apps.filter(a => (a.status||'').toUpperCase() === 'SHORTLISTED').length, color: 'bg-violet-100 text-violet-600', icon: 'Star' },
+    { label: 'Total Applications', value: pagination.total, color: 'bg-primary/10 text-primary', icon: 'ClipboardList' },
+    { label: 'Shortlisted', value: apps.filter(a => (a.status||'').toUpperCase() === 'SHORTLISTED').length, color: 'bg-violet-100 text-violet-600', icon: 'Star' }, // NOTE: These sub-stats might needing backend counts too if more than one page is shortlisted
     { label: 'Selected', value: apps.filter(a => (a.status||'').toUpperCase() === 'SELECTED' || (a.status||'').toUpperCase() === 'HIRED').length, color: 'bg-emerald-100 text-emerald-600', icon: 'CheckCircle' },
     { label: 'Rejected', value: apps.filter(a => (a.status||'').toUpperCase() === 'REJECTED').length, color: 'bg-red-100 text-red-600', icon: 'XCircle' },
   ];
@@ -251,6 +265,44 @@ export default function ApplicationsTab() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <p className="text-xs text-gray-500">
+                Showing <span className="font-semibold text-gray-900">{apps.length}</span> of <span className="font-semibold text-gray-900">{pagination.total}</span> applications
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => fetchApps(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                  className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <Icon name="ChevronLeft" size={16} />
+                </button>
+                {[...Array(pagination.totalPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => fetchApps(i + 1)}
+                    className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                      pagination.page === i + 1
+                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
+                        : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => fetchApps(pagination.page + 1)}
+                  disabled={pagination.page === pagination.totalPages}
+                  className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <Icon name="ChevronRight" size={16} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

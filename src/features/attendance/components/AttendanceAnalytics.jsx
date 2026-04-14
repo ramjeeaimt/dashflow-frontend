@@ -1,199 +1,242 @@
 import React from 'react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import Icon from '../../../components/AppIcon';
 
 const AttendanceAnalytics = ({ analyticsData }) => {
-  <></>
-  // if (!analyticsData) {
-  //   return (
-  //     <div className="flex items-center justify-center h-64 bg-card border border-border rounded-lg">
-  //       <span className="text-muted-foreground">Loading analytics...</span>
-  //     </div>
-  //   );
-  // }
+  if (!analyticsData) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-white border-2 border-slate-900 shadow-[8px_8px_0px_rgba(15,23,42,0.05)] pt-8">
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse">Initializing_Analytics_Stream...</span>
+      </div>
+    );
+  }
 
-  // const { weeklyTrend, distribution, punctualityTrend } = analyticsData;
+  const { weeklyTrend, distribution, punctualityTrend } = analyticsData;
 
   // Transform distribution data for PieChart
-  // const attendanceDistribution = distribution?.map(item => ({
-  //   name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
-  //   value: item.value,
-  //   color: item.name === 'present' ? '#22c55e' :
-  //     item.name === 'absent' ? '#ef4444' :
-  //       item.name === 'late' ? '#f59e0b' : '#f97316'
-  // })) || [];
+  const attendanceDistribution = distribution?.map(item => ({
+    name: item.name.toUpperCase(),
+    value: item.value,
+    color: item.name === 'present' ? '#064e3b' : // emerald-900
+      item.name === 'absent' ? '#881337' : // rose-900
+        item.name === 'late' ? '#78350f' : '#0f172a' // amber-900 : slate-900
+  })) || [];
 
   // Mock department stats for now as backend doesn't provide it yet
-  // const departmentStats = [
-  //   { name: 'Engineering', present: 85, total: 92, rate: 92.4 },
-  //   { name: 'Marketing', present: 28, total: 32, rate: 87.5 },
-  //   { name: 'Sales', present: 45, total: 48, rate: 93.8 },
-  //   { name: 'HR', present: 12, total: 15, rate: 80.0 },
-  //   { name: 'Finance', present: 18, total: 20, rate: 90.0 }
-  // ];
+  const departmentStats = [
+    { name: 'ENGINEERING', present: 85, total: 92, rate: 92.4 },
+    { name: 'MARKETING', present: 28, total: 32, rate: 87.5 },
+    { name: 'SALES_FORCE', present: 45, total: 48, rate: 93.8 },
+    { name: 'OPERATIONS', present: 12, total: 15, rate: 80.0 }
+  ];
 
-  // return (
-  //   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  //     {/* Weekly Attendance Trend */}
-  //     <div className="bg-card border border-border rounded-lg p-6">
-  //       <div className="flex items-center justify-between mb-4">
-  //         <h3 className="text-lg font-semibold text-foreground">Weekly Attendance Trend</h3>
-  //         <Icon name="TrendingUp" size={20} className="text-primary" />
-  //       </div>
-  //       <div className="h-64">
-  //         <ResponsiveContainer width="100%" height="100%">
-  //           <BarChart data={weeklyTrend}>
-  //             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-  //             <XAxis
-  //               dataKey="day"
-  //               stroke="hsl(var(--muted-foreground))"
-  //               fontSize={12}
-  //             />
-  //             <YAxis
-  //               stroke="hsl(var(--muted-foreground))"
-  //               fontSize={12}
-  //             />
-  //             <Tooltip
-  //               contentStyle={{
-  //                 backgroundColor: 'hsl(var(--card))',
-  //                 border: '1px solid hsl(var(--border))',
-  //                 borderRadius: '8px'
-  //               }}
-  //             />
-  //             <Bar dataKey="present" fill="#22c55e" name="Present" />
-  //             <Bar dataKey="late" fill="#f59e0b" name="Late" />
-  //             <Bar dataKey="absent" fill="#ef4444" name="Absent" />
-  //           </BarChart>
-  //         </ResponsiveContainer>
-  //       </div>
-  //     </div>
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8">
+      {/* Weekly Attendance Trend */}
+      <div className="bg-white border-2 border-slate-900 p-8 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] group">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+           <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                    <span className="w-1.5 h-6 bg-slate-900"></span>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Weekly Trend</h3>
+                </div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">Feed: ATTENDANCE_CHRONO_MAP</p>
+           </div>
+          <Icon name="TrendingUp" size={20} className="text-slate-900 group-hover:scale-125 transition-transform" strokeWidth={3} />
+        </div>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={weeklyTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e2e8f0" />
+              <XAxis
+                dataKey="day"
+                axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
+                tickLine={false}
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+                dy={10}
+              />
+              <YAxis
+                axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
+                tickLine={false}
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+              />
+              <Tooltip
+                cursor={{ fill: 'rgba(15,23,42,0.02)' }}
+                contentStyle={{
+                  backgroundColor: '#0f172a',
+                  border: 'none',
+                  borderRadius: '0px',
+                  padding: '12px',
+                  boxShadow: '8px 8px 0px rgba(15,23,42,0.1)'
+                }}
+                labelStyle={{ color: '#94a3b8', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '10px', marginBottom: '8px' }}
+                itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase' }}
+              />
+              <Bar dataKey="present" fill="#0f172a" name="Active" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="late" fill="#94a3b8" name="Delayed" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="absent" fill="#e2e8f0" name="Void" radius={[0, 0, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
-  //     {/* Attendance Distribution */}
-  //     <div className="bg-card border border-border rounded-lg p-6">
-  //       <div className="flex items-center justify-between mb-4">
-  //         <h3 className="text-lg font-semibold text-foreground">Attendance Distribution</h3>
-  //         <Icon name="PieChart" size={20} className="text-primary" />
-  //       </div>
-  //       <div className="h-64 flex items-center">
-  //         <ResponsiveContainer width="60%" height="100%">
-  //           <PieChart>
-  //             <Pie
-  //               data={attendanceDistribution}
-  //               cx="50%"
-  //               cy="50%"
-  //               innerRadius={40}
-  //               outerRadius={80}
-  //               dataKey="value"
-  //             >
-  //               {attendanceDistribution?.map((entry, index) => (
-  //                 <Cell key={`cell-${index}`} fill={entry?.color} />
-  //               ))}
-  //             </Pie>
-  //             <Tooltip />
-  //           </PieChart>
-  //         </ResponsiveContainer>
-  //         <div className="flex-1 space-y-2">
-  //           {attendanceDistribution?.map((item, index) => (
-  //             <div key={index} className="flex items-center justify-between">
-  //               <div className="flex items-center space-x-2">
-  //                 <div
-  //                   className="w-3 h-3 rounded-full"
-  //                   style={{ backgroundColor: item?.color }}
-  //                 ></div>
-  //                 <span className="text-sm text-foreground">{item?.name}</span>
-  //               </div>
-  //               <span className="text-sm font-medium text-foreground">{item?.value}%</span>
-  //             </div>
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </div>
+      {/* Attendance Distribution */}
+      <div className="bg-white border-2 border-slate-900 p-8 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] group">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+           <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                    <span className="w-1.5 h-6 bg-slate-900"></span>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Metric Allocation</h3>
+                </div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">Analysis: VOLUME_DISTRIBUTION</p>
+           </div>
+          <Icon name="PieChart" size={20} className="text-slate-900 group-hover:rotate-12 transition-transform" strokeWidth={3} />
+        </div>
+        <div className="h-72 flex items-center">
+          <ResponsiveContainer width="55%" height="100%">
+            <PieChart>
+              <Pie
+                data={attendanceDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={90}
+                dataKey="value"
+                paddingAngle={4}
+                stroke="none"
+              >
+                {attendanceDistribution?.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry?.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{
+                    backgroundColor: '#0f172a',
+                    border: 'none',
+                    borderRadius: '0px',
+                    padding: '8px',
+                    boxShadow: '4px 4px 0px rgba(0,0,0,0.1)'
+                }}
+                itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex-1 space-y-4 pl-4 border-l border-slate-100">
+            {attendanceDistribution?.map((item, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div
+                    className="w-3 h-3 shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
+                    style={{ backgroundColor: item?.color }}
+                  ></div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">{item?.name}</span>
+                </div>
+                <span className="text-[10px] font-black text-slate-900 font-mono italic">{item?.value}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-  //     {/* Department Performance */}
-  //     <div className="bg-card border border-border rounded-lg p-6">
-  //       <div className="flex items-center justify-between mb-4">
-  //         <h3 className="text-lg font-semibold text-foreground">Department Performance</h3>
-  //         <Icon name="Building" size={20} className="text-primary" />
-  //       </div>
-  //       <div className="space-y-4">
-  //         {departmentStats?.map((dept, index) => (
-  //           <div key={index} className="flex items-center justify-between">
-  //             <div className="flex-1">
-  //               <div className="flex items-center justify-between mb-1">
-  //                 <span className="text-sm font-medium text-foreground">{dept?.name}</span>
-  //                 <span className="text-sm text-muted-foreground">{dept?.present}/{dept?.total}</span>
-  //               </div>
-  //               <div className="w-full bg-muted rounded-full h-2">
-  //                 <div
-  //                   className="bg-success h-2 rounded-full transition-all duration-300"
-  //                   style={{ width: `${dept?.rate}%` }}
-  //                 ></div>
-  //               </div>
-  //             </div>
-  //             <div className="ml-4 text-right">
-  //               <span className="text-sm font-semibold text-foreground">{dept?.rate}%</span>
-  //             </div>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     </div>
+      {/* Department Performance */}
+      <div className="bg-white border-2 border-slate-900 p-8 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] group">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+           <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                    <span className="w-1.5 h-6 bg-slate-900"></span>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Sector Performance</h3>
+                </div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">Metrics: EFFICIENCY_VECTORS</p>
+           </div>
+          <Icon name="Building" size={20} className="text-slate-900 group-hover:translate-z-10 transition-transform" strokeWidth={3} />
+        </div>
+        <div className="space-y-6">
+          {departmentStats?.map((dept, index) => (
+            <div key={index} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">{dept?.name}</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-tighter">{dept?.present} OF {dept?.total} UNIT_ACTIVE</span>
+              </div>
+              <div className="w-full bg-slate-100 border border-slate-200 h-4 shadow-inner relative">
+                <div
+                  className="bg-slate-900 h-full transition-all duration-700 ease-out"
+                  style={{ width: `${dept?.rate}%` }}
+                ></div>
+                <span className="absolute right-2 top-0.5 text-[8px] font-black text-slate-400 italic">{dept?.rate}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-  //     {/* Punctuality Trend */}
-  //     <div className="bg-card border border-border rounded-lg p-6">
-  //       <div className="flex items-center justify-between mb-4">
-  //         <h3 className="text-lg font-semibold text-foreground">6-Month Punctuality Trend</h3>
-  //         <Icon name="Clock" size={20} className="text-primary" />
-  //       </div>
-  //       <div className="h-64">
-  //         <ResponsiveContainer width="100%" height="100%">
-  //           <LineChart data={punctualityTrend}>
-  //             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-  //             <XAxis
-  //               dataKey="month"
-  //               stroke="hsl(var(--muted-foreground))"
-  //               fontSize={12}
-  //             />
-  //             <YAxis
-  //               stroke="hsl(var(--muted-foreground))"
-  //               fontSize={12}
-  //             />
-  //             <Tooltip
-  //               contentStyle={{
-  //                 backgroundColor: 'hsl(var(--card))',
-  //                 border: '1px solid hsl(var(--border))',
-  //                 borderRadius: '8px'
-  //               }}
-  //             />
-  //             <Line
-  //               type="monotone"
-  //               dataKey="onTime"
-  //               stroke="#22c55e"
-  //               strokeWidth={3}
-  //               name="On Time"
-  //               dot={{ r: 4 }}
-  //             />
-  //             <Line
-  //               type="monotone"
-  //               dataKey="late"
-  //               stroke="#f59e0b"
-  //               strokeWidth={2}
-  //               name="Late"
-  //               dot={{ r: 3 }}
-  //             />
-  //             <Line
-  //               type="monotone"
-  //               dataKey="earlyOut"
-  //               stroke="#f97316"
-  //               strokeWidth={2}
-  //               name="Early Out"
-  //               dot={{ r: 3 }}
-  //             />
-  //           </LineChart>
-  //         </ResponsiveContainer>
-  //       </div>
-  //     </div>
-    // </div>
-
+      {/* Punctuality Area Chart */}
+      <div className="bg-white border-2 border-slate-900 p-8 shadow-[12px_12px_0px_rgba(15,23,42,0.05)] group">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+           <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                    <span className="w-1.5 h-6 bg-slate-900"></span>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Punctuality Vector</h3>
+                </div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-3.5">History: 6MO_ACCURACY_INDEX</p>
+           </div>
+          <Icon name="Clock" size={20} className="text-slate-900" strokeWidth={3} />
+        </div>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={punctualityTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorOnTime" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0f172a" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#0f172a" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e2e8f0" />
+              <XAxis
+                dataKey="month"
+                axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
+                tickLine={false}
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+                dy={10}
+              />
+              <YAxis
+                axisLine={{ stroke: '#0f172a', strokeWidth: 1 }}
+                tickLine={false}
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }}
+              />
+              <Tooltip
+                 contentStyle={{
+                    backgroundColor: '#0f172a',
+                    border: 'none',
+                    borderRadius: '0px',
+                    padding: '12px',
+                    boxShadow: '8px 8px 0px rgba(15,23,42,0.1)'
+                  }}
+                  itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}
+              />
+              <Area
+                type="monotone"
+                dataKey="onTime"
+                stroke="#0f172a"
+                strokeWidth={3}
+                fillOpacity={1}
+                fill="url(#colorOnTime)"
+                name="PRECISION"
+              />
+               <Area
+                type="monotone"
+                dataKey="late"
+                stroke="#94a3b8"
+                strokeWidth={2}
+                fillOpacity={0}
+                strokeDasharray="5 5"
+                name="DELAY_MARKER"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default AttendanceAnalytics;

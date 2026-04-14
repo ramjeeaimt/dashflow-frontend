@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import Select from '../../../components/ui/Select';
 
 const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
   const [filters, setFilters] = useState({
@@ -15,35 +12,35 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
   });
 
   const priorityOptions = [
-    { value: '', label: 'All Priorities' },
-    { value: 'high', label: 'High Priority' },
-    { value: 'medium', label: 'Medium Priority' },
-    { value: 'low', label: 'Low Priority' }
+    { value: '', label: 'ALL_PRIORITIES' },
+    { value: 'high', label: 'HIGH_PRIORITY' },
+    { value: 'medium', label: 'MEDIUM_PRIORITY' },
+    { value: 'low', label: 'LOW_PRIORITY' }
   ];
 
   const statusOptions = [
-    { value: '', label: 'All Status' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'in-progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'overdue', label: 'Overdue' }
+    { value: '', label: 'ALL_STATUS' },
+    { value: 'pending', label: 'PENDING' },
+    { value: 'in-progress', label: 'IN_PROGRESS' },
+    { value: 'completed', label: 'COMPLETED' },
+    { value: 'overdue', label: 'OVERDUE' }
   ];
 
   const departmentOptions = [
-    { value: '', label: 'All Departments' },
-    { value: 'engineering', label: 'Engineering' },
-    { value: 'marketing', label: 'Marketing' },
-    { value: 'sales', label: 'Sales' },
-    { value: 'hr', label: 'Human Resources' },
-    { value: 'finance', label: 'Finance' }
+    { value: '', label: 'ALL_DEPARTMENTS' },
+    { value: 'engineering', label: 'ENGINEERING' },
+    { value: 'marketing', label: 'MARKETING' },
+    { value: 'sales', label: 'SALES' },
+    { value: 'hr', label: 'HUMAN_RESOURCES' },
+    { value: 'finance', label: 'FINANCE' }
   ];
 
   const dateRangeOptions = [
-    { value: '', label: 'All Time' },
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'This Week' },
-    { value: 'month', label: 'This Month' },
-    { value: 'overdue', label: 'Overdue Only' }
+    { value: '', label: 'ALL_TIME' },
+    { value: 'today', label: 'TODAY' },
+    { value: 'week', label: 'THIS_WEEK' },
+    { value: 'month', label: 'THIS_MONTH' },
+    { value: 'overdue', label: 'OVERDUE_ONLY' }
   ];
 
   const handleFilterChange = (key, value) => {
@@ -68,90 +65,118 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
   const hasActiveFilters = Object.values(filters)?.some(value => value !== '');
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <Icon name="Filter" size={20} className="text-muted-foreground" />
-          <h3 className="text-lg font-semibold text-foreground">Task Filters</h3>
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredTasks} of {totalTasks} tasks
+    <div className="bg-white border-2 border-slate-900 rounded-none mb-12 shadow-[8px_8px_0px_rgba(15,23,42,0.1)]">
+      <div className="flex items-center justify-between p-4 border-b-2 border-slate-900 bg-slate-50">
+        <div className="flex items-center space-x-4">
+          <div className="p-2 bg-slate-900 text-white">
+            <Icon name="Filter" size={16} />
+          </div>
+          <div className="space-y-0.5">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 leading-none">
+              Diagnostic_Control
+            </h3>
+            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+              Telemetry: {filteredTasks} / {totalTasks} Records Manifested
+            </div>
           </div>
         </div>
         {hasActiveFilters && (
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={clearAllFilters}
-            iconName="X"
-            iconPosition="left"
+            className="px-3 py-1.5 border-2 border-slate-900 text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2"
           >
-            Clear Filters
-          </Button>
+            <Icon name="X" size={12} strokeWidth={3} />
+            Purge Filters
+          </button>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <div className="xl:col-span-2">
-          <Input
-            type="search"
-            placeholder="Search tasks..."
-            value={filters?.search}
-            onChange={(e) => handleFilterChange('search', e?.target?.value)}
-            className="w-full"
-          />
+
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="xl:col-span-1">
+          <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Vector_Search</label>
+          <div className="relative group">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors">
+              <Icon name="Search" size={14} />
+            </div>
+            <input
+              type="text"
+              placeholder="IDENTIFY_TASKS..."
+              value={filters?.search}
+              onChange={(e) => handleFilterChange('search', e?.target?.value)}
+              className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-200 focus:border-slate-900 focus:bg-white outline-none text-xs font-bold transition-all rounded-none placeholder:text-slate-300"
+            />
+          </div>
         </div>
 
-        <Select
-          placeholder="Priority"
-          options={priorityOptions}
+        <FilterDropdown 
+          label="Priority_Level"
           value={filters?.priority}
-          onChange={(value) => handleFilterChange('priority', value)}
+          options={priorityOptions}
+          onChange={(v) => handleFilterChange('priority', v)}
         />
 
-        <Select
-          placeholder="Status"
-          options={statusOptions}
+        <FilterDropdown 
+          label="Operational_Status"
           value={filters?.status}
-          onChange={(value) => handleFilterChange('status', value)}
+          options={statusOptions}
+          onChange={(v) => handleFilterChange('status', v)}
         />
 
-        <Select
-          placeholder="Department"
-          options={departmentOptions}
+        <FilterDropdown 
+          label="Department_Module"
           value={filters?.department}
-          onChange={(value) => handleFilterChange('department', value)}
+          options={departmentOptions}
+          onChange={(v) => handleFilterChange('department', v)}
         />
 
-        <Select
-          placeholder="Date Range"
-          options={dateRangeOptions}
+        <FilterDropdown 
+          label="Temporal_Window"
           value={filters?.dateRange}
-          onChange={(value) => handleFilterChange('dateRange', value)}
+          options={dateRangeOptions}
+          onChange={(v) => handleFilterChange('dateRange', v)}
         />
       </div>
+
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
-          <span className="text-sm text-muted-foreground">Active filters:</span>
-          {Object.entries(filters)?.map(([key, value]) => {
-            if (!value) return null;
-            return (
-              <div
-                key={key}
-                className="flex items-center space-x-1 bg-primary/10 text-primary px-2 py-1 rounded-md text-sm"
-              >
-                <span className="capitalize">{key}: {value}</span>
-                <button
-                  onClick={() => handleFilterChange(key, '')}
-                  className="hover:bg-primary/20 rounded-full p-0.5"
+        <div className="px-6 py-4 border-t border-slate-100 flex flex-wrap gap-2 items-center">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-2">Active_Sequences:</span>
+            {Object.entries(filters)?.map(([key, value]) => {
+              if (!value) return null;
+              return (
+                <div
+                  key={key}
+                  className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest"
                 >
-                  <Icon name="X" size={12} />
-                </button>
-              </div>
-            );
-          })}
+                  <span>{key}::{value}</span>
+                  <button
+                    onClick={() => handleFilterChange(key, '')}
+                    className="hover:text-red-400 transition-colors"
+                  >
+                    <Icon name="X" size={12} strokeWidth={3} />
+                  </button>
+                </div>
+              );
+            })}
         </div>
       )}
     </div>
   );
 };
 
-export default TaskFilters;
+const FilterDropdown = ({ label, value, options, onChange }) => (
+  <div className="space-y-2">
+    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</label>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 focus:border-slate-900 focus:bg-white outline-none text-xs font-bold transition-all rounded-none appearance-none cursor-pointer"
+      style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
+    >
+      {options.map(opt => (
+        <option key={opt.value} value={opt.value} className="font-bold py-2">{opt.label}</option>
+      ))}
+    </select>
+  </div>
+);
+
+export default TaskFilters;

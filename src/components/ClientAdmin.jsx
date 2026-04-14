@@ -5,7 +5,7 @@ import {
   Globe, Phone, MapPin, Building2, DollarSign, ArrowRight, ArrowLeft,
   ShieldCheck, CreditCard, Layers, LayoutGrid, Calendar, Clock, FileText,
   Edit2, Save, Github, ExternalLink, Trash, Tag, FolderOpen, Link as LinkIcon, CheckSquare,
-  UserPlus
+  UserPlus, Eye
 } from 'lucide-react';
 import { useClientStore } from '../store/useClientStore';
 import Sidebar from './ui/Sidebar';
@@ -14,6 +14,8 @@ import { FaRupeeSign } from "react-icons/fa";
 import useProjectStore from '../store/useProjectStore';
 import useAuthStore from '../store/useAuthStore';
 import InlineProjectForm from './InlineProjectForm';
+import ProjectDetailsModal from '../features/projects/components/ProjectDetailsModal';
+import ProjectEditModal from '../features/projects/components/ProjectEditModal';
 
 const ClientAdmin = () => {
   const { clients, fetchClients, processInvoice, addClient, updateClient } = useClientStore();
@@ -35,6 +37,8 @@ const ClientAdmin = () => {
   const [editData, setEditData] = useState({});
   const [editClientData, setEditClientData] = useState({});
   const [createBoth, setCreateBoth] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewProjectId, setViewProjectId] = useState(null);
 
   // --- FORM STATES ---
   const [newClient, setNewClient] = useState({
@@ -339,6 +343,8 @@ const ClientAdmin = () => {
     try {
       const projectPayload = {
         ...projectData,
+        assigningDate: projectData.assigningDate || null,
+        deadline: projectData.deadline || null,
         companyId: user.company.id
       };
 
@@ -375,8 +381,8 @@ const ClientAdmin = () => {
       const projectPayload = {
         projectName: newProject.projectName,
         description: newProject.description,
-        assigningDate: newProject.assigningDate,
-        deadline: newProject.deadline,
+        assigningDate: newProject.assigningDate || null,
+        deadline: newProject.deadline || null,
         phase: newProject.phase,
         status: newProject.status,
         totalPayment: Number(newProject.totalPayment) || 0,
@@ -435,8 +441,8 @@ const ClientAdmin = () => {
       const projectPayload = {
         projectName: newProject.projectName,
         description: newProject.description,
-        assigningDate: newProject.assigningDate,
-        deadline: newProject.deadline,
+        assigningDate: newProject.assigningDate || null,
+        deadline: newProject.deadline || null,
         phase: newProject.phase,
         status: newProject.status,
         totalPayment: Number(newProject.totalPayment) || 0,
@@ -744,45 +750,54 @@ const ClientAdmin = () => {
                         // PROJECT DETAILS SECTION
                         <div className="space-y-4 mt-3">
                         <div className="flex justify-between items-center">
-                          <h4 className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Complete Project Details</h4>
+                          <h4 className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Project Actions</h4>
                           <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedEntity(item);
-                                setIsInvoiceModalOpen(true);
-                              }}
-                              className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1 hover:bg-green-700 transition-colors"
-                            >
-                              <Send size={12} /> Send Invoice
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditData({
-                                  id: item.id,
-                                  projectName: item.name,
-                                  description: item.projectDetails.description || '',
-                                  assigningDate: item.projectDetails.assigningDate || '',
-                                  deadline: item.projectDetails.deadline || '',
-                                  phase: item.projectDetails.phase || 'Planning',
-                                  status: item.projectDetails.status || 'active',
-                                  totalPayment: item.projectDetails.totalPayment || 0,
-                                  paymentReceived: item.projectDetails.paymentReceived || 0,
-                                  budget: item.projectDetails.budget || 0,
-                                  githubLink: item.projectDetails.githubLink || '',
-                                  deploymentLink: item.projectDetails.deploymentLink || '',
-                                  contactInfo: item.projectDetails.contactInfo || '',
-                                  clientEmail: item.email || '',
-                                  clientName: item.clientName || '',
-                                  links: item.projectDetails.links || {},
-                                  tasks: item.projectDetails.tasks || [],
-                                  notes: item.projectDetails.notes || ''
-                                });
-                                setIsEditing(true);
-                              }}
-                              className="text-blue-600 hover:text-blue-700 text-xs flex items-center gap-1"
-                            >
-                              <Edit2 size={12} /> Edit Project
-                            </button>
+                             <button
+                               onClick={() => {
+                                 setViewProjectId(item.id);
+                                 setIsViewModalOpen(true);
+                               }}
+                               className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-1"
+                             >
+                                <Eye size={12} /> View Details
+                             </button>
+                             <button
+                               onClick={() => {
+                                 setSelectedEntity(item);
+                                 setIsInvoiceModalOpen(true);
+                               }}
+                               className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1 hover:bg-green-700 transition-colors"
+                             >
+                               <Send size={12} /> Send Invoice
+                             </button>
+                             <button
+                               onClick={() => {
+                                 setEditData({
+                                   id: item.id,
+                                   projectName: item.name,
+                                   description: item.projectDetails.description || '',
+                                   assigningDate: item.projectDetails.assigningDate || '',
+                                   deadline: item.projectDetails.deadline || '',
+                                   phase: item.projectDetails.phase || 'Planning',
+                                   status: item.projectDetails.status || 'active',
+                                   totalPayment: item.projectDetails.totalPayment || 0,
+                                   paymentReceived: item.projectDetails.paymentReceived || 0,
+                                   budget: item.projectDetails.budget || 0,
+                                   githubLink: item.projectDetails.githubLink || '',
+                                   deploymentLink: item.projectDetails.deploymentLink || '',
+                                   contactInfo: item.projectDetails.contactInfo || '',
+                                   clientEmail: item.email || '',
+                                   clientName: item.clientName || '',
+                                   links: item.projectDetails.links || {},
+                                   tasks: item.projectDetails.tasks || [],
+                                   notes: item.projectDetails.notes || ''
+                                 });
+                                 setIsEditing(true);
+                               }}
+                               className="text-blue-600 hover:text-blue-700 text-xs flex items-center gap-1 font-bold"
+                             >
+                               <Edit2 size={12} /> Edit Project
+                             </button>
                           </div>
                         </div>
 
@@ -1096,11 +1111,13 @@ const ClientAdmin = () => {
                                           onClick={(e) => {
                                              e.stopPropagation();
                                              setExpandedId(proj.id);
+                                              setViewProjectId(proj.id);
+                                              setIsViewModalOpen(true);
                                              window.scrollTo({ top: 0, behavior: 'smooth' });
                                           }}
                                           className="text-blue-600 hover:text-blue-800 font-medium hover:underline text-center w-full"
                                        >
-                                         View Full Details <ArrowRight size={12} className="inline ml-1"/>
+                                         View Details <Eye size={12} />
                                        </button>
                                     </div>
                                   </div>
@@ -2128,6 +2145,19 @@ const ClientAdmin = () => {
           </div>
         </div>
       )}
+
+      {/* REUSABLE PROJECT MODALS */}
+      {isViewModalOpen && (
+        <ProjectDetailsModal
+          projectId={viewProjectId}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setViewProjectId(null);
+          }}
+        />
+      )}
+
+      {/* Note: Keeping the existing isEditing modal for now but it could be replaced later */}
     </div>
   );
 };

@@ -75,89 +75,88 @@ const AttendanceActions = ({
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="bg-white border border-slate-900 p-8 shadow-[8px_8px_0px_rgba(15,23,42,0.05)]">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
         {/* Left Side - Selection Info & Bulk Actions */}
-        <div className="flex-1">
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="flex items-center space-x-2">
-              <Icon name="Users" size={20} className="text-muted-foreground" />
-              <span className="text-sm text-foreground">
-                {selectedEmployees?.length > 0
-                  ? `${selectedEmployees?.length} of ${totalRecords} selected`
-                  : `${totalRecords} total records`
-                }
-              </span>
+        <div className="flex-1 space-y-4">
+          <div className="flex items-center space-x-4">
+             <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_rgba(15,23,42,0.2)]">
+                <Icon name="Users" size={14} strokeWidth={3} />
+                <span>
+                    {selectedEmployees?.length > 0
+                    ? `SELECTED_MANIFEST: ${selectedEmployees?.length} / ${totalRecords}`
+                    : `TOTAL_SYSTEM_RECORDS: ${totalRecords}`
+                    }
+                </span>
             </div>
-
-            {selectedEmployees?.length > 0 && (
-              <div className="h-4 w-px bg-border"></div>
-            )}
           </div>
 
-          {/* Bulk Actions */}
-          {selectedEmployees?.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+          {/* Bulk Actions Grid */}
+          {selectedEmployees?.length > 0 ? (
+            <div className="flex flex-wrap gap-3">
               {bulkActions?.map((action) => (
-                <Button
+                <button
                   key={action?.id}
-                  size="sm"
                   onClick={() => onBulkAction(action?.id)}
-                  className={`${getButtonColor(action?.color)} transition-all duration-150`}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border-2 transition-all active:translate-y-0.5 flex items-center shadow-[4px_4px_0px_rgba(0,0,0,0.1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 ${
+                    action.color === 'success' ? 'border-emerald-900 bg-emerald-50 text-emerald-900' :
+                    action.color === 'error' ? 'border-rose-900 bg-rose-50 text-rose-900' :
+                    action.color === 'warning' ? 'border-amber-900 bg-amber-50 text-amber-900' :
+                    'border-slate-900 bg-slate-50 text-slate-900'
+                  }`}
                   title={action?.description}
                 >
-                  <Icon name={action?.icon} size={14} className="mr-1" />
+                  <Icon name={action?.icon} size={14} className="mr-2" strokeWidth={3} />
                   {action?.label}
-                </Button>
+                </button>
               ))}
             </div>
-          )}
-
-          {selectedEmployees?.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Select employees to perform bulk actions
-            </p>
+          ) : (
+            <div className="flex items-center space-x-3 text-slate-400 group">
+                <div className="w-8 h-px bg-slate-200"></div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] italic">Await selection to engage bulk protocols</p>
+                <div className="w-8 h-px bg-slate-200"></div>
+            </div>
           )}
         </div>
 
-        {/* Right Side - Actions */}
-        <div className="flex items-center space-x-3">
+        {/* Right Side - Actions Terminal */}
+        <div className="flex flex-wrap items-center gap-4">
           {/* Take Attendance */}
-          <Button
-            variant="default"
-            size="sm"
+          <button
             onClick={onTakeAttendance}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="px-6 py-2.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-[6px_6px_0px_rgba(15,23,42,0.15)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center"
           >
-            <Icon name="ClipboardCheck" size={14} className="mr-1" />
-            Take Attendance
-          </Button>
+            <Icon name="ClipboardCheck" size={16} className="mr-2" strokeWidth={3} />
+            Engage Attendance
+          </button>
 
           {/* Manual Entry */}
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={onManualEntry}
+            className="px-6 py-2.5 bg-white border-2 border-slate-900 text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-[6px_6px_0px_rgba(15,23,42,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center"
           >
-            <Icon name="Edit" size={14} className="mr-1" />
-            Manual Entry
-          </Button>
+            <Icon name="Edit" size={16} className="mr-2" strokeWidth={3} />
+            Manual_Overwrite
+          </button>
 
           {/* Export Menu */}
           <div className="relative">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowExportMenu(!showExportMenu)}
+            <button
+               onClick={() => setShowExportMenu(!showExportMenu)}
+               className="px-6 py-2.5 bg-white border-2 border-slate-900 text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] shadow-[6px_6px_0px_rgba(15,23,42,0.1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center"
             >
-              <Icon name="Download" size={14} className="mr-1" />
+              <Icon name="Download" size={16} className="mr-2" strokeWidth={3} />
               Export
-              <Icon name="ChevronDown" size={12} className="ml-1" />
-            </Button>
+              <Icon name="ChevronDown" size={14} className="ml-2" />
+            </button>
 
             {showExportMenu && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-lg shadow-lg z-10">
+              <div className="absolute right-0 top-full mt-4 w-72 bg-white border-4 border-slate-900 shadow-[12px_12px_0px_rgba(15,23,42,0.2)] z-20 divide-y-2 divide-slate-100">
                 <div className="py-2">
+                  <div className="px-4 py-2 border-b-2 border-slate-100">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Select_Export_Format</p>
+                  </div>
                   {exportFormats?.map((format) => (
                     <button
                       key={format?.id}
@@ -165,13 +164,15 @@ const AttendanceActions = ({
                         onExportReport(format?.id);
                         setShowExportMenu(false);
                       }}
-                      className="w-full px-4 py-2 text-left hover:bg-accent transition-colors duration-150"
+                      className="w-full px-4 py-4 text-left hover:bg-slate-50 transition-colors duration-150 group"
                     >
-                      <div className="flex items-center space-x-3">
-                        <Icon name={format?.icon} size={16} className="text-muted-foreground" />
+                      <div className="flex items-center space-x-4">
+                        <div className="p-2 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                            <Icon name={format?.icon} size={18} strokeWidth={2.5} />
+                        </div>
                         <div>
-                          <div className="text-sm font-medium text-foreground">{format?.label}</div>
-                          <div className="text-xs text-muted-foreground">{format?.description}</div>
+                          <div className="text-xs font-black text-slate-900 uppercase tracking-widest">{format?.label}</div>
+                          <div className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">{format?.description}</div>
                         </div>
                       </div>
                     </button>
@@ -182,19 +183,15 @@ const AttendanceActions = ({
           </div>
 
           {/* Policy Settings */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => console.log('Policy settings')}
+          <button
+             onClick={() => console.log('Policy settings')}
+             className="p-2.5 bg-slate-50 border-2 border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-900 hover:bg-white transition-all active:translate-y-0.5"
+             title="System Policy Architecture"
           >
-            <Icon name="Settings" size={14} className="mr-1" />
-            Policies
-          </Button>
+            <Icon name="Settings" size={20} strokeWidth={2.5} />
+          </button>
         </div>
       </div>
-
-      {/* Quick Stats Row */}
-      
     </div>
   );
 };

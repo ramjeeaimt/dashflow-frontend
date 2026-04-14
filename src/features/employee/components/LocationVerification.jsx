@@ -12,17 +12,9 @@ const LocationVerification = ({ location, onRefreshLocation, workMode }) => {
       id: 1,
       name: 'Main Office',
       address: '4/37 KV House vibhaavkhand gomti nagar lucknow',
-      latitude: 26.8611498,
-      longitude: 81.0175873,
-      radius: 250 // meters
-    },
-    {
-      id: 2,
-      name: 'main office',
-      address: '4/37 KV House vibhaavkhand gomti nagar lucknow',
-      latitude: 26.8611498,
-      longitude: 81.0175873,
-      radius: 350
+      latitude: 26.861150,
+      longitude: 81.017587,
+      radius: 300 // meters
     }
   ];
 
