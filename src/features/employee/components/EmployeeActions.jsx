@@ -12,7 +12,7 @@ const EmployeeActions = ({
   onExportEmployees
 }) => {
   const [bulkAction, setBulkAction] = useState('');
-  
+
   const bulkActionOptions = [
     { value: '', label: 'Select bulk action...' },
     { value: 'activate', label: 'Activate Selected' },
@@ -46,9 +46,9 @@ const EmployeeActions = ({
     const active = employees.filter(e => e.status === 'active').length;
     const inactive = employees.filter(e => e.status === 'inactive').length;
     const pending = employees.filter(e => e.status === 'pending').length;
-     const terminated = employees.filter(e => e.status === 'terminated').length;
+    const terminated = employees.filter(e => e.status === 'terminated').length;
 
-    return { total, active, inactive, pending ,terminated};
+    return { total, active, inactive, pending, terminated };
   }, [employees]);
 
   return (
@@ -101,19 +101,19 @@ const EmployeeActions = ({
             {selectedEmployees?.length > 0 && (
               <div className="flex items-center space-x-2">
                 <div className="relative">
-                   <select 
-                    value={bulkAction} 
+                  <select
+                    value={bulkAction}
                     onChange={(e) => setBulkAction(e.target.value)}
                     className="appearance-none pl-4 pr-10 py-2 border border-slate-200 bg-white text-slate-700 font-medium rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
-                   >
-                     {bulkActionOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                   </select>
-                   <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                     <Icon name="ChevronDown" size={14} />
-                   </div>
+                  >
+                    {bulkActionOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <Icon name="ChevronDown" size={14} />
+                  </div>
                 </div>
-                <button 
-                  onClick={handleBulkAction} 
+                <button
+                  onClick={handleBulkAction}
                   disabled={!bulkAction}
                   className="px-5 py-2 bg-slate-900 text-white font-semibold rounded-xl text-xs hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                 >
@@ -122,7 +122,7 @@ const EmployeeActions = ({
               </div>
             )}
           </div>
-          
+
           {!selectedEmployees?.length && (
             <span className="text-xs font-medium text-slate-400 italic">Select employees for bulk actions</span>
           )}

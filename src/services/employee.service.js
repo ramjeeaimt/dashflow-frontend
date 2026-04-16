@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '../api/endpoints';
 export const employeeService = {
     // Get all employees with optional filters
     async getAll(filters = {}) {
-           console.log("Employee filters:", filters);
+        console.log("Employee filters:", filters);
         let params = {};
         if (typeof filters === 'string' || typeof filters === 'number') {
             params = { companyId: filters };
@@ -14,7 +14,7 @@ export const employeeService = {
         const response = await apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, { params });
         const resData = response.data;
         const data = resData?.data !== undefined ? resData.data : resData;
-        
+
         // Ensure we always return an array
         return Array.isArray(data) ? data : [];
     },
@@ -55,7 +55,7 @@ export const employeeService = {
         return resData?.data !== undefined ? resData.data : resData;
     },
 
-    
+
 
     // Search employees
     async search(searchTerm, filters = {}) {

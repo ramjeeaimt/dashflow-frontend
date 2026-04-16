@@ -80,17 +80,17 @@ export const API_ENDPOINTS = {
     }
     ,
     JOBS: {
-        BASE: 'https://difmo-api.vercel.app/api/jobs',
-        BY_ID: (id) => `https://difmo-api.vercel.app/api/jobs/${id}`,
-        CREATE_APPLICATION: (jobId) => `https://difmo-api.vercel.app/api/jobs/${jobId}/applications`,
-        APPLICATIONS: 'https://difmo-api.vercel.app/api/jobs/applications',
-        MESSAGES: 'https://difmo-api.vercel.app/api/jobs/messages',
+        BASE: '/jobs',
+        BY_ID: (id) => `/jobs/${id}`,
+        CREATE_APPLICATION: (jobId) => `/jobs/${jobId}/applications`,
+        APPLICATIONS: '/jobs/applications',
+        MESSAGES: '/jobs/messages',
     },
     JOB_APPLICATIONS: {
-        BASE: 'https://difmo-api.vercel.app/api/applications',
-        UPDATE_STATUS: (id) => `https://difmo-api.vercel.app/api/applications/${id}/status`,
+        BASE: '/applications',
+        UPDATE_STATUS: (id) => `/applications/${id}/status`,
     },
     CONTACT: {
-        BASE: 'https://difmo-api.vercel.app/api/contact',
+        BASE: '/contact',
     }
 };

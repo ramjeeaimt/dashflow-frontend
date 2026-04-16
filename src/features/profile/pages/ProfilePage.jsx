@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import apiClient from "api/client";
+import { API_ENDPOINTS } from "api/endpoints";
 import Header from "components/ui/Header";
 import Sidebar from "components/ui/Sidebar";
 
@@ -17,10 +19,7 @@ const Profile = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await axios.get(
-          "https://difmo-crm-backend.onrender.com/auth/profile",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
 
         setUser(res.data.data);
         setFormData(res.data.data);
@@ -60,15 +59,14 @@ const Profile = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      await axios.patch(
-        "https://difmo-crm-backend.onrender.com/auth/profile",
+      await apiClient.patch(
+        API_ENDPOINTS.AUTH.PROFILE,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
 
       setUser((prev) => ({ ...prev, ...formData }));
@@ -86,10 +84,9 @@ const Profile = () => {
       const token = localStorage.getItem("token");
       if (!formData.company?.id) return;
 
-      await axios.patch(
-        `https://difmo-crm-backend.vercel.app/company/${formData.company.id}`,
-        formData.company,
-        { headers: { Authorization: `Bearer ${token}` } }
+      await apiClient.patch(
+        `/company/${formData.company.id}`,
+        formData.company
       );
 
       setUser((prev) => ({ ...prev, company: { ...formData.company } }));

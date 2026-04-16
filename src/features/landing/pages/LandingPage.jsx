@@ -941,7 +941,7 @@ const LandingPage = () => {
                     <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
                         <div>© 2026 DIFMO-CRM. All rights reserved.</div>
                         <div className="flex gap-6 mt-4 md:mt-0">
-                            <Link to="/privacy" className="hover:text-gray-300 transition">Privacy Policy</Link>
+                            <Link to="/privacy-policy" className="hover:text-gray-300 transition">Privacy Policy</Link>
                             <Link to="/terms" className="hover:text-gray-300 transition">Terms of Service</Link>
                             <Link to="/security" className="hover:text-gray-300 transition">Security</Link>
                             <Link to="/sitemap" className="hover:text-gray-300 transition">Sitemap</Link>

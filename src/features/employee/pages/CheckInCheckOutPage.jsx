@@ -50,7 +50,7 @@ const QuickAttendance = () => {
 
   const handleCheckIn = async () => {
     if (!employee) {
-      alert('Employee record not found');
+      alert('Attendance profile not found. Please contact your admin to link your account.');
       return;
     }
 
