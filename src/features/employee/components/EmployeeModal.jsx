@@ -372,6 +372,7 @@ const EmployeeModal = ({
                     <div className="relative group">
                       <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
                         <div className="w-full h-full rounded-full overflow-hidden relative">
+                           <img
                             src={formData?.avatar || 'https://via.placeholder.com/150'}
                             alt="Profile"
                             className="w-full h-full object-cover"
