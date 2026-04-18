@@ -57,9 +57,9 @@ export default function JobsTab({ setActiveTab }) {
         experience: form.experience,
         salary: form.salary,
         description: form.description,
-        slug: form.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''),
-        responsibilities: form.responsibilities ? (Array.isArray(form.responsibilities) ? form.responsibilities : form.responsibilities.split(',').map(s=>s.trim())) : [],
-        requirements: form.requirements ? (Array.isArray(form.requirements) ? form.requirements : form.requirements.split(',').map(s=>s.trim())) : [],
+        slug: form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        responsibilities: form.responsibilities ? (Array.isArray(form.responsibilities) ? form.responsibilities : form.responsibilities.split(',').map(s => s.trim())) : [],
+        requirements: form.requirements ? (Array.isArray(form.requirements) ? form.requirements : form.requirements.split(',').map(s => s.trim())) : [],
         applicationStartDate: form.applicationStartDate || null,
         applicationEndDate: form.applicationEndDate || null,
         isActive: !!form.isActive,
@@ -70,7 +70,7 @@ export default function JobsTab({ setActiveTab }) {
       } else {
         await apiClient.post(API_ENDPOINTS.JOBS.BASE, payload);
       }
-      
+
       await fetchJobs();
       setIsOpen(false);
       setEditingJob(null);
@@ -376,26 +376,26 @@ export default function JobsTab({ setActiveTab }) {
                     className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none"
                   />
                 </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Responsibilities (comma separated)</label>
-                    <input value={form.responsibilities} onChange={e=>setForm({...form, responsibilities: e.target.value})} placeholder="Develop frontend, Write APIs" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Requirements (comma separated)</label>
-                    <input value={form.requirements} onChange={e=>setForm({...form, requirements: e.target.value})} placeholder="MERN Stack, React" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Application Start</label>
-                    <input type="date" value={form.applicationStartDate} onChange={e=>setForm({...form, applicationStartDate: e.target.value})} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Application End</label>
-                    <input type="date" value={form.applicationEndDate} onChange={e=>setForm({...form, applicationEndDate: e.target.value})} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" checked={form.isActive} onChange={e=>setForm({...form, isActive: e.target.checked})} id="isActive" className="rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
-                    <label htmlFor="isActive" className="text-sm font-medium text-gray-700 cursor-pointer">Active / Visible</label>
-                  </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Responsibilities (comma separated)</label>
+                  <input value={form.responsibilities} onChange={e => setForm({ ...form, responsibilities: e.target.value })} placeholder="Develop frontend, Write APIs" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Requirements (comma separated)</label>
+                  <input value={form.requirements} onChange={e => setForm({ ...form, requirements: e.target.value })} placeholder="MERN Stack, React" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Application Start</label>
+                  <input type="date" value={form.applicationStartDate} onChange={e => setForm({ ...form, applicationStartDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Application End</label>
+                  <input type="date" value={form.applicationEndDate} onChange={e => setForm({ ...form, applicationEndDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} id="isActive" className="rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
+                  <label htmlFor="isActive" className="text-sm font-medium text-gray-700 cursor-pointer">Active / Visible</label>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-3 mt-4 border-t border-gray-100">

@@ -71,6 +71,11 @@ export const API_ENDPOINTS = {
         UPDATE_STATUS: (id) => `/leaves/${id}/status`,
         BY_EMPLOYEE: (employeeId) => `/leaves/employee/${employeeId}`,
     },
+    WFH_REQUESTS: {
+        BASE: '/wfh-requests',
+        BY_ID: (id) => `/wfh-requests/${id}`,
+        UPDATE_STATUS: (id) => `/wfh-requests/${id}/status`,
+    },
     NOTIFICATIONS: {
         BASE: '/notifications',
         MINE: '/notifications/mine',
@@ -80,15 +85,15 @@ export const API_ENDPOINTS = {
     }
     ,
     JOBS: {
-        BASE: '/jobs',
-        BY_ID: (id) => `/jobs/${id}`,
-        CREATE_APPLICATION: (jobId) => `/jobs/${jobId}/applications`,
-        APPLICATIONS: '/jobs/applications',
+        BASE: 'https://difmo-api.vercel.app/api/jobs',
+        BY_ID: (id) => `https://difmo-api.vercel.app/api/jobs/${id}`,
+        CREATE_APPLICATION: (jobId) => `https://difmo-api.vercel.app/api/jobs/${jobId}/applications`,
+        APPLICATIONS: 'https://difmo-api.vercel.app/api/jobs/applications', // Keep consistent if needed
         MESSAGES: '/jobs/messages',
     },
     JOB_APPLICATIONS: {
-        BASE: '/applications',
-        UPDATE_STATUS: (id) => `/applications/${id}/status`,
+        BASE: 'https://difmo-api.vercel.app/api/applications',
+        UPDATE_STATUS: (id) => `https://difmo-api.vercel.app/api/applications/${id}/status`,
     },
     CONTACT: {
         BASE: '/contact',

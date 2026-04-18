@@ -14,6 +14,8 @@ import { FaRupeeSign } from "react-icons/fa";
 import useProjectStore from '../store/useProjectStore';
 import useAuthStore from '../store/useAuthStore';
 import InlineProjectForm from './InlineProjectForm';
+import ImageUpload from './ui/ImageUpload';
+import uploadService from '../features/upload/uploadService';
 import ProjectDetailsModal from '../features/projects/components/ProjectDetailsModal';
 import ProjectEditModal from '../features/projects/components/ProjectEditModal';
 
@@ -126,6 +128,8 @@ const ClientAdmin = () => {
         currency: c.currency || 'INR',
         notes: c.notes || '',
         invoiceMessage: c.invoiceMessage || '',
+        logo: c.logo || null,
+        documents: c.documents || [],
         clientProjects: getProjectsByClient.get(c.email) || [],
         searchKey: (c.name + c.email + (c.company || '')).toLowerCase()
       });
@@ -337,7 +341,9 @@ const ClientAdmin = () => {
         priority: editClientData.priority,
         budget: editClientData.budget,
         currency: editClientData.currency,
-        notes: editClientData.notes
+        notes: editClientData.notes,
+        logo: editClientData.logo,
+        documents: editClientData.documents
       };
 
       await updateClient(editClientData.id, updatePayload);
@@ -771,8 +777,14 @@ const ClientAdmin = () => {
                 >
                   <div className="p-5 flex items-center justify-between" onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}>
                     <div className="flex items-center gap-4 flex-1">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base shadow-md bg-gradient-to-br from-blue-500 to-blue-600 text-white`}>
-                        {item.name?.charAt(0).toUpperCase()}
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base shadow-md overflow-hidden bg-gray-100">
+                        {item.logo ? (
+                          <img src={item.logo} alt="Logo" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                            {item.name?.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
@@ -845,6 +857,57 @@ const ClientAdmin = () => {
                                 </span>
                               </div>
                             </div>
+                          </div>
+
+                          {/* Documents Card */}
+                          <div className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm transition-all hover:border-blue-200">
+                             <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Client Documents</h4>
+                                <label className="cursor-pointer p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                   <Plus size={14} />
+                                   <input 
+                                      type="file" 
+                                      className="hidden" 
+                                      onChange={async (e) => {
+                                         const file = e.target.files[0];
+                                         if (!file) return;
+                                         try {
+                                            setIsSubmitting(true);
+                                            const res = await uploadService.uploadDocument(file);
+                                            const updatedDocs = [...(item.documents || []), res.url];
+                                            await updateClient(item.clientId || item.id, { documents: updatedDocs });
+                                            fetchClients();
+                                            alert("Document uploaded successfully!");
+                                         } catch (err) { 
+                                            console.error(err);
+                                            alert("Upload failed. Document size might be too large or invalid type."); 
+                                         } 
+                                         finally { setIsSubmitting(false); }
+                                      }}
+                                   />
+                                </label>
+                             </div>
+                             <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                                {item.documents && item.documents.length > 0 ? item.documents.map((doc, idx) => (
+                                   <a 
+                                      key={idx} 
+                                      href={doc} 
+                                      target="_blank" 
+                                      rel="noreferrer" 
+                                      className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all text-xs text-blue-600 font-semibold group"
+                                   >
+                                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-400 group-hover:text-blue-500 shadow-sm border border-slate-100 transition-colors">
+                                         <FileText size={16} />
+                                      </div>
+                                      <span className="truncate flex-1">Supporting Document {idx + 1}</span>
+                                      <ExternalLink size={14} className="text-slate-300 group-hover:text-blue-400 transition-colors" />
+                                   </a>
+                                )) : (
+                                   <div className="py-4 text-center border border-dashed border-slate-200 rounded-xl">
+                                      <p className="text-[10px] text-slate-400 italic">No formal documents attached.</p>
+                                   </div>
+                                )}
+                             </div>
                           </div>
 
                           {/* Invoice Message Card */}
@@ -1229,6 +1292,16 @@ const ClientAdmin = () => {
               </div>
 
               <div className="border-t border-gray-100 my-2"></div>
+
+              <div className="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Company Logo</p>
+                 <ImageUpload 
+                    initialImage={editClientData.logo}
+                    initials={editClientData.name?.charAt(0)}
+                    onUploadSuccess={(url) => setEditClientData(prev => ({ ...prev, logo: url }))}
+                 />
+                 <p className="text-[10px] text-gray-400 italic text-center">Change your client's branding logo here</p>
+              </div>
 
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Full Name *</label>

@@ -4,6 +4,7 @@ import apiClient from "api/client";
 import { API_ENDPOINTS } from "api/endpoints";
 import Header from "components/ui/Header";
 import Sidebar from "components/ui/Sidebar";
+import ImageUpload from "components/ui/ImageUpload";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -66,6 +67,7 @@ const Profile = () => {
           lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
+          avatar: formData.avatar,
         }
       );
 
@@ -120,9 +122,15 @@ const Profile = () => {
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-xl font-bold text-blue-600">
-                {initials}
-              </div>
+              <ImageUpload
+                initialImage={user?.avatar}
+                initials={initials}
+                size="w-20 h-20"
+                onUploadSuccess={(url) => {
+                  setFormData((prev) => ({ ...prev, avatar: url }));
+                  // Optional: auto-save or just wait for user to click "Save User"
+                }}
+              />
               <div className="text-white">
                 <h2 className="text-2xl font-bold">
                   {formData.firstName} {formData.lastName}

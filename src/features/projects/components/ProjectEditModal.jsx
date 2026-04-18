@@ -193,7 +193,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                                     const emp = employees.find(e => e.id === id);
                                                     return (
                                                         <div key={id} className="w-8 h-8 rounded-full bg-indigo-500 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] text-white font-black">
-                                                            {emp?.user?.name?.[0]?.toUpperCase() || 'E'}
+                                                            {(emp?.user?.firstName?.[0] || emp?.user?.name?.[0] || 'E').toUpperCase()}
                                                         </div>
                                                     );
                                                 })
@@ -217,8 +217,8 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                                         className="w-4 h-4 rounded-lg accent-indigo-600"
                                                     />
                                                     <div>
-                                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{emp.user?.name}</p>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase">{emp.department || "Consultant"}</p>
+                                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{emp.user?.name || `${emp.user?.firstName || ''} ${emp.user?.lastName || ''}`.trim() || 'Unknown'}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase">{emp.department?.name || (typeof emp.department === 'string' ? emp.department : "Consultant")}</p>
                                                     </div>
                                                 </label>
                                             ))}

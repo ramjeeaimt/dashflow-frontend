@@ -183,7 +183,10 @@ const EmployeeManagement = () => {
         emergencyContact: employeeData.emergencyContact || '',
         emergencyPhone: employeeData.emergencyPhone || '',
         skills: employeeData.skills || [],
-        permissionIds: employeeData.permissionIds || []
+        permissionIds: employeeData.permissionIds || [],
+        avatar: employeeData.avatar || '',
+        profileImage: employeeData.profileImage || '',
+        documents: employeeData.documents || []
       };
 
       if (modalState.mode === 'add') {

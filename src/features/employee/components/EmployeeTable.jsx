@@ -86,6 +86,15 @@ const EmployeeTable = ({
 }) => {
   const [roles, setRoles] = useState([]);
   const [rolesMap, setRolesMap] = useState({});
+  const [visibleColumns, setVisibleColumns] = useState({
+    name: true,
+    email: true,
+    department: true,
+    status: true,
+    hireDate: true,
+    manager: true
+  });
+  const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -118,23 +127,7 @@ const EmployeeTable = ({
     return 'Personnel';
   };
 
-  const handlePermissionToggle = async (employeeId) => {
-    const toastId = toast.loading("Updating access permissions...");
-    try {
-      const response = await apiClient.patch(`/employees/verify/${employeeId}`, {});
-      const updatedEmployee = response.data;
-      setEmployees((prevEmployees) =>
-        prevEmployees.map((emp) =>
-          (emp.id === employeeId || emp._id === employeeId)
-            ? { ...emp, isVerified: updatedEmployee.isVerified }
-            : emp
-        )
-      );
-      toast.success(updatedEmployee.isVerified ? "Access granted" : "Access revoked", { id: toastId });
-    } catch (error) {
-      toast.error("Failed to update access", { id: toastId });
-    }
-  };
+
 
   const handleStatusUpdate = async (employeeId, newStatus) => {
     const toastId = toast.loading(`Updating status...`);
@@ -153,19 +146,7 @@ const EmployeeTable = ({
     }
   };
 
-  const renderPermissionToggle = (employee) => {
-    const isEnabled = employee.isVerified;
-    return (
-      <button
-        onClick={() => handlePermissionToggle(employee.id || employee._id)}
-        className={`relative inline-flex h-5 w-10 items-center rounded-full transition-all duration-300 ${isEnabled ? 'bg-blue-600' : 'bg-slate-200'}`}
-      >
-        <span
-          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${isEnabled ? 'translate-x-5.5' : 'translate-x-1'}`}
-        />
-      </button>
-    );
-  };
+
 
   const renderStatusDropdown = (employee) => {
     const statusConfig = {
@@ -219,10 +200,9 @@ const EmployeeTable = ({
                 { key: 'department', label: 'Department' },
                 { key: 'role', label: 'Role' },
                 { key: 'status', label: 'Status' },
-                { key: 'isVerified', label: 'Access' },
                 { key: 'hireDate', label: 'Hire Date' },
                 { key: 'manager', label: 'Manager' },
-              ].map((column) => (
+              ].filter(col => visibleColumns[col.key]).map((column) => (
                 <th key={column.key} className="px-6 py-4 text-left">
                   <button onClick={() => onSort(column.key)} className="flex items-center space-x-2 text-[11px] font-bold text-slate-400 group hover:text-slate-600 transition-colors">
                     <span className="tracking-tight uppercase">{column.label}</span>
@@ -230,7 +210,45 @@ const EmployeeTable = ({
                   </button>
                 </th>
               ))}
-              <th className="w-24 px-6 py-4 text-center text-[11px] font-bold text-slate-400 tracking-tight uppercase bg-slate-50/80">Actions</th>
+              <th className="w-24 px-6 py-4 text-center bg-slate-50/80 relative">
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-[11px] font-bold text-slate-400 tracking-tight uppercase">Actions</span>
+                  <button 
+                    onClick={() => setIsColumnSettingsOpen(!isColumnSettingsOpen)}
+                    className="p-1 hover:bg-slate-200 rounded-md transition-colors text-slate-400 hover:text-slate-600"
+                    title="Column Visibility"
+                  >
+                    <Icon name="MoreVertical" size={14} />
+                  </button>
+                </div>
+                
+                {/* Column Toggle Dropdown */}
+                {isColumnSettingsOpen && (
+                  <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-4 w-48 text-left">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Display Columns</h4>
+                    <div className="space-y-2">
+                      {[
+                        { key: 'email', label: 'Email' },
+                        { key: 'department', label: 'Department' },
+                        { key: 'role', label: 'Role' },
+                        { key: 'status', label: 'Status' },
+                        { key: 'hireDate', label: 'Hire Date' },
+                        { key: 'manager', label: 'Manager' },
+                      ].map(col => (
+                        <label key={col.key} className="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition-colors group">
+                          <input 
+                            type="checkbox" 
+                            checked={visibleColumns[col.key]} 
+                            onChange={() => setVisibleColumns(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-100 h-3.5 w-3.5"
+                          />
+                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">{col.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -244,39 +262,49 @@ const EmployeeTable = ({
                     className="rounded-md border-slate-300 text-blue-600 focus:ring-blue-100 h-4 w-4 transition-all"
                   />
                 </td>
-                <td className="px-6 py-4">
+                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-4">
                     <EmployeeAvatar employee={employee} size="md" />
                     <div>
-                      <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{employee.name || '—'}</p>
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{employee.name || `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || '—'}</p>
                       <p className="text-[11px] text-slate-400 font-medium mt-0.5">ID: {employee.id?.toString().substring(0, 8) || 'N/A'}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
-                  <span className="text-xs font-medium text-slate-600">{employee.email || '—'}</span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center space-x-2">
-                     <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-blue-400 transition-colors"></div>
-                     <span className="text-xs font-semibold text-slate-700 capitalize">{employee.department || '—'}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="text-xs font-medium text-slate-600">{getRoleName(employee.role)}</span>
-                </td>
-                <td className="px-6 py-4">
-                  {renderStatusDropdown(employee)}
-                </td>
-                <td className="px-6 py-4 text-center">
-                  {renderPermissionToggle(employee)}
-                </td>
-                <td className="px-6 py-4 text-xs font-medium text-slate-500">
-                  {formatDate(employee.hireDate)}
-                </td>
-                <td className="px-6 py-4">
-                  <span className="text-xs font-semibold text-slate-600">{employee.manager || 'N/A'}</span>
-                </td>
+                {visibleColumns.email && (
+                  <td className="px-6 py-4">
+                    <span className="text-xs font-medium text-slate-600">{employee.email || '—'}</span>
+                  </td>
+                )}
+                {visibleColumns.department && (
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-2">
+                       <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-blue-400 transition-colors"></div>
+                       <span className="text-xs font-semibold text-slate-700 capitalize">{employee.department?.name || (typeof employee.department === 'string' ? employee.department : '—')}</span>
+                    </div>
+                  </td>
+                )}
+                {visibleColumns.role && (
+                  <td className="px-6 py-4">
+                    <span className="text-xs font-medium text-slate-600">{getRoleName(employee.role)}</span>
+                  </td>
+                )}
+                {visibleColumns.status && (
+                  <td className="px-6 py-4">
+                    {renderStatusDropdown(employee)}
+                  </td>
+                )}
+
+                {visibleColumns.hireDate && (
+                  <td className="px-6 py-4 text-xs font-medium text-slate-500">
+                    {formatDate(employee.hireDate)}
+                  </td>
+                )}
+                {visibleColumns.manager && (
+                  <td className="px-6 py-4">
+                    <span className="text-xs font-semibold text-slate-600">{employee.manager || 'N/A'}</span>
+                  </td>
+                )}
                 <td className="px-6 py-4 bg-slate-50/30">
                   <div className="flex items-center justify-center space-x-1 sm:opacity-0 group-hover:opacity-100 transition-all duration-200">
                     {[
@@ -318,7 +346,7 @@ const EmployeeTable = ({
             <div className="grid grid-cols-2 gap-4 py-4 border-t border-slate-50">
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tight mb-1">Department</p>
-                <p className="text-sm font-semibold capitalize text-slate-700">{employee.department || '—'}</p>
+                <p className="text-sm font-semibold capitalize text-slate-700">{employee.department?.name || (typeof employee.department === 'string' ? employee.department : '—')}</p>
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tight mb-1">Role</p>
@@ -328,10 +356,8 @@ const EmployeeTable = ({
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tight mb-1">Status</p>
                 {renderStatusDropdown(employee)}
               </div>
-              <div>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tight mb-1">Access</p>
-                <div className="flex items-center h-8">{renderPermissionToggle(employee)}</div>
-              </div>
+
+
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tight mb-1">Hired On</p>
                 <p className="text-[11px] text-slate-500 font-semibold">{formatDate(employee.hireDate)}</p>

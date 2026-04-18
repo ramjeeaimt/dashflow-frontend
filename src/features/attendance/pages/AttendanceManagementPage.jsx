@@ -11,6 +11,7 @@ import {
   AttendanceHistoryModal,
   AttendanceModal,
   TakeAttendanceModal,
+  WFHRequestManager,
   useAttendanceStore
 } from 'features/attendance';
 import useAuthStore from '../../../store/useAuthStore';
@@ -264,7 +265,10 @@ const AttendanceManagement = () => {
             </div> */}
 
             {/* Main Content */}
-            <div className="xl:col-span-3 space-y-6">
+            <div className="xl:col-span-3 space-y-8">
+              {/* WFH Requests Manager */}
+              <WFHRequestManager />
+
               {/* Bulk Actions */}
               <AttendanceActions
                 selectedEmployees={selectedEmployees}

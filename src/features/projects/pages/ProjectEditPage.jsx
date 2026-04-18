@@ -276,7 +276,7 @@ const ProjectEdit = () => {
                                                             />
                                                             <div className="flex-1">
                                                                 <p className="font-medium text-sm">{emp.user?.firstName} {emp.user?.lastName}</p>
-                                                                <p className="text-xs text-muted-foreground">{emp.designation || 'N/A'}</p>
+                                                                <p className="text-xs text-muted-foreground">{emp.designation?.name || (typeof emp.designation === 'string' ? emp.designation : 'N/A')}</p>
                                                             </div>
                                                         </label>
                                                     ))

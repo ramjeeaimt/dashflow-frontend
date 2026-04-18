@@ -248,7 +248,7 @@ const AddProject = () => {
                                 const emp = employees.find(e => e.id === empId);
                                 return (
                                   <span key={empId} className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2">
-                                    {emp?.user?.name || emp?.name || 'Unknown'}
+                                    {emp?.user?.name || `${emp?.user?.firstName || ''} ${emp?.user?.lastName || ''}`.trim() || emp?.name || 'Unknown'}
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -300,8 +300,8 @@ const AddProject = () => {
                                   className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                                 />
                                 <div className="flex-1">
-                                  <p className="text-sm font-semibold text-slate-800">{emp.user?.name || emp.name}</p>
-                                  <p className="text-xs text-slate-500">{emp.department?.name || emp.department || 'N/A'}</p>
+                                  <p className="text-sm font-semibold text-slate-800">{emp.user?.name || `${emp.user?.firstName || ''} ${emp.user?.lastName || ''}`.trim() || emp.name || 'Unknown'}</p>
+                                  <p className="text-xs text-slate-500">{emp.department?.name || (typeof emp.department === 'string' ? emp.department : 'N/A')}</p>
                                 </div>
                               </label>
                             ))}

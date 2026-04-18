@@ -5,4 +5,6 @@ export { default as AttendanceActions } from './components/AttendanceActions';
 export { default as AttendanceHistoryModal } from './components/AttendanceHistoryModal';
 export { default as AttendanceModal } from './components/AttendanceModal';
 export { default as TakeAttendanceModal } from './components/TakeAttendanceModal';
+export { default as WFHRequestManager } from './components/WFHRequestManager';
+export { default as WFHRequestModal } from './components/WFHRequestModal';
 export { default as useAttendanceStore } from '../../store/useAttendanceStore';

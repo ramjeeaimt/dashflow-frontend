@@ -132,9 +132,8 @@ const UserProfileDropdown = () => {
               <button
                 key={index}
                 onClick={item?.action}
-                className={`w-full flex items-start space-x-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors ${
-                  item?.variant === 'destructive' ? 'text-red-600' : 'text-slate-700'
-                }`}
+                className={`w-full flex items-start space-x-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors ${item?.variant === 'destructive' ? 'text-red-600' : 'text-slate-700'
+                  }`}
               >
                 <Icon
                   name={item?.icon}

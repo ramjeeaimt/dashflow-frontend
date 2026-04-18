@@ -103,6 +103,15 @@ const financeService = {
         return res.data;
     },
 
+    updatePayroll: async (id, data) => {
+        const response = await apiClient.patch(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}`, data);
+        return response.data.data || response.data;
+    },
+
+    deletePayroll: async (id) => {
+        const response = await apiClient.delete(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}`);
+        return response.data;
+    },
 };
 
 export default financeService;

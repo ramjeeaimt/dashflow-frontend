@@ -21,6 +21,8 @@ const PayrollPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPayroll, setSelectedPayroll] = useState(null);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentPayrollId, setCurrentPayrollId] = useState(null);
 
     // ========== NEW: Manual payroll modal state ==========
     const [isManualModalOpen, setIsManualModalOpen] = useState(false);
@@ -180,6 +182,8 @@ const PayrollPage = () => {
 
     // ========== NEW: Manual payroll handlers ==========
     const handleManuallyPayroll = () => {
+        setIsEditing(false);
+        setCurrentPayrollId(null);
         // Reset form with current month/year
         setManualFormData({
             employeeId: '',
@@ -194,6 +198,37 @@ const PayrollPage = () => {
             notes: ''
         });
         setIsManualModalOpen(true);
+    };
+
+    const handleEditPayroll = (record) => {
+        setIsEditing(true);
+        setCurrentPayrollId(record.id);
+        setManualFormData({
+            employeeId: record.employeeId,
+            basicSalary: record.basicSalary || 0,
+            allowances: record.allowances || 0,
+            deductions: record.deductions || 0,
+            overtime: record.overtime || 0,
+            netSalary: record.netSalary || 0,
+            month: record.month,
+            year: record.year,
+            status: record.status,
+            notes: record.notes || ''
+        });
+        setIsManualModalOpen(true);
+    };
+
+    const handleDeletePayroll = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this payroll record?')) return;
+        
+        try {
+            await financeService.deletePayroll(id);
+            alert('Payroll record deleted successfully');
+            fetchPayroll();
+        } catch (error) {
+            console.error('Failed to delete payroll:', error);
+            alert('Error deleting payroll');
+        }
     };
 
     const handleManualInputChange = (e) => {
@@ -220,8 +255,13 @@ const PayrollPage = () => {
                 month: parseInt(manualFormData.month),
                 year: parseInt(manualFormData.year)
             };
-            await financeService.createPayroll(payload);
-            alert('Payroll record created successfully');
+            if (isEditing) {
+                await financeService.updatePayroll(currentPayrollId, payload);
+                alert('Payroll record updated successfully');
+            } else {
+                await financeService.createPayroll(payload);
+                alert('Payroll record created successfully');
+            }
             setIsManualModalOpen(false);
             fetchPayroll(); // Refresh list
         } catch (error) {
@@ -350,15 +390,32 @@ const PayrollPage = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <button 
-                                                        onClick={() => {
-                                                            setSelectedPayroll(record);
-                                                            setIsDetailsModalOpen(true);
-                                                        }}
-                                                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                                                    >
-                                                        <Icon name="Eye" size={18} />
-                                                    </button>
+                                                    <div className="flex items-center space-x-2">
+                                                        <button 
+                                                            onClick={() => {
+                                                                setSelectedPayroll(record);
+                                                                setIsDetailsModalOpen(true);
+                                                            }}
+                                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                            title="View"
+                                                        >
+                                                            <Icon name="Eye" size={18} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleEditPayroll(record)}
+                                                            className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                            title="Edit"
+                                                        >
+                                                            <Icon name="Pencil" size={18} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleDeletePayroll(record.id)}
+                                                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                            title="Delete"
+                                                        >
+                                                            <Icon name="Trash2" size={18} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             </React.Fragment>
@@ -376,7 +433,9 @@ const PayrollPage = () => {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-card rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b border-border flex justify-between items-center">
-                            <h2 className="text-xl font-bold text-foreground">Manual Payroll Entry</h2>
+                            <h2 className="text-xl font-bold text-foreground">
+                                {isEditing ? 'Edit Payroll Entry' : 'Manual Payroll Entry'}
+                            </h2>
                             <button onClick={() => setIsManualModalOpen(false)} className="text-muted-foreground hover:text-foreground">
                                 <Icon name="X" size={20} />
                             </button>
@@ -521,7 +580,9 @@ const PayrollPage = () => {
                                     Cancel
                                 </Button>
                                 <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? 'Creating...' : 'Create Payroll'}
+                                    {isSubmitting 
+                                        ? (isEditing ? 'Updating...' : 'Creating...') 
+                                        : (isEditing ? 'Update Payroll' : 'Create Payroll')}
                                 </Button>
                             </div>
                         </form>

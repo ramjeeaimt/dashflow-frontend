@@ -8,12 +8,21 @@ import Sidebar from "components/ui/Sidebar";
 import Header from "components/ui/Header";
 import useNotificationStore from "store/useNotificationStore";
 import notificationService from "services/notification.service";
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistance, format } from "date-fns";
 import useAuthStore from "store/useAuthStore";
 
 const NotificationsPage = () => {
   const { notifications } = useNotificationStore();
   const { user } = useAuthStore();
+  const [now, setNow] = useState(Date.now());
+
+  // Update "time ago" every 30 seconds for better precision
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
   const [filterType, setFilterType] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedNotification, setSelectedNotification] = useState(null);
@@ -23,7 +32,8 @@ const NotificationsPage = () => {
   const getTimeAgo = (timestamp) => {
     try {
       if (!timestamp) return "just now";
-      return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+      // Use the 'now' state to force reactivity on every tick
+      return formatDistance(new Date(timestamp), now, { addSuffix: true });
     } catch (e) {
       return "just now";
     }

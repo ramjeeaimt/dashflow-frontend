@@ -6,14 +6,14 @@ import { API_ENDPOINTS } from 'api/endpoints';
 const ALL_STATUSES = ['ALL', 'PENDING', 'REVIEWED', 'SHORTLISTED', 'CALL DONE', 'INTERVIEW DONE', 'GOOGLE MEET DONE', 'SELECTED', 'REJECTED'];
 
 const STATUS_CONFIG = {
-  PENDING:          { cls: 'bg-slate-100 text-slate-600 border-slate-200', dot: 'bg-slate-400', icon: 'Clock' },
-  REVIEWED:         { cls: 'bg-blue-50 text-blue-600 border-blue-200',   dot: 'bg-blue-500',   icon: 'Eye' },
-  SHORTLISTED:      { cls: 'bg-violet-50 text-violet-600 border-violet-200', dot: 'bg-violet-500', icon: 'Star' },
-  'CALL DONE':      { cls: 'bg-cyan-50 text-cyan-600 border-cyan-200',   dot: 'bg-cyan-500',   icon: 'Phone' },
+  PENDING: { cls: 'bg-slate-100 text-slate-600 border-slate-200', dot: 'bg-slate-400', icon: 'Clock' },
+  REVIEWED: { cls: 'bg-blue-50 text-blue-600 border-blue-200', dot: 'bg-blue-500', icon: 'Eye' },
+  SHORTLISTED: { cls: 'bg-violet-50 text-violet-600 border-violet-200', dot: 'bg-violet-500', icon: 'Star' },
+  'CALL DONE': { cls: 'bg-cyan-50 text-cyan-600 border-cyan-200', dot: 'bg-cyan-500', icon: 'Phone' },
   'INTERVIEW DONE': { cls: 'bg-amber-50 text-amber-600 border-amber-200', dot: 'bg-amber-500', icon: 'Users' },
-  'GOOGLE MEET DONE':{ cls: 'bg-indigo-50 text-indigo-600 border-indigo-200', dot: 'bg-indigo-500', icon: 'Video' },
-  SELECTED:         { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: 'CheckCircle' },
-  REJECTED:         { cls: 'bg-red-50 text-red-600 border-red-200',      dot: 'bg-red-400',    icon: 'XCircle' },
+  'GOOGLE MEET DONE': { cls: 'bg-indigo-50 text-indigo-600 border-indigo-200', dot: 'bg-indigo-500', icon: 'Video' },
+  SELECTED: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: 'CheckCircle' },
+  REJECTED: { cls: 'bg-red-50 text-red-600 border-red-200', dot: 'bg-red-400', icon: 'XCircle' },
 };
 
 const AVATAR_COLORS = ['bg-primary', 'bg-violet-500', 'bg-emerald-500', 'bg-amber-500', 'bg-cyan-500', 'bg-pink-500', 'bg-indigo-500', 'bg-rose-500'];
@@ -46,9 +46,9 @@ export default function ApplicationsTab() {
         limit: pagination.limit,
         status: filter.status !== 'ALL' ? filter.status : undefined,
       };
-      
+
       const res = await apiClient.get(API_ENDPOINTS.JOB_APPLICATIONS.BASE, { params });
-      
+
       const { applications, total, pages, page: currentPage } = res.data || {};
       setApps(Array.isArray(applications) ? applications : []);
       setPagination(prev => ({ ...prev, total, totalPages: pages, page: currentPage }));
@@ -78,11 +78,11 @@ export default function ApplicationsTab() {
       if (jobs.length > 0) {
         const found = jobs.find(j => j.title === candidate.job || j.id === candidate.job || j._id === candidate.job);
         if (found) {
-           jobId = found.id || found._id;
-           jobTitle = found.title;
+          jobId = found.id || found._id;
+          jobTitle = found.title;
         }
       }
-      
+
       const formData = new FormData();
       if (jobId) formData.append('jobId', jobId);
       if (jobTitle) formData.append('jobTitle', jobTitle);
@@ -96,7 +96,7 @@ export default function ApplicationsTab() {
       await apiClient.post(API_ENDPOINTS.JOB_APPLICATIONS.BASE, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
+
       await fetchApps();
       setIsAddOpen(false);
       setCandidate(EMPTY_CANDIDATE);
@@ -120,9 +120,9 @@ export default function ApplicationsTab() {
 
   const stats = [
     { label: 'Total Applications', value: pagination.total, color: 'bg-primary/10 text-primary', icon: 'ClipboardList' },
-    { label: 'Shortlisted', value: apps.filter(a => (a.status||'').toUpperCase() === 'SHORTLISTED').length, color: 'bg-violet-100 text-violet-600', icon: 'Star' }, // NOTE: These sub-stats might needing backend counts too if more than one page is shortlisted
-    { label: 'Selected', value: apps.filter(a => (a.status||'').toUpperCase() === 'SELECTED' || (a.status||'').toUpperCase() === 'HIRED').length, color: 'bg-emerald-100 text-emerald-600', icon: 'CheckCircle' },
-    { label: 'Rejected', value: apps.filter(a => (a.status||'').toUpperCase() === 'REJECTED').length, color: 'bg-red-100 text-red-600', icon: 'XCircle' },
+    { label: 'Shortlisted', value: apps.filter(a => (a.status || '').toUpperCase() === 'SHORTLISTED').length, color: 'bg-violet-100 text-violet-600', icon: 'Star' }, // NOTE: These sub-stats might needing backend counts too if more than one page is shortlisted
+    { label: 'Selected', value: apps.filter(a => (a.status || '').toUpperCase() === 'SELECTED' || (a.status || '').toUpperCase() === 'HIRED').length, color: 'bg-emerald-100 text-emerald-600', icon: 'CheckCircle' },
+    { label: 'Rejected', value: apps.filter(a => (a.status || '').toUpperCase() === 'REJECTED').length, color: 'bg-red-100 text-red-600', icon: 'XCircle' },
   ];
 
   const KANBAN_COLS = ['PENDING', 'REVIEWED', 'SHORTLISTED', 'CALL DONE', 'INTERVIEW DONE', 'GOOGLE MEET DONE', 'SELECTED', 'REJECTED'];
@@ -284,11 +284,10 @@ export default function ApplicationsTab() {
                   <button
                     key={i + 1}
                     onClick={() => fetchApps(i + 1)}
-                    className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
-                      pagination.page === i + 1
+                    className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${pagination.page === i + 1
                         ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
                         : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     {i + 1}
                   </button>
@@ -311,7 +310,7 @@ export default function ApplicationsTab() {
         <div className="overflow-x-auto pb-4 animate-in fade-in duration-500">
           <div className="flex gap-4 min-w-max">
             {KANBAN_COLS.map(col => {
-              const colApps = filtered.filter(a => (a.status||'').toUpperCase() === col);
+              const colApps = filtered.filter(a => (a.status || '').toUpperCase() === col);
               const sc = STATUS_CONFIG[col] || STATUS_CONFIG.PENDING;
               return (
                 <div key={col} className="w-64 flex-shrink-0">
@@ -367,8 +366,8 @@ export default function ApplicationsTab() {
                 <div>
                   <h4 className="text-xl font-bold text-gray-900">{selected.fullName || selected.name}</h4>
                   <p className="text-sm text-gray-500 font-medium">{selected.job?.title || selected.jobTitle || 'N/A'}</p>
-                  <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 mt-2 rounded-full border ${(STATUS_CONFIG[(selected.status||'').toUpperCase()] || STATUS_CONFIG.PENDING).cls}`}>
-                    {(selected.status||'PENDING').toUpperCase()}
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 mt-2 rounded-full border ${(STATUS_CONFIG[(selected.status || '').toUpperCase()] || STATUS_CONFIG.PENDING).cls}`}>
+                    {(selected.status || 'PENDING').toUpperCase()}
                   </span>
                 </div>
               </div>
@@ -400,7 +399,7 @@ export default function ApplicationsTab() {
                 <div className="grid grid-cols-2 gap-2">
                   {ALL_STATUSES.filter(s => s !== 'ALL').map(s => {
                     const sc = STATUS_CONFIG[s] || STATUS_CONFIG.PENDING;
-                    const isActive = (selected.status||'').toUpperCase() === s;
+                    const isActive = (selected.status || '').toUpperCase() === s;
                     return (
                       <button
                         key={s}

@@ -94,23 +94,23 @@ const Dashboard = () => {
       description: 'Create and manage new career opportunities',
       icon: 'Briefcase',
       color: 'success',
-      onClick: () => navigate('/jobs')
+      onClick: () => navigate('/difmo-jobs')
     },
     {
       title: 'Review Applications',
       description: 'Check latest candidate applications and status',
       icon: 'ClipboardList',
       color: 'warning',
-      onClick: () => navigate('/jobs/applications')
+      onClick: () => navigate('/difmo-jobs/')
     },
-    {
-      title: 'Check Messages',
-      description: 'View and respond to recruitment inquiries',
-      icon: 'MessageSquare',
-      color: 'primary',
-      badge: 'New',
-      onClick: () => navigate('/messages')
-    }
+    // {
+    //   title: 'Check Messages',
+    //   description: 'View and respond to recruitment inquiries',
+    //   icon: 'MessageSquare',
+    //   color: 'primary',
+    //   badge: 'New',
+    //   onClick: () => navigate('/messages')
+    // }
   ];
 
   const handleToggleSidebar = () => {
@@ -201,7 +201,7 @@ const Dashboard = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {quickActions?.map((action, index) => (
                 <QuickActionCard
                   key={index}

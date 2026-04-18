@@ -4,6 +4,9 @@ import useAuthStore from "store/useAuthStore";
 import { Search, Calendar, FileDown, Clock, MapPin } from "lucide-react";
 import Header from "components/ui/Header";
 import Sidebar from "components/ui/Sidebar";
+import WFHRequestModal from "./WFHRequestModal";
+import WorkFromHomeRequestList from "./WorkFromHomeRequestList";
+
 
 const AttendanceHistory = () => {
   const { user } = useAuthStore();
@@ -12,6 +15,8 @@ const AttendanceHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [isWFHModalOpen, setIsWFHModalOpen] = useState(false);
+
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const years = [2024, 2025, 2026];
@@ -91,6 +96,12 @@ const AttendanceHistory = () => {
             >
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
+            <button 
+              onClick={() => setIsWFHModalOpen(true)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+            >
+              Request Work From Home
+            </button>
             <button className="bg-slate-900 text-white px-4 py-2 rounded text-[11px] font-bold uppercase tracking-wider flex items-center gap-2">
               <FileDown size={14}/> Export
             </button>
@@ -128,9 +139,10 @@ const AttendanceHistory = () => {
                   </td>
                   <td className="p-4">
                     <span className={`text-[9px] font-black px-2.5 py-1 rounded border uppercase tracking-wider ${
+                      log.status === "wfh" ? "text-indigo-600 border-indigo-100 bg-indigo-50" :
                       log.isLate ? "text-amber-600 border-amber-100 bg-amber-50" : "text-emerald-600 border-emerald-100 bg-emerald-50"
                     }`}>
-                      {log.isLate ? "LATE ENTRY" : "ON TIME"}
+                      {log.status === "wfh" ? "WFH" : log.isLate ? "LATE ENTRY" : "ON TIME"}
                     </span>
                   </td>
                   <td className="p-4 text-center">
@@ -143,9 +155,10 @@ const AttendanceHistory = () => {
                       <Clock size={12} className="text-indigo-400" /> {log.workHours || "0.0"} hrs
                     </div>
                   </td>
-                  <td className="p-4 text-right">
+                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 font-medium">
-                      <MapPin size={12} /> {log.location || 'Office'}
+                      {log.location === 'WFH' ? <Icon name="Home" size={12} className="text-indigo-400" /> : <MapPin size={12} />}
+                      {log.location || (log.status === 'wfh' ? 'WFH' : 'Office')}
                     </div>
                   </td>
                 </tr>
@@ -155,7 +168,18 @@ const AttendanceHistory = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Work From Home Request History */}
+        <div className="ml-44">
+           <WorkFromHomeRequestList employeeId={user?.id} />
+        </div>
       </div>
+      
+      <WFHRequestModal 
+        isOpen={isWFHModalOpen}
+        onClose={() => setIsWFHModalOpen(false)}
+        employeeId={user?.id}
+      />
     </div>
   );
 };

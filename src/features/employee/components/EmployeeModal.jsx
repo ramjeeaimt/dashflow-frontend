@@ -43,11 +43,15 @@ const EmployeeModal = ({
   const [activeTab, setActiveTab] = useState('basic');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingDocs, setUploadingDocs] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [permissionsLoading, setPermissionsLoading] = useState(false); // Track permissions fetch
   const [roles, setRoles] = useState([]);
   const [availablePermissions, setAvailablePermissions] = useState([]); // All possible system permissions
   const [designations, setDesignations] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [availableManagers, setAvailableManagers] = useState([]);
 
   // Refs for file uploads
   const avatarInputRef = useRef(null);
@@ -76,7 +80,8 @@ const EmployeeModal = ({
         emergencyContact: employee?.emergencyContact || '',
         emergencyPhone: employee?.emergencyPhone || '',
         skills: employee?.skills || [],
-        profileImage: employee?.profileImage || '',
+        profileImage: employee?.profileImage || employee?.avatar || '',
+        avatar: employee?.avatar || employee?.profileImage || '',
         checkInTime: employee?.checkInTime || '',
         documents: employee?.documents || [] // Load existing docs
       });
@@ -113,11 +118,12 @@ const EmployeeModal = ({
     const fetchData = async () => {
       setPermissionsLoading(true);
       try {
-        const [deptRes, roleRes, designRes, permissionRes] = await Promise.all([
+        const [deptRes, roleRes, designRes, permissionRes, employeeRes] = await Promise.all([
           apiClient.get(API_ENDPOINTS.DEPARTMENTS.BASE),
           apiClient.get(API_ENDPOINTS.ACCESS_CONTROL.ROLES, { params: { companyId: currentUser?.company?.id } }),
           apiClient.get(API_ENDPOINTS.DESIGNATIONS.BASE, { params: { companyId: currentUser?.company?.id } }),
-          apiClient.get(API_ENDPOINTS.ACCESS_CONTROL.PERMISSIONS)
+          apiClient.get(API_ENDPOINTS.ACCESS_CONTROL.PERMISSIONS),
+          apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, { params: { companyId: currentUser?.company?.id } })
         ]);
 
         const rolesData = roleRes.data?.data || roleRes.data || [];
@@ -128,6 +134,19 @@ const EmployeeModal = ({
 
         const deptsData = deptRes.data?.data || deptRes.data || [];
         setDepartments(deptsData.map(d => ({ value: d.id, label: d.name })));
+
+        const employeesData = employeeRes.data?.data || employeeRes.data || [];
+        // Filter for managers only (role designation)
+        const managersList = employeesData
+          .filter(emp =>
+            emp.user?.roles?.some(r => r.name?.toLowerCase() === 'manager') ||
+            emp.role?.toLowerCase() === 'manager'
+          )
+          .map(emp => ({
+            value: `${emp.user?.firstName} ${emp.user?.lastName}`,
+            label: `${emp.user?.firstName} ${emp.user?.lastName}`
+          }));
+        setAvailableManagers(managersList);
 
         // --- DEDUPLICATION LOGIC ---
         const rawPerms = permissionRes.data?.data || permissionRes.data || [];
@@ -161,6 +180,8 @@ const EmployeeModal = ({
   const files = Array.from(e.target.files);
   if (!files.length) return;
 
+  if (type === 'profileImage') setUploadingProfile(true);
+  else if (type === 'doc') setUploadingDocs(true);
   setIsLoading(true);
 
   try {
@@ -172,16 +193,10 @@ const EmployeeModal = ({
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 
-    // --- NEW EXTRACTION LOGIC BASED ON YOUR LOG ---
-    // Layer 1: Axios wrapper (res.data)
-    // Layer 2: Interceptor wrapper (res.data.data)
-    // Layer 3: Controller wrapper (res.data.data.data)
-    
-    const interceptorData = res.data?.data;
-    const controllerData = interceptorData?.data;
-    const uploadedUrl = controllerData?.url;
+    // Safety check for URL extraction at various depths
+    const uploadedUrl = res.data?.url || res.data?.data?.url || res.data?.data?.data?.url;
 
-    console.log("Deeply nested URL check:", uploadedUrl);
+    console.log("Extracted URL:", uploadedUrl);
 
     if (!uploadedUrl) {
       console.error("Structure check - res.data is:", res.data);
@@ -199,7 +214,7 @@ const EmployeeModal = ({
         name: file.name,
         size: (file.size / 1024).toFixed(1) + ' KB',
         url: uploadedUrl,
-        publicId: controllerData?.public_id
+        publicId: res.data?.public_id || undefined
       };
       
       setFormData(prev => ({
@@ -213,6 +228,8 @@ const EmployeeModal = ({
     console.error(`${type} upload failed:`, errorMsg);
   } finally {
     setIsLoading(false);
+    setUploadingProfile(false);
+    setUploadingDocs(false);
     if (e.target) e.target.value = null; 
   }
 };
@@ -256,13 +273,6 @@ const EmployeeModal = ({
     { value: 'remote', label: 'Remote' }
   ];
 
-  const managerOptions = [
-    { value: 'sarah-johnson', label: 'Sarah Johnson' },
-    { value: 'michael-chen', label: 'Michael Chen' },
-    { value: 'emily-davis', label: 'Emily Davis' },
-    { value: 'david-wilson', label: 'David Wilson' },
-    { value: 'lisa-anderson', label: 'Lisa Anderson' }
-  ];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -291,6 +301,7 @@ const EmployeeModal = ({
 
   const handleSave = async () => {
     if (!validateForm()) return;
+    setIsSaving(true);
     setIsLoading(true);
     try {
       const employeeData = {
@@ -304,6 +315,7 @@ const EmployeeModal = ({
       console.error('Error saving employee:', error);
     } finally {
       setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -361,13 +373,18 @@ const EmployeeModal = ({
                 <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="flex items-start space-x-8 pb-10 border-b border-slate-100">
                     <div className="relative group">
-                      <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1">
-                        <div className="w-full h-full rounded-full overflow-hidden">
+                      <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
+                        <div className="w-full h-full rounded-full overflow-hidden relative">
                            <img
                             src={formData?.profileImage || formData?.avatar || 'https://via.placeholder.com/150'}
                             alt="Profile"
                             className="w-full h-full object-cover"
                           />
+                          {uploadingProfile && (
+                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                              <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin shadow-lg"></div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       {!isReadOnly && (
@@ -454,7 +471,7 @@ const EmployeeModal = ({
                         { label: 'Employment Type', key: 'employmentType', options: employmentTypeOptions },
                         { label: 'Status', key: 'status', options: statusOptions },
                         { label: 'Branch', key: 'branch', options: branchOptions },
-                        { label: 'Manager', key: 'manager', options: managerOptions }
+                        { label: 'Manager', key: 'manager', options: availableManagers }
                       ].map((f, i) => (
                         <div key={i} className="space-y-2">
                            <label className="text-xs font-semibold text-slate-500 ml-1">{f.label}</label>
@@ -648,15 +665,29 @@ const EmployeeModal = ({
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                    {!isReadOnly && (
                       <div 
-                        onClick={() => docInputRef.current.click()}
-                        className="border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl p-12 text-center group cursor-pointer hover:bg-blue-50/50 hover:border-blue-400 transition-all"
+                        onClick={() => !uploadingDocs && docInputRef.current.click()}
+                        className={`border-2 border-dashed rounded-2xl p-12 text-center group transition-all ${
+                          uploadingDocs 
+                          ? 'border-blue-400 bg-blue-50/30 cursor-wait' 
+                          : 'border-slate-200 bg-slate-50 cursor-pointer hover:bg-blue-50/50 hover:border-blue-400'
+                        }`}
                       >
-                         <input type="file" multiple hidden ref={docInputRef} onChange={(e) => handleFileChange(e, 'doc')} />
-                         <div className="w-16 h-16 bg-white rounded-2xl border border-slate-100 flex items-center justify-center text-slate-300 mx-auto mb-4 shadow-sm group-hover:text-blue-500 group-hover:scale-110 transition-all">
-                           <Icon name="UploadCloud" size={32} />
-                         </div>
-                         <span className="block text-sm font-bold text-slate-800 tracking-tight transition-colors">Upload Documents</span>
-                         <p className="text-xs text-slate-400 font-medium mt-2">PDF, DOCX or Images up to 10MB per file</p>
+                         <input type="file" multiple hidden ref={docInputRef} onChange={(e) => handleFileChange(e, 'doc')} disabled={uploadingDocs} />
+                         {uploadingDocs ? (
+                           <div className="space-y-4 py-2 animate-in fade-in duration-300">
+                             <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto shadow-md"></div>
+                             <p className="text-sm font-bold text-blue-600 tracking-tight">Processing your files...</p>
+                             <p className="text-[10px] text-slate-400 font-medium">Please wait a moment</p>
+                           </div>
+                         ) : (
+                           <>
+                             <div className="w-16 h-16 bg-white rounded-2xl border border-slate-100 flex items-center justify-center text-slate-300 mx-auto mb-4 shadow-sm group-hover:text-blue-500 group-hover:scale-110 transition-all">
+                               <Icon name="UploadCloud" size={32} />
+                             </div>
+                             <span className="block text-sm font-bold text-slate-800 tracking-tight transition-colors">Upload Documents</span>
+                             <p className="text-xs text-slate-400 font-medium mt-2">PDF, DOCX or Images up to 10MB per file</p>
+                           </>
+                         )}
                       </div>
                    )}
 
@@ -709,9 +740,17 @@ const EmployeeModal = ({
                   {!isReadOnly && (
                     <button 
                       onClick={handleSave}
-                      className="px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95"
+                      disabled={isSaving || isLoading}
+                      className={`px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 ${
+                        isSaving || isLoading 
+                        ? 'bg-blue-400 cursor-not-allowed shadow-none' 
+                        : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'
+                      }`}
                     >
-                      Save Changes
+                      {(isSaving || isLoading) && (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      )}
+                      <span>{isSaving ? 'Processing...' : 'Save Changes'}</span>
                     </button>
                   )}
                </div>

@@ -148,6 +148,7 @@ const AttendanceTable = ({
       late: { color: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Late', icon: 'Clock', iconColor: 'text-amber-500' },
       early_checkin: { color: 'bg-sky-50 text-sky-700 border-sky-200', label: 'Early In', icon: 'Clock', iconColor: 'text-sky-500' },
       early_departure: { color: 'bg-orange-50 text-orange-700 border-orange-200', label: 'Early Out', icon: 'LogOut', iconColor: 'text-orange-500' },
+      wfh: { color: 'bg-indigo-50 text-indigo-700 border-indigo-200', label: 'WFH', icon: 'Home', iconColor: 'text-indigo-500' },
       not_checked_in: { color: 'bg-gray-50 text-gray-600 border-gray-200', label: 'Not Checked In', icon: 'MinusCircle', iconColor: 'text-gray-400' }
     };
 
@@ -317,18 +318,20 @@ const AttendanceTable = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-start gap-1">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                            employee?.status === 'present' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' :
-                            employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
-                            employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
-                            'border-slate-100 bg-slate-50 text-slate-600'
-                        }`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${
-                                employee?.status === 'present' ? 'bg-emerald-500' :
-                                employee?.status === 'late' ? 'bg-amber-500' :
-                                employee?.status === 'absent' ? 'bg-rose-500' : 'bg-slate-400'
-                            }`}></div>
-                            {employee?.status?.replace('_', ' ')}
-                        </span>
+                             employee?.status === 'present' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' :
+                             employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
+                             employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
+                             employee?.status === 'wfh' ? 'border-indigo-100 bg-indigo-50 text-indigo-700' :
+                             'border-slate-100 bg-slate-50 text-slate-600'
+                         }`}>
+                             <div className={`w-1.5 h-1.5 rounded-full ${
+                                 employee?.status === 'present' ? 'bg-emerald-500' :
+                                 employee?.status === 'late' ? 'bg-amber-500' :
+                                 employee?.status === 'absent' ? 'bg-rose-500' :
+                                 employee?.status === 'wfh' ? 'bg-indigo-500' : 'bg-slate-400'
+                             }`}></div>
+                             {employee?.status?.replace('_', ' ')}
+                         </span>
                     </div>
                  </td>
                 <td className="px-6 py-4 whitespace-nowrap">

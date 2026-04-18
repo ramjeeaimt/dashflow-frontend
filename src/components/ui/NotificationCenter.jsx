@@ -1,17 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../AppIcon';
 import { useNotificationStore } from '../../store/useNotificationStore';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import notificationService from '../../services/notification.service';
 
 const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { notifications, clearNotifications } = useNotificationStore();
+  const [now, setNow] = useState(Date.now());
+
+  // Update "time ago" every 30 seconds for better precision
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const getTimeAgo = (timestamp) => {
     try {
       if (!timestamp) return 'just now';
-      return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+      // Use the 'now' state to force reactivity on every tick
+      return formatDistance(new Date(timestamp), now, { addSuffix: true });
     } catch (e) {
       return 'just now';
     }
@@ -27,6 +37,8 @@ const NotificationCenter = () => {
       TASK_ASSIGNED: 'CheckSquare',
       LEAVE_REQUEST: 'Clock',
       LEAVE_STATUS: 'Clock',
+      WFH_REQUEST: 'Home',
+      WFH_STATUS: 'Home',
       PAYROLL_GENERATED: 'CreditCard',
       WELCOME: 'UserPlus',
       system: 'Settings',
@@ -40,9 +52,9 @@ const NotificationCenter = () => {
     const type = notification?.metadata?.type || notification?.type;
     const priority = notification?.metadata?.priority || notification?.priority;
     if (priority === 'high' || priority === 'HIGH') return 'text-error';
-    if (type === 'LEAVE_REQUEST') return 'text-warning';
+    if (type === 'LEAVE_REQUEST' || type === 'WFH_REQUEST') return 'text-warning';
     if (type === 'PAYROLL_GENERATED') return 'text-success';
-    if (type === 'TASK_ASSIGNED') return 'text-primary';
+    if (type === 'TASK_ASSIGNED' || type === 'WFH_STATUS') return 'text-primary';
     return 'text-muted-foreground';
   };
 
@@ -56,6 +68,10 @@ const NotificationCenter = () => {
       window.location.href = '/employee-leave'; // Admin view
     } else if (type === 'LEAVE_STATUS') {
       window.location.href = '/employee/leaves'; // Employee view
+    } else if (type === 'WFH_REQUEST') {
+      window.location.href = '/attendance-management'; // Admin view
+    } else if (type === 'WFH_STATUS') {
+      window.location.href = '/employee-attendance'; // Employee view
     } else if (type === 'PAYROLL_GENERATED') {
       window.location.href = '/employee/payroll';
     } else if (type === 'TASK_ASSIGNED') {

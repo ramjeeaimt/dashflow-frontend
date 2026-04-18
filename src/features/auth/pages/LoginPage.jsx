@@ -11,16 +11,24 @@ const Login = () => {
         try {
             await login(email, password);
             const user = useAuthStore.getState().user;
+            const loginRole = user?.loginRole;
             let targetPath = '/dashboard';
 
-            const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin'].includes(r.name));
-            const isEmployee = user?.roles?.some(r => r.name === 'Employee');
-            const isIntern = user?.roles?.some(r => r.name === 'Interns');
-
-            if (isAdmin) {
+            if (loginRole === 'manager') {
                 targetPath = '/dashboard';
-            } else if (isEmployee || isIntern) {
+            } else if (loginRole === 'employee') {
                 targetPath = '/employee-dashboard';
+            } else {
+                // Fallback case for existing tokens or other roles
+                const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin'].includes(r.name));
+                const isEmployee = user?.roles?.some(r => r.name === 'Employee');
+                const isIntern = user?.roles?.some(r => r.name === 'Interns');
+
+                if (isAdmin) {
+                    targetPath = '/dashboard';
+                } else if (isEmployee || isIntern) {
+                    targetPath = '/employee-dashboard';
+                }
             }
 
             const from = location.state?.from?.pathname || targetPath;
