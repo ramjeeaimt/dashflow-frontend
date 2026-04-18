@@ -35,7 +35,6 @@ const EmployeeModal = ({
     emergencyPhone: '',
     skills: [],
     avatar: '',
-    profileImage:'',
     checkInTime: '',
     documents: [] // Added for document management
   });
@@ -80,8 +79,7 @@ const EmployeeModal = ({
         emergencyContact: employee?.emergencyContact || '',
         emergencyPhone: employee?.emergencyPhone || '',
         skills: employee?.skills || [],
-        profileImage: employee?.profileImage || employee?.avatar || '',
-        avatar: employee?.avatar || employee?.profileImage || '',
+        avatar: employee?.avatar || '',
         checkInTime: employee?.checkInTime || '',
         documents: employee?.documents || [] // Load existing docs
       });
@@ -206,7 +204,6 @@ const EmployeeModal = ({
     if (type === "profileImage") {
       setFormData(prev => ({
         ...prev,
-        profileImage: uploadedUrl,
         avatar: uploadedUrl 
       }));
     } else if (type === "doc") {
@@ -375,8 +372,7 @@ const EmployeeModal = ({
                     <div className="relative group">
                       <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
                         <div className="w-full h-full rounded-full overflow-hidden relative">
-                           <img
-                            src={formData?.profileImage || formData?.avatar || 'https://via.placeholder.com/150'}
+                            src={formData?.avatar || 'https://via.placeholder.com/150'}
                             alt="Profile"
                             className="w-full h-full object-cover"
                           />

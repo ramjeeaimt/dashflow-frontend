@@ -185,7 +185,6 @@ const EmployeeManagement = () => {
         skills: employeeData.skills || [],
         permissionIds: employeeData.permissionIds || [],
         avatar: employeeData.avatar || '',
-        profileImage: employeeData.profileImage || '',
         documents: employeeData.documents || []
       };
 
