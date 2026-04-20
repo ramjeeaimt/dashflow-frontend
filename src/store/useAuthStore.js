@@ -21,7 +21,8 @@ const sanitizeUser = (user) => {
             id: user.company.id,
             name: user.company.name,
             email: user.company.email
-        } : null
+        } : null,
+        permissions: user.permissions || []
     };
 };
 
@@ -157,6 +158,21 @@ const useAuthStore = create((set, get) => ({
     },
 
     clearError: () => set({ error: null }),
+
+    // Helper to check for a specific permission
+    can: (action, resource) => {
+        const { user } = get();
+        if (!user || !user.permissions) return false;
+
+        // Check for super admin bypass logic if applicable
+        const isSuperAdmin = user.roles?.some(r => r.name === 'Super Admin' || r.name === 'Admin');
+        if (isSuperAdmin) return true;
+
+        return user.permissions.some(p => 
+            p.action === action && (p.resource === resource || p.resource === 'all') ||
+            p.action === 'manage' && (p.resource === resource || p.resource === 'all')
+        );
+    }
 }));
 
 export default useAuthStore;

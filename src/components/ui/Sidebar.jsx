@@ -11,191 +11,140 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
   const location = useLocation();
   const activeItem = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { user } = useAuthStore();
-  const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin'].includes(r.name));
-  const isEmployee = user?.roles?.some(r => r.name === 'Employee');
-  const isIntern = user?.roles?.some(r => r.name === 'Interns');
-
+  const { user, can } = useAuthStore();
   const comingSoonPaths = [];
 
-  let navigationItems = [];
+  const allNavigationItems = [
+    {
+      label: 'Dashboard',
+      path: '/dashboard',
+      icon: 'LayoutDashboard',
+      tooltip: 'Analytics overview and metrics',
+      permission: { action: 'read', resource: 'dashboard' },
+      alwaysShow: true // Personal dashboard for everyone
+    },
+    {
+      label: 'Employees',
+      path: '/employee-management',
+      icon: 'Users',
+      tooltip: 'Workforce management',
+      permission: { action: 'read', resource: 'employee' }
+    },
+    {
+      label: 'Employee-Leave',
+      path: '/employee-leave',
+      icon: 'Users',
+      tooltip: 'Manage team leaves',
+      permission: { action: 'manage', resource: 'leave' }
+    },
+    {
+      label: 'My Leaves',
+      path: '/employee/leaves',
+      icon: 'Calendar',
+      tooltip: 'Apply and track leaves',
+      permission: { action: 'read', resource: 'personal_leaves' },
+      alwaysShow: true
+    },
+    {
+      label: 'Attendance',
+      path: '/attendance-management',
+      icon: 'CalendarCheck',
+      tooltip: 'Daily check-in/out management',
+      permission: { action: 'manage', resource: 'attendance' }
+    },
+    {
+      label: 'My Attendance',
+      path: '/employee-attendance',
+      icon: 'CalendarCheck',
+      tooltip: 'My daily attendance',
+      permission: { action: 'read', resource: 'personal_attendance' },
+      alwaysShow: true
+    },
+    {
+      label: 'Client',
+      path: '/client-management',
+      icon: 'Briefcase',
+      permission: { action: 'read', resource: 'client' }
+    },
+    {
+      label: 'Tasks',
+      path: '/task-management',
+      icon: 'CheckSquare',
+      tooltip: 'Project and assignment management',
+      permission: { action: 'read', resource: 'task' }
+    },
+    {
+      label: 'Time Tracking',
+      path: '/time-tracking',
+      icon: 'Clock',
+      tooltip: 'Productivity monitoring',
+      permission: { action: 'read', resource: 'time-tracking' }
+    },
+    {
+      label: 'Project',
+      path: '/projects',
+      icon: 'Folder',
+      tooltip: 'Manage projects and assignments',
+      permission: { action: 'read', resource: 'project' }
+    },
+    {
+      label: 'Monitoring',
+      path: '/monitoring-dashboard',
+      icon: 'Monitor',
+      tooltip: 'Advanced oversight capabilities',
+      permission: { action: 'read', resource: 'monitoring' }
+    },
+    {
+      label: 'Payroll',
+      path: '/payroll',
+      icon: 'Calculator',
+      tooltip: 'Financial processing',
+      permission: { action: 'read', resource: 'payroll' }
+    },
+    {
+      label: 'My Payroll',
+      path: '/employee/payroll',
+      icon: 'Calculator',
+      tooltip: 'View my payslips',
+      permission: { action: 'read', resource: 'personal_payroll' },
+      alwaysShow: true
+    },
+    {
+      label: 'Finance',
+      path: '/finance',
+      icon: 'DollarSign',
+      tooltip: 'Revenue and Expense tracking',
+      permission: { action: 'read', resource: 'expense' }
+    },
+    {
+      label: 'Company Profile',
+      path: '/company-profile',
+      icon: 'Building',
+      tooltip: 'Manage company settings',
+      permission: { action: 'update', resource: 'company' }
+    },
+    {
+      label: 'Roles & Permissions',
+      path: '/settings/roles',
+      icon: 'Shield',
+      tooltip: 'System configuration',
+      permission: { action: 'manage', resource: 'access-control' }
+    },
+    {
+      label: 'Difmo Jobs',
+      path: '/difmo-jobs',
+      icon: 'Briefcase',
+      tooltip: 'Manage difmo jobs',
+      permission: { action: 'read', resource: 'job' }
+    }
+  ];
 
-  if (isAdmin) {
-    navigationItems = [
-      {
-        label: 'Dashboard',
-        path: '/dashboard',
-        icon: 'LayoutDashboard',
-        tooltip: 'Analytics overview and metrics'
-      },
-      {
-        label: 'Employees',
-        path: '/employee-management',
-        icon: 'Users',
-        tooltip: 'Workforce management'
-      },
-      {
-        label: 'Employee-Leave',
-        path: '/employee-leave',
-        icon: 'Users',
-        tooltip: 'Workforce management'
-      },
-
-      {
-        label: 'Attendance',
-        path: '/attendance-management',
-        icon: 'CalendarCheck',
-        tooltip: 'Daily check-in/out'
-      },
-
-       {
-        label: 'Client',
-        path: '/client-management',
-        icon: 'CalendarCheck',
-        
-      },
-      {
-        label: 'Tasks',
-        path: '/task-management',
-        icon: 'CheckSquare',
-        tooltip: 'Project and assignment management'
-      },
-      {
-        label: 'Time Tracking',
-        path: '/time-tracking',
-        icon: 'Clock',
-        tooltip: 'Productivity monitoring'
-      },
-      {
-        label: 'Project',       
-        path: '/projects',
-        icon: 'Folder',
-        tooltip: 'Manage projects and assignments'
-      },
-      {
-        label: 'Monitoring',
-        path: '/monitoring-dashboard',
-        icon: 'Monitor',
-        tooltip: 'Advanced oversight capabilities'
-      },
-      {
-        label: 'Payroll',
-        path: '/payroll',
-        icon: 'Calculator',
-        tooltip: 'Financial processing'
-      },
-      {
-        label: 'Finance',
-        path: '/finance',
-        icon: 'DollarSign',
-        tooltip: 'Revenue and Expense tracking'
-      },
-      {
-        label: 'Company Profile',
-        path: '/company-profile',
-        icon: 'Building',
-        tooltip: 'Manage company settings'
-      },
-      {
-        label: 'Roles & Permissions',
-        path: '/settings/roles',
-        icon: 'Shield',
-        tooltip: 'System configuration'
-      },
-      // 
-      
-      {
-        label: 'Difmo Jobs',
-        path: '/difmo-jobs',
-        icon: 'Briefcase',
-        tooltip: 'Manage difmo jobs'
-      },
-      // {
-      //   label: 'Applications',
-      //   path: '/jobs/applications',
-      //   icon: 'ClipboardList',
-      //   tooltip: 'Candidate applications'
-      // },
-      // {
-      //   label: 'Messages',
-      //   path: '/messages',
-      //   icon: 'MessageSquare',
-      //   tooltip: 'Recruitment & inquiries'
-      // },
-    ];
-  } else if (isEmployee) {
-    navigationItems = [
-      {
-        label: 'Dashboard',
-        path: '/employee-dashboard',
-        icon: 'LayoutDashboard',
-        tooltip: 'My Dashboard'
-      },
-      {
-        label: 'My Leaves',
-        path: '/employee/leaves',
-        icon: 'Calendar',
-        tooltip: 'Apply and track leaves'
-      },
-      {
-        label: 'My Payroll',
-        path: '/employee/payroll',
-        icon: 'Calculator',
-        tooltip: 'View my payslips and salary'
-      },
-      {
-        label: 'Attendance',
-        path: '/employee-attendance',
-        icon: 'CalendarCheck',
-        tooltip: 'My daily attendance'
-      },
-    ];
-
-  } else if (isIntern) {
-    navigationItems = [
-      {
-        label: 'My Dashboard',
-        path: '/employee-dashboard',
-        icon: 'LayoutDashboard',
-        tooltip: 'My Intern Dashboard'
-      },
-      {
-        label: 'My Leaves',
-        path: '/employee/leaves',
-        icon: 'Calendar',
-        tooltip: 'Apply and track leaves'
-      },
-      {
-        label: 'Attendance',
-        path: '/employee-attendance',
-        icon: 'CalendarCheck',
-        tooltip: 'My daily attendance'
-      },
-    ];
-
-  } else {
-    // Fallback: show minimal employee-style nav for unknown roles
-    navigationItems = [
-      {
-        label: 'Dashboard',
-        path: '/employee-dashboard',
-        icon: 'LayoutDashboard',
-        tooltip: 'My Dashboard'
-      },
-      {
-        label: 'My Leaves',
-        path: '/employee/leaves',
-        icon: 'Calendar',
-        tooltip: 'Apply and track leaves'
-      },
-      {
-        label: 'Attendance',
-        path: '/employee-attendance',
-        icon: 'CalendarCheck',
-        tooltip: 'My daily attendance'
-      },
-    ];
-  }
+  // Filter navigation items based on permissions
+  const navigationItems = allNavigationItems.filter(item => {
+    if (item.alwaysShow) return true;
+    if (!item.permission) return false;
+    return can(item.permission.action, item.permission.resource);
+  });
 
   const handleNavigation = (path) => {
     if (comingSoonPaths.includes(path)) {

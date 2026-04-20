@@ -384,7 +384,7 @@ const EmployeeModal = ({
                           )}
                         </div>
                       </div>
-                      {!isReadOnly && (
+                      { (mode === 'edit' || mode === 'add') && (
                          <button 
                           onClick={() => avatarInputRef.current.click()}
                           className="absolute -bottom-1 -right-1 bg-blue-600 text-white p-2.5 rounded-full hover:bg-blue-700 transition-all border-2 border-white shadow-lg"
@@ -395,7 +395,7 @@ const EmployeeModal = ({
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-800 mb-4">Profile Picture</h3>
-                      {!isReadOnly && (
+                      { (mode === 'edit' || mode === 'add') && (
                         <div className="space-y-3">
                           <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={(e) => handleFileChange(e, 'profileImage')} />
                           <button
@@ -544,8 +544,7 @@ const EmployeeModal = ({
                            const isSelected = formData.roleIds.includes(role.id);
                            return (
                              <button
-                               key={role.id}
-                               onClick={() => {
+                               key={role.id} type="button" onClick={(e) => { e.preventDefault();
                                  if (isReadOnly) return;
                                  const newRoles = isSelected ? formData.roleIds.filter(id => id !== role.id) : [...formData.roleIds, role.id];
                                  handleInputChange('roleIds', newRoles);
@@ -610,8 +609,10 @@ const EmployeeModal = ({
                                 return (
                                   <button
                                     key={perm.id}
+                                    type="button"
                                     disabled={isInherited || isReadOnly}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.preventDefault();
                                       const newPerms = isDirect ? formData.permissionIds.filter(id => id !== perm.id) : [...formData.permissionIds, perm.id];
                                       handleInputChange('permissionIds', newPerms);
                                     }}
@@ -660,7 +661,7 @@ const EmployeeModal = ({
 
               {activeTab === 'documents' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                   {!isReadOnly && (
+                   { (mode === 'edit' || mode === 'add') && (
                       <div 
                         onClick={() => !uploadingDocs && docInputRef.current.click()}
                         className={`border-2 border-dashed rounded-2xl p-12 text-center group transition-all ${
@@ -729,16 +730,18 @@ const EmployeeModal = ({
                </div>
                <div className="flex space-x-3">
                   <button 
+                  type="button"
                   onClick={onClose}
                   className="px-6 py-2.5 bg-white border border-slate-200 text-sm font-bold text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
                   >
                     Cancel
                   </button>
-                  {!isReadOnly && (
+                  { (mode === 'edit' || mode === 'add') && (
                     <button 
+                      type="button"
                       onClick={handleSave}
                       disabled={isSaving || isLoading}
-                      className={`px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 ${
+                      className={`px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center ${
                         isSaving || isLoading 
                         ? 'bg-blue-400 cursor-not-allowed shadow-none' 
                         : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'
