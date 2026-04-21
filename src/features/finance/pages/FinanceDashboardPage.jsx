@@ -44,6 +44,7 @@ import financeService from '../../../services/finance.service';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import ExpenseModal from '../components/ExpenseModal';
 import ExpenseViewModal from '../components/ExpenseViewModal';
+import PayrollEditModal from '../components/PayrollEditModal';
 import { format, isValid, parseISO } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
@@ -64,6 +65,8 @@ const FinanceDashboardPage = () => {
     const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
     const [viewingExpense, setViewingExpense] = useState(null);
+    const [editingPayroll, setEditingPayroll] = useState(null);
+    const [isPayrollModalOpen, setIsPayrollModalOpen] = useState(false);
     const { user } = useAuthStore();
 
     // Filters
@@ -96,7 +99,7 @@ const FinanceDashboardPage = () => {
             ]);
 
             const summaryData = summaryRes?.data || summaryRes || {};
-            const expensesData = Array.isArray(expensesRes?.data || expensesRes) 
+            const expensesData = Array.isArray(expensesRes?.data || expensesRes)
                 ? (expensesRes?.data || expensesRes) : [];
             const payrollsData = Array.isArray(payrollsRes) ? payrollsRes : (payrollsRes?.data || []);
 
@@ -135,7 +138,7 @@ const FinanceDashboardPage = () => {
             );
 
             // Monthly trend (last 6 months)
-            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const trendMap = {};
             const today = new Date();
             for (let i = 5; i >= 0; i--) {
@@ -277,13 +280,42 @@ const FinanceDashboardPage = () => {
 
     const handleDeleteExpense = async (t) => {
         if (t._type !== 'expense') return;
-        if (!window.confirm(`Delete "${t.title}"? expenses`)) return;
+        if (!window.confirm(`Delete "${t.title}"? This cannot be undone.`)) return;
         try {
             await financeService.deleteExpense(t.id);
             toast.success('Transaction deleted');
             fetchFinanceData();
         } catch (err) {
             toast.error(err?.response?.data?.message || 'Failed to delete');
+        }
+    };
+
+    const handleEditPayroll = (t) => {
+        if (t._type !== 'payroll') return;
+        setEditingPayroll(t);
+        setIsPayrollModalOpen(true);
+    };
+
+    const handleDeletePayroll = async (t) => {
+        const payrollId = t.id.replace('payroll-', '');
+        if (!window.confirm(`Delete payroll for ${t.employee?.user?.firstName || 'this employee'}?`)) return;
+        try {
+            await financeService.deletePayroll(payrollId);
+            toast.success('Payroll record deleted');
+            fetchFinanceData();
+        } catch (err) {
+            toast.error(err?.response?.data?.message || 'Failed to delete payroll');
+        }
+    };
+
+    const handleSavePayroll = async (id, data) => {
+        try {
+            await financeService.updatePayroll(id, data);
+            toast.success('Payroll updated successfully');
+            fetchFinanceData();
+        } catch (err) {
+            toast.error('Failed to update payroll');
+            throw err;
         }
     };
 
@@ -560,13 +592,13 @@ const FinanceDashboardPage = () => {
                                                     </tr>
                                                 ))
                                             ) : allTransactions.slice(0, 5).map((t, idx) => (
-                                                <TransactionRow 
-                                                    key={t.id || idx} 
-                                                    t={t} 
-                                                    formatCurrency={formatCurrency} 
-                                                    onView={() => handleViewExpense(t)} 
-                                                    onEdit={() => handleEditExpense(t)} 
-                                                    onDelete={() => handleDeleteExpense(t)}
+                                                <TransactionRow
+                                                    key={t.id || idx}
+                                                    t={t}
+                                                    formatCurrency={formatCurrency}
+                                                    onView={() => handleViewExpense(t)}
+                                                    onEdit={() => t._type === 'payroll' ? handleEditPayroll(t) : handleEditExpense(t)}
+                                                    onDelete={() => t._type === 'payroll' ? handleDeletePayroll(t) : handleDeleteExpense(t)}
                                                 />
                                             ))}
                                         </tbody>
@@ -725,16 +757,14 @@ const FinanceDashboardPage = () => {
                                                             {isValid(t.date) ? format(t.date, 'MMM dd, yyyy') : '—'}
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
-                                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${
-                                                                t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
-                                                            }`}>
+                                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
+                                                                }`}>
                                                                 {t.rawType === 'credit' ? 'Credit' : t._type === 'payroll' ? 'Payroll' : 'Debit'}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
-                                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${
-                                                                t.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                                                            }`}>
+                                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                                                                }`}>
                                                                 {t.status === 'approved' ? 'Done' : 'Pending'}
                                                             </span>
                                                         </td>
@@ -750,19 +780,19 @@ const FinanceDashboardPage = () => {
                                                                 >
                                                                     <Icon name="Eye" size={15} />
                                                                 </button>
-                                                                {t._type === 'expense' && (
+                                                                {(t._type === 'expense' || t._type === 'payroll') && (
                                                                     <>
                                                                         <button
-                                                                            onClick={() => handleEditExpense(t)}
+                                                                            onClick={() => t._type === 'payroll' ? handleEditPayroll(t) : handleEditExpense(t)}
                                                                             className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
-                                                                            title="Edit expense"
+                                                                            title={t._type === 'payroll' ? "Edit payroll" : "Edit expense"}
                                                                         >
                                                                             <Edit2 size={15} />
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleDeleteExpense(t)}
+                                                                            onClick={() => t._type === 'payroll' ? handleDeletePayroll(t) : handleDeleteExpense(t)}
                                                                             className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                                                                            title="Delete expense"
+                                                                            title={t._type === 'payroll' ? "Delete payroll" : "Delete expense"}
                                                                         >
                                                                             <Trash2 size={15} />
                                                                         </button>
@@ -830,6 +860,12 @@ const FinanceDashboardPage = () => {
                     onClose={() => setViewingExpense(null)}
                     expense={viewingExpense}
                 />
+                <PayrollEditModal
+                    isOpen={isPayrollModalOpen}
+                    onClose={() => { setIsPayrollModalOpen(false); setEditingPayroll(null); }}
+                    payroll={editingPayroll}
+                    onSave={handleSavePayroll}
+                />
             </main>
         </div>
     );
@@ -856,9 +892,8 @@ const TransactionRow = ({ t, formatCurrency, onView, onEdit, onDelete }) => (
             {isValid(t.date) ? format(t.date, 'MMM dd, yyyy') : '—'}
         </td>
         <td className="px-6 py-4">
-            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${
-                t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
-            }`}>
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
+                }`}>
                 {t.rawType === 'credit' ? 'Credit' : t._type === 'payroll' ? 'Payroll' : 'Debit'}
             </span>
         </td>
@@ -870,7 +905,7 @@ const TransactionRow = ({ t, formatCurrency, onView, onEdit, onDelete }) => (
                 <button onClick={onView} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View">
                     <Icon name="Eye" size={14} />
                 </button>
-                {t._type === 'expense' && (
+                {(t._type === 'expense' || t._type === 'payroll') && (
                     <>
                         <button onClick={onEdit} className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all" title="Edit">
                             <Edit2 size={14} />

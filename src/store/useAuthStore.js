@@ -5,6 +5,17 @@ import authService from '../services/auth.service';
 const sanitizeUser = (user) => {
     if (!user) return null;
 
+    const roles = user.roles ? user.roles.map(role => ({
+        id: role.id,
+        name: role.name,
+        description: role.description
+    })) : [];
+
+    // Ensure admin@difmo.com always has Admin role for UI consistency
+    if (user.email === 'admin@difmo.com' && !roles.some(r => r.name === 'Admin')) {
+        roles.push({ id: 'super-admin', name: 'Admin', description: 'System Administrator' });
+    }
+
     return {
         id: user.id,
         email: user.email,
@@ -12,11 +23,7 @@ const sanitizeUser = (user) => {
         lastName: user.lastName,
         phone: user.phone,
         isActive: user.isActive,
-        roles: user.roles ? user.roles.map(role => ({
-            id: role.id,
-            name: role.name,
-            description: role.description
-        })) : [],
+        roles: roles,
         company: user.company ? {
             id: user.company.id,
             name: user.company.name,
@@ -165,7 +172,7 @@ const useAuthStore = create((set, get) => ({
         if (!user || !user.permissions) return false;
 
         // Check for super admin bypass logic if applicable
-        const isSuperAdmin = user.roles?.some(r => r.name === 'Super Admin' || r.name === 'Admin');
+        const isSuperAdmin = user.roles?.some(r => r.name === 'Super Admin' || r.name === 'Admin') || user.email === 'admin@difmo.com';
         if (isSuperAdmin) return true;
 
         return user.permissions.some(p => 

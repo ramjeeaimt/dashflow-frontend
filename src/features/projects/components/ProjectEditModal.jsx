@@ -109,7 +109,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-950 w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="bg-white dark:bg-slate-950 w-full max-w-3xl max-h-[90vh]  overflow-hidden border border-white/20 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <div>

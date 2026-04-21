@@ -34,6 +34,11 @@ export const accessControlService = {
     async seedPermissions() {
         const response = await apiClient.post(`${API_ENDPOINTS.ACCESS_CONTROL.BASE}/seed`);
         return response.data;
+    },
+
+    async deleteRole(id) {
+        const response = await apiClient.delete(`${API_ENDPOINTS.ACCESS_CONTROL.BASE}/roles/${id}`);
+        return response.data;
     }
 };
 

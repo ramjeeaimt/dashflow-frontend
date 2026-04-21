@@ -36,9 +36,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user?.company?.id) {
-      fetchDashboardData(user.company.id, isManagement, user.id);
+      // If user is Admin/Management, show company-wide metrics by passing null for userId
+      const isAdminView = can('manage', 'access-control') || user.roles?.some(r => r.name === 'Admin') || user.email === 'admin@difmo.com';
+      const fetchUserId = isAdminView ? null : user.id;
+      
+      fetchDashboardData(user.company.id, isManagement, fetchUserId);
     }
-  }, [user, fetchDashboardData, isManagement]);
+  }, [user, fetchDashboardData, isManagement, can]);
 
   useEffect(() => {
     const timer = setInterval(() => {

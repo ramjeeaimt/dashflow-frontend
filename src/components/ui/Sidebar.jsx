@@ -95,6 +95,20 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       permission: { action: 'read', resource: 'monitoring' }
     },
     {
+      label: 'Attendance Analytics',
+      path: '/attendance-analytics',
+      icon: 'LineChart',
+      tooltip: 'Detailed attendance reports',
+      permission: { action: 'read', resource: 'attendance' }
+    },
+    {
+      label: 'My Check-in',
+      path: '/employee-dashboard',
+      icon: 'UserCircle',
+      tooltip: 'Personal attendance dashboard',
+      alwaysShow: true
+    },
+    {
       label: 'Payroll',
       path: '/payroll',
       icon: 'Calculator',

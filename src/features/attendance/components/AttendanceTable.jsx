@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
+
 import { getISTDateString } from '../../../utils/dateUtils';
 import AppImage from '../../../components/AppImage';
 import AttendanceModal from './AttendanceModal';
@@ -7,7 +8,7 @@ import AttendanceModal from './AttendanceModal';
 // Avatar Component with fallback logic
 const EmployeeAvatar = ({ employee, size = 'md' }) => {
   const [imageError, setImageError] = useState(false);
-  
+
   const getInitials = () => {
     const name = employee?.employeeName || '';
     const parts = name.split(' ');
@@ -19,12 +20,12 @@ const EmployeeAvatar = ({ employee, size = 'md' }) => {
 
   const getColorFromName = () => {
     const colors = [
-      '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', 
+      '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e',
       '#ef4444', '#f97316', '#f59e0b', '#eab308',
       '#84cc16', '#10b981', '#14b8a6', '#06b6d4',
       '#0ea5e9', '#3b82f6', '#6366f1'
     ];
-    
+
     const name = employee?.employeeName || '';
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -41,7 +42,7 @@ const EmployeeAvatar = ({ employee, size = 'md' }) => {
   };
 
   const avatarUrl = employee?.profileImage || employee?.avatar;
-  
+
   if (avatarUrl && !imageError) {
     return (
       <div className={`${sizeClasses[size]} rounded-none overflow-hidden bg-gray-100 flex-shrink-0`}>
@@ -56,7 +57,7 @@ const EmployeeAvatar = ({ employee, size = 'md' }) => {
   }
 
   return (
-    <div 
+    <div
       className={`${sizeClasses[size]} rounded-none flex items-center justify-center font-medium text-white flex-shrink-0 shadow-sm`}
       style={{ backgroundColor: getColorFromName() }}
     >
@@ -78,6 +79,22 @@ const AttendanceTable = ({
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    employeeName: true,
+    department: true,
+    checkInTime: true,
+    checkOutTime: true,
+    workDuration: true,
+    status: true,
+    location: true,
+    productivity: true
+  });
+  const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
+
+  const handleColumnToggle = (column) => {
+    setVisibleColumns(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -115,7 +132,7 @@ const AttendanceTable = ({
       const recordDate = new Date(dateStr);
       const [hours, minutes] = timeStr.split(':');
       recordDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      
+
       const now = new Date();
       const diffMs = now - recordDate;
       const diffMins = Math.floor(diffMs / 60000);
@@ -135,7 +152,7 @@ const AttendanceTable = ({
   const getStatusBadge = (status, reason, dateStr) => {
     const today = getISTDateString();
     const isToday = dateStr === today;
-    
+
     // Finalized status logic: after 24h, late/early_checkin/early_departure show as 'Present'
     let effectiveStatus = status;
     if (!isToday && ['late', 'early_checkin', 'early_departure'].includes(status)) {
@@ -190,6 +207,8 @@ const AttendanceTable = ({
     }
   });
 
+
+
   const SortableHeader = ({ field, children }) => (
     <th
       className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-widest cursor-pointer hover:bg-slate-50 hover:text-slate-900 transition-all duration-150 group"
@@ -200,9 +219,8 @@ const AttendanceTable = ({
         <Icon
           name={sortField === field && sortDirection === 'desc' ? 'ChevronDown' : 'ChevronUp'}
           size={12}
-          className={`transition-opacity duration-150 ${
-            sortField === field ? 'text-blue-600 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'
-          }`}
+          className={`transition-opacity duration-150 ${sortField === field ? 'text-blue-600 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'
+            }`}
         />
       </div>
     </th>
@@ -247,17 +265,58 @@ const AttendanceTable = ({
                   className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer"
                 />
               </th>
-              <SortableHeader field="employeeName">Employee</SortableHeader>
-              <SortableHeader field="department">Department</SortableHeader>
-              <SortableHeader field="checkInTime">Check In</SortableHeader>
-              <SortableHeader field="checkOutTime">Check Out</SortableHeader>
-              <SortableHeader field="workDuration">Duration</SortableHeader>
-              <SortableHeader field="status">Status</SortableHeader>
-              <SortableHeader field="location">Location</SortableHeader>
-              <SortableHeader field="productivity">Productivity</SortableHeader>
-              <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                Actions
+              {visibleColumns.employeeName && <SortableHeader field="employeeName">Employee</SortableHeader>}
+              {visibleColumns.department && <SortableHeader field="department">Department</SortableHeader>}
+              {visibleColumns.checkInTime && <SortableHeader field="checkInTime">Check In</SortableHeader>}
+              {visibleColumns.checkOutTime && <SortableHeader field="checkOutTime">Check Out</SortableHeader>}
+              {visibleColumns.workDuration && <SortableHeader field="workDuration">Duration</SortableHeader>}
+              {visibleColumns.status && <SortableHeader field="status">Status</SortableHeader>}
+              {visibleColumns.location && <SortableHeader field="location">Location</SortableHeader>}
+              {visibleColumns.productivity && <SortableHeader field="productivity">Productivity</SortableHeader>}
+
+              <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-widest relative">
+                <div className="flex items-center gap-2">
+                  <span>Actions</span>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsColumnSettingsOpen(!isColumnSettingsOpen);
+                    }}
+                    className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-600"
+                  >
+                    <Icon name="MoreVertical" size={14} />
+                  </button>
+                </div>
+
+                {isColumnSettingsOpen && (
+                  <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-4 w-48 text-left">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Display Columns</h4>
+                    <div className="space-y-2">
+                      {[
+                        { key: 'department', label: 'Department' },
+                        { key: 'checkInTime', label: 'Check In' },
+                        { key: 'checkOutTime', label: 'Check Out' },
+                        { key: 'workDuration', label: 'Duration' },
+                        { key: 'status', label: 'Status' },
+                        { key: 'location', label: 'Location' },
+                        { key: 'productivity', label: 'Productivity' }
+                      ].map(col => (
+                        <label key={col.key} className="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition-colors group">
+                          <input
+                            type="checkbox"
+                            checked={visibleColumns[col.key]}
+                            onChange={() => handleColumnToggle(col.key)}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-100 h-3.5 w-3.5"
+                          />
+                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">{col.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </th>
+
+
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-slate-50">
@@ -275,94 +334,109 @@ const AttendanceTable = ({
                     className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer"
                   />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-3">
-                    <EmployeeAvatar employee={employee} size="md" />
-                    <div>
-                      <div className="text-sm font-bold text-slate-900 tracking-tight">{employee?.employeeName || '—'}</div>
-                      <div className="text-[11px] font-medium text-slate-400">{employee?.employeeCode || employee?.employeeId || '—'}</div>
+                {visibleColumns.employeeName && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <EmployeeAvatar employee={employee} size="md" />
+                      <div>
+                        <div className="text-sm font-bold text-slate-900 tracking-tight">{employee?.employeeName || '—'}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">{employee?.department || 'Not Assigned'}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex flex-col">
+                  </td>
+                )}
+                {visibleColumns.department && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">{employee?.department || 'Not Assigned'}</span>
+                  </td>
+                )}
+                {visibleColumns.checkInTime && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex flex-col">
+                      <div className="text-sm text-slate-900 font-bold">
+                        {formatTime(employee?.checkInTime)}
+                      </div>
+                      {employee?.checkInTime && employee?.checkInTime !== '--' && (
+                        <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                          {getRelativeTime(employee.checkInTime, employee.date)}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                )}
+                {visibleColumns.checkOutTime && (
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-slate-900 font-bold">
-                      {formatTime(employee?.checkInTime)}
+                      {formatTime(employee?.checkOutTime)}
                     </div>
-                    {employee?.checkInTime && employee?.checkInTime !== '--' && (
-                      <div className="text-[10px] text-slate-400 font-medium mt-0.5">
-                        {getRelativeTime(employee.checkInTime, employee.date)}
+                  </td>
+                )}
+                {visibleColumns.workDuration && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-bold text-slate-900">
+                      {employee?.workDuration || '—'}
+                    </div>
+                    {employee?.overtime && employee?.overtime !== '0m' && employee?.overtime !== '--' && (
+                      <div className="text-[10px] font-bold text-blue-600 flex items-center gap-1 mt-0.5">
+                        <Icon name="Plus" size={10} />
+                        {employee?.overtime} OT
                       </div>
                     )}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-slate-900 font-bold">
-                    {formatTime(employee?.checkOutTime)}
-                  </div>
-                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-bold text-slate-900">
-                    {employee?.workDuration || '—'}
-                  </div>
-                  {employee?.overtime && employee?.overtime !== '0m' && employee?.overtime !== '--' && (
-                    <div className="text-[10px] font-bold text-blue-600 flex items-center gap-1 mt-0.5">
-                      <Icon name="Plus" size={10} />
-                      {employee?.overtime} OT
-                    </div>
-                  )}
-                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                  </td>
+                )}
+                {visibleColumns.status && (
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-start gap-1">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                             employee?.status === 'present' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' :
-                             employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
-                             employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
-                             employee?.status === 'wfh' ? 'border-indigo-100 bg-indigo-50 text-indigo-700' :
-                             'border-slate-100 bg-slate-50 text-slate-600'
-                         }`}>
-                             <div className={`w-1.5 h-1.5 rounded-full ${
-                                 employee?.status === 'present' ? 'bg-emerald-500' :
-                                 employee?.status === 'late' ? 'bg-amber-500' :
-                                 employee?.status === 'absent' ? 'bg-rose-500' :
-                                 employee?.status === 'wfh' ? 'bg-indigo-500' : 'bg-slate-400'
-                             }`}></div>
-                             {employee?.status?.replace('_', ' ')}
-                         </span>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-[10px] font-bold uppercase tracking-wider border ${employee?.status === 'present' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' :
+                        employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
+                          employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
+                            employee?.status === 'wfh' ? 'border-indigo-100 bg-indigo-50 text-indigo-700' :
+                              'border-slate-100 bg-slate-50 text-slate-600'
+                        }`}>
+                        <div className={`w-1.5 h-1.5 rounded-none ${employee?.status === 'present' ? 'bg-emerald-500' :
+                          employee?.status === 'late' ? 'bg-amber-500' :
+                            employee?.status === 'absent' ? 'bg-rose-500' :
+                              employee?.status === 'wfh' ? 'bg-indigo-500' : 'bg-slate-400'
+                          }`}></div>
+                        {employee?.status?.replace('_', ' ')}
+                      </span>
                     </div>
-                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-1.5 text-slate-600">
-                    <Icon
-                      name={employee?.location === 'Office' ? 'Building' : employee?.location === 'WFH' ? 'Home' : 'MapPin'}
-                      size={14}
-                      className="text-slate-400"
-                    />
-                    <span className="text-xs font-semibold">{employee?.location || '—'}</span>
-                  </div>
-                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {employee?.productivity > 0 ? (
-                    <div className="flex items-center space-x-2">
-                         <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${employee.productivity >= 80 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${employee?.productivity}%` }}></div>
-                         </div>
-                         <span className="text-xs font-bold text-slate-700">{employee?.productivity}%</span>
+
+                  </td>
+                )}
+                {visibleColumns.location && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 text-slate-600">
+                      <Icon
+                        name={employee?.location === 'Office' ? 'Building' : employee?.location === 'WFH' ? 'Home' : 'MapPin'}
+                        size={14}
+                        className="text-slate-400"
+                      />
+                      <span className="text-xs font-semibold">{employee?.location || '—'}</span>
                     </div>
-                  ) : <span className="text-xs font-bold text-slate-300">—</span>}
-                 </td>
+                  </td>
+                )}
+                {visibleColumns.productivity && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {employee?.productivity > 0 ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${employee.productivity >= 80 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${employee?.productivity}%` }}></div>
+                        </div>
+                        <span className="text-xs font-bold text-slate-700">{employee?.productivity}%</span>
+                      </div>
+                    ) : <span className="text-xs font-bold text-slate-300">—</span>}
+                  </td>
+                )}
+
                 <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e?.stopPropagation()}>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {!employee.hasRecord ? (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onCheckIn(employee.employeeId || employee.id);
                         }}
-                        className="px-4 py-1.5 text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wider rounded-lg hover:bg-blue-700 transition-all shadow-sm"
+                        className="px-4 py-1.5 text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wider rounded-none hover:bg-blue-700 transition-all shadow-sm"
                       >
                         Check In
                       </button>
@@ -372,24 +446,27 @@ const AttendanceTable = ({
                           e.stopPropagation();
                           onCheckOut(employee.id || employee.employeeId);
                         }}
-                        className="px-4 py-1.5 text-[10px] font-bold bg-white border border-slate-200 text-slate-700 uppercase tracking-wider rounded-lg hover:bg-slate-50 transition-all shadow-sm"
+                        className="px-4 py-1.5 text-[10px] font-bold bg-white border border-slate-200 text-slate-700 uppercase tracking-wider rounded-none hover:bg-slate-50 transition-all shadow-sm"
                       >
                         Check Out
                       </button>
                     ) : (
-                      <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-lg uppercase tracking-wider">Done</span>
+                      <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-none uppercase tracking-wider">Done</span>
                     )}
 
                     <button
                       onClick={() => onViewHistory(employee)}
-                      className="p-2 bg-slate-50 border border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all rounded-lg"
+                      className="p-2 bg-slate-50 border border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all rounded-none"
                       title="View Details"
                     >
                       <Icon name="Eye" size={16} />
                     </button>
                   </div>
-                 </td>
-               </tr>
+                </td>
+
+
+
+              </tr>
             ))}
           </tbody>
         </table>

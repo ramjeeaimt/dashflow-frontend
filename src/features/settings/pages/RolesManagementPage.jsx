@@ -114,6 +114,21 @@ const RolesManagement = () => {
         }
     };
 
+    const handleDeleteRole = async (roleId) => {
+        if (window.confirm('Are you sure you want to delete this role? This action cannot be undone.')) {
+            try {
+                setLoading(true);
+                await accessControlService.deleteRole(roleId);
+                await fetchData();
+            } catch (error) {
+                console.error('Error deleting role:', error);
+                alert(error.response?.data?.message || 'Failed to delete role');
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     const groupedPermissions = permissions.reduce((acc, perm) => {
         if (!acc[perm.resource]) acc[perm.resource] = [];
         acc[perm.resource].push(perm);
@@ -181,7 +196,10 @@ const RolesManagement = () => {
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                                                <button 
+                                                    onClick={() => handleDeleteRole(role.id)}
+                                                    className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                >
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
