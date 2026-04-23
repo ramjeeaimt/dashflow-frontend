@@ -7,10 +7,10 @@ import Button from '../../../components/ui/Button'; // Adjusted path
 
 const ComanyDocsGST = () => {
     const { user } = useAuthStore();
-    
+
     // DEBUG FIX: Extract 'saveDocs' (NOT updateDocs) from the store
     const { company, fetchCompany, saveDocs, isUpdating } = useCompanyStore();
-    
+
     const [formData, setFormData] = useState({
         companyName: '',
         gstNumber: '',
@@ -51,7 +51,7 @@ const ComanyDocsGST = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        
+
         if (!user?.company?.id) {
             alert("User company ID not found!");
             return;
@@ -59,7 +59,7 @@ const ComanyDocsGST = () => {
 
         // DEBUG FIX: saveDocs is now defined from the destructuring above
         const result = await saveDocs(user.company.id, formData);
-        
+
         if (result.success) {
             alert('Company Profile saved successfully!');
         } else {
@@ -76,25 +76,25 @@ const ComanyDocsGST = () => {
                     <h2 className="font-semibold text-lg">Tax & Business Identity</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input 
-                        label="Registered Company Name" 
-                        name="companyName" 
-                        value={formData.companyName} 
-                        onChange={handleChange} 
+                    <Input
+                        label="Registered Company Name"
+                        name="companyName"
+                        value={formData.companyName}
+                        onChange={handleChange}
                     />
-                    <Input 
-                        label="GST Number" 
-                        name="gstNumber" 
-                        value={formData.gstNumber} 
-                        onChange={handleChange} 
-                        className="uppercase" 
+                    <Input
+                        label="GST Number"
+                        name="gstNumber"
+                        value={formData.gstNumber}
+                        onChange={handleChange}
+                        className="uppercase"
                     />
-                    <Input 
-                        label="PAN Number" 
-                        name="panNumber" 
-                        value={formData.panNumber} 
-                        onChange={handleChange} 
-                        className="uppercase" 
+                    <Input
+                        label="PAN Number"
+                        name="panNumber"
+                        value={formData.panNumber}
+                        onChange={handleChange}
+                        className="uppercase"
                     />
                 </div>
             </div>

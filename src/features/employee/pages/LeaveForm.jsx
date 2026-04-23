@@ -21,8 +21,8 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
 
   // --- Search & Filter Logic ---
   const filteredLeaves = leaves?.filter(leave => {
-    const matchesSearch = leave.reason?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          leave.type?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = leave.reason?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      leave.type?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "ALL" || (leave.status || 'PENDING').toUpperCase() === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -41,12 +41,12 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
   return (
     <div className="flex min-h-screen bg-[#FCFCFD]">
       <Sidebar />
-      
+
       <div className="flex-1 flex flex-col min-w-0 lg:pl-64"> {/* Fixed Sidebar Offset */}
         <Header />
-        
+
         <main className="flex-1 pt-24 pb-12 px-6 lg:px-10 max-w-[1400px] mx-auto w-full">
-          
+
           {/* 1. Header & Stats Component */}
           <div className="flex flex-col gap-8 mb-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -55,31 +55,31 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                 <p className="text-sm text-slate-500 font-medium">Manage and track your leave applications</p>
               </div>
               <div className="flex gap-2">
-                 <div className="px-3 py-1.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-200">
-                   Active Session: {activeId.slice(0,6)}
-                 </div>
+                <div className="px-3 py-1.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-200">
+                  Active Session: {activeId.slice(0, 6)}
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Total" value={leaves?.length} icon={<List size={16}/>} />
-              <StatCard label="Approved" value={leaves?.filter(l => l.status === 'APPROVED').length} icon={<CheckCircle size={16}/>} color="text-emerald-600" />
-              <StatCard label="Pending" value={leaves?.filter(l => l.status === 'PENDING').length} icon={<Clock size={16}/>} color="text-amber-500" />
-              <StatCard label="Rejected" value={leaves?.filter(l => l.status === 'REJECTED').length} icon={<X size={16}/>} color="text-rose-500" />
+              <StatCard label="Total" value={leaves?.length} icon={<List size={16} />} />
+              <StatCard label="Approved" value={leaves?.filter(l => l.status === 'APPROVED').length} icon={<CheckCircle size={16} />} color="text-emerald-600" />
+              <StatCard label="Pending" value={leaves?.filter(l => l.status === 'PENDING').length} icon={<Clock size={16} />} color="text-amber-500" />
+              <StatCard label="Rejected" value={leaves?.filter(l => l.status === 'REJECTED').length} icon={<X size={16} />} color="text-rose-500" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            
+
             {/* 2. Left: Application Form (Flat Design) */}
             <div className="lg:col-span-5 border border-slate-200 bg-white rounded-xl p-6">
               <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                <Plus size={14}/> Request Leave
+                <Plus size={14} /> Request Leave
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-slate-500 uppercase">Category</label>
-                  <select name="type" value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900">
+                  <select name="type" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900">
                     <option value="sick">Sick Leave</option>
                     <option value="casual">Casual Leave</option>
                     <option value="earned">Earned Leave</option>
@@ -88,16 +88,16 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-slate-500 uppercase">From</label>
-                    <input type="date" required value={formData.startDate} onChange={(e) => setFormData({...formData, startDate: e.target.value})} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900" />
+                    <input type="date" required value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold text-slate-500 uppercase">To</label>
-                    <input type="date" required value={formData.endDate} onChange={(e) => setFormData({...formData, endDate: e.target.value})} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900" />
+                    <input type="date" required value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900" />
                   </div>
                 </div>
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-slate-500 uppercase">Note</label>
-                  <textarea required value={formData.reason} onChange={(e) => setFormData({...formData, reason: e.target.value})} className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none resize-none focus:border-slate-900" placeholder="Type your reason..."></textarea>
+                  <textarea required value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none resize-none focus:border-slate-900" placeholder="Type your reason..."></textarea>
                 </div>
                 <button type="submit" disabled={isLoading} className="w-full h-11 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black transition-all">
                   {isLoading ? 'Sending...' : 'Submit Application'}
@@ -111,9 +111,9 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                  <input 
-                    type="text" 
-                    placeholder="Search by reason or type..." 
+                  <input
+                    type="text"
+                    placeholder="Search by reason or type..."
                     className="w-full h-10 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-slate-400"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -121,7 +121,7 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                 </div>
                 <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2">
                   <Filter size={14} className="text-slate-400 ml-1" />
-                  <select 
+                  <select
                     className="h-9 text-xs font-bold text-slate-600 outline-none bg-transparent pr-2"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}

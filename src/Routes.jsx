@@ -2,7 +2,8 @@
 // import ScrollToTop from "./components/ScrollToTop";
 // import Dashboard from "./pages/dashboard";
 import React from "react";
-import { BrowserRouter, Routes as RouterRoutes, Route } from "react-router-dom";
+import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
+import useAuthStore from "./store/useAuthStore";
 // import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./features/misc/pages/NotFoundPage";
@@ -18,7 +19,7 @@ import EmployeeCheckInCheckOut from './features/employee/pages/CheckInCheckOutPa
 import AttendanceAnalytics from './features/attendance/pages/AttendanceAnalyticsPage';
 import ScrollToTop from "./components/ScrollToTop";
 import Login from './features/auth/pages/LoginPage';
-import EmployeeDashboard from './features/employee/pages/EmployeeDashboardPage';
+
 import Profile from "./features/profile/pages/ProfilePage";
 import LandingPage from './features/landing/pages/LandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -43,16 +44,29 @@ import ClientAdmin from "components/ClientAdmin";
 import EmployeeAttendanceHistoryPage from "features/attendance/components/EmployeeAttandece";
 import IndividualEmployeeAttendance from "features/attendance/components/EmployeeAttandece";
 import NotificationsPage from "features/notifications/pages/NotificationsPage";
+import EmployeeDashboard from "features/employee/pages/EmployeeDashboardPage";
 
+const DashboardSwitcher = () => {
+  const { user } = useAuthStore();
+  const isAdmin = user?.roles?.some(r => ['Admin', 'Super Admin', 'Manager'].includes(r.name)) || user?.email === 'admin@difmo.com';
+  
+  if (isAdmin) {
+    return <Dashboard />;
+  }
+  return <EmployeeDashboard />;
+};
 
 const Routes = () => {
+  const { isAuthenticated } = useAuthStore();
   return (
     <BrowserRouter>
       <ErrorBoundary>
         <ScrollToTop />
         <RouterRoutes>
           {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />
+          } />
           <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
           <Route path="/pricing" element={<Pricing/>}/>
           <Route path="/features" element={<FeaturesPage/>}/>
@@ -62,14 +76,13 @@ const Routes = () => {
           {/* Protected Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <Dashboard />
+              <DashboardSwitcher />
             </ProtectedRoute>
           } />
           <Route path="/employee-dashboard" element={
             <ProtectedRoute>
               <EmployeeDashboard />
             </ProtectedRoute>
-
           } />
           <Route path="/employee/leaves" element={
             <ProtectedRoute>

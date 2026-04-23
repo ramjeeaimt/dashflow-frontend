@@ -39,7 +39,7 @@ const Dashboard = () => {
       // If user is Admin/Management, show company-wide metrics by passing null for userId
       const isAdminView = can('manage', 'access-control') || user.roles?.some(r => r.name === 'Admin') || user.email === 'admin@difmo.com';
       const fetchUserId = isAdminView ? null : user.id;
-      
+
       fetchDashboardData(user.company.id, isManagement, fetchUserId);
     }
   }, [user, fetchDashboardData, isManagement, can]);
@@ -139,7 +139,7 @@ const Dashboard = () => {
     },
   ];
 
-  const filteredQuickActions = quickActions.filter(action => 
+  const filteredQuickActions = quickActions.filter(action =>
     !action.permission || can(action.permission.action, action.permission.resource)
   );
 
@@ -165,7 +165,7 @@ const Dashboard = () => {
 
       <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-8`}>
         <div className="p-8 max-w-[1600px] mx-auto space-y-8">
-          
+
           {/* Management Metrics Row */}
           {isManagement && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">

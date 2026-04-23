@@ -47,7 +47,7 @@ const TaskTable = ({ tasks, onTaskSelect, onBulkAction, selectedTasks, onTaskCli
     if (!dateString) return 'NO_LIMIT';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'TBD_SCHEDULE';
-    
+
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: '2-digit',
@@ -77,7 +77,7 @@ const TaskTable = ({ tasks, onTaskSelect, onBulkAction, selectedTasks, onTaskCli
             />
           </div>
           <div className="space-y-0.5">
-             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 leading-none">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 leading-none">
               Data_Manifest
             </h3>
             {selectedTasks?.length > 0 && (
@@ -87,29 +87,29 @@ const TaskTable = ({ tasks, onTaskSelect, onBulkAction, selectedTasks, onTaskCli
             )}
           </div>
         </div>
-        
+
         {selectedTasks?.length > 0 && (
           <div className="flex items-center gap-2">
             <button
-               onClick={() => onBulkAction('priority', 'high')}
-               className="px-3 py-1.5 border-2 border-slate-900 text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2"
+              onClick={() => onBulkAction('priority', 'high')}
+              className="px-3 py-1.5 border-2 border-slate-900 text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2"
             >
               <Icon name="AlertTriangle" size={12} />
               Set_Critical
             </button>
             <button
-               onClick={() => onBulkAction('status', 'completed')}
-               className="px-3 py-1.5 border-2 border-slate-900 text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2"
+              onClick={() => onBulkAction('status', 'completed')}
+              className="px-3 py-1.5 border-2 border-slate-900 text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2"
             >
-               <Icon name="CheckCircle" size={12} />
-               Finalize
+              <Icon name="CheckCircle" size={12} />
+              Finalize
             </button>
             <button
-               onClick={() => onBulkAction('delete')}
-               className="px-3 py-1.5 border-2 border-red-600 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center gap-2"
+              onClick={() => onBulkAction('delete')}
+              className="px-3 py-1.5 border-2 border-red-600 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center gap-2"
             >
-               <Icon name="Trash2" size={12} />
-               Purge
+              <Icon name="Trash2" size={12} />
+              Purge
             </button>
           </div>
         )}
@@ -213,8 +213,8 @@ const TaskTable = ({ tasks, onTaskSelect, onBulkAction, selectedTasks, onTaskCli
                 <td className="px-6 py-5 text-right" onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <ActionButton icon="Eye" onClick={() => onTaskClick(task)} />
-                    <ActionButton icon="Edit" onClick={() => {}} />
-                    <ActionButton icon="Trash2" variant="danger" onClick={() => {}} />
+                    <ActionButton icon="Edit" onClick={() => { }} />
+                    <ActionButton icon="Trash2" variant="danger" onClick={() => { }} />
                   </div>
                 </td>
               </tr>
@@ -222,7 +222,7 @@ const TaskTable = ({ tasks, onTaskSelect, onBulkAction, selectedTasks, onTaskCli
           </tbody>
         </table>
       </div>
-      
+
       {tasks?.length === 0 && (
         <div className="text-center py-20 bg-slate-50 border-t-2 border-slate-900">
           <div className="inline-flex p-4 bg-slate-100 border-2 border-slate-900 mb-4">
@@ -245,10 +245,10 @@ const TableHead = ({ label, onSort, sortKey, currentSort }) => (
       className="flex items-center space-x-2 text-[10px] font-black tracking-[0.2em] text-slate-400 hover:text-white transition-colors uppercase group"
     >
       <span>{label}</span>
-      <Icon 
-        name={currentSort?.key === sortKey ? (currentSort?.direction === 'asc' ? 'ArrowUp' : 'ArrowDown') : 'ArrowUpDown'} 
-        size={10} 
-        className={currentSort?.key === sortKey ? 'text-blue-400' : 'text-slate-700 group-hover:text-slate-500'} 
+      <Icon
+        name={currentSort?.key === sortKey ? (currentSort?.direction === 'asc' ? 'ArrowUp' : 'ArrowDown') : 'ArrowUpDown'}
+        size={10}
+        className={currentSort?.key === sortKey ? 'text-blue-400' : 'text-slate-700 group-hover:text-slate-500'}
       />
     </button>
   </th>
@@ -257,11 +257,10 @@ const TableHead = ({ label, onSort, sortKey, currentSort }) => (
 const ActionButton = ({ icon, onClick, variant = 'default' }) => (
   <button
     onClick={onClick}
-    className={`p-2 border-2 transition-all active:scale-90 ${
-      variant === 'danger' 
-        ? 'border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600' 
+    className={`p-2 border-2 transition-all active:scale-90 ${variant === 'danger'
+        ? 'border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600'
         : 'border-slate-200 text-slate-400 hover:bg-slate-900 hover:text-white hover:border-slate-900'
-    }`}
+      }`}
   >
     <Icon name={icon} size={14} strokeWidth={3} />
   </button>

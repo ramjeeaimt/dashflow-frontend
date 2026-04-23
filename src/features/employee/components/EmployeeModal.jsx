@@ -81,6 +81,8 @@ const EmployeeModal = ({
         skills: employee?.skills || [],
         avatar: employee?.avatar || '',
         checkInTime: employee?.checkInTime || '',
+        designationId: employee?.designationId || '',
+        customDesignation: '',
         documents: employee?.documents || [] // Load existing docs
       });
     } else if (mode === 'add') {
@@ -90,6 +92,8 @@ const EmployeeModal = ({
         email: '',
         phone: '',
         department: '',
+        designationId: '',
+        customDesignation: '',
         roleIds: [],
         permissionIds: [],
         employmentType: 'full-time',
@@ -128,7 +132,27 @@ const EmployeeModal = ({
         setRoles(rolesData);
 
         const designsData = designRes.data?.data || designRes.data || [];
-        setDesignations(designsData.map(d => ({ value: d.id, label: d.name })));
+        const fetchedDesignations = designsData.map(d => ({ value: d.id, label: d.name }));
+        
+        // Add requested designations as defaults if not already present
+        const requestedDesignations = [
+          'Software Engineer',
+          'DevOps Engineer',
+          'Software Tester',
+          'UI & UX Designer'
+        ];
+        
+        const finalDesignations = [...fetchedDesignations];
+        requestedDesignations.forEach(name => {
+          if (!fetchedDesignations.some(d => d.label === name)) {
+            finalDesignations.push({ value: name, label: name });
+          }
+        });
+        
+        // Add "Other" option
+        finalDesignations.push({ value: 'other', label: 'Other' });
+        
+        setDesignations(finalDesignations);
 
         const deptsData = deptRes.data?.data || deptRes.data || [];
         setDepartments(deptsData.map(d => ({ value: d.id, label: d.name })));
@@ -301,8 +325,11 @@ const EmployeeModal = ({
     setIsSaving(true);
     setIsLoading(true);
     try {
+      const finalDesignationId = formData.designationId === 'other' ? formData.customDesignation : formData.designationId;
+      
       const employeeData = {
         ...formData,
+        designationId: finalDesignationId,
         name: `${formData?.firstName} ${formData?.lastName}`?.trim(),
         id: employee?.id || Date.now()
       };
@@ -486,6 +513,20 @@ const EmployeeModal = ({
                                <Icon name="ChevronDown" size={14} />
                              </div>
                            </div>
+
+                           {/* Show custom designation input if "other" is selected */}
+                           {f.key === 'designationId' && formData.designationId === 'other' && (
+                             <div className="mt-3 animate-in slide-in-from-top-1 duration-200">
+                               <input
+                                 type="text"
+                                 placeholder="Enter custom designation..."
+                                 className="w-full px-4 py-2.5 bg-white border border-blue-200 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                                 value={formData.customDesignation || ''}
+                                 onChange={(e) => handleInputChange('customDesignation', e.target.value)}
+                                 disabled={isReadOnly}
+                               />
+                             </div>
+                           )}
                         </div>
                       ))}
                       <div className="space-y-2">

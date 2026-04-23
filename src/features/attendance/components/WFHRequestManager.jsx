@@ -43,6 +43,18 @@ const WorkFromHomeRequestManager = () => {
         }
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this request permanently?')) return;
+        try {
+            await api.delete(API_ENDPOINTS.WFH_REQUESTS.BY_ID(id));
+            toast.success('Request deleted');
+            fetchPendingRequests();
+        } catch (error) {
+            console.error('Failed to delete request:', error);
+            toast.error('Delete failed');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -114,6 +126,14 @@ const WorkFromHomeRequestManager = () => {
                                     </div>
                                     
                                     <div className="flex items-center space-x-2">
+                                        <button 
+                                            onClick={() => handleDelete(req.id)}
+                                            className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                                            title="Delete permanently"
+                                        >
+                                            <Icon name="Trash2" size={18} />
+                                        </button>
+                                        <div className="h-6 w-[1px] bg-slate-100 mx-1" />
                                         <button 
                                             onClick={() => handleAction(req.id, 'REJECTED')}
                                             className="p-3 bg-rose-50 text-rose-500 hover:bg-rose-100 rounded-xl transition-all"

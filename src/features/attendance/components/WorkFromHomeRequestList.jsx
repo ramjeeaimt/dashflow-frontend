@@ -22,6 +22,18 @@ const WorkFromHomeRequestList = ({ employeeId }) => {
         }
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this historical request record?')) return;
+        try {
+            await api.delete(API_ENDPOINTS.WFH_REQUESTS.BY_ID(id));
+            toast.success('Record deleted');
+            fetchRequests();
+        } catch (error) {
+            console.error('Failed to delete request:', error);
+            toast.error('Delete failed');
+        }
+    };
+
     useEffect(() => {
         fetchRequests();
     }, [employeeId]);
@@ -62,6 +74,7 @@ const WorkFromHomeRequestList = ({ employeeId }) => {
                             <th className="px-8 py-4">Reason</th>
                             <th className="px-8 py-4">Status</th>
                             <th className="px-8 py-4">Admin Remarks</th>
+                            <th className="px-8 py-4 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -89,6 +102,15 @@ const WorkFromHomeRequestList = ({ employeeId }) => {
                                     ) : (
                                         <span className="text-[10px] text-slate-300 font-bold uppercase tracking-tighter">No remarks</span>
                                     )}
+                                </td>
+                                <td className="px-8 py-5 text-right">
+                                    <button 
+                                        onClick={() => handleDelete(req.id)}
+                                        className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                                        title="Delete Record"
+                                    >
+                                        <Icon name="Trash2" size={16} />
+                                    </button>
                                 </td>
                             </tr>
                         ))}

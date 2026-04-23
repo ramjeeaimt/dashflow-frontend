@@ -12,14 +12,15 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
   const activeItem = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, can } = useAuthStore();
+  const isAdmin = user?.roles?.some(r => ['Admin', 'Super Admin', 'Manager'].includes(r.name)) || user?.email === 'admin@difmo.com';
   const comingSoonPaths = [];
 
   const allNavigationItems = [
     {
-      label: 'Dashboard',
+      label: isAdmin ? 'Dashboard' : 'Dashboard',
       path: '/dashboard',
-      icon: 'LayoutDashboard',
-      tooltip: 'Analytics overview and metrics',
+      icon: isAdmin ? 'LayoutDashboard' : 'UserCircle',
+      tooltip: isAdmin ? 'Analytics overview and metrics' : 'Personal attendance dashboard',
       permission: { action: 'read', resource: 'dashboard' },
       alwaysShow: true // Personal dashboard for everyone
     },
@@ -42,7 +43,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       path: '/employee/leaves',
       icon: 'Calendar',
       tooltip: 'Apply and track leaves',
-      permission: { action: 'read', resource: 'personal_leaves' },
+      permission: { action: 'read', resource: 'leave' },
       alwaysShow: true
     },
     {
@@ -57,14 +58,14 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       path: '/employee-attendance',
       icon: 'CalendarCheck',
       tooltip: 'My daily attendance',
-      permission: { action: 'read', resource: 'personal_attendance' },
+      permission: { action: 'read', resource: 'attendance' },
       alwaysShow: true
     },
     {
       label: 'Client',
       path: '/client-management',
       icon: 'Briefcase',
-      permission: { action: 'read', resource: 'client' }
+      permission: { action: 'manage', resource: 'client' }
     },
     {
       label: 'Tasks',
@@ -85,42 +86,36 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       path: '/projects',
       icon: 'Folder',
       tooltip: 'Manage projects and assignments',
-      permission: { action: 'read', resource: 'project' }
+      permission: { action: 'manage', resource: 'project' }
     },
     {
       label: 'Monitoring',
       path: '/monitoring-dashboard',
       icon: 'Monitor',
       tooltip: 'Advanced oversight capabilities',
-      permission: { action: 'read', resource: 'monitoring' }
+      permission: { action: 'manage', resource: 'monitoring' }
     },
     {
       label: 'Attendance Analytics',
       path: '/attendance-analytics',
       icon: 'LineChart',
       tooltip: 'Detailed attendance reports',
-      permission: { action: 'read', resource: 'attendance' }
+      permission: { action: 'manage', resource: 'attendance' }
     },
-    {
-      label: 'My Check-in',
-      path: '/employee-dashboard',
-      icon: 'UserCircle',
-      tooltip: 'Personal attendance dashboard',
-      alwaysShow: true
-    },
+
     {
       label: 'Payroll',
       path: '/payroll',
       icon: 'Calculator',
       tooltip: 'Financial processing',
-      permission: { action: 'read', resource: 'payroll' }
+      permission: { action: 'manage', resource: 'payroll' }
     },
     {
       label: 'My Payroll',
       path: '/employee/payroll',
       icon: 'Calculator',
       tooltip: 'View my payslips',
-      permission: { action: 'read', resource: 'personal_payroll' },
+      permission: { action: 'read', resource: 'payroll' },
       alwaysShow: true
     },
     {
@@ -128,7 +123,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       path: '/finance',
       icon: 'DollarSign',
       tooltip: 'Revenue and Expense tracking',
-      permission: { action: 'read', resource: 'expense' }
+      permission: { action: 'manage', resource: 'expense' }
     },
     {
       label: 'Company Profile',
@@ -157,7 +152,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
   const navigationItems = allNavigationItems.filter(item => {
     if (item.alwaysShow) return true;
     if (!item.permission) return false;
-    return can(item.permission.action, item.permission.resource);
+    return user?.roles?.some(r => ['Admin', 'Super Admin'].includes(r.name)) || user?.email === 'admin@difmo.com' || can(item.permission.action, item.permission.resource);
   });
 
   const handleNavigation = (path) => {
@@ -180,21 +175,15 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
       <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex-col bg-card border-r border-border transition-all duration-300 ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
         }`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between p-4 border-b border-border min-h-[64px]">
           {!isCollapsed && (
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Icon name="Building2" size={20} color="white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-foreground">CRM HRM</h1>
-                <p className="text-xs text-muted-foreground">Productivity System</p>
-              </div>
+               <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-10 w-auto object-contain" />
             </div>
           )}
           {isCollapsed && (
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mx-auto">
-              <Icon name="Building2" size={20} color="white" />
+            <div className="flex items-center justify-center w-full">
+               <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-8 w-8 object-contain" />
             </div>
           )}
           <button

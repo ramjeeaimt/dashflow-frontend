@@ -6,6 +6,7 @@ import Header from "components/ui/Header";
 import Sidebar from "components/ui/Sidebar";
 import WFHRequestModal from "./WFHRequestModal";
 import WorkFromHomeRequestList from "./WorkFromHomeRequestList";
+import Icon from "../../../components/AppIcon";
 
 
 const AttendanceHistory = () => {
@@ -16,6 +17,7 @@ const AttendanceHistory = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isWFHModalOpen, setIsWFHModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('logs');
 
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -60,50 +62,50 @@ const AttendanceHistory = () => {
   return (
     <div className="p-6 bg-slate-50/50 min-h-screen font-sans text-slate-900">
       <div className="max-w-6xl mx-auto space-y-6">
-        
+
         {/* Header Section */}
         <div>
-            <Header/>
+          <Header />
         </div>
 
         <div>
-            <Sidebar/>
+          <Sidebar />
         </div>
         <div className="flex flex-col ml-56  md:flex-row justify-between items-center gap-4">
           <h1 className="text-2xl font-bold tracking-tight text-slate-800">Attendance Overview</h1>
-          
+
           <div className="flex items-center gap-2 mt-20  w-full md:w-auto bg-white p-1 rounded-lg border border-slate-200">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-              <input 
+              <input
                 type="text"
                 placeholder="Search..."
                 className="text-xs pl-8 pr-3 py-2 outline-none w-full md:w-44 border-r border-slate-100"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <select 
-              value={selectedMonth} 
+            <select
+              value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="text-xs font-bold px-2 py-2 outline-none bg-transparent cursor-pointer"
             >
               {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
             </select>
-            <select 
-              value={selectedYear} 
+            <select
+              value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
               className="text-xs font-bold px-2 py-2 outline-none bg-transparent cursor-pointer"
             >
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
-            <button 
+            <button
               onClick={() => setIsWFHModalOpen(true)}
               className="bg-indigo-600 text-white px-4 py-2 rounded text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
             >
               Request Work From Home
             </button>
             <button className="bg-slate-900 text-white px-4 py-2 rounded text-[11px] font-bold uppercase tracking-wider flex items-center gap-2">
-              <FileDown size={14}/> Export
+              <FileDown size={14} /> Export
             </button>
           </div>
         </div>
@@ -116,66 +118,93 @@ const AttendanceHistory = () => {
           <StatCard label="Working Days" value={filteredData.length} color="text-slate-800" sub="In this month" />
         </div>
 
-        {/* Professional Table Container */}
-        <div className="bg-white border ml-44 border-slate-200 rounded-lg overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                <th className="p-4">Log Date</th>
-                <th className="p-4">Shift Status</th>
-                <th className="p-4 text-center">Timing (In - Out)</th>
-                <th className="p-4">Duration</th>
-                <th className="p-4 text-right">Location</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading ? (
-                <tr><td colSpan="5" className="p-12 text-center text-xs font-bold text-slate-300 uppercase tracking-widest">Refreshing logs...</td></tr>
-              ) : filteredData.length > 0 ? filteredData.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-50/80 transition-all group cursor-default">
-                  <td className="p-4">
-                    <div className="text-sm font-bold text-slate-900">{new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{new Date(log.date).toLocaleDateString('en-GB', { weekday: 'long' })}</div>
-                  </td>
-                  <td className="p-4">
-                    <span className={`text-[9px] font-black px-2.5 py-1 rounded border uppercase tracking-wider ${
-                      log.status === "wfh" ? "text-indigo-600 border-indigo-100 bg-indigo-50" :
-                      log.isLate ? "text-amber-600 border-amber-100 bg-amber-50" : "text-emerald-600 border-emerald-100 bg-emerald-50"
-                    }`}>
-                      {log.status === "wfh" ? "WFH" : log.isLate ? "LATE ENTRY" : "ON TIME"}
-                    </span>
-                  </td>
-                  <td className="p-4 text-center">
-                    <div className="text-xs font-bold text-slate-700 flex items-center justify-center gap-2">
-                       {log.checkInTime || "--:--"} <span className="text-slate-200">→</span> {log.checkOutTime || "--:--"}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                      <Clock size={12} className="text-indigo-400" /> {log.workHours || "0.0"} hrs
-                    </div>
-                  </td>
-                   <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 font-medium">
-                      {log.location === 'WFH' ? <Icon name="Home" size={12} className="text-indigo-400" /> : <MapPin size={12} />}
-                      {log.location || (log.status === 'wfh' ? 'WFH' : 'Office')}
-                    </div>
-                  </td>
-                </tr>
-              )) : (
-                <tr><td colSpan="5" className="p-16 text-center text-sm text-slate-400 font-medium italic">No attendance history found for this period.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        {/* Tab System */}
+        <div className="ml-44 bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+          <div className="flex border-b border-slate-100 bg-slate-50/30">
+            <button
+              onClick={() => setActiveTab('logs')}
+              className={`flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'logs'
+                  ? 'bg-white text-indigo-600 border-b-2 border-indigo-600'
+                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                }`}
+            >
+              <Calendar size={14} />
+              Attendance Logs
+            </button>
+            <button
+              onClick={() => setActiveTab('wfh')}
+              className={`flex-1 flex items-center justify-center gap-2 py-4 text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'wfh'
+                  ? 'bg-white text-indigo-600 border-b-2 border-indigo-600'
+                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                }`}
+            >
+              <MapPin size={14} />
+              WFH Requests
+            </button>
+          </div>
 
-        {/* Work From Home Request History */}
-        <div className="ml-44">
-           <WorkFromHomeRequestList employeeId={user?.id} />
+          <div className="p-0">
+            {activeTab === 'logs' ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                      <th className="p-4 pl-6">Log Date</th>
+                      <th className="p-4">Shift Status</th>
+                      <th className="p-4 text-center">Timing (In - Out)</th>
+                      <th className="p-4">Duration</th>
+                      <th className="p-4 pr-6 text-right">Location</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {loading ? (
+                      <tr><td colSpan="5" className="p-12 text-center text-xs font-bold text-slate-300 uppercase tracking-widest">Refreshing logs...</td></tr>
+                    ) : filteredData.length > 0 ? filteredData.map((log) => (
+                      <tr key={log.id} className="hover:bg-slate-50/80 transition-all group cursor-default">
+                        <td className="p-4 pl-6">
+                          <div className="text-sm font-bold text-slate-900">{new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{new Date(log.date).toLocaleDateString('en-GB', { weekday: 'long' })}</div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`text-[9px] font-black px-2.5 py-1 rounded border uppercase tracking-wider ${log.status === "wfh" ? "text-indigo-600 border-indigo-100 bg-indigo-50" :
+                              log.isLate ? "text-amber-600 border-amber-100 bg-amber-50" : "text-emerald-600 border-emerald-100 bg-emerald-50"
+                            }`}>
+                            {log.status === "wfh" ? "WFH" : log.isLate ? "LATE ENTRY" : "ON TIME"}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <div className="text-xs font-bold text-slate-700 flex items-center justify-center gap-2">
+                            {log.checkInTime || "--:--"} <span className="text-slate-200">→</span> {log.checkOutTime || "--:--"}
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                            <Clock size={12} className="text-indigo-400" /> {log.workHours || "0.0"} hrs
+                          </div>
+                        </td>
+                        <td className="p-4 pr-6 text-right">
+                          <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 font-medium">
+                            {log.location === 'WFH' ? <Icon name="Home" size={12} className="text-indigo-400" /> : <MapPin size={12} />}
+                            {log.location || (log.status === 'wfh' ? 'WFH' : 'Office')}
+                          </div>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr><td colSpan="5" className="p-16 text-center text-sm text-slate-400 font-medium italic">No attendance history found for this period.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-6 bg-white min-h-[400px]">
+                <WorkFromHomeRequestList employeeId={user?.id} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      
-      <WFHRequestModal 
+
+      <WFHRequestModal
         isOpen={isWFHModalOpen}
         onClose={() => setIsWFHModalOpen(false)}
         employeeId={user?.id}

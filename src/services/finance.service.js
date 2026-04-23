@@ -112,6 +112,14 @@ const financeService = {
         const response = await apiClient.delete(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}`);
         return response.data;
     },
+    updateLeave: async (id, data) => {
+        const response = await apiClient.patch(`${API_ENDPOINTS.LEAVES.BASE}/${id}`, data);
+        return response.data;
+    },
+    deleteLeave: async (id) => {
+        const response = await apiClient.delete(`${API_ENDPOINTS.LEAVES.BASE}/${id}`);
+        return response.data;
+    },
 };
 
 export default financeService;

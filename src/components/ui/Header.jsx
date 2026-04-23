@@ -2,132 +2,71 @@ import React, { useState } from 'react';
 import Icon from '../AppIcon';
 import UserProfileDropdown from './UserProfileDropdown';
 import NotificationCenter from './NotificationCenter';
-
 import useAuthStore from '../../store/useAuthStore';
-import { path } from 'd3';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuthStore();
   const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin'].includes(r.name));
-  const isEmployee = user?.roles?.some(r => r.name === 'Employee');
 
-  let navigationItems = [];
-  let moreItems = [];
-
-  // Employee only view if employee AND NOT admin
-  if (isEmployee && !isAdmin) {
-    navigationItems = [
-      { label: 'Dashboard', path: '/employee-dashboard', icon: 'LayoutDashboard' }
-    ];
-    moreItems = [];
-  } else {
-    navigationItems = [
-      { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
-      { label: 'Employees', path: '/employee-management', icon: 'Users' },
-      { label: 'Tasks', path: '/task-management', icon: 'CheckSquare' },
-      { label: 'Time Tracking', path: '/time-tracking', icon: 'Clock' },
-      { label: 'Project', path: '/projects', icon: 'Folder' }
-    ];
-
-    moreItems = [
-      { label: 'Monitoring', path: '/monitoring-dashboard', icon: 'Monitor' },
-      { label: 'Payroll', path: '/payroll', icon: 'DollarSign' },
-      { label: 'Settings', path: '/settings', icon: 'Settings' },
-    ];
-  }
+  const getPageTitle = () => {
+    const path = window.location.pathname;
+    if (path.includes('/dashboard')) return isAdmin ? 'Admin Dashboard' : 'Dashboard';
+    if (path.includes('/employee-dashboard')) return 'Employee Dashboard';
+    if (path.includes('/employee-management')) return 'Employee Management';
+    if (path.includes('/attendance-management') || path.includes('/attendance')) return 'Attendance Management';
+    if (path.includes('/employee/leaves') || path.includes('/admin/leaves')) return 'Leave Management';
+    if (path.includes('/payroll')) return 'Payroll Management';
+    if (path.includes('/task-management')) return 'Task Management';
+    if (path.includes('/projects')) return 'Project Management';
+    if (path.includes('/settings')) return 'Settings';
+    if (path.includes('/monitoring')) return 'Monitoring Dashboard';
+    return 'CRM HRM';
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleNavigation = (path) => {
-    window.location.href = path;
-    setIsMobileMenuOpen(false);
-  };
-
   return (
-    <header className="fixed top-0 left-0 right-0 bg-card border-b border-border z-50 h-16">
-      <div className="flex items-center justify-between h-full px-6">
-        {/* Logo Section */}
-        <div className="flex items-center">
-          <div className="flex items-center space-x-3">
-            <div className=" bg-primary flex items-center justify-center">
-            </div>
-            <div className="hidden  sm:block">
-              {/* <h1 className="text-lg font-semibold text-foreground">CRM HRM</h1> */}
-              <img className='font-semibold h-20 w-40 ' src="https://tse3.mm.bing.net/th/id/OIP.gVbcFQ5WNdo2VRntRihUSwHaFo?pid=ImgDet&w=194&h=147&c=7&o=7&rm=3" alt="" />
+    <header className="fixed top-0 left-0 right-0 bg-card border-b border-border z-50 h-16 shadow-sm">
+      <div className="relative flex items-center justify-between h-full px-6">
 
-              {/* <p className="text-xs text-muted-foreground -mt-1">Productivity System</p> */}
-            </div>
+        {/* Left: Logo Section */}
+        <div className="flex items-center">
+          <div className="hidden sm:block">
+            <img className='h-14 w-auto object-contain' src="/assets/images/crm.logo1.png" alt="CRM Logo" />
           </div>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1">
-          {navigationItems?.map((item) => (
-            <button
-              key={item?.path}
-              onClick={() => handleNavigation(item?.path)}
-              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors duration-150"
-            >
-              <Icon name={item?.icon} size={16} />
-              <span>{item?.label}</span>
-            </button>
-          ))}
+        {/* Center: Dynamic Page Title (Absolute Centered) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center whitespace-nowrap">
+          <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase tracking-[0.1em]">
+            {getPageTitle()}
+          </h2>
+        </div>
 
-          {/* More Dropdown */}
-          <div className="relative group">
-            <button className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors duration-150">
-              <Icon name="MoreHorizontal" size={16} />
-              <span>More</span>
-            </button>
-            <div className="absolute top-full right-0 mt-1 w-48 bg-popover border border-border rounded-lg dropdown-shadow opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-              <div className="py-2">
-                {moreItems?.map((item) => (
-                  <button
-                    key={item?.path}
-                    onClick={() => handleNavigation(item?.path)}
-                    className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-popover-foreground hover:bg-muted transition-colors duration-150"
-                  >
-                    <Icon name={item?.icon} size={16} />
-                    <span>{item?.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </nav>
-
-        {/* Right Section */}
-        <div className="flex items-center space-x-4">
+        {/* Right Section: Notifications & Profile */}
+        <div className="flex items-center space-x-3">
           <NotificationCenter />
           <UserProfileDropdown />
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button (Optional, can be removed if sidebar is main nav) */}
           <button
             onClick={toggleMobileMenu}
-            className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors duration-150"
+            className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
           >
             <Icon name={isMobileMenuOpen ? "X" : "Menu"} size={20} />
           </button>
         </div>
       </div>
-      {/* Mobile Navigation */}
+
+      {/* Mobile Menu (Optional, can be removed if empty) */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-card border-b border-border dropdown-shadow">
-          <nav className="py-4 px-6 space-y-2">
-            {[...navigationItems, ...moreItems]?.map((item) => (
-              <button
-                key={item?.path}
-                onClick={() => handleNavigation(item?.path)}
-                className="flex items-center space-x-3 w-full px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors duration-150"
-              >
-                <Icon name={item?.icon} size={18} />
-                <span>{item?.label}</span>
-              </button>
-            ))}
-          </nav>
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-card border-b border-border shadow-xl p-4">
+          <p className="text-[10px] font-black text-slate-400 text-center uppercase tracking-widest">
+            Navigation managed via sidebar
+          </p>
         </div>
       )}
     </header>
