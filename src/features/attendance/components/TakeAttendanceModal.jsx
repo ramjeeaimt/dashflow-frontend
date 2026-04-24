@@ -27,6 +27,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                         status: 'present', // Default to present
                         checkInTime: '09:00',
                         checkOutTime: '',
+                        label: '',
                         isExisting: false
                     };
                 }
@@ -60,6 +61,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                 status: data.status,
                 checkInTime: data.checkInTime,
                 checkOutTime: data.checkOutTime,
+                label: data.label,
                 date: new Date().toISOString().split('T')[0]
             }));
 
@@ -103,9 +105,10 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                             <div className="col-span-4 flex items-center space-x-2">
                                 <span>Employee</span>
                             </div>
-                            <div className="col-span-4">Attendance Status</div>
+                            <div className="col-span-3">Attendance Status</div>
                             <div className="col-span-2">Time In</div>
-                            <div className="col-span-2">Time Out</div>
+                            <div className="col-span-1">Time Out</div>
+                            <div className="col-span-2">Label</div>
                         </div>
 
                         <div className="space-y-3">
@@ -126,7 +129,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                         </div>
 
                                         {/* Status Selection */}
-                                        <div className="col-span-4">
+                                        <div className="col-span-3">
                                             {isExisting ? (
                                                 <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg w-fit">
                                                     <Icon name="Check" size={12} className="text-blue-600" />
@@ -138,7 +141,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                                         <button
                                                             key={status}
                                                             onClick={() => handleStatusChange(emp.id, status)}
-                                                            className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all border active:scale-95 ${data.status === status
+                                                            className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-lg transition-all border active:scale-95 ${data.status === status
                                                                 ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-100'
                                                                 : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
                                                                 }`}
@@ -162,13 +165,25 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                         </div>
 
                                         {/* Time Out */}
-                                        <div className="col-span-2">
+                                        <div className="col-span-1">
                                             <input
                                                 type="time"
                                                 value={data.checkOutTime || ''}
                                                 onChange={(e) => handleTimeChange(emp.id, 'checkOutTime', e.target.value)}
                                                 disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
                                                 className="w-full px-4 py-2 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
+                                            />
+                                        </div>
+
+                                        {/* Label */}
+                                        <div className="col-span-2">
+                                            <input
+                                                type="text"
+                                                value={data.label || ''}
+                                                onChange={(e) => handleTimeChange(emp.id, 'label', e.target.value)}
+                                                placeholder="Label..."
+                                                disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
+                                                className="w-full px-4 py-2 text-[10px] font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none disabled:opacity-30 transition-all"
                                             />
                                         </div>
                                     </div>

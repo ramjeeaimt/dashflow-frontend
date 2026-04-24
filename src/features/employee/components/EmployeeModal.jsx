@@ -36,6 +36,8 @@ const EmployeeModal = ({
     skills: [],
     avatar: '',
     checkInTime: '',
+    startTime: '',
+    endTime: '',
     documents: [] // Added for document management
   });
 
@@ -81,6 +83,8 @@ const EmployeeModal = ({
         skills: employee?.skills || [],
         avatar: employee?.avatar || '',
         checkInTime: employee?.checkInTime || '',
+        startTime: employee?.startTime || '',
+        endTime: employee?.endTime || '',
         designationId: employee?.designationId || '',
         customDesignation: '',
         documents: employee?.documents || [] // Load existing docs
@@ -109,6 +113,8 @@ const EmployeeModal = ({
         avatar: '',
         profileImage:'',
         checkInTime: '',
+        startTime: '09:00',
+        endTime: '18:00',
         employeeType: 'office',
         workFromHome: false,
         documents: []
@@ -562,7 +568,7 @@ const EmployeeModal = ({
                          </div>
                       </div>
 
-                      <div className="space-y-2">
+                       <div className="space-y-2">
                          <label className="text-xs font-semibold text-slate-500 ml-1">Work From Home</label>
                          <div className="flex items-center space-x-3 pt-1">
                            <button
@@ -574,6 +580,55 @@ const EmployeeModal = ({
                            </button>
                            <span className="text-xs font-semibold text-slate-600">{formData.workFromHome ? 'Enabled' : 'Disabled'}</span>
                          </div>
+                      </div>
+
+                      {/* Working Hours - Added Square Styling */}
+                      <div className="col-span-1 md:col-span-2 pt-4">
+                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-none space-y-6">
+                           <div className="flex items-center space-x-3 border-b border-slate-200 pb-4">
+                              <div className="w-8 h-8 bg-blue-100 text-blue-600 flex items-center justify-center rounded-none border border-blue-200">
+                                 <Icon name="Clock" size={16} />
+                              </div>
+                              <div>
+                                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Employee Working Hours</h4>
+                                 <p className="text-[10px] text-slate-400 font-medium">Define the daily schedule for this employee</p>
+                              </div>
+                           </div>
+                           
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              <div className="space-y-3">
+                                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-tight ml-0.5">Start Time</label>
+                                 <div className="relative group">
+                                    <input 
+                                      type="time" 
+                                      value={formData.startTime} 
+                                      onChange={(e) => handleInputChange('startTime', e.target.value)}
+                                      disabled={isReadOnly}
+                                      className="w-full px-4 py-3 bg-white border border-slate-200 text-sm font-bold rounded-none focus:ring-0 focus:border-blue-500 outline-none transition-all hover:border-slate-300"
+                                    />
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-blue-500 transition-colors">
+                                       <Icon name="LogIn" size={14} />
+                                    </div>
+                                 </div>
+                              </div>
+                              
+                              <div className="space-y-3">
+                                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-tight ml-0.5">End Time</label>
+                                 <div className="relative group">
+                                    <input 
+                                      type="time" 
+                                      value={formData.endTime} 
+                                      onChange={(e) => handleInputChange('endTime', e.target.value)}
+                                      disabled={isReadOnly}
+                                      className="w-full px-4 py-3 bg-white border border-slate-200 text-sm font-bold rounded-none focus:ring-0 focus:border-blue-500 outline-none transition-all hover:border-slate-300"
+                                    />
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-blue-500 transition-colors">
+                                       <Icon name="LogOut" size={14} />
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
                       </div>
                    </div>
 

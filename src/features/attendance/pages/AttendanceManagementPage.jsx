@@ -49,8 +49,10 @@ const AttendanceManagement = () => {
 
   const handleCheckIn = async (employeeId) => {
     if (!window.confirm('Are you sure you want to check in this employee?')) return;
+    const label = window.prompt('Enter check-in label/reason (e.g. Late check, etc.):');
+    if (label === null) return;
     try {
-      await checkIn(employeeId, user.company.id);
+      await checkIn(employeeId, user.company.id, label);
       alert('Check-in successful');
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to check in');
@@ -59,10 +61,12 @@ const AttendanceManagement = () => {
 
   const handleCheckOut = async (attendanceId) => {
     if (!window.confirm('Are you sure you want to check out this employee?')) return;
+    const label = window.prompt('Enter check-out label/reason (e.g. Early departure, Finished work, etc.):');
+    if (label === null) return;
     const notes = window.prompt('Enter checkout notes (optional):');
     if (notes === null) return;
     try {
-      await checkOut(attendanceId, user.company.id, notes);
+      await checkOut(attendanceId, user.company.id, notes, label);
       alert('Check-out successful');
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to check out');
@@ -104,9 +108,29 @@ const AttendanceManagement = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  const handleBulkAction = (action, employeeIds) => {
-    console.log(`Bulk action ${action} for employees:`, employeeIds);
-    alert('Bulk action executed');
+  const handleBulkAction = async (action, employeeIds) => {
+    if (!employeeIds || employeeIds.length === 0) {
+      alert('Please select employees first');
+      return;
+    }
+
+    if (action === 'mark_present') {
+      const label = window.prompt('Enter label/reason for bulk check-in (e.g. On Time, Training, etc.):');
+      if (label === null) return;
+      try {
+        await useAttendanceStore.getState().bulkCheckIn(employeeIds, user.company.id, 'Bulk Check-in', label);
+        alert(`Successfully marked ${employeeIds.length} employees as present`);
+      } catch (error) {
+        alert('Failed to execute bulk check-in');
+      }
+    } else if (action === 'mark_absent') {
+      // Logic for mark absent can be added here if needed, 
+      // but usually bulk check-in is for present status.
+      alert('Bulk mark absent logic coming soon');
+    } else {
+      console.log(`Bulk action ${action} for employees:`, employeeIds);
+      alert(`Action ${action} executed`);
+    }
   };
 
   const handleExportReport = () => {

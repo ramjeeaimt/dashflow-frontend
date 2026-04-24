@@ -113,9 +113,9 @@ const useAttendanceStore = create((set, get) => ({
         set({ filteredData: filtered });
     },
 
-    checkIn: async (employeeId, companyId) => {
+    checkIn: async (employeeId, companyId, label) => {
         try {
-            await attendanceService.checkIn(employeeId, 'Office', 'Manual Check-in');
+            await attendanceService.checkIn(employeeId, 'Office', 'Manual Check-in', null, null, label);
             await get().fetchAttendanceData(companyId);
             return true;
         } catch (error) {
@@ -123,9 +123,9 @@ const useAttendanceStore = create((set, get) => ({
         }
     },
 
-    checkOut: async (attendanceId, companyId, notes) => {
+    checkOut: async (attendanceId, companyId, notes, label) => {
         try {
-            await attendanceService.checkOut(attendanceId, notes || 'Manual Check-out');
+            await attendanceService.checkOut(attendanceId, notes || 'Manual Check-out', null, null, label);
             await get().fetchAttendanceData(companyId);
             return true;
         } catch (error) {
@@ -147,9 +147,9 @@ const useAttendanceStore = create((set, get) => ({
         }
     },
 
-    bulkCheckIn: async (employeeIds, companyId, notes) => {
+    bulkCheckIn: async (employeeIds, companyId, notes, label) => {
         try {
-            await attendanceService.bulkCheckIn(employeeIds, notes);
+            await attendanceService.bulkCheckIn(employeeIds, notes, label);
             await get().fetchAttendanceData(companyId);
             return true;
         } catch (error) {

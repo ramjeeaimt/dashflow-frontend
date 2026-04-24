@@ -41,7 +41,7 @@ const EmployeeDashboard = () => {
     const { user, isAuthenticated } = useAuthStore();
     const [currentTime, setCurrentTime] = useState(new Date());
 
-    
+
 
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/dashboard' }
@@ -105,7 +105,7 @@ const EmployeeDashboard = () => {
                     address: 'GPS coordinates retrieved.',
                     verified: true
                 });
-                
+
                 // Also update the string location for backward compatibility
                 setLocation(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
                 setGeoLoading(false);
@@ -394,7 +394,7 @@ const EmployeeDashboard = () => {
                             </div>
 
                             {/* Location Verification & Details */}
-                            <LocationVerification 
+                            <LocationVerification
                                 location={locationData}
                                 onRefreshLocation={getUserLocation}
                                 workMode={employee?.employeeType || 'office'}
