@@ -23,6 +23,15 @@ const TaskManagement = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
   const [isLoading, setIsLoading] = useState(true);
   const [employees, setEmployees] = useState([]);
   const { user } = useAuthStore();
@@ -196,15 +205,18 @@ const TaskManagement = () => {
     setIsTaskModalOpen(true);
   };
 
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar 
         isCollapsed={sidebarCollapsed} 
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+        onToggleCollapse={handleToggleSidebar} 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-8 flex flex-col min-h-screen`}>
-        <div className="p-6 flex-1 flex flex-col">
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 flex flex-col min-h-screen`}>
+        <div className="p-4 sm:p-6 flex-1 flex flex-col">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center">

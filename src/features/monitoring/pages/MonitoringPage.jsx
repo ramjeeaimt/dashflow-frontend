@@ -70,6 +70,12 @@ const MonitoringDashboard = () => {
 
   const selectedEmployee = employees?.find((emp) => emp?.workMode === 'WFH') || employees?.[0];
   
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
   const breadcrumbItems = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Monitoring', path: '/monitoring-dashboard' }
@@ -77,14 +83,16 @@ const MonitoringDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
-        onToggleCollapse={handleSidebarToggle} />
+        onToggleCollapse={handleSidebarToggle}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-      <main className={`pt-16 pb-20 lg:pb-8 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'}`
-      }>
-        <div className="p-6">
+      <main className={`pt-16 pb-8 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'}`}>
+        <div className="p-4 sm:p-6">
           <BreadcrumbNavigation items={breadcrumbItems} />
 
           {/* Page Header */}

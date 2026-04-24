@@ -119,12 +119,27 @@ const ProjectEdit = () => {
         { label: "Edit Project", path: `/edit-project/${id}` }
     ];
 
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+    const toggleMobileSidebar = () => {
+        setIsMobileSidebarOpen(!isMobileSidebarOpen);
+    };
+
+    const handleToggleSidebar = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
+    };
+
     if (loading) return (
         <div className="min-h-screen bg-background text-foreground">
-            <Header />
-            <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-                <div className="p-6 flex flex-col items-center justify-center h-[70vh]">
+            <Header onToggleSidebar={toggleMobileSidebar} />
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggleCollapse={handleToggleSidebar}
+                isMobileOpen={isMobileSidebarOpen}
+                onMobileClose={() => setIsMobileSidebarOpen(false)}
+            />
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 px-4 sm:px-6 md:px-8`}>
+                <div className="flex flex-col items-center justify-center h-[70vh]">
                     <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                     <p className="mt-4 text-muted-foreground font-medium">Loading project details...</p>
                 </div>
@@ -134,10 +149,15 @@ const ProjectEdit = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <Header />
-            <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-                <div className="p-6">
+            <Header onToggleSidebar={toggleMobileSidebar} />
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggleCollapse={handleToggleSidebar}
+                isMobileOpen={isMobileSidebarOpen}
+                onMobileClose={() => setIsMobileSidebarOpen(false)}
+            />
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 px-4 sm:px-6 md:px-8`}>
+                <div>
                     <BreadcrumbNavigation items={breadcrumbItems} />
 
                     <div className="max-w-4xl mx-auto mt-6">

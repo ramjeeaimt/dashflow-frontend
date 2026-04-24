@@ -16,10 +16,46 @@ const LandingPage = () => {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showNotification, setShowNotification] = useState(true);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [chatMessage, setChatMessage] = useState('');
+    const [messages, setMessages] = useState([
+        { text: "Hello!  Welcome to Dashflow CRM. How can I help you today?", isBot: true }
+    ]);
 
     const handleLogout = () => {
         logout();
         navigate('/login');
+    };
+
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        if (!chatMessage.trim()) return;
+
+        const userMsg = { text: chatMessage, isBot: false };
+        setMessages(prev => [...prev, userMsg]);
+        const lowerMsg = chatMessage.toLowerCase();
+        setChatMessage('');
+
+        // Bot Logic
+        setTimeout(() => {
+            let botText = "That's a great question! Our team will get back to you shortly with more details. Is there anything specific about DIFMO CRM you'd like to know?";
+
+            if (lowerMsg.includes('payroll') || lowerMsg.includes('salary')) {
+                botText = "Our Payroll module automates TDS, PF, and ESI calculations specifically for Indian compliance. Would you like to see our payroll features?";
+            } else if (lowerMsg.includes('price') || lowerMsg.includes('pricing') || lowerMsg.includes('cost')) {
+                botText = "We offer flexible pricing starting from a Free Tier for small teams. You can find the full breakdown on our Pricing page!";
+            } else if (lowerMsg.includes('feature') || lowerMsg.includes('what') || lowerMsg.includes('do')) {
+                botText = "DIFMO CRM handles Projects, Attendance, Payroll, and Leave Management in one unified dashboard. It's built for efficiency!";
+            } else if (lowerMsg.includes('contact') || lowerMsg.includes('help') || lowerMsg.includes('support')) {
+                botText = "You can reach our support team at support@difmo.com or use the 'Contact Sales' button. We're here to help!";
+            } else if (lowerMsg.includes('register') || lowerMsg.includes('signup') || lowerMsg.includes('join') || lowerMsg.includes('start')) {
+                botText = "To register your company, simply click the 'Start Free Trial' button in the top menu. It takes less than 2 minutes to get your dedicated CRM instance ready!";
+            } else if (lowerMsg.includes('demo') || lowerMsg.includes('video')) {
+                botText = "You can watch our 5-minute product walkthrough right here on the landing page! Just scroll down to the 'See in Action' section.";
+            }
+
+            setMessages(prev => [...prev, { text: botText, isBot: true }]);
+        }, 1000);
     };
 
     const getFullName = () => {
@@ -102,113 +138,87 @@ const LandingPage = () => {
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-sans selection:bg-blue-100 selection:text-blue-900">
             {/* Live Notification Banner */}
             {showNotification && (
-                <div className="bg-blue-600 text-white py-2 px-4 text-center text-sm relative">
-                    <p className="animate-pulse inline-flex items-center gap-2">
-                        <Zap className="w-4 h-4" />
-                        <span className="font-medium">Live Demo Available:</span> See how DIFMO CRM handles 10,000+ concurrent users with 99.9% uptime.
-                        <button className="underline font-bold ml-2 hover:text-blue-200">Join Live Demo →</button>
+                <div className="bg-blue-600 text-white py-2.5 px-4 text-center text-[10px] sm:text-sm relative">
+                    <p className="inline-flex flex-wrap justify-center items-center gap-2">
+                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-300 fill-current" />
+                        <span className="font-medium">Live:</span> DIFMO CRM handles 10,000+ users with 99.9% uptime.
+                        <button className="underline font-bold hover:text-blue-200">View Demo →</button>
                     </p>
                     <button
                         onClick={() => setShowNotification(false)}
-                        className="absolute right-4 top-2 text-white/80 hover:text-white"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-white/80 hover:text-white"
                     >
                         <X className="w-4 h-4" />
                     </button>
                 </div>
             )}
 
-            {/* Sticky Navigation with Role Indicator */}
-            <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-sm">
+            {/* Sticky Navigation */}
+            <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         {/* Logo */}
-                        <div className="flex items-center gap-8">
-                            <Link to="/" className="flex items-center gap-2">
-                                <span className="text-2xl font-extrabold tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                                    DIFMO
-                                </span>
-                                {/* <span className="text-2xl font-light text-gray-400">/</span> */}
-                                <span className="text-2xl font-extrabold text-gray-700">CRM</span>
-                            </Link>
+                        <Link to="/" className="flex items-center flex-shrink-0">
+                            <img 
+                                className="h-10 sm:h-12 w-auto object-contain" 
+                                src="/assets/images/crm.logo1.png" 
+                                alt="DIFMO CRM Logo" 
+                            />
+                        </Link>
 
-                            {/* Desktop Navigation */}
-                            <div className="hidden md:flex space-x-1">
-                                <Link to="/features" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Features</Link>
-                                <Link to="/pricing" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Pricing</Link>
-                                {/* <Link to="/enterprise" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Enterprise</Link> */}
-                                {/* <Link to="/customers" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Customers</Link> */}
-                                <button onClick={() => navigate('/privacy-policy')} className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Privacy</button>
-                            </div>
+                        {/* Desktop Navigation */}
+                        <div className="hidden lg:flex items-center space-x-1">
+                            <Link to="/features" className="px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Features</Link>
+                            <Link to="/pricing" className="px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Pricing</Link>
+                            <button onClick={() => navigate('/privacy-policy')} className="px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Privacy</button>
                         </div>
 
                         {/* Right Section */}
-                        <div className="flex items-center gap-4">
-                            {/* Role-based quick access */}
-                            {isAuthenticated && userRole && (
-                                <div className="hidden md:flex items-center gap-2 mr-2">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold bg-${userRole.color}-100 text-${userRole.color}-700`}>
-                                        {userRole.label}
-                                    </span>
-                                </div>
-                            )}
-
-                            {/* User Menu */}
+                        <div className="flex items-center gap-2 sm:gap-4">
                             {isAuthenticated ? (
-                                <div className="flex items-center gap-3">
-                                    <Link
-                                        to="/dashboard"
-                                        className="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
-                                    >
-                                        <User className="h-4 w-4 text-gray-600" />
-                                        <span className="text-sm font-medium text-gray-700">{getFullName()}</span>
+                                <div className="flex items-center gap-2">
+                                    <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+                                        <User className="h-4 w-4 text-slate-600" />
+                                        <span className="text-xs font-bold text-slate-700">{getFullName()}</span>
                                     </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition flex items-center gap-2"
-                                        title="Logout"
-                                    >
+                                    <button onClick={handleLogout} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition">
                                         <LogOut className="h-4 w-4" />
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-3">
-                                    <Link
-                                        to="/login"
-                                        className="text-gray-600 hover:text-gray-900 font-medium text-sm px-4 py-2 hover:bg-gray-100 rounded-lg transition"
-                                    >
+                                <div className="flex items-center gap-2">
+                                    <Link to="/login" className="text-slate-600 hover:text-slate-900 font-bold text-xs sm:text-sm px-3 py-2 hover:bg-slate-100 rounded-lg transition">
                                         Log in
                                     </Link>
                                     <Link
                                         to="/company-registration"
-                                        className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all text-sm font-semibold flex items-center gap-2"
+                                        className="hidden sm:flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow-md transition-all text-xs sm:text-sm font-bold"
                                     >
-                                        Start Free Trial <ArrowRight className="w-4 h-4" />
+                                        Free Trial <ArrowRight className="w-4 h-4" />
                                     </Link>
                                 </div>
                             )}
 
                             {/* Mobile Menu Button */}
                             <button
-                                className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+                                className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600"
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             >
-                                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                             </button>
                         </div>
                     </div>
 
                     {/* Mobile Menu */}
                     {mobileMenuOpen && (
-                        <div className="md:hidden py-4 border-t border-gray-100">
-                            <div className="flex flex-col space-y-2">
-                                <Link to="/features" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Features</Link>
-                                <Link to="/pricing" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Pricing</Link>
-                                <Link to="/enterprise" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Enterprise</Link>
-                                <Link to="/customers" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Customers</Link>
-                                <button onClick={() => navigate('/contact')} className="px-3 py-2 text-left text-gray-700 hover:bg-blue-50 rounded-lg">Contact</button>
-                                {isAuthenticated && (
-                                    <Link to="/dashboard" className="px-3 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-lg">
-                                        Go to Dashboard
+                        <div className="lg:hidden py-4 border-t border-slate-100 animate-in slide-in-from-top duration-200">
+                            <div className="flex flex-col space-y-1">
+                                <Link to="/features" className="px-4 py-3 text-slate-700 hover:bg-blue-50 rounded-lg font-semibold">Features</Link>
+                                <Link to="/pricing" className="px-4 py-3 text-slate-700 hover:bg-blue-50 rounded-lg font-semibold">Pricing</Link>
+                                <Link to="/privacy-policy" className="px-4 py-3 text-slate-700 hover:bg-blue-50 rounded-lg font-semibold">Privacy Policy</Link>
+                                {!isAuthenticated && (
+                                    <Link to="/company-registration" className="mx-4 mt-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-bold text-center">
+                                        Start Free Trial
                                     </Link>
                                 )}
                             </div>
@@ -276,48 +286,36 @@ const LandingPage = () => {
                 </div>
             )}
 
-            {/* Hero Section - Dynamic based on auth */}
-            <header className="relative pt-16 pb-24 overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-
+            {/* Hero Section */}
+            <header className="relative pt-12 sm:pt-20 pb-20 sm:pb-32 overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
-                        <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-                            {/* Live Stats Badge */}
-                            {/* <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium mb-6 border border-green-200">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                </span>
-                                Live: 1,847 active users right now
-                            </div> */}
-
-                            <h1 className="text-5xl tracking-tight font-black text-gray-900 sm:text-6xl lg:text-7xl">
+                    <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+                        <div className="text-center lg:text-left lg:col-span-6">
+                            <h1 className="text-4xl sm:text-6xl lg:text-7xl tracking-tight font-black text-slate-900 leading-[1.1]">
                                 {isAuthenticated ? (
-                                    <>Grow Your Bussiness <br />
-                                        <span className="text-blue-600">With Us</span></>
+                                    <>Grow business <br />
+                                        <span className="text-blue-600 underline decoration-blue-100 underline-offset-8">With Us</span></>
                                 ) : (
-                                    <>Scale your business <br />
-                                        <span className="text-blue-600">faster than ever</span></>
+                                    <>Manage business <br />
+                                        <span className="text-blue-600 underline decoration-blue-100 underline-offset-8">All in One Place</span></>
                                 )}
                             </h1>
 
-                            <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-xl">
+                            <p className="mt-6 text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
                                 {isAuthenticated
-                                    ? "Pick up right where you stopped. Your team, projects, and analytics are waiting for you."
-                                    : "The first CRM built for modern Indian teams. Unified projects, automated payroll, and deep analytics—all in one place. No more switching tabs."}
+                                    ? "Your team, projects, and payroll are waiting. Pick up right where you left off."
+                                    : "Unified projects, automated payroll, and deep analytics—all in one place. Built for modern Indian teams."}
                             </p>
 
                             {/* Trust Indicators */}
-                            <div className="mt-8 flex items-center gap-6 text-sm text-gray-500">
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                    <span>ISO 27001 Certified</span>
+                            <div className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-slate-500">
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full">
+                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                    <span>ISO 27001</span>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full">
                                     <Shield className="w-4 h-4 text-blue-500" />
-                                    <span>100% Data Sovereignty</span>
+                                    <span>100% Secure</span>
                                 </div>
                             </div>
 
@@ -957,13 +955,69 @@ const LandingPage = () => {
                 </div>
             </footer>
 
-            {/* Floating Help Button */}
-            <div className="fixed bottom-6 right-6 z-50">
-                <button className="bg-blue-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-700 transition group relative">
-                    <MessageSquare className="w-6 h-6" />
-                    <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
-                        Need help? Chat with us
-                    </span>
+            {/* Floating Help Button & Chat Window */}
+            <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
+                {isChatOpen && (
+                    <div className="mb-4 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+                        {/* Chat Header */}
+                        <div className="bg-blue-600 p-4 text-white flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                    <MessageSquare className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold">DIFMO Support</p>
+                                    <p className="text-[10px] text-blue-100 uppercase tracking-widest font-medium">Online now</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setIsChatOpen(false)} className="hover:bg-white/10 p-1 rounded-lg transition">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Chat Messages */}
+                        <div className="h-64 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                            {messages.map((msg, idx) => (
+                                <div key={idx} className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}>
+                                    <div className={`max-w-[85%] px-4 py-2 text-sm ${
+                                        msg.isBot 
+                                        ? 'bg-white text-slate-800 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm' 
+                                        : 'bg-blue-600 text-white rounded-2xl rounded-tr-none shadow-md'
+                                    }`}>
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Chat Input */}
+                        <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-100">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={chatMessage}
+                                    onChange={(e) => setChatMessage(e.target.value)}
+                                    placeholder="Type your message..."
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-600 transition-all pr-10"
+                                />
+                                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-700">
+                                    <ArrowRight className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+                
+                <button 
+                    onClick={() => setIsChatOpen(!isChatOpen)}
+                    className={`${isChatOpen ? 'bg-slate-800' : 'bg-blue-600'} text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all group relative`}
+                >
+                    {isChatOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+                    {!isChatOpen && (
+                        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none shadow-xl">
+                            Need help? Chat with us
+                        </span>
+                    )}
                 </button>
             </div>
 

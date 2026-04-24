@@ -108,7 +108,7 @@ const UserProfileDropdown = () => {
         <Icon
           name="ChevronDown"
           size={14}
-          className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`hidden sm:block text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 

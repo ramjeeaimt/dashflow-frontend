@@ -199,6 +199,12 @@ const EmployeeManagement = () => {
     }
   };
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
   const handleCloseModal = () => {
     setModalState({ isOpen: false, mode: 'view', employee: null });
   };
@@ -206,10 +212,15 @@ const EmployeeManagement = () => {
   if (loading && employees.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-        <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-          <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <Header onToggleSidebar={toggleMobileSidebar} />
+        <Sidebar 
+          isCollapsed={sidebarCollapsed} 
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={() => setIsMobileSidebarOpen(false)}
+        />
+        <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
+          <div className="p-4 sm:p-6 flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               <p className="mt-4 text-muted-foreground">Loading employees...</p>
@@ -222,11 +233,16 @@ const EmployeeManagement = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <Header onToggleSidebar={toggleMobileSidebar} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6 bg-slate-50 min-h-screen`}>
-        <div className="p-8 max-w-[1600px] mx-auto">
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 bg-slate-50 min-h-screen`}>
+        <div className="p-4 sm:p-8 max-w-[1600px] mx-auto">
           <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
               <BreadcrumbNavigation items={breadcrumbItems} />

@@ -16,6 +16,17 @@ const AdminLeaveManagement = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [adminNote, setAdminNote] = useState({}); 
 
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+    const toggleMobileSidebar = () => {
+        setIsMobileSidebarOpen(!isMobileSidebarOpen);
+    };
+
+    const handleToggleSidebar = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
+    };
+
     const fetchAllLeaves = async () => {
         setLoading(true);
         try {
@@ -81,10 +92,15 @@ const AdminLeaveManagement = () => {
 
     return (
         <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
-            <Header />
-            <Sidebar />
+            <Header onToggleSidebar={toggleMobileSidebar} />
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggleCollapse={handleToggleSidebar}
+                isMobileOpen={isMobileSidebarOpen}
+                onMobileClose={() => setIsMobileSidebarOpen(false)}
+            />
             
-            <main className="lg:pl-64 pt-16 transition-all duration-300">
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} pt-16 pb-8`}>
                 <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-8">
                     
                     {/* Stats Header */}

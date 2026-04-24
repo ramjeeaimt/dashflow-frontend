@@ -11,6 +11,7 @@ import ComanyDocsGST from '../components/CompanyDOcsGST';
 const CompanyProfile = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('details');
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/dashboard' },
@@ -26,11 +27,16 @@ const CompanyProfile = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            <Header />
-            <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+            <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                isMobileOpen={isMobileSidebarOpen}
+                onMobileClose={() => setIsMobileSidebarOpen(false)}
+            />
 
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-                <div className="p-6">
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
+                <div className="px-4 sm:px-6 md:px-8">
                     <BreadcrumbNavigation items={breadcrumbItems} />
 
                     <div className="mb-8">

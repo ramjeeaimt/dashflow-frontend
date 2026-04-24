@@ -353,8 +353,8 @@ const EmployeeModal = ({
   const modalTitle = mode === 'add' ? 'Add New Employee' : mode === 'edit' ? 'Edit Employee' : 'Employee Details';
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
-      <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden text-slate-900 shadow-2xl border border-slate-100">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-0 md:p-4 animate-in fade-in duration-300">
+      <div className="bg-white rounded-none md:rounded-2xl w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] flex flex-col overflow-hidden text-slate-900 shadow-2xl border border-slate-100">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 bg-white border-b border-slate-100">
           <div className="flex items-center space-x-5">
@@ -371,20 +371,20 @@ const EmployeeModal = ({
           </button>
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
           {/* Side Tabs - Modern Style */}
-          <div className="w-64 bg-slate-50/50 border-r border-slate-100 flex flex-col">
-            <div className="p-5 border-b border-slate-100">
+          <div className="w-full md:w-64 bg-slate-50/50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col">
+            <div className="p-4 md:p-5 border-b border-slate-100 hidden md:block">
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Information Sections</p>
             </div>
-            <nav className="flex-1 p-3 space-y-1">
+            <nav className="flex md:flex-col p-2 md:p-3 space-y-0 md:space-y-1 space-x-2 md:space-x-0 overflow-x-auto md:overflow-x-visible no-scrollbar">
               {tabs?.map((tab) => (
                 <button
                   key={tab?.id}
                   onClick={() => setActiveTab(tab?.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 text-left text-sm font-semibold rounded-xl transition-all ${
+                  className={`flex-shrink-0 md:flex-shrink-1 flex items-center space-x-3 px-4 py-2.5 md:py-3 text-left text-xs md:text-sm font-semibold rounded-xl transition-all ${
                     activeTab === tab?.id 
-                    ? 'bg-blue-50 text-blue-700 shadow-sm' 
+                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100 md:border-transparent' 
                     : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
@@ -397,10 +397,10 @@ const EmployeeModal = ({
 
           {/* Content Area */}
           <div className="flex-1 flex flex-col overflow-hidden bg-white">
-            <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+            <div className="p-4 sm:p-8 overflow-y-auto flex-1 custom-scrollbar">
               {activeTab === 'basic' && (
-                <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="flex items-start space-x-8 pb-10 border-b border-slate-100">
+                <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-8 pb-6 md:pb-10 border-b border-slate-100">
                     <div className="relative group">
                       <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
                         <div className="w-full h-full rounded-full overflow-hidden relative">
@@ -813,9 +813,8 @@ const EmployeeModal = ({
               )}
             </div>
 
-            {/* Modern Footer */}
-            <div className="px-8 py-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-               <div className="flex items-center space-x-3">
+            <div className="px-4 md:px-8 py-4 md:py-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+               <div className="flex items-center space-x-3 hidden md:flex">
                   <div className="flex -space-x-1">
                     {[1, 2, 3].map(i => (
                       <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-50 bg-slate-200" />
@@ -823,11 +822,11 @@ const EmployeeModal = ({
                   </div>
                   <span className="text-[11px] font-semibold text-slate-400">Collaborating with the HR team</span>
                </div>
-               <div className="flex space-x-3">
+               <div className="flex space-x-3 w-full md:w-auto">
                   <button 
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2.5 bg-white border border-slate-200 text-sm font-bold text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+                  className="flex-1 md:flex-none px-6 py-2.5 bg-white border border-slate-200 text-sm font-bold text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
                   >
                     Cancel
                   </button>
@@ -836,7 +835,7 @@ const EmployeeModal = ({
                       type="button"
                       onClick={handleSave}
                       disabled={isSaving || isLoading}
-                      className={`px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center ${
+                      className={`flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center ${
                         isSaving || isLoading 
                         ? 'bg-blue-400 cursor-not-allowed shadow-none' 
                         : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'
@@ -845,7 +844,7 @@ const EmployeeModal = ({
                       {(isSaving || isLoading) && (
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                       )}
-                      <span>{isSaving ? 'Processing...' : 'Save Changes'}</span>
+                      <span>{isSaving ? 'Processing...' : (mode === 'add' ? 'Create' : 'Save')}</span>
                     </button>
                   )}
                </div>

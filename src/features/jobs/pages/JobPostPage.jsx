@@ -11,6 +11,7 @@ import ApiDocsTab from '../components/ApiDocsTab';
 export default function JobPostPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState('jobs');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const tabs = [
     { id: 'jobs', label: 'Job Postings', icon: 'Briefcase' },
@@ -21,11 +22,16 @@ export default function JobPostPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
-      <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 flex-1 flex flex-col`}>
-        <div className="px-6 py-6 max-w-[1600px] w-full mx-auto flex-1 flex flex-col">
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 flex-1 flex flex-col pb-8`}>
+        <div className="px-4 sm:px-6 md:px-8 w-full flex-1 flex flex-col">
             
           {/* Header & Tabs */}
           <div className="mb-6 animate-in fade-in duration-500">

@@ -168,12 +168,28 @@ const NotificationsPage = () => {
     return groups;
   }, [filteredNotifications]);
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <Sidebar />
+      <Header onToggleSidebar={toggleMobileSidebar} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={handleToggleSidebar}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header />
-        <main className="flex-1 ml-56 overflow-y-auto p-6 md:p-8 mt-14">
+        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} overflow-y-auto p-4 sm:p-6 md:p-8 mt-14 pb-8`}>
           {/* Page Header */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-1 text-indigo-600 font-bold text-xs uppercase tracking-widest">

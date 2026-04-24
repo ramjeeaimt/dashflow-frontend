@@ -319,6 +319,16 @@ const FinanceDashboardPage = () => {
         }
     };
 
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+    const toggleMobileSidebar = () => {
+        setIsMobileSidebarOpen(!isMobileSidebarOpen);
+    };
+
+    const handleToggleSidebar = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
+    };
+
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/dashboard' },
         { label: 'Finance', path: '/finance' },
@@ -344,14 +354,16 @@ const FinanceDashboardPage = () => {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
-            <Header />
+            <Header onToggleSidebar={toggleMobileSidebar} />
             <Sidebar
                 isCollapsed={sidebarCollapsed}
-                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                onToggleCollapse={handleToggleSidebar}
+                isMobileOpen={isMobileSidebarOpen}
+                onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
 
             <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-12 flex flex-col min-h-screen`}>
-                <div className="p-6 md:p-8 max-w-[1600px] mx-auto w-full space-y-8">
+                <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto w-full space-y-8">
                     <BreadcrumbNavigation items={breadcrumbItems} />
 
                     {/* Page Header */}

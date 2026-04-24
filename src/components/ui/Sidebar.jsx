@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import useAuthStore from '../../store/useAuthStore';
 
-const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
+const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, onMobileClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const activeItem = location.pathname;
@@ -16,6 +16,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
   const comingSoonPaths = [];
 
   const allNavigationItems = [
+    // ... (rest of navigation items)
     {
       label: isAdmin ? 'Dashboard' : 'Dashboard',
       path: '/dashboard',
@@ -171,6 +172,43 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
 
   return (
     <>
+      {/* Mobile Drawer Overlay */}
+      <div 
+        className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+          isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onMobileClose}
+      />
+
+      {/* Mobile Drawer Sidebar */}
+      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out ${
+        isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="flex items-center justify-between p-4 border-b border-border h-16">
+          <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-10 w-auto object-contain" />
+          <button onClick={onMobileClose} className="p-2 text-muted-foreground hover:bg-muted rounded-md">
+            <Icon name="X" size={20} />
+          </button>
+        </div>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto max-h-[calc(100vh-64px)]">
+          {navigationItems?.map((item) => {
+            const isActive = activeItem === item?.path;
+            return (
+              <button
+                key={item?.path}
+                onClick={() => { handleNavigation(item?.path); onMobileClose(); }}
+                className={`w-full flex items-center space-x-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                  isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                <Icon name={item?.icon} size={18} />
+                <span>{item?.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+
       {/* Desktop Sidebar */}
       <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex-col bg-card border-r border-border transition-all duration-300 ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
         }`}>
@@ -246,50 +284,6 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse }) => {
           </div>
         </div>
       </aside>
-      {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40 h-16">
-        <div className="flex items-center justify-around h-full px-2">
-          {navigationItems?.slice(0, 4)?.map((item) => {
-            const isActive = activeItem === item?.path;
-            return (
-              <button
-                key={item?.path}
-                onClick={() => handleNavigation(item?.path)}
-                className={`flex flex-col items-center justify-center space-y-1 px-2 py-1 rounded-lg transition-colors duration-150 ${isActive
-                  ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                <Icon name={item?.icon} size={18} />
-                <span className="text-xs font-medium">{item?.label}</span>
-              </button>
-            );
-          })}
-
-          {/* More button for additional items */}
-          <div className="relative group">
-            <button className="flex flex-col items-center justify-center space-y-1 px-2 py-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors duration-150">
-              <Icon name="MoreHorizontal" size={18} />
-              <span className="text-xs font-medium">More</span>
-            </button>
-
-            {/* More dropdown */}
-            <div className="absolute bottom-full right-0 mb-2 w-48 bg-popover border border-border rounded-lg dropdown-shadow opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-              <div className="py-2">
-                {navigationItems?.slice(4)?.map((item) => (
-                  <button
-                    key={item?.path}
-                    onClick={() => handleNavigation(item?.path)}
-                    className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-popover-foreground hover:bg-muted transition-colors duration-150"
-                  >
-                    <Icon name={item?.icon} size={16} />
-                    <span>{item?.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
       <ComingSoonModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );

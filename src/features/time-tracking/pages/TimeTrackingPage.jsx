@@ -141,16 +141,27 @@ const TimeTrackingPage = () => {
     }
   };
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <Sidebar
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      <Header onToggleSidebar={toggleMobileSidebar} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={handleToggleSidebar}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
-      <main className={`pt-16 pb-20 lg:pb-8 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
-        }`}>
-        <div className="px-6 py-8">
+      <main className={`pt-16 pb-8 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'}`}>
+        <div className="px-4 sm:px-6 md:px-8">
           <BreadcrumbNavigation items={breadcrumbItems} />
 
           {/* Page Header */}

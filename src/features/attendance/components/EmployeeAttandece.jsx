@@ -59,22 +59,28 @@ const AttendanceHistory = () => {
     return { late, present, totalHrs: totalHrs.toFixed(1) };
   }, [filteredData]);
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   return (
-    <div className="p-6 bg-slate-50/50 min-h-screen font-sans text-slate-900">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-        {/* Header Section */}
-        <div>
-          <Header />
-        </div>
+      <div className={`transition-all duration-300 ${
+        sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+      } pt-16 pb-8`}>
+        <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
 
-        <div>
-          <Sidebar />
-        </div>
-        <div className="flex flex-col ml-56  md:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-800">Attendance Overview</h1>
+        <main className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-800">Attendance Overview</h1>
 
-          <div className="flex items-center gap-2 mt-20  w-full md:w-auto bg-white p-1 rounded-lg border border-slate-200">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto bg-white p-1 rounded-lg border border-slate-200">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               <input
@@ -111,7 +117,7 @@ const AttendanceHistory = () => {
         </div>
 
         {/* Medium Stat Cards - Balanced & Bold */}
-        <div className="grid grid-cols-1 ml-44 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard label="Monthly Present" value={stats.present} color="text-emerald-600" sub="Days on-time" />
           <StatCard label="Late Arrivals" value={stats.late} color="text-amber-600" sub="After 10:00 AM" />
           <StatCard label="Total Hours" value={stats.totalHrs} color="text-indigo-600" sub="Working time" />
@@ -119,7 +125,7 @@ const AttendanceHistory = () => {
         </div>
 
         {/* Tab System */}
-        <div className="ml-44 bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           <div className="flex border-b border-slate-100 bg-slate-50/30">
             <button
               onClick={() => setActiveTab('logs')}
@@ -202,15 +208,15 @@ const AttendanceHistory = () => {
             )}
           </div>
         </div>
-      </div>
-
+      </main>
       <WFHRequestModal
         isOpen={isWFHModalOpen}
         onClose={() => setIsWFHModalOpen(false)}
         employeeId={user?.id}
       />
     </div>
-  );
+  </div>
+);
 };
 
 // Balanced Stat Card Component

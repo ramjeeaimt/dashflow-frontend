@@ -38,14 +38,24 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
     alert(success ? "Leave application submitted successfully!" : "Failed to submit leave application. Please try again.");
   };
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen bg-[#FCFCFD]">
-      <Sidebar />
+    <div className="min-h-screen bg-[#FCFCFD]">
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-64"> {/* Fixed Sidebar Offset */}
-        <Header />
+      <div className={`transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+        } min-h-screen flex flex-col pt-16 pb-8`}>
+        <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
 
-        <main className="flex-1 pt-24 pb-12 px-6 lg:px-10 max-w-[1400px] mx-auto w-full">
+        <main className="flex-1 px-4 sm:px-6 md:px-8 w-full">
 
           {/* 1. Header & Stats Component */}
           <div className="flex flex-col gap-8 mb-10">

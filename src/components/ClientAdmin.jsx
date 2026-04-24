@@ -675,13 +675,29 @@ const ClientAdmin = () => {
   }, 0);
   const activeWorkflows = projects?.filter(p => p.status === 'active').length || 0;
 
-  return (
-    <div className="flex h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
-        <Header />
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-        <main className="flex-1 mt-16 overflow-y-auto px-6 py-8">
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50 font-sans text-gray-900 overflow-hidden">
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={handleToggleSidebar}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'}`}>
+        <Header onToggleSidebar={toggleMobileSidebar} />
+
+        <main className="flex-1 pt-16 overflow-y-auto px-4 sm:px-6 md:px-8 py-8">
           {/* Stats Cards with Enhanced Design */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Network Entities Card */}

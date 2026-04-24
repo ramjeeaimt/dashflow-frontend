@@ -143,6 +143,12 @@ const Dashboard = () => {
     !action.permission || can(action.permission.action, action.permission.resource)
   );
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
   const handleToggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
@@ -160,11 +166,18 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Header />
-      <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={handleToggleSidebar} />
+      <Header onToggleSidebar={toggleMobileSidebar} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={handleToggleSidebar}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-8`}>
-        <div className="p-8 max-w-[1600px] mx-auto space-y-8">
+      <main className={`transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+        } pt-16 pb-8`}>
+        <div className="p-4 sm:p-8 max-w-[1600px] mx-auto space-y-8">
 
           {/* Management Metrics Row */}
           {isManagement && (

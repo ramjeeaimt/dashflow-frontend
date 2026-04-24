@@ -110,6 +110,16 @@ const Projects = () => {
       });
   }, [cleanProjects, search, phase, deadlineStatus, budget, sort]);
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   const breadcrumbItems = [
     { label: "Dashboard", path: "/dashboard" },
     { label: "Projects", path: "/projects" }
@@ -117,11 +127,16 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
-      <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+      <Header onToggleSidebar={toggleMobileSidebar} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={handleToggleSidebar} 
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-6`}>
-        <div className="p-8 max-w-[1600px] mx-auto space-y-10">
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
+        <div className="p-4 sm:p-8 max-w-[1600px] mx-auto space-y-10">
           <BreadcrumbNavigation items={breadcrumbItems} />
 
           {/* Clean Header Section */}

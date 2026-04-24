@@ -100,24 +100,33 @@ const Profile = () => {
     }
   };
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   if (!user) return <div className="p-10">Loading profile...</div>;
 
-  const initials = `${formData.firstName?.[0] || ""}${formData.lastName?.[0] || ""
-    }`;
+  const initials = `${formData.firstName?.[0] || ""}${formData.lastName?.[0] || ""}`;
   const company = formData.company || {};
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
+      <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggleCollapse={handleToggleSidebar}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
 
-      <main
-        className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"
-          } pt-16 p-6`}
-      >
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16 pb-8`}>
+        <div className="p-4 sm:p-6">
         <div className="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden mt-5">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 flex items-center justify-between">
@@ -338,9 +347,10 @@ const Profile = () => {
             </div>
           </div>
         </div>
-      </main>
-    </div>
-  );
+      </div>
+    </main>
+  </div>
+);
 };
 
 const Input = ({ label, ...props }) => (

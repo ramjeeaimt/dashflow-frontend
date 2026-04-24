@@ -12,6 +12,15 @@ const ProjectDetails = () => {
     const [project, setProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+    const toggleMobileSidebar = () => {
+        setIsMobileSidebarOpen(!isMobileSidebarOpen);
+    };
+
+    const handleToggleSidebar = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
+    };
 
     const fetchProject = async () => {
         try {
@@ -41,13 +50,17 @@ const ProjectDetails = () => {
 
     return (
         <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950">
-            <Header />
-            <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+            <Header onToggleSidebar={toggleMobileSidebar} />
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggleCollapse={handleToggleSidebar}
+                isMobileOpen={isMobileSidebarOpen}
+                onMobileClose={() => setIsMobileSidebarOpen(false)}
+            />
             
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} pt-20 pb-10 px-4 lg:px-8`}>
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 px-4 sm:px-6 md:px-8`}>
                 <div className="max-w-7xl mx-auto">
                     
-                    {/* Yahan logic change ki hai: Loading sirf yahan dikhega, structure same rahega */}
                     {loading ? (
                         <div className="flex flex-col items-center justify-center min-h-[60vh]">
                             <div className="relative">

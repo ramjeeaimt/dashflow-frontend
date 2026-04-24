@@ -146,6 +146,12 @@ const AttendanceManagement = () => {
     setIsTakeAttendanceOpen(true);
   };
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
   const breadcrumbItems = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Attendance Management', path: '/attendance-management' }
@@ -163,10 +169,15 @@ const AttendanceManagement = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
-      <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={handleToggleSidebar} />
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-20 lg:pb-8`}>
-        <div className="p-8 max-w-[1600px] mx-auto space-y-10">
+      <Header onToggleSidebar={toggleMobileSidebar} />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={handleToggleSidebar}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
+        <div className="p-4 sm:p-8 max-w-[1600px] mx-auto space-y-10">
 
           {/* Header Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-100">
