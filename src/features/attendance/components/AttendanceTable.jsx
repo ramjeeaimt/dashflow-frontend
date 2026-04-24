@@ -86,6 +86,7 @@ const AttendanceTable = ({
     checkOutTime: true,
     workDuration: true,
     status: true,
+    label: true,
     location: true,
     productivity: true
   });
@@ -271,6 +272,7 @@ const AttendanceTable = ({
               {visibleColumns.checkOutTime && <SortableHeader field="checkOutTime">Check Out</SortableHeader>}
               {visibleColumns.workDuration && <SortableHeader field="workDuration">Duration</SortableHeader>}
               {visibleColumns.status && <SortableHeader field="status">Status</SortableHeader>}
+              {visibleColumns.label && <SortableHeader field="label">Label</SortableHeader>}
               {visibleColumns.location && <SortableHeader field="location">Location</SortableHeader>}
               {visibleColumns.productivity && <SortableHeader field="productivity">Productivity</SortableHeader>}
 
@@ -298,6 +300,7 @@ const AttendanceTable = ({
                         { key: 'checkOutTime', label: 'Check Out' },
                         { key: 'workDuration', label: 'Duration' },
                         { key: 'status', label: 'Status' },
+                        { key: 'label', label: 'Label' },
                         { key: 'location', label: 'Location' },
                         { key: 'productivity', label: 'Productivity' }
                       ].map(col => (
@@ -401,6 +404,15 @@ const AttendanceTable = ({
                       </span>
                     </div>
 
+                  </td>
+                )}
+                {visibleColumns.label && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {employee?.label ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-tight">
+                        {employee.label}
+                      </span>
+                    ) : <span className="text-xs font-bold text-slate-300">—</span>}
                   </td>
                 )}
                 {visibleColumns.location && (

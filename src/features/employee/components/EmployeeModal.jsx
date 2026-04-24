@@ -85,7 +85,6 @@ const EmployeeModal = ({
         checkInTime: employee?.checkInTime || '',
         startTime: employee?.startTime || '',
         endTime: employee?.endTime || '',
-        designationId: employee?.designationId || '',
         customDesignation: '',
         documents: employee?.documents || [] // Load existing docs
       });

@@ -163,6 +163,7 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                                         <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Check Out</th>
                                         <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center">Work Hours</th>
                                         <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Status</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Label</th>
                                         <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Notes</th>
                                     </tr>
                                 </thead>
@@ -192,6 +193,13 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                                                                     'bg-slate-50 text-slate-700 border-slate-200'}`}>
                                                     {record.status?.replace('_', ' ')}
                                                 </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {record.label ? (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                        {record.label}
+                                                    </span>
+                                                ) : '--'}
                                             </td>
                                             <td className="px-4 py-3 text-xs text-muted-foreground max-w-xs truncate group-hover:text-foreground transition-colors" title={record.notes}>
                                                 {record.notes || '--'}
