@@ -44,7 +44,7 @@ const Header = ({ onToggleSidebar }) => {
 
         {/* Center: Dynamic Page Title (Absolute Centered) */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-full max-w-[45%] sm:max-w-[60%] lg:max-w-none px-2">
-          <h2 className="text-[10px] sm:text-base lg:text-lg font-black text-slate-800 tracking-tight uppercase tracking-[0.05em] sm:tracking-[0.1em] truncate">
+          <h2 className="text-[10px] sm:text-sm lg:text-base font-semibold text-slate-800 uppercase tracking-[0.04em] sm:tracking-[0.08em] truncate">
             {getPageTitle()}
           </h2>
         </div>

@@ -181,7 +181,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       />
 
       {/* Mobile Drawer Sidebar */}
-      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out ${
+      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col ${
         isMobileOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between p-4 border-b border-border h-16">
@@ -190,18 +190,18 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
             <Icon name="X" size={20} />
           </button>
         </div>
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto max-h-[calc(100vh-64px)]">
+        <nav className="flex-1 min-h-0 p-3 space-y-1.5 overflow-y-auto overscroll-contain">
           {navigationItems?.map((item) => {
             const isActive = activeItem === item?.path;
             return (
               <button
                 key={item?.path}
                 onClick={() => { handleNavigation(item?.path); onMobileClose(); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                className={`w-full flex items-center space-x-3 px-3 py-2 text-[13px] font-medium rounded-lg transition-all ${
                   isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                <Icon name={item?.icon} size={18} />
+                <Icon name={item?.icon} size={17} />
                 <span>{item?.label}</span>
               </button>
             );
@@ -210,7 +210,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex-col bg-card border-r border-border transition-all duration-300 ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
+      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:h-screen lg:flex-col bg-card border-r border-border transition-all duration-300 overflow-hidden ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
         }`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border min-h-[64px]">
@@ -234,7 +234,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 min-h-0 p-3 space-y-1.5 overflow-y-auto overscroll-contain">
           {navigationItems?.map((item) => {
             const isActive = activeItem === item?.path;
             const isComingSoon = comingSoonPaths.includes(item?.path);
@@ -243,14 +243,14 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
               <div key={item?.path} className="relative group">
                 <button
                   onClick={() => handleNavigation(item?.path)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 micro-interaction ${isActive
+                  className={`w-full flex items-center space-x-3 px-3 py-2 text-[13px] font-medium rounded-lg transition-all duration-150 micro-interaction ${isActive
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : isComingSoon
                       ? 'text-muted-foreground opacity-50 hover:opacity-80 hover:bg-muted/50'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     } ${isCollapsed ? 'justify-center' : ''}`}
                 >
-                  <Icon name={item?.icon} size={18} />
+                  <Icon name={item?.icon} size={17} />
                   {!isCollapsed && (
                     <div className="flex-1 flex items-center justify-between">
                       <span>{item?.label}</span>
@@ -270,7 +270,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border">
+        <div className="shrink-0 p-4 border-t border-border">
           <div className={`flex items-center space-x-3 ${isCollapsed ? 'justify-center' : ''}`}>
             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
               {/* <Icon name="User" size={16} className="text-muted-foreground" /> */}

@@ -35,7 +35,9 @@ function App() {
   }
 
   return (
-    <Routes />
+    <div className="professional-ui">
+      <Routes />
+    </div>
   );
 }
 
