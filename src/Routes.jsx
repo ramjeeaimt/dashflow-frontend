@@ -41,9 +41,12 @@ import LeaveForm from "features/employee/pages/LeaveForm";
 import EmployeePayrollPage from "features/payroll/pages/EmployeePayrollPage";
 import AdminLeaveManagement from "features/employee/pages/AdminLeaveManagement";
 import ClientAdmin from "components/ClientAdmin";
+import ClientDetailsPage from "components/ClientDetailsPage";
 import EmployeeAttendanceHistoryPage from "features/attendance/components/EmployeeAttandece";
 import IndividualEmployeeAttendance from "features/attendance/components/EmployeeAttandece";
 import NotificationsPage from "features/notifications/pages/NotificationsPage";
+import TemplateDesignerPage from "features/notifications/pages/TemplateDesignerPage";
+import EmailTemplatesPage from "features/notifications/pages/EmailTemplatesPage";
 import EmployeeDashboard from "features/employee/pages/EmployeeDashboardPage";
 
 const DashboardSwitcher = () => {
@@ -116,6 +119,12 @@ const Routes = () => {
           <Route path="/client-management" element={
             <ProtectedRoute>
               <ClientAdmin />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/client-details/:id" element={
+            <ProtectedRoute>
+              <ClientDetailsPage />
             </ProtectedRoute>
           } />
 
@@ -221,6 +230,24 @@ const Routes = () => {
           <Route path="/notifications" element={
             <ProtectedRoute>
               <NotificationsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/notifications/templates" element={
+            <ProtectedRoute>
+              <EmailTemplatesPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/notifications/templates/design" element={
+            <ProtectedRoute>
+              <TemplateDesignerPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/notifications/templates/design/:id" element={
+            <ProtectedRoute>
+              <TemplateDesignerPage />
             </ProtectedRoute>
           } />
 

@@ -159,26 +159,90 @@ const PayrollPage = () => {
     useEffect(() => {
         if (user?.company?.id) {
             fetchPayroll();
+            fetchAllEmployees();
         }
     }, [user, selectedMonth, selectedYear]);
 
+    const fetchAllEmployees = async () => {
+        try {
+            const employees = await employeeService.getAll({ companyId: user.company.id });
+            setEmployeesList(employees.filter(e => e.status === 'active'));
+        } catch (error) {
+            console.error('Failed to fetch employees:', error);
+        }
+    };
+
     // ========== NEW: Filtered data based on search term ==========
-    const filteredPayrollData = useMemo(() => {
-        if (!payrollData || !Array.isArray(payrollData)) return [];
-        if (!searchTerm.trim()) return payrollData;
+    const combinedPayrollData = useMemo(() => {
+        // Map of existing payrolls by employeeId
+        const payrollMap = new Map();
+        (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
+
+        // Create a list including all employees
+        const allRows = employeesList.map(emp => {
+            const existingPayroll = payrollMap.get(emp.id);
+            return {
+                id: existingPayroll?.id || `temp-${emp.id}`,
+                isGenerated: !!existingPayroll,
+                employee: emp,
+                employeeId: emp.id,
+                basicSalary: existingPayroll?.basicSalary || emp.salary || 20000,
+                allowances: existingPayroll?.allowances || 0,
+                deductions: existingPayroll?.deductions || 0,
+                netSalary: existingPayroll?.netSalary || (emp.salary || 20000),
+                status: existingPayroll?.status || 'not-generated',
+                month: existingPayroll?.month || selectedMonth,
+                year: existingPayroll?.year || selectedYear,
+                record: existingPayroll
+            };
+        });
+
+        if (!searchTerm.trim()) return allRows;
 
         const term = searchTerm.toLowerCase();
-        return payrollData.filter(record => {
-            const employee = record.employee || {};
-            const user = employee.user || {};
-            const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-            const email = (user.email || '').toLowerCase();
-            // Adjust phone field according to your data structure – here we assume it's under user.phone or employee.phone
-            const phone = (user.phone || employee.phone || '').toLowerCase();
+        return allRows.filter(row => {
+            const fullName = `${row.employee.user?.firstName || ''} ${row.employee.user?.lastName || ''}`.toLowerCase();
+            const email = (row.employee.user?.email || '').toLowerCase();
+            const phone = (row.employee.user?.phone || row.employee.phone || '').toLowerCase();
+            const code = (row.employee.employeeCode || '').toLowerCase();
 
-            return fullName.includes(term) || email.includes(term) || phone.includes(term);
+            return fullName.includes(term) || email.includes(term) || phone.includes(term) || code.includes(term);
         });
-    }, [payrollData, searchTerm]);
+    }, [payrollData, employeesList, searchTerm, selectedMonth, selectedYear]);
+
+    const handleSendIndividualEmail = async (id) => {
+        try {
+            await financeService.sendPayrollEmail(id);
+            alert('Email sent successfully');
+        } catch (error) {
+            console.error('Failed to send email:', error);
+            alert('Error sending email');
+        }
+    };
+
+    const handleGenerateIndividual = async (row) => {
+        try {
+            setIsLoading(true);
+            await financeService.createPayroll({
+                employeeId: row.employeeId,
+                companyId: user.company.id,
+                basicSalary: row.basicSalary,
+                allowances: 3000,
+                deductions: 1000,
+                netSalary: row.basicSalary + 3000 - 1000,
+                month: selectedMonth,
+                year: selectedYear,
+                status: "pending"
+            });
+            alert("Payroll generated for " + row.employee.user?.firstName);
+            fetchPayroll();
+        } catch (error) {
+            console.error("Individual generation failed:", error);
+            alert("Error generating payroll");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // ========== NEW: Manual payroll handlers ==========
     const handleManuallyPayroll = () => {
@@ -365,71 +429,97 @@ const PayrollPage = () => {
                                                 <p className="text-muted-foreground">Loading payroll records...</p>
                                             </td>
                                         </tr>
-                                    ) : (!filteredPayrollData || filteredPayrollData.length === 0) ? (
+                                    ) : (!combinedPayrollData || combinedPayrollData.length === 0) ? (
                                         <tr>
                                             <td colSpan="7" className="px-3 sm:px-6 py-12 text-center">
                                                 <Icon name="DollarSign" size={48} className="text-muted-foreground/20 mx-auto mb-4" />
                                                 <p className="text-foreground font-medium">
-                                                    {searchTerm ? 'No matching records found' : 'No payroll records found'}
+                                                    {searchTerm ? 'No matching records found' : 'No employees found'}
                                                 </p>
                                                 <p className="text-muted-foreground text-sm">
                                                     {searchTerm 
                                                         ? 'Try adjusting your search term.' 
-                                                        : `Records for ${months.find(m => m.value === selectedMonth).label} ${selectedYear} will appear here.`}
+                                                        : `Active employees for ${months.find(m => m.value === selectedMonth).label} ${selectedYear} will appear here.`}
                                                 </p>
                                             </td>
                                         </tr>
                                     ) : (
-                                        filteredPayrollData.map((record) => (
-                                            <React.Fragment key={record.id}>
+                                        combinedPayrollData.map((row) => (
+                                            <React.Fragment key={row.id}>
                                             <tr className="hover:bg-muted/30 transition-colors">
                                                 <td className="px-3 sm:px-6 py-4">
                                                     <div className="flex items-center space-x-3">
                                                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                                            {record.employee?.user?.firstName?.[0]}{record.employee?.user?.lastName?.[0]}
+                                                            {row.employee?.user?.firstName?.[0]}{row.employee?.user?.lastName?.[0]}
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm font-medium text-foreground">{record.employee?.user?.firstName} {record.employee?.user?.lastName}</p>
-                                                            <p className="text-xs text-muted-foreground">{record.employee?.employeeCode}</p>
+                                                            <p className="text-sm font-medium text-foreground">{row.employee?.user?.firstName} {row.employee?.user?.lastName}</p>
+                                                            <p className="text-xs text-muted-foreground">{row.employee?.employeeCode}</p>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm">₹{record.basicSalary}</td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm text-green-600">+₹{record.allowances}</td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm text-red-600">-₹{record.deductions}</td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">₹{record.netSalary}</td>
+                                                <td className="px-3 sm:px-6 py-4 text-sm">₹{row.basicSalary}</td>
+                                                <td className="px-3 sm:px-6 py-4 text-sm text-green-600">
+                                                    {row.isGenerated ? `+₹${row.allowances}` : '-'}
+                                                </td>
+                                                <td className="px-3 sm:px-6 py-4 text-sm text-red-600">
+                                                    {row.isGenerated ? `-₹${row.deductions}` : '-'}
+                                                </td>
+                                                <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
+                                                    {row.isGenerated ? `₹${row.netSalary}` : '₹' + (row.employee.salary || '0')}
+                                                </td>
                                                 <td className="px-3 sm:px-6 py-4">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                                        row.status === 'paid' ? 'bg-green-100 text-green-800' : 
+                                                        row.status === 'not-generated' ? 'bg-slate-100 text-slate-500' : 'bg-yellow-100 text-yellow-800'
                                                         }`}>
-                                                        {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                                                        {row.status.replace('-', ' ')}
                                                     </span>
                                                 </td>
                                                 <td className="px-3 sm:px-6 py-4">
                                                     <div className="flex items-center justify-end space-x-2">
-                                                        <button 
-                                                            onClick={() => {
-                                                                setSelectedPayroll(record);
-                                                                setIsDetailsModalOpen(true);
-                                                            }}
-                                                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                                                            title="View"
-                                                        >
-                                                            <Icon name="Eye" size={18} />
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => handleEditPayroll(record)}
-                                                            className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-                                                            title="Edit"
-                                                        >
-                                                            <Icon name="Pencil" size={18} />
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => handleDeletePayroll(record.id)}
-                                                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                                            title="Delete"
-                                                        >
-                                                            <Icon name="Trash2" size={18} />
-                                                        </button>
+                                                        {!row.isGenerated ? (
+                                                            <button 
+                                                                onClick={() => handleGenerateIndividual(row)}
+                                                                className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-primary/90 transition-all uppercase tracking-wider"
+                                                            >
+                                                                Generate
+                                                            </button>
+                                                        ) : (
+                                                            <>
+                                                                <button 
+                                                                    onClick={() => handleSendIndividualEmail(row.id)}
+                                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                    title="Send Email"
+                                                                >
+                                                                    <Icon name="Mail" size={18} />
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => {
+                                                                        setSelectedPayroll(row.record);
+                                                                        setIsDetailsModalOpen(true);
+                                                                    }}
+                                                                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                    title="View"
+                                                                >
+                                                                    <Icon name="Eye" size={18} />
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleEditPayroll(row.record)}
+                                                                    className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                                    title="Edit"
+                                                                >
+                                                                    <Icon name="Pencil" size={18} />
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleDeletePayroll(row.id)}
+                                                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                                    title="Delete"
+                                                                >
+                                                                    <Icon name="Trash2" size={18} />
+                                                                </button>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Icon from '../../../components/AppIcon';
 
 import { getISTDateString } from '../../../utils/dateUtils';
 import AppImage from '../../../components/AppImage';
 import AttendanceModal from './AttendanceModal';
+import EditAttendanceModal from './EditAttendanceModal';
+import { Checkbox } from '../../../components/ui/Checkbox';
+
+const DEFAULT_VISIBLE_COLUMNS = {
+  employeeName: true,
+  department: true,
+  checkInTime: true,
+  checkOutTime: true,
+  workDuration: true,
+  status: true,
+  label: true,
+  notes: true,
+  location: true,
+  productivity: true
+};
+
+const COLUMN_OPTIONS = [
+  { key: 'department', label: 'Department' },
+  { key: 'checkInTime', label: 'Check In' },
+  { key: 'checkOutTime', label: 'Check Out' },
+  { key: 'workDuration', label: 'Duration' },
+  { key: 'status', label: 'Status' },
+  { key: 'label', label: 'Label' },
+  { key: 'notes', label: 'Notes' },
+  { key: 'location', label: 'Location' },
+  { key: 'productivity', label: 'Productivity' }
+];
+
+const COLUMN_STORAGE_KEY = 'attendance-table-visible-columns';
 
 // Avatar Component with fallback logic
 const EmployeeAvatar = ({ employee, size = 'md' }) => {
@@ -73,27 +102,56 @@ const AttendanceTable = ({
   onSelectionChange,
   onCheckIn,
   onCheckOut,
+  onUpdate,
   onViewHistory
 }) => {
   const [sortField, setSortField] = useState('employeeName');
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState({
-    employeeName: true,
-    department: true,
-    checkInTime: true,
-    checkOutTime: true,
-    workDuration: true,
-    status: true,
-    label: true,
-    location: true,
-    productivity: true
-  });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [attendanceToEdit, setAttendanceToEdit] = useState(null);
+  const [visibleColumns, setVisibleColumns] = useState(DEFAULT_VISIBLE_COLUMNS);
+  const [draftVisibleColumns, setDraftVisibleColumns] = useState(DEFAULT_VISIBLE_COLUMNS);
   const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
 
   const handleColumnToggle = (column) => {
-    setVisibleColumns(prev => ({ ...prev, [column]: !prev[column] }));
+    setDraftVisibleColumns(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
+  useEffect(() => {
+    try {
+      const savedColumns = localStorage.getItem(COLUMN_STORAGE_KEY);
+      if (!savedColumns) return;
+
+      const parsedColumns = JSON.parse(savedColumns);
+      const normalizedColumns = { ...DEFAULT_VISIBLE_COLUMNS, ...parsedColumns };
+      setVisibleColumns(normalizedColumns);
+      setDraftVisibleColumns(normalizedColumns);
+    } catch (error) {
+      console.error('Failed to load saved attendance columns:', error);
+    }
+  }, []);
+
+  const handleOpenColumnSettings = (event) => {
+    event.stopPropagation();
+    setDraftVisibleColumns(visibleColumns);
+    setIsColumnSettingsOpen(prev => !prev);
+  };
+
+  const handleCancelColumnSettings = () => {
+    setDraftVisibleColumns(visibleColumns);
+    setIsColumnSettingsOpen(false);
+  };
+
+  const handleSaveColumnSettings = () => {
+    setVisibleColumns(draftVisibleColumns);
+    setIsColumnSettingsOpen(false);
+    try {
+      localStorage.setItem(COLUMN_STORAGE_KEY, JSON.stringify(draftVisibleColumns));
+    } catch (error) {
+      console.error('Failed to save attendance columns:', error);
+    }
   };
 
 
@@ -125,6 +183,17 @@ const AttendanceTable = ({
   const handleEmployeeClick = (employee) => {
     setSelectedEmployee(employee);
     setShowModal(true);
+  };
+
+  const handleEditClick = (event, attendance) => {
+    event.stopPropagation();
+    setAttendanceToEdit(attendance);
+    setShowEditModal(true);
+  };
+
+  const handleSaveUpdate = (id, data) => {
+    onUpdate(id, data);
+    setShowEditModal(false);
   };
 
   const getRelativeTime = (timeStr, dateStr) => {
@@ -273,17 +342,15 @@ const AttendanceTable = ({
               {visibleColumns.workDuration && <SortableHeader field="workDuration">Duration</SortableHeader>}
               {visibleColumns.status && <SortableHeader field="status">Status</SortableHeader>}
               {visibleColumns.label && <SortableHeader field="label">Label</SortableHeader>}
+              {visibleColumns.notes && <SortableHeader field="notes">Notes</SortableHeader>}
               {visibleColumns.location && <SortableHeader field="location">Location</SortableHeader>}
               {visibleColumns.productivity && <SortableHeader field="productivity">Productivity</SortableHeader>}
 
               <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-widest relative">
                 <div className="flex items-center gap-2">
                   <span>Actions</span>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsColumnSettingsOpen(!isColumnSettingsOpen);
-                    }}
+                  <button
+                    onClick={handleOpenColumnSettings}
                     className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-600"
                   >
                     <Icon name="MoreVertical" size={14} />
@@ -291,29 +358,36 @@ const AttendanceTable = ({
                 </div>
 
                 {isColumnSettingsOpen && (
-                  <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-4 w-48 text-left">
+                  <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-4 w-56 text-left">
                     <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Display Columns</h4>
-                    <div className="space-y-2">
-                      {[
-                        { key: 'department', label: 'Department' },
-                        { key: 'checkInTime', label: 'Check In' },
-                        { key: 'checkOutTime', label: 'Check Out' },
-                        { key: 'workDuration', label: 'Duration' },
-                        { key: 'status', label: 'Status' },
-                        { key: 'label', label: 'Label' },
-                        { key: 'location', label: 'Location' },
-                        { key: 'productivity', label: 'Productivity' }
-                      ].map(col => (
-                        <label key={col.key} className="flex items-center space-x-3 cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition-colors group">
-                          <input
-                            type="checkbox"
-                            checked={visibleColumns[col.key]}
+                    <div className="space-y-1.5">
+                      {COLUMN_OPTIONS.map(col => (
+                        <div key={col.key} className="hover:bg-slate-50 px-1.5 py-1 rounded-lg transition-colors">
+                          <Checkbox
+                            checked={draftVisibleColumns[col.key]}
                             onChange={() => handleColumnToggle(col.key)}
-                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-100 h-3.5 w-3.5"
+                            label={col.label}
+                            size="sm"
+                            className="items-center space-x-3"
                           />
-                          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">{col.label}</span>
-                        </label>
+                        </div>
                       ))}
+                    </div>
+                    <div className="mt-4 flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+                      <button
+                        type="button"
+                        onClick={handleCancelColumnSettings}
+                        className="px-3 py-1.5 text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveColumnSettings}
+                        className="px-3 py-1.5 text-[11px] font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                        Save
+                      </button>
                     </div>
                   </div>
                 )}
@@ -415,6 +489,22 @@ const AttendanceTable = ({
                     ) : <span className="text-xs font-bold text-slate-300">—</span>}
                   </td>
                 )}
+                {/* {visibleColumns.notes && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {employee?.notes ? (
+                      <div className="max-w-[250px] overflow-hidden text-ellipsis">
+                         {employee.notes.split('|').map((note, i) => {
+                            const isEditLog = note.includes('[Edited on');
+                            return (
+                                <div key={i} className={`text-[10px] truncate ${isEditLog ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}>
+                                    {note.trim()}
+                                </div>
+                            );
+                         })}
+                      </div>
+                    ) : <span className="text-xs font-bold text-slate-300">—</span>}
+                  </td>
+                )} */}
                 {visibleColumns.location && (
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1.5 text-slate-600">
@@ -466,6 +556,16 @@ const AttendanceTable = ({
                       <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-none uppercase tracking-wider">Done</span>
                     )}
 
+                    {employee.hasRecord && (
+                      <button
+                        onClick={(e) => handleEditClick(e, employee)}
+                        className="p-2 bg-amber-50 border border-amber-100 text-amber-500 hover:text-amber-700 hover:bg-amber-100 transition-all rounded-none"
+                        title="Edit Record"
+                      >
+                        <Icon name="Edit" size={14} />
+                      </button>
+                    )}
+
                     <button
                       onClick={() => onViewHistory(employee)}
                       className="p-2 bg-slate-50 border border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all rounded-none"
@@ -493,6 +593,13 @@ const AttendanceTable = ({
           </div>
         )}
       </div>
+
+      <EditAttendanceModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSave={handleSaveUpdate}
+        attendance={attendanceToEdit}
+      />
     </div>
   );
 };

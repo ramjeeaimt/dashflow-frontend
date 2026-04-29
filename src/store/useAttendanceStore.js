@@ -63,6 +63,7 @@ const useAttendanceStore = create((set, get) => ({
                     status: record?.status || 'not_checked_in',
                     location: record?.location || 'Office',
                     date: record?.date || todayDate,
+                    notes: record?.notes || '',
                     profileImage: emp.user?.avatar,
                     hasRecord: !!record
                 };
@@ -150,6 +151,20 @@ const useAttendanceStore = create((set, get) => ({
     bulkCheckIn: async (employeeIds, companyId, notes, label) => {
         try {
             await attendanceService.bulkCheckIn(employeeIds, notes, label);
+            await get().fetchAttendanceData(companyId);
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    updateRecord: async (id, data, companyId) => {
+        try {
+            await attendanceService.update(id, {
+                ...data,
+                checkInTime: data.checkInTime ? data.checkInTime : null,
+                checkOutTime: (data.checkOutTime && data.checkOutTime !== '--') ? data.checkOutTime : null,
+            });
             await get().fetchAttendanceData(companyId);
             return true;
         } catch (error) {

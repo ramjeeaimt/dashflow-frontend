@@ -98,7 +98,7 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-card w-full max-w-4xl rounded-lg shadow-lg border border-border animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            <div className="bg-card w-full max-w-6xl rounded-lg shadow-lg border border-border animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <div>
                         <h2 className="text-xl font-semibold text-foreground">
@@ -201,8 +201,19 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                                                     </span>
                                                 ) : '--'}
                                             </td>
-                                            <td className="px-4 py-3 text-xs text-muted-foreground max-w-xs truncate group-hover:text-foreground transition-colors" title={record.notes}>
-                                                {record.notes || '--'}
+                                            <td className="px-4 py-3 text-xs text-muted-foreground min-w-[350px]">
+                                                {record.notes ? (
+                                                    <div className="space-y-1">
+                                                        {record.notes.split('|').map((note, i) => {
+                                                            const isEditLog = note.includes('[Edited on');
+                                                            return (
+                                                                <div key={i} className={`pb-1 ${i !== 0 ? 'border-t border-slate-100 pt-1' : ''} ${isEditLog ? 'text-blue-600 font-medium' : 'text-slate-600'}`}>
+                                                                    {note.trim()}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ) : '--'}
                                             </td>
                                         </tr>
                                     ))}

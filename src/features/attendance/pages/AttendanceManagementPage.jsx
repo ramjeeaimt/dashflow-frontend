@@ -31,6 +31,7 @@ const AttendanceManagement = () => {
     setFilters,
     checkIn,
     checkOut,
+    updateRecord,
     createRecord
   } = useAttendanceStore();
 
@@ -84,6 +85,15 @@ const AttendanceManagement = () => {
       alert('Attendance record created successfully');
     } catch (error) {
       alert('Failed to create attendance record');
+    }
+  };
+
+  const handleUpdateAttendance = async (id, data) => {
+    try {
+      await updateRecord(id, data, user.company.id);
+      alert('Attendance record updated successfully');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update attendance record');
     }
   };
 
@@ -170,8 +180,8 @@ const AttendanceManagement = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header onToggleSidebar={toggleMobileSidebar} />
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleSidebar}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
@@ -190,8 +200,8 @@ const AttendanceManagement = () => {
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
                 className={`flex items-center space-x-2 px-4 py-2 text-xs font-bold rounded-xl transition-all border ${showAnalytics
-                    ? 'bg-blue-50 border-blue-100 text-blue-600 shadow-sm'
-                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-blue-50 border-blue-100 text-blue-600 shadow-sm'
+                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                   }`}
               >
                 <Icon name="BarChart2" size={16} />
@@ -321,6 +331,7 @@ const AttendanceManagement = () => {
                 onSelectionChange={setSelectedEmployees}
                 onCheckIn={handleCheckIn}
                 onCheckOut={handleCheckOut}
+                onUpdate={handleUpdateAttendance}
                 onViewHistory={handleViewHistory}
               />
             </div>

@@ -79,6 +79,9 @@ export const API_ENDPOINTS = {
     NOTIFICATIONS: {
         BASE: '/notifications',
         MINE: '/notifications/mine',
+        SEND: '/notifications/send',
+        HISTORY: '/notifications/history',
+        STATS: '/notifications/stats',
         MARK_READ: '/notifications/mark-read',
         CLEAR: '/notifications/clear',
         FCM_TOKEN: '/notifications/fcm-token',

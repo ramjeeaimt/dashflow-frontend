@@ -83,6 +83,13 @@ export const attendanceService = {
         const resData = response.data;
         const data = resData?.data !== undefined ? resData.data : resData;
         return Array.isArray(data) ? data : [];
+    },
+
+    // Update attendance record
+    async update(id, attendanceData) {
+        const response = await apiClient.patch(`${API_ENDPOINTS.ATTENDANCE.BASE}/${id}`, attendanceData);
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     }
 };
 
