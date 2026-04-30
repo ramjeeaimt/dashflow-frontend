@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import authService from '../services/auth.service';
 
-// Sanitize user data to prevent circular references
 const sanitizeUser = (user) => {
     if (!user) return null;
 
@@ -11,7 +10,7 @@ const sanitizeUser = (user) => {
         description: role.description
     })) : [];
 
-    // Ensure admin@difmo.com always has Admin role for UI consistency
+
     if (user.email === 'admin@difmo.com' && !roles.some(r => r.name === 'Admin')) {
         roles.push({ id: 'super-admin', name: 'Admin', description: 'System Administrator' });
     }
@@ -71,7 +70,7 @@ const useAuthStore = create((set, get) => ({
         set({ isLoading: true, error: null });
 
         // Create a timeout promise to prevent indefinite hanging (especially on mobile)
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Login timed out. Please check your internet or server.')), 10000)
         );
 
@@ -94,7 +93,7 @@ const useAuthStore = create((set, get) => ({
             if (accessToken) {
                 localStorage.setItem('token', accessToken);
             } else {
-                throw new Error('Login failed: No access token received');
+                throw new Error('Could not complete login. Please try again or contact support.');
             }
 
             localStorage.setItem('user', JSON.stringify(sanitizedUser));
@@ -111,8 +110,17 @@ const useAuthStore = create((set, get) => ({
         } catch (error) {
             console.error('[AuthFlow] Login error:', error);
 
+            let errorMessage = 'Login failed';
+
+            if (error.response?.data?.message) {
+                const backendMessage = error.response.data.message;
+                errorMessage = Array.isArray(backendMessage) ? backendMessage[0] : backendMessage;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
             set({
-                error: error.response?.data?.message || error.message || 'Login failed',
+                error: errorMessage,
                 isLoading: false
             });
 
@@ -175,7 +183,7 @@ const useAuthStore = create((set, get) => ({
         const isSuperAdmin = user.roles?.some(r => r.name === 'Super Admin' || r.name === 'Admin') || user.email === 'admin@difmo.com';
         if (isSuperAdmin) return true;
 
-        return user.permissions.some(p => 
+        return user.permissions.some(p =>
             p.action === action && (p.resource === resource || p.resource === 'all') ||
             p.action === 'manage' && (p.resource === resource || p.resource === 'all')
         );
