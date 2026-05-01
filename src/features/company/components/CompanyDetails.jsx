@@ -3,6 +3,7 @@ import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
+import Icon from '../../../components/AppIcon';
 
 const CompanyDetails = () => {
     const { user } = useAuthStore();
@@ -29,7 +30,7 @@ const CompanyDetails = () => {
             setLoading(true);
 
             // Fetch by ID
-            const response = await api.get(`/company/id/${user.company.id}`);
+            const response = await api.get(`/system-company/id/${user.company.id}`);
             const data = response.data;
             const company = data?.data || data;
 
@@ -89,56 +90,73 @@ const CompanyDetails = () => {
     if (loading && !formData.name) return <div>Loading...</div>;
 
     return (
-        <div className="max-w-4xl">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Company Information</h2>
+        <div className="max-w-4xl mx-auto">
+            <div className="flex justify-between items-center mb-10">
+                <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Organization Identity</h3>
+                    <p className="text-sm text-slate-500">Essential information about your company.</p>
+                </div>
                 {!isEditing && (
-                    <Button onClick={() => setIsEditing(true)} iconName="Edit">
-                        Edit Profile
+                    <Button
+                        onClick={() => setIsEditing(true)}
+                        variant="outline"
+                        className="border-slate-200 text-slate-700 hover:bg-slate-50"
+                    >
+                        <Icon name="Edit" size={16} className="mr-2" />
+                        Edit Details
                     </Button>
                 )}
             </div>
 
             {isEditing ? (
-                <form onSubmit={handleSubmit} className="space-y-6 bg-card p-6 rounded-lg border border-border">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-slate-50/50 p-8 rounded-xl border border-slate-200">
                         <Input
                             label="Company Name"
                             value={formData.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                             required
+                            placeholder="Acme Inc."
                         />
                         <Input
-                            label="Website"
+                            label="Official Website"
                             value={formData.website}
                             onChange={(e) => handleChange('website', e.target.value)}
+                            placeholder="https://example.com"
                         />
                         <Input
-                            label="Industry"
+                            label="Industry Type"
                             value={formData.industry}
                             onChange={(e) => handleChange('industry', e.target.value)}
+                            placeholder="Technology, Manufacturing, etc."
                         />
                         <Input
-                            label="Company Size"
+                            label="Estimated Size"
                             value={formData.size}
                             onChange={(e) => handleChange('size', e.target.value)}
+                            placeholder="e.g. 50-100"
                         />
                         <Input
-                            label="Email"
+                            label="Primary Email"
                             value={formData.email}
                             onChange={(e) => handleChange('email', e.target.value)}
                             disabled
+                            className="bg-slate-100"
                         />
                         <Input
-                            label="Phone"
+                            label="Support Phone"
                             value={formData.phone}
                             onChange={(e) => handleChange('phone', e.target.value)}
+                            placeholder="+1 (555) 000-0000"
                         />
-                        <Input
-                            label="Address"
-                            value={formData.address}
-                            onChange={(e) => handleChange('address', e.target.value)}
-                        />
+                        <div className="md:col-span-2">
+                            <Input
+                                label="HQ Address"
+                                value={formData.address}
+                                onChange={(e) => handleChange('address', e.target.value)}
+                                placeholder="Street address, Floor, Suite"
+                            />
+                        </div>
                         <Input
                             label="City"
                             value={formData.city}
@@ -149,77 +167,94 @@ const CompanyDetails = () => {
                             value={formData.country}
                             onChange={(e) => handleChange('country', e.target.value)}
                         />
-                        <Input
-                            label="Opening Time"
-                            type="time"
-                            value={formData.openingTime}
-                            onChange={(e) => handleChange('openingTime', e.target.value)}
-                        />
-                        <Input
-                            label="Closing Time"
-                            type="time"
-                            value={formData.closingTime}
-                            onChange={(e) => handleChange('closingTime', e.target.value)}
-                        />
+                        <div className="md:col-span-2 grid grid-cols-2 gap-4 border-t border-slate-200 pt-6">
+                            <Input
+                                label="Business Opening Time"
+                                type="time"
+                                value={formData.openingTime}
+                                onChange={(e) => handleChange('openingTime', e.target.value)}
+                            />
+                            <Input
+                                label="Business Closing Time"
+                                type="time"
+                                value={formData.closingTime}
+                                onChange={(e) => handleChange('closingTime', e.target.value)}
+                            />
+                        </div>
                     </div>
 
-                    <div className="flex justify-end space-x-3">
-                        <Button variant="ghost" onClick={() => setIsEditing(false)} type="button">
+                    <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsEditing(false)}
+                            type="button"
+                            className="text-slate-500 hover:text-slate-700"
+                        >
                             Cancel
                         </Button>
-                        <Button type="submit" loading={saving} iconName="Save">
+                        <Button
+                            type="submit"
+                            loading={saving}
+                            className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-8"
+                        >
+                            <Icon name="Save" size={16} className="mr-2" />
                             Save Changes
                         </Button>
                     </div>
                 </form>
             ) : (
-                <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Company Name</label>
-                            <p className="text-lg font-medium mt-1">{formData.name}</p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Website</label>
-                            <p className="text-lg mt-1 text-primary hover:underline">
-                                <a href={formData.website} target="_blank" rel="noopener noreferrer">{formData.website || '-'}</a>
-                            </p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Industry</label>
-                            <p className="text-lg mt-1">{formData.industry || '-'}</p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Company Size</label>
-                            <p className="text-lg mt-1">{formData.size || '-'}</p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Email</label>
-                            <p className="text-lg mt-1">{formData.email}</p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Phone</label>
-                            <p className="text-lg mt-1">{formData.phone || '-'}</p>
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="text-sm font-medium text-muted-foreground">Address</label>
-                            <p className="text-lg mt-1">
-                                {[formData.address, formData.city, formData.country].filter(Boolean).join(', ') || '-'}
-                            </p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Opening Time</label>
-                            <p className="text-lg mt-1">{formData.openingTime || '-'}</p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-muted-foreground">Closing Time</label>
-                            <p className="text-lg mt-1">{formData.closingTime || '-'}</p>
-                        </div>
-                    </div>
+                <div className="divide-y divide-slate-100">
+                    <DetailRow label="Legal Name" value={formData.name} icon="Building" />
+                    <DetailRow
+                        label="Website"
+                        value={formData.website}
+                        icon="Globe"
+                        isLink
+                    />
+                    <DetailRow label="Industry" value={formData.industry} icon="Briefcase" />
+                    <DetailRow label="Organization Size" value={formData.size} icon="Users" />
+                    <DetailRow label="Corporate Email" value={formData.email} icon="Mail" />
+                    <DetailRow label="Phone Number" value={formData.phone} icon="Phone" />
+                    <DetailRow
+                        label="Headquarters"
+                        value={[formData.address, formData.city, formData.country].filter(Boolean).join(', ') || 'Not provided'}
+                        icon="MapPin"
+                    />
+                    <DetailRow
+                        label="Operating Hours"
+                        value={formData.openingTime && formData.closingTime ? `${formData.openingTime} - ${formData.closingTime}` : null}
+                        icon="Clock"
+                    />
                 </div>
             )}
         </div>
     );
 };
+
+const DetailRow = ({ label, value, icon, isLink }) => (
+    <div className="py-6 flex flex-col sm:flex-row sm:items-center group">
+        <div className="w-full sm:w-1/3 flex items-center gap-3 mb-1 sm:mb-0">
+            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                <Icon name={icon} size={16} />
+            </div>
+            <span className="text-sm font-medium text-slate-500">{label}</span>
+        </div>
+        <div className="w-full sm:w-2/3 pl-11 sm:pl-0">
+            {isLink && value ? (
+                <a
+                    href={value.startsWith('http') ? value : `https://${value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
+                >
+                    {value}
+                    <Icon name="ExternalLink" size={12} />
+                </a>
+            ) : (
+                <p className="text-sm font-semibold text-slate-900">{value || 'Not provided'}</p>
+            )}
+        </div>
+    </div>
+);
 
 export default CompanyDetails;

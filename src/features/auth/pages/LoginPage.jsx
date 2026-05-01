@@ -20,7 +20,7 @@ const Login = () => {
                 targetPath = '/employee-dashboard';
             } else {
                 // Fallback case for existing tokens or other roles
-                const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin'].includes(r.name));
+                const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin', 'ADMIN'].includes(r.name)) || ['admin@difmo.com', 'pritam@difmo.com'].includes(user?.email);
                 const isEmployee = user?.roles?.some(r => r.name === 'Employee');
                 const isIntern = user?.roles?.some(r => r.name === 'Interns');
 

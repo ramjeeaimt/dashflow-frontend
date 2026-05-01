@@ -11,7 +11,7 @@ const sanitizeUser = (user) => {
     })) : [];
 
 
-    if (user.email === 'admin@difmo.com' && !roles.some(r => r.name === 'Admin')) {
+    if (['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user.email) && !roles.some(r => r.name?.toUpperCase() === 'ADMIN')) {
         roles.push({ id: 'super-admin', name: 'Admin', description: 'System Administrator' });
     }
 
@@ -28,6 +28,7 @@ const sanitizeUser = (user) => {
             name: user.company.name,
             email: user.company.email
         } : null,
+        companies: (user.companies || []).map(c => ({ id: c.id, name: c.name, email: c.email })),
         permissions: user.permissions || []
     };
 };
@@ -64,12 +65,9 @@ const useAuthStore = create((set, get) => ({
     error: null,
 
     login: async (email, password) => {
-        // Prevent multiple clicks/requests while already loading
         if (get().isLoading) return;
 
         set({ isLoading: true, error: null });
-
-        // Create a timeout promise to prevent indefinite hanging (especially on mobile)
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Login timed out. Please check your internet or server.')), 10000)
         );
@@ -142,6 +140,37 @@ const useAuthStore = create((set, get) => ({
         }
     },
 
+    switchCompany: async (companyId) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await authService.switchCompany(companyId);
+            const payload = response.data || response;
+            const accessToken = payload.access_token;
+            const sanitizedUser = sanitizeUser(payload.user);
+
+            if (accessToken) {
+                localStorage.setItem('token', accessToken);
+            }
+            localStorage.setItem('user', JSON.stringify(sanitizedUser));
+
+            set({
+                user: sanitizedUser,
+                token: accessToken,
+                isAuthenticated: true,
+                isLoading: false
+            });
+
+            // Reload to refresh all state based on new company
+            window.location.href = '/dashboard';
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || 'Switching company failed',
+                isLoading: false
+            });
+            throw error;
+        }
+    },
+
     fetchProfile: async () => {
         set({ isLoading: true, error: null });
         try {
@@ -180,7 +209,8 @@ const useAuthStore = create((set, get) => ({
         if (!user || !user.permissions) return false;
 
         // Check for super admin bypass logic if applicable
-        const isSuperAdmin = user.roles?.some(r => r.name === 'Super Admin' || r.name === 'Admin') || user.email === 'admin@difmo.com';
+        const isSuperAdmin = user.roles?.some(r => r.name?.toUpperCase() === 'SUPER ADMIN' || r.name?.toUpperCase() === 'ADMIN') || 
+                            ['admin@difmo.com', 'info@difmo.com', 'hello@system.com', 'pritam@difmo.com'].includes(user.email);
         if (isSuperAdmin) return true;
 
         return user.permissions.some(p =>

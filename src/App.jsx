@@ -8,10 +8,10 @@ function App() {
   const { listen, stopListening } = useNotificationStore();
 
   useEffect(() => {
-    if (token && !user) {
+    if (token) {
       fetchProfile();
     }
-  }, [token, user, fetchProfile]);
+  }, [token, fetchProfile]);
 
   useEffect(() => {
     if (user?.id) {

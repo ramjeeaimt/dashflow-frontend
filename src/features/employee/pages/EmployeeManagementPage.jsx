@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import {
@@ -13,6 +14,7 @@ import useAuthStore from '../../../store/useAuthStore';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 
 const EmployeeManagement = () => {
+  const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -46,6 +48,8 @@ const EmployeeManagement = () => {
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Employee Management', path: '/employee-management' }
   ];
+
+  const isSystemAdmin = ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email);
 
   useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
@@ -122,7 +126,7 @@ const EmployeeManagement = () => {
   };
 
   const handleViewEmployee = (employee) => {
-    setModalState({ isOpen: true, mode: 'view', employee });
+    navigate(`/employees/${employee.id}`);
   };
 
   const handleDeleteEmployee = async (employeeId) => {
@@ -213,9 +217,9 @@ const EmployeeManagement = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header onToggleSidebar={toggleMobileSidebar} />
-        <Sidebar 
-          isCollapsed={sidebarCollapsed} 
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+        <Sidebar
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           isMobileOpen={isMobileSidebarOpen}
           onMobileClose={() => setIsMobileSidebarOpen(false)}
         />
@@ -234,8 +238,8 @@ const EmployeeManagement = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header onToggleSidebar={toggleMobileSidebar} />
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
@@ -247,9 +251,13 @@ const EmployeeManagement = () => {
             <div>
               <BreadcrumbNavigation items={breadcrumbItems} />
               <div className="mt-4">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Employee Management</h1>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                  {isSystemAdmin ? 'Global Founder Directory' : 'Employee Management'}
+                </h1>
                 <p className="text-slate-500 max-w-2xl text-sm font-medium">
-                  Efficiently manage your workforce, departments, and employee details in one place.
+                  {isSystemAdmin
+                    ? 'Directory of all company administrators and founders across the DIFMO platform.'
+                    : 'Efficiently manage your workforce, departments, and employee details in one place.'}
                 </p>
               </div>
             </div>

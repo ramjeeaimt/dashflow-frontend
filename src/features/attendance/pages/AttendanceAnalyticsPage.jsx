@@ -23,7 +23,7 @@ const AttendanceAnalytics = () => {
     try {
       const now = new Date();
       let startDate = new Date();
-      
+
       if (selectedPeriod === 'weekly') {
         startDate.setDate(now.getDate() - 7);
       } else if (selectedPeriod === 'monthly') {
@@ -108,8 +108,8 @@ const AttendanceAnalytics = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header onToggleSidebar={toggleMobileSidebar} />
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleSidebar}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
@@ -118,13 +118,13 @@ const AttendanceAnalytics = () => {
         <div className="p-4 sm:p-6 max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-            <div>
+            {/* <div>
               <BreadcrumbNavigation items={breadcrumbItems} />
               <h1 className="text-3xl font-semibold text-foreground mb-2">Attendance Analytics</h1>
               <p className="text-muted-foreground">
                 Comprehensive workforce attendance insights and trend analysis for strategic decision-making.
               </p>
-            </div>
+            </div> */}
 
             <div className="flex items-center space-x-4 mt-4 lg:mt-0">
               <ExportPanel onExport={handleExportData} />

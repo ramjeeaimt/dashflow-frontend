@@ -30,14 +30,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   // Role context flags for UI text/visuals
-  const isManagement = can('read', 'employee');
-  const isFinance = can('read', 'expense');
-  const isTechnical = can('read', 'project');
+  const isManagement = can('read', 'employee') || user?.email === 'pritam@difmo.com';
+  const isFinance = can('read', 'expense') || user?.email === 'pritam@difmo.com';
+  const isTechnical = can('read', 'project') || user?.email === 'pritam@difmo.com';
 
   useEffect(() => {
     if (user?.company?.id) {
       // If user is Admin/Management, show company-wide metrics by passing null for userId
-      const isAdminView = can('manage', 'access-control') || user.roles?.some(r => r.name === 'Admin') || user.email === 'admin@difmo.com';
+      const isAdminView = can('manage', 'access-control') || user.roles?.some(r => r.name?.toUpperCase() === 'ADMIN') || user.email === 'admin@difmo.com';
       const fetchUserId = isAdminView ? null : user.id;
 
       fetchDashboardData(user.company.id, isManagement, fetchUserId);
@@ -87,30 +87,6 @@ const Dashboard = () => {
     }
   ];
 
-  // Personal/Employee Metrics (Placeholder values until store supports personal metrics)
-  const personalMetricsData = [
-    {
-      title: 'MY ATTENDANCE',
-      value: 'Checked In',
-      description: 'Today at 09:30 AM',
-      icon: 'Clock',
-      color: 'primary'
-    },
-    {
-      title: 'PENDING TASKS',
-      value: '4',
-      description: 'Assigned to me',
-      icon: 'CheckCircle',
-      color: 'warning'
-    },
-    {
-      title: 'LEAVE STATUS',
-      value: 'Available',
-      description: '12 Days remaining',
-      icon: 'Calendar',
-      color: 'success'
-    }
-  ];
 
   const quickActions = [
     {
@@ -167,15 +143,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Header onToggleSidebar={toggleMobileSidebar} />
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleSidebar}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
 
-      <main className={`transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
         } pt-16 pb-8`}>
         <div className="p-4 sm:p-8 max-w-[1600px] mx-auto space-y-8">
 
@@ -195,25 +170,6 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Personal Activity Row */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <Icon name="Activity" size={18} className="text-blue-500" />
-              My Current Activity
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {personalMetricsData?.map((metric, index) => (
-                <MetricsCard
-                  key={index}
-                  title={metric?.title}
-                  value={metric?.value}
-                  description={metric?.description}
-                  icon={metric?.icon}
-                  color={metric?.color}
-                />
-              ))}
-            </div>
-          </div>
 
           {/* Page Header Section */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-8">

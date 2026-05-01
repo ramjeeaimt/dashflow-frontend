@@ -19,6 +19,9 @@ import EmployeeCheckInCheckOut from './features/employee/pages/CheckInCheckOutPa
 import AttendanceAnalytics from './features/attendance/pages/AttendanceAnalyticsPage';
 import ScrollToTop from "./components/ScrollToTop";
 import Login from './features/auth/pages/LoginPage';
+import CompanyManagement from './features/company/pages/CompanyManagementPage';
+import MyCompanies from './features/company/pages/MyCompaniesPage';
+import EmployeeDetails from './features/employee/pages/EmployeeDetailsPage';
 
 import Profile from "./features/profile/pages/ProfilePage";
 import LandingPage from './features/landing/pages/LandingPage';
@@ -49,10 +52,12 @@ import TemplateDesignerPage from "features/notifications/pages/TemplateDesignerP
 import EmailTemplatesPage from "features/notifications/pages/EmailTemplatesPage";
 import EmployeeDashboard from "features/employee/pages/EmployeeDashboardPage";
 
+import GlobalUsersPage from "features/admin/pages/GlobalUsersPage";
+
 const DashboardSwitcher = () => {
   const { user } = useAuthStore();
-  const isAdmin = user?.roles?.some(r => ['Admin', 'Super Admin', 'Manager'].includes(r.name)) || user?.email === 'admin@difmo.com';
-  
+  const isAdmin = user?.roles?.some(r => ['Admin', 'Super Admin', 'Manager', 'ADMIN'].includes(r.name)) || ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email);
+
   if (isAdmin) {
     return <Dashboard />;
   }
@@ -70,10 +75,11 @@ const Routes = () => {
           <Route path="/" element={
             isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />
           } />
-          <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
-          <Route path="/pricing" element={<Pricing/>}/>
-          <Route path="/features" element={<FeaturesPage/>}/>
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/features" element={<FeaturesPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/global-users" element={<GlobalUsersPage />} />
           <Route path="/company-registration" element={<CompanyRegistration />} />
 
           {/* Protected Routes */}
@@ -89,15 +95,15 @@ const Routes = () => {
           } />
           <Route path="/employee/leaves" element={
             <ProtectedRoute>
-              <LeaveForm/>
+              <LeaveForm />
             </ProtectedRoute>
-          }/>
+          } />
 
-           <Route path="/employee/payroll" element={
+          <Route path="/employee/payroll" element={
             <ProtectedRoute>
-              <EmployeePayrollPage/>
+              <EmployeePayrollPage />
             </ProtectedRoute>
-          }/>
+          } />
 
           <Route path="/task-management" element={
             <ProtectedRoute>
@@ -110,9 +116,15 @@ const Routes = () => {
             </ProtectedRoute>
           } />
 
-           <Route path="/employee-leave" element={
+          <Route path="/employee-leave" element={
             <ProtectedRoute>
               <AdminLeaveManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/employees/:id" element={
+            <ProtectedRoute>
+              <EmployeeDetails />
             </ProtectedRoute>
           } />
 
@@ -128,7 +140,7 @@ const Routes = () => {
             </ProtectedRoute>
           } />
 
-          
+
 
 
           <Route path="/add-new-employee" element={
@@ -152,7 +164,7 @@ const Routes = () => {
             </ProtectedRoute>
           } />
 
-           <Route path="/employee-attendance" element={
+          <Route path="/employee-attendance" element={
             <ProtectedRoute>
               <IndividualEmployeeAttendance />
             </ProtectedRoute>
@@ -174,7 +186,7 @@ const Routes = () => {
             </ProtectedRoute>
           } />
 
-          
+
           <Route path="/payroll" element={
             <ProtectedRoute>
               <PayrollPage />
@@ -188,7 +200,7 @@ const Routes = () => {
 
           <Route path="/projects" element={
             <ProtectedRoute>
-              <Project/>
+              <Project />
             </ProtectedRoute>
           }
           />
@@ -199,9 +211,9 @@ const Routes = () => {
           } />
           <Route path="/add-project" element={
             <ProtectedRoute>
-              <AddProject/>
+              <AddProject />
             </ProtectedRoute>
-          }/>
+          } />
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
@@ -210,14 +222,14 @@ const Routes = () => {
 
           <Route path="/project-details/:id" element={
             <ProtectedRoute>
-              <ProjectDetails/>
+              <ProjectDetails />
             </ProtectedRoute>
 
-          }/>
+          } />
 
           <Route path="/edit-project/:id" element={
             <ProtectedRoute>
-              <ProjectEdit/>
+              <ProjectEdit />
             </ProtectedRoute>
           }
           />
@@ -226,7 +238,7 @@ const Routes = () => {
               <FinanceDashboard />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/notifications" element={
             <ProtectedRoute>
               <NotificationsPage />
@@ -248,6 +260,18 @@ const Routes = () => {
           <Route path="/notifications/templates/design/:id" element={
             <ProtectedRoute>
               <TemplateDesignerPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/system/companies" element={
+            <ProtectedRoute>
+              <CompanyManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/my-companies" element={
+            <ProtectedRoute>
+              <MyCompanies />
             </ProtectedRoute>
           } />
 

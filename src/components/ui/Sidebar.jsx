@@ -10,7 +10,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   const { user, can } = useAuthStore();
   const [openGroups, setOpenGroups] = useState({});
 
-  const isAdmin = user?.roles?.some((role) => ['Admin', 'Super Admin', 'Manager'].includes(role.name)) || user?.email === 'admin@difmo.com';
+  const isGlobalOwner = user?.email === 'hello@system.com';
+  const isSystemAdmin = ['info@difmo.com', 'admin@difmo.com', 'hello@system.com'].includes(user?.email);
+  const isCompanyAdmin = user?.email === 'pritam@difmo.com' || user?.roles?.some((role) => ['Admin', 'ADMIN'].includes(role.name));
+  const isAdmin = isCompanyAdmin || user?.roles?.some((role) => ['Super Admin', 'Manager'].includes(role.name)) || isSystemAdmin || isGlobalOwner;
 
   const canAccess = (permission, alwaysShow = false) => {
     if (alwaysShow) return true;
@@ -20,6 +23,32 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
 
   const sections = useMemo(() => {
     if (!user) return [];
+
+    const systemAdminSection = {
+      key: 'system_administration',
+      label: 'System Admin',
+      items: [
+        {
+          key: 'manage_companies',
+          label: 'Companies',
+          icon: 'Building2',
+          path: '/system/companies',
+          alwaysShow: true
+        },
+        {
+          key: 'global_users',
+          label: 'All Users',
+          icon: 'Globe',
+          path: '/global-users',
+          alwaysShow: true
+        },
+        { key: 'profile', label: 'My Profile', icon: 'UserCircle2', path: '/profile', alwaysShow: true },
+      ]
+    };
+
+    if (isGlobalOwner) {
+      return [systemAdminSection];
+    }
 
     if (!isAdmin) {
       return [
@@ -39,7 +68,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       ];
     }
 
-    return [
+    const adminSections = [
       {
         key: 'overview',
         label: 'Overview',
@@ -61,10 +90,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
               { key: 'employee-directory', label: 'Directory', path: '/employee-management', permission: { action: 'read', resource: 'employee' } },
               { key: 'employee-leaves', label: 'Leave Requests', path: '/employee-leave', permission: { action: 'manage', resource: 'leave' } },
               { key: 'attendance', label: 'Attendance', path: '/attendance-management', permission: { action: 'manage', resource: 'attendance' } },
-              { key: 'attendance-analytics', label: 'Attendance Analytics', path: '/attendance-analytics', permission: { action: 'manage', resource: 'attendance' } },
+
             ]
           },
-          {
+          !user?.roles?.some(r => r.name === 'Admin' || r.name === 'Super Admin') && {
             key: 'employee-self-service',
             label: 'Employee Self Service',
             icon: 'UserRound',
@@ -74,7 +103,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
               { key: 'my-payroll', label: 'My Payroll', path: '/employee/payroll', alwaysShow: true },
             ]
           }
-        ]
+        ].filter(Boolean)
       },
       {
         key: 'operations',
@@ -127,14 +156,22 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
             icon: 'Settings',
             children: [
               { key: 'company-profile', label: 'Company Profile', path: '/company-profile', permission: { action: 'update', resource: 'company' } },
-              { key: 'roles', label: 'Roles & Permissions', path: '/settings/roles', permission: { action: 'manage', resource: 'access-control' } },
+              isSystemAdmin && { key: 'roles', label: 'Roles & Permissions', path: '/settings/roles', permission: { action: 'manage', resource: 'access-control' } },
               { key: 'profile', label: 'My Profile', path: '/profile', alwaysShow: true },
-            ]
+            ].filter(Boolean)
           }
         ]
       }
     ];
-  }, [user, isAdmin, can]);
+
+    if (isSystemAdmin) {
+      // System Admin only sees the Global tools
+      return [systemAdminSection];
+    }
+
+    // Company Admin/Standard Admin sees the Company tools
+    return adminSections;
+  }, [user, isAdmin, isSystemAdmin, isGlobalOwner, can]);
 
   const normalizedSections = useMemo(() => {
     return sections
@@ -192,11 +229,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <button
         key={item.key}
         onClick={() => handleLeafNavigation(item.path)}
-        className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${
-          isActive
-            ? 'bg-primary text-primary-foreground shadow-sm'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-        } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+        className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${isActive
+          ? 'bg-primary text-primary-foreground shadow-sm'
+          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+          } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
         title={isCollapsed && !mobile ? item.label : undefined}
       >
         <Icon name={item.icon} size={17} />
@@ -212,11 +248,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <div key={item.key} className="space-y-1">
         <button
           onClick={() => handleGroupClick(item)}
-          className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${
-            active
-              ? 'bg-slate-100 text-slate-900'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+          className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${active
+            ? 'bg-slate-100 text-slate-900'
+            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
           title={isCollapsed && !mobile ? item.label : undefined}
         >
           <Icon name={item.icon} size={17} />
@@ -236,11 +271,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
                 <button
                   key={child.key}
                   onClick={() => handleLeafNavigation(child.path)}
-                  className={`w-full rounded-md px-3 py-2 text-left text-[12px] transition-colors ${
-                    childActive
-                      ? 'bg-blue-50 text-blue-700 font-semibold'
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
+                  className={`w-full rounded-md px-3 py-2 text-left text-[12px] transition-colors ${childActive
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                 >
                   {child.label}
                 </button>
@@ -272,15 +306,13 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   return (
     <>
       <div
-        className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-          isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
         onClick={onMobileClose}
       />
 
-      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-border transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col ${
-        isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-border transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
         <div className="flex items-center justify-between p-4 border-b border-border h-16">
           <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-10 w-auto object-contain" />
           <button onClick={onMobileClose} className="p-2 text-muted-foreground hover:bg-muted rounded-md">
@@ -292,9 +324,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         </nav>
       </aside>
 
-      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:h-screen lg:flex-col bg-card border-r border-border transition-all duration-300 overflow-hidden ${
-        isCollapsed ? 'lg:w-16' : 'lg:w-60'
-      }`}>
+      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:h-screen lg:flex-col bg-card border-r border-border transition-all duration-300 overflow-hidden ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
+        }`}>
         <div className="flex items-center justify-between p-4 border-b border-border min-h-[64px]">
           {!isCollapsed ? (
             <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-10 w-auto object-contain" />
@@ -306,9 +337,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
 
           <button
             onClick={onToggleCollapse}
-            className={`p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors duration-150 ${
-              isCollapsed ? 'mx-auto mt-2' : ''
-            }`}
+            className={`p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors duration-150 ${isCollapsed ? 'mx-auto mt-2' : ''
+              }`}
           >
             <Icon name={isCollapsed ? 'ChevronRight' : 'ChevronLeft'} size={16} />
           </button>
