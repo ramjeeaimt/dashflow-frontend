@@ -3,10 +3,11 @@ import Icon from '../AppIcon';
 import UserProfileDropdown from './UserProfileDropdown';
 import NotificationCenter from './NotificationCenter';
 import useAuthStore from '../../store/useAuthStore';
+import CompanySwitcher from './CompanySwitcher';
 
 const Header = ({ onToggleSidebar }) => {
   const { user } = useAuthStore();
-  const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin'].includes(r.name));
+  const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin', 'ADMIN'].includes(r.name));
 
   const getPageTitle = () => {
     // ... same logic
@@ -50,7 +51,9 @@ const Header = ({ onToggleSidebar }) => {
         </div>
 
         {/* Right Section: Notifications & Profile */}
-        <div className="flex items-center space-x-1 sm:space-x-3">
+        <div className="flex items-center space-x-1 sm:space-x-4">
+          {isAdmin && <CompanySwitcher />}
+          <div className="h-8 w-px bg-border hidden sm:block"></div>
           <NotificationCenter />
           <UserProfileDropdown />
         </div>

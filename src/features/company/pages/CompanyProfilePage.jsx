@@ -15,62 +15,75 @@ const CompanyProfile = () => {
 
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/dashboard' },
+        { label: 'Settings', path: '#' },
         { label: 'Company Profile', path: '/company-profile' }
     ];
 
     const tabs = [
-        { id: 'details', label: 'Company Details', icon: 'Building' },
-        { id: 'departments', label: 'Departments', icon: 'Layers' },
-        { id: 'managers', label: 'Managers', icon: 'Users' },
-        { id: 'GST', label: 'CompanyDocsGst', icon: 'CompanyDocs' }
+        { id: 'details', label: 'General Information', icon: 'Building', description: 'View and update your company details' },
+        { id: 'departments', label: 'Departments', icon: 'Layers', description: 'Organize your team structure' },
+        { id: 'managers', label: 'Managers', icon: 'Users', description: 'Manage administrators and leads' },
+        { id: 'GST', label: 'Compliance & Docs', icon: 'FileText', description: 'GST, tax and legal documentation' }
     ];
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-[#F8FAFC]">
             <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
-            <Sidebar 
-                isCollapsed={sidebarCollapsed} 
+            <Sidebar
+                isCollapsed={sidebarCollapsed}
                 onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                 isMobileOpen={isMobileSidebarOpen}
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
 
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
-                <div className="px-4 sm:px-6 md:px-8">
-                    <BreadcrumbNavigation items={breadcrumbItems} />
-
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+                } pt-16 pb-8`}>
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-semibold text-foreground mb-2">Company Profile</h1>
-                        <p className="text-muted-foreground">
-                            Manage your company information, departments, and administrators.
-                        </p>
+                        <BreadcrumbNavigation items={breadcrumbItems} />
+                        <div className="mt-4">
+                            <h1 className="text-2xl font-bold text-slate-900">Organization Settings</h1>
+                            <p className="text-slate-500 mt-1">Manage your company's identity, team structure, and legal compliance.</p>
+                        </div>
                     </div>
 
-                    <div className="bg-card border border-border rounded-lg overflow-hidden">
-                        <div className="border-b border-border">
-                            <nav className="flex space-x-8 px-6 overflow-x-auto">
+                    <div className="flex flex-col lg:flex-row gap-8">
+                        {/* Internal Sidebar */}
+                        <aside className="lg:w-64 flex-shrink-0">
+                            <nav className="space-y-1">
                                 {tabs.map((tab) => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center space-x-2 py-4 border-b-2 text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                                        className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === tab.id
+                                            ? 'bg-white text-blue-600 shadow-sm border border-slate-200'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                             }`}
                                     >
-                                        <Icon name={tab.icon} size={16} />
+                                        <Icon name={tab.icon} size={18} className={activeTab === tab.id ? 'text-blue-600' : 'text-slate-400'} />
                                         <span>{tab.label}</span>
                                     </button>
                                 ))}
                             </nav>
-                        </div>
+                        </aside>
 
-                        <div className="p-6">
-                            {activeTab === 'details' && <CompanyDetails />}
-                            {activeTab === 'departments' && <DepartmentManager />}
-                            {activeTab === 'managers' && <ManagerList />}
-                            {activeTab === 'GST' && <ComanyDocsGST />}
+                        {/* Content Area */}
+                        <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="border-b border-slate-100 px-8 py-6">
+                                <h2 className="text-lg font-semibold text-slate-900">
+                                    {tabs.find(t => t.id === activeTab)?.label}
+                                </h2>
+                                <p className="text-sm text-slate-500 mt-1">
+                                    {tabs.find(t => t.id === activeTab)?.description}
+                                </p>
+                            </div>
 
+                            <div className="p-8">
+                                {activeTab === 'details' && <CompanyDetails />}
+                                {activeTab === 'departments' && <DepartmentManager />}
+                                {activeTab === 'managers' && <ManagerList />}
+                                {activeTab === 'GST' && <ComanyDocsGST />}
+                            </div>
                         </div>
                     </div>
                 </div>

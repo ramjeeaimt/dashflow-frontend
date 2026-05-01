@@ -66,6 +66,20 @@ const CompanyRegistration = () => {
     enablePayroll: true
   });
 
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (user && !formData.email) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+      }));
+    }
+  }, [user]);
+
   // Validation functions
   const validateStep1 = () => {
     const newErrors = {};

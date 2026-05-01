@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
+import useAuthStore from '../../../store/useAuthStore';
 
 const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { user: authenticatedUser } = useAuthStore();
+  const isLinking = !!authenticatedUser;
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -117,9 +121,28 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
             />
           </div>
 
-          {/* Right Column - Security */}
+          {/* Right Column - Security / Info */}
           <div className="space-y-6">
-            <div className="relative">
+            {isLinking ? (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 space-y-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-2">
+                  <Icon name="Link" size={24} />
+                </div>
+                <h3 className="text-lg font-bold text-blue-900">Linking to your account</h3>
+                <p className="text-sm text-blue-700 leading-relaxed">
+                  We've detected you're already logged in as <strong>{authenticatedUser.email}</strong>. 
+                  This new company will be added to your existing account, allowing you to switch between workspaces instantly.
+                </p>
+                <div className="pt-2">
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 bg-white px-3 py-1 rounded-full border border-blue-200">
+                    <Icon name="CheckCircle" size={12} />
+                    Verified Identity
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="relative">
               <Input
                 label="Password"
                 type={showPassword ? "text" : "password"}
@@ -201,7 +224,9 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </>
+        )}
+      </div>
         </div>
 
         {/* Admin Privileges Notice */}

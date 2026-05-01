@@ -6,7 +6,7 @@ export const authService = {
         const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, { email, password });
         const resData = response.data;
         const data = resData?.data || resData;
-        
+
         if (data.access_token) {
             localStorage.setItem('token', data.access_token);
         }
@@ -30,6 +30,18 @@ export const authService = {
 
     getProfile: async () => {
         const response = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
+        const resData = response.data;
+        return resData?.data || resData;
+    },
+
+    switchCompany: async (companyId) => {
+        const response = await apiClient.post('/auth/switch-company', { companyId });
+        const resData = response.data;
+        return resData?.data || resData;
+    },
+
+    getMyWorkspaces: async () => {
+        const response = await apiClient.get('/auth/my-workspaces');
         const resData = response.data;
         return resData?.data || resData;
     }
