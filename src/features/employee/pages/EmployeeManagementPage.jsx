@@ -199,7 +199,11 @@ const EmployeeManagement = () => {
       }
       handleCloseModal();
     } catch (err) {
-      throw new Error('Failed to save employee. Please try again.');
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Failed to save employee. Please try again.';
+      throw new Error(message);
     }
   };
 

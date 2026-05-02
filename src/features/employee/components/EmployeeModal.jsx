@@ -47,6 +47,7 @@ const EmployeeModal = ({
   const [uploadingProfile, setUploadingProfile] = useState(false);
   const [uploadingDocs, setUploadingDocs] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [apiError, setApiError] = useState('');
   const [permissionsLoading, setPermissionsLoading] = useState(false); // Track permissions fetch
   const [roles, setRoles] = useState([]);
   const [availablePermissions, setAvailablePermissions] = useState([]); // All possible system permissions
@@ -327,6 +328,7 @@ const EmployeeModal = ({
 
   const handleSave = async () => {
     if (!validateForm()) return;
+    setApiError('');
     setIsSaving(true);
     setIsLoading(true);
     try {
@@ -341,7 +343,7 @@ const EmployeeModal = ({
       await onSave(employeeData);
       onClose();
     } catch (error) {
-      console.error('Error saving employee:', error);
+      setApiError(error?.message || 'Failed to save employee. Please try again.');
     } finally {
       setIsLoading(false);
       setIsSaving(false);
@@ -810,6 +812,12 @@ const EmployeeModal = ({
               )}
             </div>
 
+            {apiError && (
+              <div className="mx-4 md:mx-8 mt-4 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3">
+                <Icon name="AlertCircle" size={18} className="flex-shrink-0 mt-0.5 text-red-500" />
+                <p className="text-sm font-medium">{apiError}</p>
+              </div>
+            )}
             <div className="px-4 md:px-8 py-4 md:py-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center space-x-3 hidden md:flex">
                 <div className="flex -space-x-1">

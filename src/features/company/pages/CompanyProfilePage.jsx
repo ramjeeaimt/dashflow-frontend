@@ -7,6 +7,8 @@ import DepartmentManager from '../components/DepartmentManager';
 import ManagerList from '../components/ManagerList';
 import Icon from '../../../components/AppIcon';
 import ComanyDocsGST from '../components/CompanyDOcsGST';
+import AttendancePolicySettings from '../components/AttendancePolicySettings';
+import RewardSystemSettings from '../components/RewardSystemSettings';
 
 const CompanyProfile = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -23,7 +25,9 @@ const CompanyProfile = () => {
         { id: 'details', label: 'General Information', icon: 'Building', description: 'View and update your company details' },
         { id: 'departments', label: 'Departments', icon: 'Layers', description: 'Organize your team structure' },
         { id: 'managers', label: 'Managers', icon: 'Users', description: 'Manage administrators and leads' },
-        { id: 'GST', label: 'Compliance & Docs', icon: 'FileText', description: 'GST, tax and legal documentation' }
+        { id: 'GST', label: 'Compliance & Docs', icon: 'FileText', description: 'GST, tax and legal documentation' },
+        { id: 'attendance-policy', label: 'Attendance Policy', icon: 'Clock', description: 'Late marking, check-in windows, and half-day rules' },
+        { id: 'rewards', label: 'Reward System', icon: 'Star', description: 'Configure employee point-based rewards' },
     ];
 
     return (
@@ -83,6 +87,8 @@ const CompanyProfile = () => {
                                 {activeTab === 'departments' && <DepartmentManager />}
                                 {activeTab === 'managers' && <ManagerList />}
                                 {activeTab === 'GST' && <ComanyDocsGST />}
+                                {activeTab === 'attendance-policy' && <AttendancePolicySettings />}
+                                {activeTab === 'rewards' && <RewardSystemSettings />}
                             </div>
                         </div>
                     </div>

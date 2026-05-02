@@ -90,6 +90,13 @@ export const attendanceService = {
         const response = await apiClient.patch(`${API_ENDPOINTS.ATTENDANCE.BASE}/${id}`, attendanceData);
         const resData = response.data;
         return resData?.data !== undefined ? resData.data : resData;
+    },
+    
+    // Revoke attendance record (for today)
+    async revoke(employeeId) {
+        const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.REVOKE(employeeId));
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     }
 };
 

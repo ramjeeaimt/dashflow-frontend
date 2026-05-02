@@ -170,6 +170,16 @@ const useAttendanceStore = create((set, get) => ({
         } catch (error) {
             throw error;
         }
+    },
+    
+    revokeAttendance: async (employeeId, companyId) => {
+        try {
+            await attendanceService.revoke(employeeId);
+            await get().fetchAttendanceData(companyId);
+            return true;
+        } catch (error) {
+            throw error;
+        }
     }
 }));
 

@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
         TODAY: (employeeId) => `/attendance/today/${employeeId}`,
         ANALYTICS: '/attendance/analytics',
         RECORD: (id) => `/attendance/${id}`,
+        REVOKE: (employeeId) => `/attendance/revoke/${employeeId}`,
     },
     EMPLOYEES: {
         BASE: '/employees',

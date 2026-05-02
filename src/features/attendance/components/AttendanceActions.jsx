@@ -21,18 +21,18 @@ const AttendanceActions = ({
       description: 'Mark selected employees as present'
     },
     {
+      id: 'mark_half_day',
+      label: 'Mark Half Day',
+      icon: 'Clock4',
+      color: 'purple',
+      description: 'Mark selected employees as half-day (affects payroll)'
+    },
+    {
       id: 'mark_absent',
       label: 'Mark Absent',
       icon: 'UserX',
       color: 'error',
       description: 'Mark selected employees as absent'
-    },
-    {
-      id: 'approve_overtime',
-      label: 'Approve Overtime',
-      icon: 'Clock',
-      color: 'warning',
-      description: 'Approve overtime for selected employees'
     },
     {
       id: 'send_notification',
@@ -90,6 +90,7 @@ const AttendanceActions = ({
                     action.color === 'success' ? 'border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' :
                     action.color === 'error' ? 'border-rose-100 bg-rose-50 text-rose-700 hover:bg-rose-100' :
                     action.color === 'warning' ? 'border-amber-100 bg-amber-50 text-amber-700 hover:bg-amber-100' :
+                    action.color === 'purple' ? 'border-purple-100 bg-purple-50 text-purple-700 hover:bg-purple-100' :
                     'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                   title={action?.description}

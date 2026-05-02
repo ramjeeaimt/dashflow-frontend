@@ -17,6 +17,29 @@ import {
 import useAuthStore from '../../../store/useAuthStore';
 import Icon from '../../../components/AppIcon';
 
+const colorMap = {
+  slate: { bg: 'bg-slate-50', border: 'border-slate-100', text: 'text-slate-900', icon: 'text-slate-400', label: 'text-slate-400' },
+  emerald: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700', icon: 'text-emerald-600', label: 'text-emerald-600/70' },
+  rose: { bg: 'bg-rose-50', border: 'border-rose-100', text: 'text-rose-700', icon: 'text-rose-600', label: 'text-rose-600/70' },
+  amber: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700', icon: 'text-amber-600', label: 'text-amber-600/70' },
+  sky: { bg: 'bg-sky-50', border: 'border-sky-100', text: 'text-sky-700', icon: 'text-sky-600', label: 'text-sky-600/70' },
+};
+
+const StatCard = ({ label, value, icon, color }) => {
+  const c = colorMap[color] || colorMap.slate;
+  return (
+    <div className={`${c.bg} border ${c.border} p-5 hover:shadow-md transition-all group`}>
+      <p className={`text-[11px] font-bold uppercase tracking-widest ${c.label} mb-3 ml-1`}>{label}</p>
+      <div className="flex items-center justify-between">
+        <span className={`text-3xl font-bold ${c.text} tracking-tight leading-none`}>{value ?? 0}</span>
+        <div className={`w-10 h-10 bg-white rounded-xl flex items-center justify-center ${c.icon} group-hover:scale-110 transition-all border ${c.border}`}>
+          <Icon name={icon} size={20} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AttendanceManagement = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { user, isAuthenticated } = useAuthStore();
@@ -97,6 +120,16 @@ const AttendanceManagement = () => {
     }
   };
 
+  const handleRevoke = async (employeeId) => {
+    if (!window.confirm('Are you sure you want to revoke today\'s attendance for this employee? This will delete their current check-in/out record.')) return;
+    try {
+      await useAttendanceStore.getState().revokeAttendance(employeeId, user.company.id);
+      alert('Attendance revoked successfully. Employee can now check in again.');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to revoke attendance');
+    }
+  };
+
   const handleSaveBulkAttendance = async (records) => {
     try {
       for (const record of records) {
@@ -133,13 +166,29 @@ const AttendanceManagement = () => {
       } catch (error) {
         alert('Failed to execute bulk check-in');
       }
+    } else if (action === 'mark_half_day') {
+      if (!window.confirm(`Mark ${employeeIds.length} selected employee(s) as half-day? This will affect their payroll.`)) return;
+      try {
+        for (const empId of employeeIds) {
+          const today = new Date().toISOString().split('T')[0];
+          await useAttendanceStore.getState().updateRecord(empId, { status: 'half-day', notes: 'Marked half-day by admin' }, user.company.id);
+        }
+        alert(`${employeeIds.length} employee(s) marked as half-day`);
+      } catch (error) {
+        alert('Failed to mark half-day for some employees');
+      }
     } else if (action === 'mark_absent') {
-      // Logic for mark absent can be added here if needed, 
-      // but usually bulk check-in is for present status.
-      alert('Bulk mark absent logic coming soon');
+      if (!window.confirm(`Mark ${employeeIds.length} selected employee(s) as absent?`)) return;
+      try {
+        for (const empId of employeeIds) {
+          await useAttendanceStore.getState().updateRecord(empId, { status: 'absent', notes: 'Marked absent by admin' }, user.company.id);
+        }
+        alert(`${employeeIds.length} employee(s) marked as absent`);
+      } catch (error) {
+        alert('Failed to mark absent for some employees');
+      }
     } else {
       console.log(`Bulk action ${action} for employees:`, employeeIds);
-      alert(`Action ${action} executed`);
     }
   };
 
@@ -211,83 +260,12 @@ const AttendanceManagement = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {/* Total Records */}
-            <div className="bg-slate-50 border border-slate-100 p-5   hover:shadow-md transition-all group">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3 ml-1">Total Team</p>
-              <div className="flex items-center justify-between">
-                <span className="text-3xl font-bold text-slate-900 tracking-tight leading-none">{attendanceStats?.totalEmployees}</span>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform">
-                  <Icon name="Users" size={20} />
-                </div>
-              </div>
-            </div>
-
-            {/* Present */}
-            <div className="bg-emerald-50 border border-emerald-100 p-5  hover:shadow-md transition-all group">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-600/70 mb-3 ml-1">Present Today</p>
-              <div className="flex items-center justify-between">
-                <span className="text-3xl font-bold text-emerald-700 tracking-tight leading-none">{attendanceStats?.presentToday}</span>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-all border border-emerald-100/50">
-                  <Icon name="UserCheck" size={20} />
-                </div>
-              </div>
-            </div>
-
-            {/* Inactive */}
-            <div className="bg-rose-50 border border-rose-100 p-5  hover:shadow-md transition-all group">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-rose-600/70 mb-3 ml-1">Absent</p>
-              <div className="flex items-center justify-between">
-                <span className="text-3xl font-bold text-rose-700 tracking-tight leading-none">{attendanceStats?.absentToday}</span>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-rose-600 group-hover:scale-110 transition-all border border-rose-100/50">
-                  <Icon name="UserX" size={20} />
-                </div>
-              </div>
-            </div>
-
-            {/* Late */}
-            <div className="bg-amber-50 border border-amber-100 p-5  hover:shadow-md transition-all group">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600/70 mb-3 ml-1">Late </p>
-              <div className="flex items-center justify-between">
-                <span className="text-3xl font-bold text-amber-700 tracking-tight leading-none">{attendanceStats?.lateArrivals}</span>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-all border border-amber-100/50">
-                  <Icon name="Clock" size={20} />
-                </div>
-              </div>
-            </div>
-
-            {/* Early Out */}
-            {/* <div className="bg-orange-50 border border-orange-100 p-5  hover:shadow-md transition-all group">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-orange-600/70 mb-3 ml-1">Early Out</p>
-                <div className="flex items-center justify-between">
-                    <span className="text-3xl font-bold text-orange-700 tracking-tight leading-none">{attendanceStats?.earlyDepartures}</span>
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-orange-600 group-hover:scale-110 transition-all border border-orange-100/50">
-                      <Icon name="LogOut" size={20} />
-                    </div>
-                </div>
-            </div> */}
-
-            {/* Early In */}
-            <div className="bg-sky-50 border border-sky-100 p-5 hover:shadow-md transition-all group">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-sky-600/70 mb-3 ml-1">Early check-In</p>
-              <div className="flex items-center justify-between">
-                <span className="text-3xl font-bold text-sky-700 tracking-tight leading-none">{attendanceStats?.earlyCheckins}</span>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-sky-600 group-hover:scale-110 transition-all border border-sky-100/50">
-                  <Icon name="Sun" size={20} />
-                </div>
-              </div>
-            </div>
-
-            {/* Checked Out */}
-            <div className="bg-slate-100/50 border border-slate-200 p-5  hover:shadow-md transition-all group">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3 ml-1">Checked Out</p>
-              <div className="flex items-center justify-between">
-                <span className="text-3xl font-bold text-slate-700 tracking-tight leading-none">{attendanceStats?.checkedOutTotal}</span>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-500 group-hover:scale-110 transition-all border border-slate-200/50">
-                  <Icon name="LogOut" size={20} />
-                </div>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <StatCard label="Total Team" value={attendanceStats?.totalEmployees} icon="Users" color="slate" />
+            <StatCard label="Present" value={attendanceStats?.presentToday} icon="UserCheck" color="emerald" />
+            <StatCard label="Absent" value={attendanceStats?.absentToday} icon="UserX" color="rose" />
+            <StatCard label="Late" value={attendanceStats?.lateArrivals} icon="Clock" color="amber" />
+            <StatCard label="Early Check-in" value={attendanceStats?.earlyCheckins} icon="Sun" color="sky" />
           </div>
 
           {/* Analytics Panel */}
@@ -300,41 +278,27 @@ const AttendanceManagement = () => {
           {/* Policy Violation Alerts */}
 
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Filters Panel */}
-            {/* <div className="xl:col-span-1">
-              <AttendanceFilters
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                attendanceData={attendanceData} />
-            </div> */}
-
-            {/* Main Content */}
-            <div className="xl:col-span-3 space-y-8">
-              {/* WFH Requests Manager */}
-              <WFHRequestManager />
-
-              {/* Bulk Actions */}
-              <AttendanceActions
-                selectedEmployees={selectedEmployees}
-                onBulkAction={handleBulkAction}
-                onExportReport={handleExportReport}
-                onManualEntry={handleManualEntry}
-                onTakeAttendance={handleTakeAttendance}
-                totalRecords={filteredData?.length} />
-
-              {/* Attendance Table */}
-              <AttendanceTable
-                attendanceData={filteredData}
-                loading={loading}
-                selectedEmployees={selectedEmployees}
-                onSelectionChange={setSelectedEmployees}
-                onCheckIn={handleCheckIn}
-                onCheckOut={handleCheckOut}
-                onUpdate={handleUpdateAttendance}
-                onViewHistory={handleViewHistory}
-              />
-            </div>
+          <div className="space-y-8">
+            <WFHRequestManager />
+            <AttendanceActions
+              selectedEmployees={selectedEmployees}
+              onBulkAction={handleBulkAction}
+              onExportReport={handleExportReport}
+              onManualEntry={handleManualEntry}
+              onTakeAttendance={handleTakeAttendance}
+              totalRecords={filteredData?.length}
+            />
+            <AttendanceTable
+              attendanceData={filteredData}
+              loading={loading}
+              selectedEmployees={selectedEmployees}
+              onSelectionChange={setSelectedEmployees}
+              onCheckIn={handleCheckIn}
+              onCheckOut={handleCheckOut}
+              onUpdate={handleUpdateAttendance}
+              onRevoke={handleRevoke}
+              onViewHistory={handleViewHistory}
+            />
           </div>
         </div>
 

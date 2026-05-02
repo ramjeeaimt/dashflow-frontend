@@ -75,7 +75,7 @@ const CompanyDetails = () => {
         }
         try {
             setSaving(true);
-            await api.patch(`/company/${user.company.id}`, formData);
+            await api.patch(`/system-company/${user.company.id}`, formData);
             alert('Company details updated successfully');
             setIsEditing(false);
             fetchCompany(); // Refresh data

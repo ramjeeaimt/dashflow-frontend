@@ -103,6 +103,7 @@ const AttendanceTable = ({
   onCheckIn,
   onCheckOut,
   onUpdate,
+  onRevoke,
   onViewHistory
 }) => {
   const [sortField, setSortField] = useState('employeeName');
@@ -557,13 +558,25 @@ const AttendanceTable = ({
                     )}
 
                     {employee.hasRecord && (
-                      <button
-                        onClick={(e) => handleEditClick(e, employee)}
-                        className="p-2 bg-amber-50 border border-amber-100 text-amber-500 hover:text-amber-700 hover:bg-amber-100 transition-all rounded-none"
-                        title="Edit Record"
-                      >
-                        <Icon name="Edit" size={14} />
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={(e) => handleEditClick(e, employee)}
+                          className="p-2 bg-amber-50 border border-amber-100 text-amber-500 hover:text-amber-700 hover:bg-amber-100 transition-all rounded-none"
+                          title="Edit Record"
+                        >
+                          <Icon name="Edit" size={14} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onRevoke(employee.employeeId || employee.id);
+                          }}
+                          className="p-2 bg-red-50 border border-red-100 text-red-500 hover:text-red-700 hover:bg-red-100 transition-all rounded-none"
+                          title="Revoke Attendance"
+                        >
+                          <Icon name="RotateCcw" size={14} />
+                        </button>
+                      </div>
                     )}
 
                     <button
