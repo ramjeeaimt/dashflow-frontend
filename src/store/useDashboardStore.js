@@ -36,7 +36,7 @@ const useDashboardStore = create((set, get) => ({
             }
 
             const results = await Promise.all(promises);
-            console.log('[useDashboardStore] Raw fetch results:', results);
+            console.log(`[useDashboardStore] Raw fetch results from ${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5002/api'}:`, results);
             
             const [metrics, charts, feed, financials] = results;
             console.log('[useDashboardStore] Metrics data:', metrics);

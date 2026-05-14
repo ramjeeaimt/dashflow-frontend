@@ -73,7 +73,7 @@ const useAuthStore = create((set, get) => ({
         );
 
         try {
-            console.log(`[AuthFlow] Initiating login for: ${email}`);
+            console.log(`[AuthFlow] Initiating login for: ${email} using API: ${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5002/api'}`);
 
             // Race the login request against the 10-second timeout
             const response = await Promise.race([
