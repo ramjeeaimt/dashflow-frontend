@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 
-const MetricsCard = ({ title, value, description, icon, color = "primary" }) => {
+const MetricsCard = ({ title, value, description, icon, color = "primary", onClick }) => {
   const getColorConfig = (colorType) => {
     const configs = {
       primary: {
@@ -39,7 +39,10 @@ const MetricsCard = ({ title, value, description, icon, color = "primary" }) => 
   const config = getColorConfig(color);
 
   return (
-    <div className={`relative p-6 ${config.bg} border ${config.border} rounded-none shadow-sm hover:shadow-md transition-all duration-300 h-full flex items-center justify-between`}>
+    <div 
+      onClick={onClick}
+      className={`relative p-6 ${config.bg} border ${config.border} rounded-none shadow-sm hover:shadow-md transition-all duration-300 h-full flex items-center justify-between ${onClick ? 'cursor-pointer active:scale-[0.98] group' : ''}`}
+    >
       <div className="space-y-4">
         <div>
           <p className={`text-[11px] font-bold uppercase tracking-wider ${config.text} mb-2`}>
@@ -55,7 +58,7 @@ const MetricsCard = ({ title, value, description, icon, color = "primary" }) => 
       </div>
 
       <div className={`w-14 h-14 ${config.iconContainer} rounded-none flex items-center justify-center text-white shadow-inner`}>
-        <div className={`w-10 h-10 ${config.iconBg} rounded-none flex items-center justify-center shadow-lg transition-transform hover:scale-110`}>
+        <div className={`w-10 h-10 ${config.iconBg} rounded-none flex items-center justify-center shadow-lg transition-transform ${onClick ? 'group-hover:scale-110' : 'hover:scale-110'}`}>
           <Icon name={icon} size={22} strokeWidth={2.5} />
         </div>
       </div>
