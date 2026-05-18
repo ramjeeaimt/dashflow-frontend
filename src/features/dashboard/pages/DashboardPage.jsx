@@ -62,28 +62,32 @@ const Dashboard = () => {
       value: (metrics?.totalEmployees ?? 0).toString(),
       description: 'Active Personnel',
       icon: 'Users',
-      color: 'primary'
+      color: 'primary',
+      navigateTo: '/employee-management'
     },
     {
       title: 'PRESENT TODAY',
       value: (metrics?.presentToday ?? 0).toString(),
       description: 'Currently On-Site',
       icon: 'UserCheck',
-      color: 'success'
+      color: 'success',
+      navigateTo: '/attendance-management'
     },
     {
       title: 'PRODUCTIVITY',
       value: `${metrics?.avgProductivity ?? 0}%`,
       description: 'Target Achievement',
       icon: 'TrendingUp',
-      color: 'purple'
+      color: 'purple',
+      navigateTo: '/time-tracking'
     },
     {
       title: 'ANALYTICS',
       value: (metrics?.activeProjects ?? 0).toString(),
       description: 'System Activity',
       icon: 'Activity',
-      color: 'warning'
+      color: 'warning',
+      navigateTo: '/monitoring-dashboard'
     }
   ];
 
@@ -165,6 +169,7 @@ const Dashboard = () => {
                   description={metric?.description}
                   icon={metric?.icon}
                   color={metric?.color}
+                  onClick={() => metric.navigateTo && navigate(metric.navigateTo)}
                 />
               ))}
             </div>

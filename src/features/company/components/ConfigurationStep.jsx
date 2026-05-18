@@ -74,16 +74,15 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-card rounded-lg border border-border p-8">
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Initial Configuration</h2>
-          <p className="text-muted-foreground">
-            Configure your company's basic operational settings. These can be modified later in the system settings.
-          </p>
-        </div>
+    <div className="p-6">
+      <div className="mb-6 border-b border-border/50 pb-4">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Workspace Configuration</h2>
+        <p className="text-muted-foreground">
+          Define your core operational standards. These foundation settings will shape how your enterprise manages time, capital, and resources.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Column - Time & Currency */}
           <div className="space-y-6">
             <Select
@@ -233,7 +232,6 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };

@@ -81,16 +81,15 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-card rounded-lg border border-border p-8">
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Company Information</h2>
-          <p className="text-muted-foreground">
-            Tell us about your company to customize your experience and set up your workspace.
-          </p>
-        </div>
+    <div className="p-6">
+      <div className="mb-6 border-b border-border/50 pb-4">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Company Profile</h2>
+        <p className="text-muted-foreground">
+          Provide your business details to help us customize your experience and configure your enterprise workspace.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Column - Basic Info */}
           <div className="space-y-6">
             <Input
@@ -256,7 +255,6 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
