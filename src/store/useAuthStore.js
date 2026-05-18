@@ -129,8 +129,29 @@ const useAuthStore = create((set, get) => ({
     register: async (companyData) => {
         set({ isLoading: true, error: null });
         try {
-            await authService.register(companyData);
-            set({ isLoading: false });
+            const response = await authService.register(companyData);
+            
+            // Auto-login after registration
+            const payload = response.data || response;
+            const accessToken = payload.access_token;
+            const sanitizedUser = sanitizeUser(payload.user);
+
+            if (accessToken) {
+                localStorage.setItem('token', accessToken);
+            }
+            
+            if (sanitizedUser) {
+                localStorage.setItem('user', JSON.stringify(sanitizedUser));
+            }
+
+            set({
+                user: sanitizedUser,
+                token: accessToken,
+                isAuthenticated: !!accessToken,
+                isLoading: false
+            });
+
+            return response;
         } catch (error) {
             set({
                 error: error.response?.data?.message || 'Registration failed',
@@ -209,8 +230,8 @@ const useAuthStore = create((set, get) => ({
         if (!user || !user.permissions) return false;
 
         // Check for super admin bypass logic if applicable
-        const isSuperAdmin = user.roles?.some(r => r.name?.toUpperCase() === 'SUPER ADMIN' || r.name?.toUpperCase() === 'ADMIN') || 
-                            ['admin@difmo.com', 'info@difmo.com', 'hello@system.com', 'pritam@difmo.com'].includes(user.email);
+        const isSuperAdmin = user.roles?.some(r => r.name?.toUpperCase() === 'SUPER ADMIN' || r.name?.toUpperCase() === 'ADMIN') ||
+            ['admin@difmo.com', 'info@difmo.com', 'hello@system.com', 'pritam@difmo.com'].includes(user.email);
         if (isSuperAdmin) return true;
 
         return user.permissions.some(p =>

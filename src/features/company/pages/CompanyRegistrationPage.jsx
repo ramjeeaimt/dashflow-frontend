@@ -270,15 +270,15 @@ const CompanyRegistration = () => {
       // Or maybe just a success screen. Let's redirect to a success page or show a modal.
       // Since we don't have a success page, let's use a modal or just redirect to login with a success state.
 
-      alert('Registration completed successfully! Please login.');
-      navigate('/login');
-      // navigate('/profile');
+      alert('Registration completed successfully! Redirecting to your dashboard...');
+      navigate('/dashboard');
 
-    } catch (error) {
+    } catch (error) { 
       console.error('Registration failed:', error);
-      alert(storeError || 'Registration failed. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      alert(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -351,54 +351,77 @@ const CompanyRegistration = () => {
   }, [formData]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Progress Indicator */}
-      <ProgressIndicator
-        currentStep={currentStep}
-        totalSteps={steps?.length}
-        steps={steps}
-      />
-      {/* Main Content */}
-      <div className="flex-1">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 p-6">
-          {/* Form Content */}
-          <div className="xl:col-span-3">
-            {renderStepContent()}
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+      {/* Hero Header - Reduced spacing */}
+      <div className="bg-white border-b border-border py-6 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl mb-3">
+            <Icon name="Building2" size={24} className="text-primary" />
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+            Build Your Enterprise Workspace
+          </h1>
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+            Experience the next generation of workforce management. Set up your profile to unlock powerful features.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex-1 py-8 px-6">
+        <div className="max-w-5xl mx-auto">
+          {/* Progress Section - Reduced margin */}
+          <div className="mb-8">
+            <ProgressIndicator
+              currentStep={currentStep}
+              totalSteps={steps?.length}
+              steps={steps}
+            />
           </div>
 
-          {/* Pricing Panel */}
-          <div className="xl:col-span-1">
-            <PricingPanel selectedCompanySize={formData?.companySize} />
+          {/* Form Card */}
+          <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border/50 overflow-hidden">
+            <div className="p-2 md:p-4">
+              {renderStepContent()}
+            </div>
+            
+            {/* Navigation Bar inside the card */}
+            <div className="px-8 py-6 bg-[#FAFAFA] border-t border-border/50">
+              <NavigationControls
+                currentStep={currentStep}
+                totalSteps={steps?.length}
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                onComplete={handleComplete}
+                isLoading={isLoading}
+                canProceed={canProceed()}
+              />
+            </div>
+          </div>
+
+          {/* Footer Info */}
+          <div className="mt-8 text-center text-sm text-muted-foreground">
+            <p>© 2024 DashFlow Enterprise. All rights reserved. | Security & Compliance</p>
           </div>
         </div>
       </div>
-      {/* Navigation Controls */}
-      <NavigationControls
-        currentStep={currentStep}
-        totalSteps={steps?.length}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        onComplete={handleComplete}
-        isLoading={isLoading}
-        canProceed={canProceed()}
-      />
+
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-lg p-8 text-center max-w-md mx-4">
-            <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-              <Icon name="Building2" size={32} className="text-primary animate-pulse" />
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-50 flex items-center justify-center">
+          <div className="bg-card border border-border rounded-3xl p-10 text-center max-w-md mx-4 shadow-2xl">
+            <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+              <Icon name="Building2" size={40} className="text-primary animate-pulse" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              Setting up your company...
+            <h3 className="text-2xl font-bold text-foreground mb-3">
+              Configuring Workspace
             </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              We're creating your workspace and configuring your settings. This may take a few moments.
+            <p className="text-muted-foreground mb-6">
+              We're initializing your secure environment and preparing your dashboard. This usually takes less than a minute.
             </p>
-            <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="flex items-center justify-center space-x-3">
+              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         </div>
