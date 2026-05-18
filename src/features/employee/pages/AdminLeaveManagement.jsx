@@ -219,14 +219,22 @@ const LeaveRow = ({ leave, onUpdate, onDelete, isExpanded, onToggle, adminNote, 
                 </td>
                 <td className="px-8 py-5">
                     <span className="text-[10px] font-black text-slate-600 uppercase bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
-                        {leave.leaveType}
+                        {leave.type || leave.leaveType || 'General'}
                     </span>
                 </td>
                 <td className="px-8 py-5">
-                    <div className="text-xs font-black text-slate-700">
-                        {new Date(leave.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                    <div className="text-xs font-black text-slate-700 flex items-center gap-1">
+                        <span>{new Date(leave.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                        {leave.endDate && (
+                            <>
+                                <span className="text-slate-300">-</span>
+                                <span>{new Date(leave.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                            </>
+                        )}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Starting Date</div>
+                    <div className="text-[10px] text-slate-400 font-bold mt-1 uppercase">
+                        {leave.endDate ? 'Duration' : 'Starting Date'}
+                    </div>
                 </td>
                 <td className="px-8 py-5">
                     <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${

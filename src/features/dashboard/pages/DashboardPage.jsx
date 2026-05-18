@@ -15,8 +15,8 @@ import useAuthStore from '../../../store/useAuthStore';
 import Icon from '../../../components/AppIcon';
 import { useNavigate } from 'react-router-dom';
 
-//  IMPORT EMPLOYEE MODAL
-import { EmployeeModal } from 'features/employee';
+//  IMPORT EMPLOYEE MODAL & STORE
+import { EmployeeModal, useEmployeeStore } from 'features/employee';
 
 const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -24,6 +24,7 @@ const Dashboard = () => {
 
   //  MODAL STATE
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
+  const { createEmployee } = useEmployeeStore();
 
   const { user, can } = useAuthStore();
   const { metrics, charts, feed, financials, loading, fetchDashboardData, refreshDashboard } = useDashboardStore();
@@ -141,7 +142,40 @@ const Dashboard = () => {
   };
 
   const handleSaveEmployee = async (employeeData) => {
-    setIsEmployeeModalOpen(false);
+    try {
+      const payload = {
+        firstName: employeeData.firstName || '',
+        lastName: employeeData.lastName || '',
+        email: employeeData.email || '',
+        phone: employeeData.phone || '',
+        password: 'welcome123',
+        companyId: user?.company?.id || '',
+        role: employeeData.roleIds?.[0] || 'Employee',
+        roleIds: employeeData.roleIds || [],
+        hireDate: employeeData.hireDate || new Date().toISOString(),
+        salary: employeeData.salary || '',
+        manager: employeeData.manager || '',
+        branch: employeeData.branch || '',
+        employmentType: employeeData.employmentType || '',
+        status: employeeData.status || 'active',
+        address: employeeData.address || '',
+        emergencyContact: employeeData.emergencyContact || '',
+        emergencyPhone: employeeData.emergencyPhone || '',
+        skills: employeeData.skills || [],
+        permissionIds: employeeData.permissionIds || [],
+        avatar: employeeData.avatar || '',
+        documents: employeeData.documents || []
+      };
+
+      if (employeeData.department) payload.departmentId = employeeData.department;
+      if (employeeData.designationId) payload.designationId = employeeData.designationId;
+
+      await createEmployee(payload, user?.company?.id);
+      setIsEmployeeModalOpen(false);
+      alert('Employee added successfully!');
+    } catch (err) {
+      alert('Failed to add employee: ' + (err?.response?.data?.message || err?.message || 'Unknown error'));
+    }
   };
 
   return (
