@@ -23,6 +23,7 @@ const PayrollPage = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentPayrollId, setCurrentPayrollId] = useState(null);
+    const [sendingEmails, setSendingEmails] = useState({});
 
     // ========== NEW: Manual payroll modal state ==========
     const [isManualModalOpen, setIsManualModalOpen] = useState(false);
@@ -110,7 +111,7 @@ const PayrollPage = () => {
 
             // 🔹 3. Generate payroll
             const requests = employees.map(emp => {
-                const basicSalary = emp.salary || 20000;
+                const basicSalary = parseFloat(emp.salary) || 20000;
                 const allowances = 3000;
                 const deductions = 1000;
 
@@ -211,25 +212,31 @@ const PayrollPage = () => {
     }, [payrollData, employeesList, searchTerm, selectedMonth, selectedYear]);
 
     const handleSendIndividualEmail = async (id) => {
+        if (sendingEmails[id]) return;
+        
+        setSendingEmails(prev => ({ ...prev, [id]: true }));
         try {
             await financeService.sendPayrollEmail(id);
             alert('Email sent successfully');
         } catch (error) {
             console.error('Failed to send email:', error);
             alert('Error sending email');
+        } finally {
+            setSendingEmails(prev => ({ ...prev, [id]: false }));
         }
     };
 
     const handleGenerateIndividual = async (row) => {
         try {
             setIsLoading(true);
+            const basicSalary = parseFloat(row.basicSalary) || 20000;
             await financeService.createPayroll({
                 employeeId: row.employeeId,
                 companyId: user.company.id,
-                basicSalary: row.basicSalary,
+                basicSalary: basicSalary,
                 allowances: 3000,
                 deductions: 1000,
-                netSalary: row.basicSalary + 3000 - 1000,
+                netSalary: basicSalary + 3000 - 1000,
                 month: selectedMonth,
                 year: selectedYear,
                 status: "pending"
@@ -466,7 +473,7 @@ const PayrollPage = () => {
                                                     {row.isGenerated ? `-₹${row.deductions}` : '-'}
                                                 </td>
                                                 <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
-                                                    {row.isGenerated ? `₹${row.netSalary}` : '₹' + (row.employee.salary || '0')}
+                                                    {row.isGenerated ? `₹${row.netSalary}` : `₹${row.basicSalary}`}
                                                 </td>
                                                 <td className="px-3 sm:px-6 py-4">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
@@ -489,10 +496,11 @@ const PayrollPage = () => {
                                                             <>
                                                                 <button 
                                                                     onClick={() => handleSendIndividualEmail(row.id)}
-                                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                    disabled={sendingEmails[row.id]}
+                                                                    className={`p-2 rounded-lg transition-all ${sendingEmails[row.id] ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
                                                                     title="Send Email"
                                                                 >
-                                                                    <Icon name="Mail" size={18} />
+                                                                    {sendingEmails[row.id] ? <Icon name="Loader2" size={18} className="animate-spin" /> : <Icon name="Mail" size={18} />}
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => {
