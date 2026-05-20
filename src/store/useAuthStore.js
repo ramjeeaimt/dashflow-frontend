@@ -26,9 +26,15 @@ const sanitizeUser = (user) => {
         company: user.company ? {
             id: user.company.id,
             name: user.company.name,
-            email: user.company.email
+            email: user.company.email,
+            attendanceAlertEmails: user.company.attendanceAlertEmails
         } : null,
-        companies: (user.companies || []).map(c => ({ id: c.id, name: c.name, email: c.email })),
+        companies: (user.companies || []).map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            attendanceAlertEmails: c.attendanceAlertEmails
+        })),
         permissions: user.permissions || []
     };
 };
@@ -130,7 +136,7 @@ const useAuthStore = create((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await authService.register(companyData);
-            
+
             // Auto-login after registration
             const payload = response.data || response;
             const accessToken = payload.access_token;
@@ -139,7 +145,7 @@ const useAuthStore = create((set, get) => ({
             if (accessToken) {
                 localStorage.setItem('token', accessToken);
             }
-            
+
             if (sanitizedUser) {
                 localStorage.setItem('user', JSON.stringify(sanitizedUser));
             }

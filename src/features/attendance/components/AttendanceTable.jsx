@@ -490,7 +490,7 @@ const AttendanceTable = ({
                     ) : <span className="text-xs font-bold text-slate-300">—</span>}
                   </td>
                 )}
-                {/* {visibleColumns.notes && (
+                {visibleColumns.notes && (
                   <td className="px-6 py-4 whitespace-nowrap">
                     {employee?.notes ? (
                       <div className="max-w-[250px] overflow-hidden text-ellipsis">
@@ -505,7 +505,7 @@ const AttendanceTable = ({
                       </div>
                     ) : <span className="text-xs font-bold text-slate-300">—</span>}
                   </td>
-                )} */}
+                )}
                 {visibleColumns.location && (
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1.5 text-slate-600">

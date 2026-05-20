@@ -13,9 +13,14 @@ const PayrollPage = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [payrollData, setPayrollData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isEmployeesLoading, setIsEmployeesLoading] = useState(true);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const { user } = useAuthStore();
+
+    // ========== NEW: Email template states ==========
+    const [selectedTemplateId, setSelectedTemplateId] = useState('default');
+    const [templates, setTemplates] = useState([]);
 
     // ========== NEW: Search filter state ==========
     const [searchTerm, setSearchTerm] = useState('');
@@ -162,14 +167,22 @@ const PayrollPage = () => {
             fetchPayroll();
             fetchAllEmployees();
         }
+        // Load custom email templates
+        const saved = localStorage.getItem('notification_templates');
+        if (saved) {
+            setTemplates(JSON.parse(saved));
+        }
     }, [user, selectedMonth, selectedYear]);
 
     const fetchAllEmployees = async () => {
+        setIsEmployeesLoading(true);
         try {
             const employees = await employeeService.getAll({ companyId: user.company.id });
             setEmployeesList(employees.filter(e => e.status === 'active'));
         } catch (error) {
             console.error('Failed to fetch employees:', error);
+        } finally {
+            setIsEmployeesLoading(false);
         }
     };
 
@@ -211,12 +224,177 @@ const PayrollPage = () => {
         });
     }, [payrollData, employeesList, searchTerm, selectedMonth, selectedYear]);
 
-    const handleSendIndividualEmail = async (id) => {
+    const renderCustomPayrollHtml = (templateText, employeeName, month, year, salary, activeTpl = {}) => {
+        let finalMessage = templateText || '';
+        finalMessage = finalMessage.replace(/\${employeeName}/g, employeeName);
+        finalMessage = finalMessage.replace(/\${name}/g, employeeName);
+        finalMessage = finalMessage.replace(/\${month}/g, month.toString());
+        finalMessage = finalMessage.replace(/\${year}/g, year.toString());
+        finalMessage = finalMessage.replace(/\${salary}/g, salary);
+        finalMessage = finalMessage.replace(/\${netSalary}/g, salary);
+
+        const currentYear = new Date().getFullYear();
+        const bannerUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777468072/difmo_banner_final.png';
+
+        const sigTeam = activeTpl?.signatureTeam || 'Team DIFMO';
+        const sigDept = activeTpl?.signatureDept || 'Corporate Support';
+        const sigRole = activeTpl?.signatureRole || 'Communications & Experience';
+        const sigCompany = activeTpl?.signatureCompany || 'DIFMO Pvt Ltd';
+        const sigMeetText = activeTpl?.signatureMeetText || "Let's meet";
+        const sigMeetLink = activeTpl?.signatureMeetLink || 'https://www.difmo.com/contact';
+        const sigEmail = activeTpl?.signatureEmail || 'info@difmo.com';
+        const sigAddress = activeTpl?.signatureAddress || '4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India';
+        const sigWebsite = activeTpl?.signatureWebsite || 'difmo.com';
+        const sigWebsiteLink = activeTpl?.signatureWebsiteLink || 'https://www.difmo.com';
+
+        return `
+            <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: #fff; color: #1e293b; margin: 0; padding: 0;">
+                <div style="max-width: 700px; margin: 0;">
+
+                    <!-- Body -->
+                    <div style="font-size: 16px; line-height: 1.6; color: #334155;">
+                        ${finalMessage}
+                    </div>
+
+                    <!-- Signature -->
+                    <div style="margin-top: 48px; padding-top: 28px; border-top: 1px solid #f1f5f9;">
+                        <img src="https://res.cloudinary.com/dxju8ikk4/image/upload/v1777469595/difmo_vector_icon.png"
+                             width="100" height="100"
+                             style="border-radius: 50%; object-fit: cover; display: block; margin-bottom: 20px;">
+
+                        <div style="border-top: 1px solid #1e293b; padding-top: 22px; max-width: 650px;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <!-- Left: Identity -->
+                                    <td width="55%" valign="top">
+                                        <p style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: #000; letter-spacing: -0.4px;">${sigTeam}</p>
+                                        <p style="margin: 0 0 1px; font-size: 15px; color: #1e293b; font-weight: 500;">${sigDept}</p>
+                                        <p style="margin: 0 0 12px; font-size: 14px; color: #475569; font-style: italic;">${sigRole}</p>
+                                        <p style="margin: 0 0 14px; font-size: 15px; font-weight: 800; color: #000;">${sigCompany}</p>
+                                        <a href="${sigMeetLink}" style="color: #d03f13ff; font-size: 14px; font-weight: 700; text-decoration: none;">
+                                            ${sigMeetText}
+                                        </a>
+                                    </td>
+
+                                    <!-- Right: Contact -->
+                                    <td width="45%" valign="top">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="32" valign="top" style="padding-bottom: 14px;">
+                                                    <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                                                        <span style="color: #fff; font-size: 11px; font-weight: 800;">E</span>
+                                                    </div>
+                                                </td>
+                                                <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                                                    <a href="mailto:${sigEmail}" style="color: #000; text-decoration: none;">${sigEmail}</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="32" valign="top" style="padding-bottom: 14px;">
+                                                    <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                                                        <span style="color: #fff; font-size: 11px; font-weight: 800;">A</span>
+                                                    </div>
+                                                </td>
+                                                <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                                                    ${sigAddress}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="32" valign="top" style="padding-bottom: 14px;">
+                                                    <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                                                        <span style="color: #fff; font-size: 11px; font-weight: 800;">W</span>
+                                                    </div>
+                                                </td>
+                                                <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                                                    <a href="${sigWebsiteLink}" style="color: #d03f13ff; text-decoration: none;">${sigWebsite}</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div style="border-top: 1px solid #1e293b; margin-top: 22px; max-width: 650px;"></div>
+                    </div>
+
+                    <!-- Banner -->
+                    <div style="margin-top: 36px; border-radius: 10px; overflow: hidden; line-height: 0;">
+                        <img src="${bannerUrl}" alt="Our Services" style="width: 100%; height: auto; display: block;">
+                    </div>
+
+                    <!-- Social Links -->
+                    <div style="margin-top: 28px;">
+                        <a href="#" style="display: inline-block; margin-right: 14px;">
+                            <img src="https://cdn-icons-png.flaticon.com/512/145/145807.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+                        </a>
+                        <a href="#" style="display: inline-block; margin-right: 14px;">
+                            <img src="https://cdn-icons-png.flaticon.com/512/145/145802.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+                        </a>
+                        <a href="#" style="display: inline-block; margin-right: 14px;">
+                            <img src="https://cdn-icons-png.flaticon.com/512/145/145812.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+                        </a>
+                    </div>
+
+                    <!-- Legal -->
+                    <div style="margin-top: 36px; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+                        <p style="margin: 0;">
+                            This email, along with any attachments, documents, project files, source code, designs, business strategies, client information, and other transmitted materials, contains confidential and proprietary information belonging to <b>DIFMO</b>. It is intended solely for the use of the individual, organization, or entity to whom it is addressed.
+                            <br/><br/>
+                            Any unauthorized access, review, copying, disclosure, distribution, modification, or use of this information is strictly prohibited and may be unlawful.
+                            <br/><br/>
+                            If you have received this communication in error, please notify us immediately by replying to this email or contacting our support team at <b>info@difmo.com, mailto:info@difmo.com</b>, and permanently delete all copies of this message and its attachments from your system.
+                            <br/><br/>
+                            Difmo Private Limited is committed to protecting client data, intellectual property, and business confidentiality across all services including AI solutions, web development, mobile applications, cloud services, cybersecurity, and smart technology solutions.
+                            <br/><br/>
+                            <b>© ${currentYear} Difmo Private Limited. All rights reserved.</b>
+                        </p>
+                        <p style="margin: 8px 0 0;">&copy; ${currentYear} DIFMO PRIVATE LIMITED. ALL RIGHTS RESERVED.</p>
+                    </div>
+
+                </div>
+            </div>
+        `;
+    };
+
+    const handleSendIndividualEmail = async (id, customNotes = null) => {
         if (sendingEmails[id]) return;
-        
+
         setSendingEmails(prev => ({ ...prev, [id]: true }));
         try {
-            await financeService.sendPayrollEmail(id);
+            const row = combinedPayrollData.find(r => r.id === id);
+            let customHtml;
+
+            // Determine template layout choice
+            let targetTemplateId = selectedTemplateId;
+            if (targetTemplateId === 'default') {
+                const globalActiveId = localStorage.getItem('global_active_template_id');
+                if (globalActiveId) {
+                    targetTemplateId = globalActiveId;
+                }
+            }
+
+            if (targetTemplateId !== 'default' && row) {
+                const activeTpl = templates.find(t => t.id.toString() === targetTemplateId.toString());
+                if (activeTpl) {
+                    const empName = `${row.employee?.user?.firstName || ''} ${row.employee?.user?.lastName || ''}`.trim() || 'Employee';
+                    const netSalaryFormatted = Number(row.netPayable || row.netSalary || row.basicSalary || 0).toFixed(2);
+                    customHtml = renderCustomPayrollHtml(activeTpl.message, empName, selectedMonth, selectedYear, netSalaryFormatted, activeTpl);
+                    
+                    if (customNotes && customNotes.trim() !== '') {
+                        customHtml = customHtml.replace(
+                            '<!-- Signature -->',
+                            `<!-- Notes -->\n                    <div style="margin-top: 15px; padding: 15px; background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 4px;">\n                        <h4 style="margin: 0 0 8px 0; color: #1e293b; font-size: 14px; text-transform: uppercase;">Manager Reminders & Notes</h4>\n                        <p style="margin: 0; color: #475569; font-size: 14px; white-space: pre-wrap;">${customNotes}</p>\n                    </div>\n\n                    <!-- Signature -->`
+                        );
+                    }
+                }
+            }
+
+            const payload = { customHtml };
+            if (customNotes && customNotes.trim() !== '') {
+                payload.notes = customNotes;
+            }
+
+            await financeService.sendPayrollEmail(id, payload);
             alert('Email sent successfully');
         } catch (error) {
             console.error('Failed to send email:', error);
@@ -291,7 +469,7 @@ const PayrollPage = () => {
 
     const handleDeletePayroll = async (id) => {
         if (!window.confirm('Are you sure you want to delete this payroll record?')) return;
-        
+
         try {
             await financeService.deletePayroll(id);
             alert('Payroll record deleted successfully');
@@ -361,9 +539,9 @@ const PayrollPage = () => {
     return (
         <div className="min-h-screen bg-background">
             <Header onToggleSidebar={toggleMobileSidebar} />
-            <Sidebar 
-                isCollapsed={sidebarCollapsed} 
-                onToggleCollapse={handleToggleSidebar} 
+            <Sidebar
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={handleToggleSidebar}
                 isMobileOpen={isMobileSidebarOpen}
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
@@ -391,6 +569,25 @@ const PayrollPage = () => {
                                     className="flex-1 sm:flex-none bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                                 >
                                     {[2023, 2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+                                </select>
+                            </div>
+
+                            {/* ========== NEW: Branded Email Format Selector ========== */}
+                            <div className="flex items-center gap-2 w-full sm:w-auto bg-card border border-border rounded-lg px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-primary">
+                                <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Email Format:</span>
+                                <select
+                                    value={selectedTemplateId}
+                                    onChange={(e) => setSelectedTemplateId(e.target.value)}
+                                    className="bg-transparent border-0 text-xs font-bold text-foreground focus:outline-none focus:ring-0 cursor-pointer min-w-[200px]"
+                                >
+                                    <option value="default">
+                                        {localStorage.getItem('global_active_template_id') ? 'Default (👑 Global Active)' : 'Default (Standard)'}
+                                    </option>
+                                    {templates.map(tpl => (
+                                        <option key={tpl.id} value={tpl.id.toString()}>
+                                            Created: {tpl.name || tpl.title || 'Unnamed Template'}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -429,7 +626,7 @@ const PayrollPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
-                                    {isLoading ? (
+                                    {(isLoading || isEmployeesLoading) ? (
                                         <tr>
                                             <td colSpan="7" className="px-3 sm:px-6 py-12 text-center">
                                                 <Icon name="Loader2" size={24} className="animate-spin text-primary mx-auto mb-2" />
@@ -444,8 +641,8 @@ const PayrollPage = () => {
                                                     {searchTerm ? 'No matching records found' : 'No employees found'}
                                                 </p>
                                                 <p className="text-muted-foreground text-sm">
-                                                    {searchTerm 
-                                                        ? 'Try adjusting your search term.' 
+                                                    {searchTerm
+                                                        ? 'Try adjusting your search term.'
                                                         : `Active employees for ${months.find(m => m.value === selectedMonth).label} ${selectedYear} will appear here.`}
                                                 </p>
                                             </td>
@@ -453,84 +650,83 @@ const PayrollPage = () => {
                                     ) : (
                                         combinedPayrollData.map((row) => (
                                             <React.Fragment key={row.id}>
-                                            <tr className="hover:bg-muted/30 transition-colors">
-                                                <td className="px-3 sm:px-6 py-4">
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                                            {row.employee?.user?.firstName?.[0]}{row.employee?.user?.lastName?.[0]}
+                                                <tr className="hover:bg-muted/30 transition-colors">
+                                                    <td className="px-3 sm:px-6 py-4">
+                                                        <div className="flex items-center space-x-3">
+                                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                                                {row.employee?.user?.firstName?.[0]}{row.employee?.user?.lastName?.[0]}
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-medium text-foreground">{row.employee?.user?.firstName} {row.employee?.user?.lastName}</p>
+                                                                <p className="text-xs text-muted-foreground">{row.employee?.employeeCode}</p>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <p className="text-sm font-medium text-foreground">{row.employee?.user?.firstName} {row.employee?.user?.lastName}</p>
-                                                            <p className="text-xs text-muted-foreground">{row.employee?.employeeCode}</p>
+                                                    </td>
+                                                    <td className="px-3 sm:px-6 py-4 text-sm">₹{row.basicSalary}</td>
+                                                    <td className="px-3 sm:px-6 py-4 text-sm text-green-600">
+                                                        {row.isGenerated ? `+₹${row.allowances}` : '-'}
+                                                    </td>
+                                                    <td className="px-3 sm:px-6 py-4 text-sm text-red-600">
+                                                        {row.isGenerated ? `-₹${row.deductions}` : '-'}
+                                                    </td>
+                                                    <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
+                                                        {row.isGenerated ? `₹${row.netSalary}` : `₹${row.basicSalary}`}
+                                                    </td>
+                                                    <td className="px-3 sm:px-6 py-4">
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${row.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                                            row.status === 'not-generated' ? 'bg-slate-100 text-slate-500' : 'bg-yellow-100 text-yellow-800'
+                                                            }`}>
+                                                            {row.status.replace('-', ' ')}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-3 sm:px-6 py-4">
+                                                        <div className="flex items-center justify-end space-x-2">
+                                                            {!row.isGenerated ? (
+                                                                <button
+                                                                    onClick={() => handleGenerateIndividual(row)}
+                                                                    className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-primary/90 transition-all uppercase tracking-wider"
+                                                                >
+                                                                    Generate
+                                                                </button>
+                                                            ) : (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleSendIndividualEmail(row.id)}
+                                                                        disabled={sendingEmails[row.id]}
+                                                                        className={`p-2 rounded-lg transition-all ${sendingEmails[row.id] ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
+                                                                        title="Send Email"
+                                                                    >
+                                                                        {sendingEmails[row.id] ? <Icon name="Loader2" size={18} className="animate-spin" /> : <Icon name="Mail" size={18} />}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setSelectedPayroll(row.record);
+                                                                            setIsDetailsModalOpen(true);
+                                                                        }}
+                                                                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                        title="View"
+                                                                    >
+                                                                        <Icon name="Eye" size={18} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleEditPayroll(row.record)}
+                                                                        className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                                        title="Edit"
+                                                                    >
+                                                                        <Icon name="Pencil" size={18} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDeletePayroll(row.id)}
+                                                                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                                        title="Delete"
+                                                                    >
+                                                                        <Icon name="Trash2" size={18} />
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm">₹{row.basicSalary}</td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm text-green-600">
-                                                    {row.isGenerated ? `+₹${row.allowances}` : '-'}
-                                                </td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm text-red-600">
-                                                    {row.isGenerated ? `-₹${row.deductions}` : '-'}
-                                                </td>
-                                                <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
-                                                    {row.isGenerated ? `₹${row.netSalary}` : `₹${row.basicSalary}`}
-                                                </td>
-                                                <td className="px-3 sm:px-6 py-4">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                                        row.status === 'paid' ? 'bg-green-100 text-green-800' : 
-                                                        row.status === 'not-generated' ? 'bg-slate-100 text-slate-500' : 'bg-yellow-100 text-yellow-800'
-                                                        }`}>
-                                                        {row.status.replace('-', ' ')}
-                                                    </span>
-                                                </td>
-                                                <td className="px-3 sm:px-6 py-4">
-                                                    <div className="flex items-center justify-end space-x-2">
-                                                        {!row.isGenerated ? (
-                                                            <button 
-                                                                onClick={() => handleGenerateIndividual(row)}
-                                                                className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-primary/90 transition-all uppercase tracking-wider"
-                                                            >
-                                                                Generate
-                                                            </button>
-                                                        ) : (
-                                                            <>
-                                                                <button 
-                                                                    onClick={() => handleSendIndividualEmail(row.id)}
-                                                                    disabled={sendingEmails[row.id]}
-                                                                    className={`p-2 rounded-lg transition-all ${sendingEmails[row.id] ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
-                                                                    title="Send Email"
-                                                                >
-                                                                    {sendingEmails[row.id] ? <Icon name="Loader2" size={18} className="animate-spin" /> : <Icon name="Mail" size={18} />}
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => {
-                                                                        setSelectedPayroll(row.record);
-                                                                        setIsDetailsModalOpen(true);
-                                                                    }}
-                                                                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                                                                    title="View"
-                                                                >
-                                                                    <Icon name="Eye" size={18} />
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => handleEditPayroll(row.record)}
-                                                                    className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-                                                                    title="Edit"
-                                                                >
-                                                                    <Icon name="Pencil" size={18} />
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => handleDeletePayroll(row.id)}
-                                                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                                                    title="Delete"
-                                                                >
-                                                                    <Icon name="Trash2" size={18} />
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
                                             </React.Fragment>
                                         ))
                                     )}
@@ -594,7 +790,7 @@ const PayrollPage = () => {
                                         onChange={handleManualInputChange}
                                         className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm"
                                     >
-                                        {[2023, 2024, 2025,2026].map(y => <option key={y} value={y}>{y}</option>)}
+                                        {[2023, 2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
                                 </div>
 
@@ -693,8 +889,8 @@ const PayrollPage = () => {
                                     Cancel
                                 </Button>
                                 <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting 
-                                        ? (isEditing ? 'Updating...' : 'Creating...') 
+                                    {isSubmitting
+                                        ? (isEditing ? 'Updating...' : 'Creating...')
                                         : (isEditing ? 'Update Payroll' : 'Create Payroll')}
                                 </Button>
                             </div>
@@ -707,6 +903,7 @@ const PayrollPage = () => {
                 isOpen={isDetailsModalOpen}
                 onClose={() => setIsDetailsModalOpen(false)}
                 payroll={selectedPayroll}
+                onSendEmail={handleSendIndividualEmail}
             />
         </div>
     );

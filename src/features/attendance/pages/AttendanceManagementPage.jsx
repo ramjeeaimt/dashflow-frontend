@@ -16,6 +16,7 @@ import {
 } from 'features/attendance';
 import useAuthStore from '../../../store/useAuthStore';
 import Icon from '../../../components/AppIcon';
+import api from '../../../api/client';
 
 const colorMap = {
   slate: { bg: 'bg-slate-50', border: 'border-slate-100', text: 'text-slate-900', icon: 'text-slate-400', label: 'text-slate-400' },
@@ -64,6 +65,10 @@ const AttendanceManagement = () => {
   const [isTakeAttendanceOpen, setIsTakeAttendanceOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyEmployee, setHistoryEmployee] = useState(null);
+
+
+  const isAdmin = user?.roles?.some(role => ['super admin', 'admin', 'Super Admin', 'Admin', 'ADMIN', 'manager', 'Manager'].includes(role.name)) || 
+                  ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email?.toLowerCase());
 
   useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
@@ -274,8 +279,6 @@ const AttendanceManagement = () => {
               <AttendanceAnalytics analyticsData={analyticsData} />
             </div>
           }
-
-          {/* Policy Violation Alerts */}
 
 
           <div className="space-y-8">

@@ -63,6 +63,7 @@ const UserProfileDropdown = () => {
   };
 
   const menuItems = [
+    { label: 'My Profile', icon: 'User', action: () => handleNavigation('/profile'), description: 'View and manage your profile details' },
     { label: 'Notifications', icon: 'Bell', action: () => handleNavigation('/notifications'), description: 'Configure notification preferences' },
     { label: 'Sign Out', icon: 'LogOut', action: handleSignOut, description: 'Sign out of your account', variant: 'destructive' }
   ];
@@ -116,7 +117,10 @@ const UserProfileDropdown = () => {
       {isOpen && (
         <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl shadow-slate-200/50 z-50 overflow-hidden">
           {/* User Info Header */}
-          <div className="p-4 bg-slate-50/50 border-b border-slate-100">
+          <button
+            onClick={() => handleNavigation('/profile')}
+            className="w-full text-left p-4 bg-slate-50/50 border-b border-slate-100 hover:bg-slate-50 transition-colors flex items-center justify-between outline-none group"
+          >
             <div className="flex items-center space-x-3">
               {renderAvatar("w-12 h-12", "text-base")}
               <div className="flex-1 min-w-0">
@@ -124,7 +128,8 @@ const UserProfileDropdown = () => {
                 <p className="text-[11px] text-slate-500 truncate font-medium">{userProfile?.email}</p>
               </div>
             </div>
-          </div>
+            <Icon name="ChevronRight" size={14} className="text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+          </button>
 
           {/* Menu Items */}
           <div className="py-1">
