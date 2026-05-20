@@ -13,12 +13,18 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   const isGlobalOwner = user?.email === 'hello@system.com';
   const isSystemAdmin = ['info@difmo.com', 'admin@difmo.com', 'hello@system.com'].includes(user?.email);
   const isCompanyAdmin = user?.email === 'pritam@difmo.com' || user?.roles?.some((role) => ['Admin', 'ADMIN'].includes(role.name));
-  const isAdmin = isCompanyAdmin || user?.roles?.some((role) => ['Super Admin', 'Manager'].includes(role.name)) || isSystemAdmin || isGlobalOwner;
+  const isAdmin = isCompanyAdmin ||
+    user?.roles?.some((role) => ['Super Admin', 'Manager', 'HR Manager', 'HR MANAGER'].includes(role.name)) ||
+    user?.roles?.some((role) => !['Employee', 'EMPLOYEE'].includes(role.name)) ||
+    (user?.permissions && user.permissions.length > 0) ||
+    isSystemAdmin ||
+    isGlobalOwner;
 
   const canAccess = (permission, alwaysShow = false) => {
     if (alwaysShow) return true;
     if (!permission) return false;
-    return isAdmin || can(permission.action, permission.resource);
+    const isFullAdmin = isCompanyAdmin || isSystemAdmin || isGlobalOwner;
+    return isFullAdmin || can(permission.action, permission.resource);
   };
 
   const sections = useMemo(() => {
@@ -156,7 +162,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
             icon: 'Settings',
             children: [
               { key: 'company-profile', label: 'Company Profile', path: '/company-profile', permission: { action: 'update', resource: 'company' } },
-              isSystemAdmin && { key: 'roles', label: 'Roles & Permissions', path: '/settings/roles', permission: { action: 'manage', resource: 'access-control' } },
+              isCompanyAdmin && { key: 'roles', label: 'Roles & Permissions', path: '/settings/roles', alwaysShow: true },
+              isCompanyAdmin && { key: 'user-permissions', label: 'User Permissions', path: '/settings/user-permissions', alwaysShow: true },
               { key: 'profile', label: 'My Profile', path: '/profile', alwaysShow: true },
             ].filter(Boolean)
           }
@@ -355,7 +362,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
                 {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.email}
               </p>
               <p className="mt-1 text-[11px] text-slate-500 truncate">
-                {isAdmin ? 'Admin Workspace' : 'Employee Workspace'}
+                {isCompanyAdmin ? 'Admin Workspace' : isAdmin ? 'Staff Workspace' : 'Employee Workspace'}
               </p>
             </div>
           </div>

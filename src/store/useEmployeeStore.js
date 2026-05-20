@@ -28,7 +28,10 @@ const transformEmployee = (emp) => ({
     companyId: emp.companyId,
     departmentId: emp.department?.id || emp.departmentId,
     roleIds: emp.user?.roles?.map(r => typeof r === 'string' ? r : (r?.id || r)) || [],
-    permissionIds: emp.user?.permissions?.map(p => typeof p === 'string' ? p : (p?.id || p)) || []
+    permissionIds: emp.user?.permissions?.map(p => typeof p === 'string' ? p : (p?.id || p)) || [],
+    startTime: emp.startTime,
+    endTime: emp.endTime,
+    checkInTime: emp.checkInTime
 });
 
 const useEmployeeStore = create((set, get) => ({

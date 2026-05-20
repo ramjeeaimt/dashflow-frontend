@@ -41,9 +41,9 @@ const Dashboard = () => {
       const isAdminView = can('manage', 'access-control') || user.roles?.some(r => r.name?.toUpperCase() === 'ADMIN') || user.email === 'admin@difmo.com';
       const fetchUserId = isAdminView ? null : user.id;
 
-      fetchDashboardData(user.company.id, isManagement, fetchUserId);
+      fetchDashboardData(user.company.id, isManagement || isFinance, fetchUserId);
     }
-  }, [user, fetchDashboardData, isManagement, can]);
+  }, [user, fetchDashboardData, isManagement, isFinance, can]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -263,6 +263,58 @@ const Dashboard = () => {
                     onClick={action?.onClick}
                   />
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent Activity Feed (For Management/Admin) */}
+          {isManagement && feed?.recentActivity && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+                  <div className="w-2 h-8 bg-blue-600"></div>
+                  Recent Activity Feed
+                </h2>
+                <span className="text-xs text-slate-500 font-medium">Real-time Updates</span>
+              </div>
+
+              <div className="bg-white border border-slate-100 shadow-sm rounded-none p-6">
+                <div className="divide-y divide-slate-100">
+                  {feed.recentActivity.length > 0 ? (
+                    feed.recentActivity.map((log) => {
+                      let iconName = 'Info';
+                      let iconBg = 'bg-blue-50 text-blue-600';
+                      
+                      if (log.type === 'task') {
+                        iconName = 'CheckSquare';
+                        iconBg = 'bg-emerald-50 text-emerald-600';
+                      } else if (log.type === 'leave') {
+                        iconName = 'Calendar';
+                        iconBg = 'bg-amber-50 text-amber-600';
+                      }
+
+                      return (
+                        <div key={log.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4 group hover:bg-slate-50/30 px-2 transition-all">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center shrink-0`}>
+                              <Icon name={iconName} size={18} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-slate-800">{log.message}</p>
+                              <span className="text-xs text-slate-400 font-medium capitalize mt-0.5 block">{log.type} Activity</span>
+                            </div>
+                          </div>
+                          <span className="text-xs text-slate-400 font-bold shrink-0">{log.time}</span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+                      <Icon name="Inbox" size={32} className="text-slate-300 animate-pulse" />
+                      <p className="font-bold text-xs uppercase tracking-wider">No recent activities found</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

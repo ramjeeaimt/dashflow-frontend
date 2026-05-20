@@ -323,7 +323,18 @@ const EmployeeModal = ({
     if (!formData?.hireDate) newErrors.hireDate = 'Hire date is required';
 
     setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
+
+    if (Object.keys(newErrors).length > 0) {
+      // Auto-switch to the first tab that has an error so the user sees it immediately
+      if (newErrors.firstName || newErrors.lastName || newErrors.email) {
+        setActiveTab('basic');
+      } else if (newErrors.department || newErrors.roleIds || newErrors.hireDate) {
+        setActiveTab('employment');
+      }
+      return false;
+    }
+
+    return true;
   };
 
   const handleSave = async () => {
@@ -464,9 +475,12 @@ const EmployeeModal = ({
                       <label className="text-xs font-semibold text-slate-500 ml-1">Email Address</label>
                       <input
                         type="email"
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                        className={`w-full px-4 py-2.5 bg-slate-50 border text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all ${
+                          errors?.email ? 'border-rose-500' : 'border-slate-200'
+                        }`}
                         value={formData?.email} onChange={(e) => handleInputChange('email', e?.target?.value)} disabled={isReadOnly}
                       />
+                      {errors?.email && <p className="text-xs text-rose-500 font-medium ml-1">{errors.email}</p>}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 ml-1">Phone Number</label>
@@ -510,7 +524,9 @@ const EmployeeModal = ({
                             value={formData[f.key]}
                             onChange={(e) => handleInputChange(f.key, e.target.value)}
                             disabled={isReadOnly}
-                            className="w-full appearance-none px-4 py-2.5 bg-slate-50 border border-slate-200 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all cursor-pointer"
+                            className={`w-full appearance-none px-4 py-2.5 bg-slate-50 border text-xs font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all cursor-pointer ${
+                              errors?.[f.key] ? 'border-rose-500' : 'border-slate-200'
+                            }`}
                           >
                             <option value="">Select {f.label}</option>
                             {f.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -519,6 +535,7 @@ const EmployeeModal = ({
                             <Icon name="ChevronDown" size={14} />
                           </div>
                         </div>
+                        {errors?.[f.key] && <p className="text-xs text-rose-500 font-medium ml-1">{errors[f.key]}</p>}
 
                         {/* Show custom designation input if "other" is selected */}
                         {f.key === 'designationId' && formData.designationId === 'other' && (
@@ -537,7 +554,16 @@ const EmployeeModal = ({
                     ))}
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 ml-1">Hire Date</label>
-                      <input type="date" value={formData?.hireDate} onChange={(e) => handleInputChange('hireDate', e?.target?.value)} disabled={isReadOnly} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" />
+                      <input 
+                        type="date" 
+                        value={formData?.hireDate} 
+                        onChange={(e) => handleInputChange('hireDate', e?.target?.value)} 
+                        disabled={isReadOnly} 
+                        className={`w-full px-4 py-2 bg-slate-50 border text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all ${
+                          errors?.hireDate ? 'border-rose-500' : 'border-slate-200'
+                        }`} 
+                      />
+                      {errors?.hireDate && <p className="text-xs text-rose-500 font-medium ml-1">{errors.hireDate}</p>}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 ml-1">Salary</label>
@@ -635,6 +661,7 @@ const EmployeeModal = ({
                   {/* System Roles */}
                   <div className="pt-6 border-t border-slate-100">
                     <label className="text-xs font-semibold text-slate-500 ml-1 mb-4 block">System Authorization Roles</label>
+                    {errors?.roleIds && <p className="text-xs text-rose-500 font-medium ml-1 mb-3">{errors.roleIds}</p>}
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                       {roles.map(role => {
                         const isSelected = formData.roleIds.includes(role.id);

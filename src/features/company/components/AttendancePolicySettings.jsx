@@ -54,7 +54,10 @@ const AttendancePolicySettings = () => {
     halfDayMinHours: 4,
     halfDayPayPercent: 50,
     enableLateEmailAlert: true,
+    attendanceAlertEmails: '',
   });
+
+  const [newEmailInput, setNewEmailInput] = useState('');
 
   useEffect(() => {
     const fetch = async () => {
@@ -71,6 +74,7 @@ const AttendancePolicySettings = () => {
             halfDayMinHours: c.halfDayMinHours ?? 4,
             halfDayPayPercent: c.halfDayPayPercent ?? 50,
             enableLateEmailAlert: c.enableLateEmailAlert ?? true,
+            attendanceAlertEmails: c.attendanceAlertEmails || '',
           });
         }
       } catch (e) {
@@ -90,6 +94,17 @@ const AttendancePolicySettings = () => {
       setSaving(true);
       setSaved(false);
       await api.patch(`/system-company/${user.company.id}`, form);
+      
+      const updatedUser = {
+        ...user,
+        company: {
+          ...user.company,
+          ...form,
+        }
+      };
+      useAuthStore.setState({ user: updatedUser });
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
@@ -97,6 +112,56 @@ const AttendancePolicySettings = () => {
       alert('Failed to save. Please try again.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const emailList = form.attendanceAlertEmails ? form.attendanceAlertEmails.split(',').map(e => e.trim()).filter(Boolean) : [];
+
+  const handleAddEmail = async (e) => {
+    e?.preventDefault();
+    const email = newEmailInput.trim().toLowerCase();
+    if (!email) return;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    if (emailList.includes(email)) {
+      alert('This email is already in the list.');
+      return;
+    }
+
+    const updatedList = [...emailList, email];
+    const newEmailsString = updatedList.join(', ');
+    set('attendanceAlertEmails', newEmailsString);
+    setNewEmailInput('');
+
+    if (!user?.company?.id) return;
+    try {
+      await api.patch(`/system-company/${user.company.id}`, { attendanceAlertEmails: newEmailsString });
+      const updatedUser = { ...user, company: { ...user.company, attendanceAlertEmails: newEmailsString } };
+      useAuthStore.setState({ user: updatedUser });
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Failed to save email automatically', err);
+    }
+  };
+
+  const handleRemoveEmail = async (emailToRemove) => {
+    const updatedList = emailList.filter((e) => e !== emailToRemove);
+    const newEmailsString = updatedList.join(', ');
+    set('attendanceAlertEmails', newEmailsString);
+
+    if (!user?.company?.id) return;
+    try {
+      await api.patch(`/system-company/${user.company.id}`, { attendanceAlertEmails: newEmailsString });
+      const updatedUser = { ...user, company: { ...user.company, attendanceAlertEmails: newEmailsString } };
+      useAuthStore.setState({ user: updatedUser });
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Failed to remove email automatically', err);
     }
   };
 
@@ -143,6 +208,61 @@ const AttendancePolicySettings = () => {
               onChange={(v) => set('enableLateEmailAlert', v)}
               label={form.enableLateEmailAlert ? 'Enabled — late arrivals receive an email warning' : 'Disabled'}
             />
+          </FieldGroup>
+
+          <FieldGroup
+            label="Admin Alert Emails"
+            hint="Administrators who will receive notifications for check-ins, check-outs, and late arrivals."
+          >
+            <div className="space-y-4 max-w-lg">
+              <form onSubmit={handleAddEmail} className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                    <Icon name="Mail" size={14} />
+                  </span>
+                  <input
+                    type="text"
+                    value={newEmailInput}
+                    onChange={(e) => setNewEmailInput(e.target.value)}
+                    placeholder="Enter email to add..."
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400 text-slate-800"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <Icon name="Plus" size={14} />
+                  <span>Add</span>
+                </button>
+              </form>
+
+              {emailList.length > 0 ? (
+                <div className="flex flex-wrap gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100 min-h-[46px] items-center">
+                  {emailList.map((email) => (
+                    <div
+                      key={email}
+                      className="flex items-center space-x-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-xs font-semibold text-slate-700 hover:border-slate-300 transition-all group/chip shadow-sm"
+                    >
+                      <Icon name="Mail" size={12} className="text-slate-400" />
+                      <span>{email}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEmail(email)}
+                        className="w-4 h-4 rounded flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-all"
+                        title={`Remove ${email}`}
+                      >
+                        <Icon name="X" size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-3 border border-dashed border-slate-200 rounded-lg bg-slate-50">
+                  <p className="text-xs font-medium text-slate-400">No admin emails added yet.</p>
+                </div>
+              )}
+            </div>
           </FieldGroup>
         </div>
       </div>

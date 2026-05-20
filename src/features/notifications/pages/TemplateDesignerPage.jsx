@@ -1,73 +1,91 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './TemplateDesigner.css';
-import { Save, Eye, Layout, Type, Palette, ChevronLeft, Trash2, Send, CheckCircle2, Maximize2, Minimize2, Bold, Italic, List, AlignLeft, AlignCenter, AlignRight, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Save, Eye, Layout, Type, Palette, ChevronLeft, Trash2, Send, CheckCircle2, Maximize2, Minimize2, Bold, Italic, List, AlignLeft, AlignCenter, AlignRight, X, PanelLeftClose, PanelLeftOpen, AlertCircle } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import useAuthStore from '../../../store/useAuthStore';
+import api from '../../../api/client';
 
 const TemplateDesignerPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
   const editorRef = useRef(null);
-  
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showForm, setShowForm] = useState(true);
-  
+
   const [template, setTemplate] = useState({
     name: '',
-    title: '',
-    message: '',
-    type: 'email'
+    title: 'Your Salary Slip for May 2026',
+    message: 'Dear Employee,<br/><br/>Your salary slip for May 2026 has been successfully generated.<br/><br/>Net Salary: <strong>₹20,000.00</strong><br/><br/>Please review the attached PDF payslip for detailed allowances and deductions. If you have any queries, reach out to corporate support.',
+    type: 'email',
+    signatureTeam: 'Team DIFMO',
+    signatureDept: 'Corporate Support',
+    signatureRole: 'Communications & Experience',
+    signatureCompany: 'DIFMO Pvt Ltd',
+    signatureMeetText: "Let's meet",
+    signatureMeetLink: 'https://www.difmo.com/contact',
+    signatureEmail: 'info@difmo.com',
+    signatureAddress: '4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India',
+    signatureWebsite: 'difmo.com',
+    signatureWebsiteLink: 'https://www.difmo.com'
   });
 
   const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
-    if (id) {
-      const savedTemplates = JSON.parse(localStorage.getItem('notification_templates') || '[]');
-      const found = savedTemplates.find(t => t.id.toString() === id);
-      if (found) {
-        setTemplate(found);
+    const loadTemplate = async () => {
+      if (id) {
+        try {
+          const res = await api.get(`/email-templates/${id}`);
+          if (res.data) {
+            setTemplate(res.data);
+          }
+        } catch (err) {
+          console.error('Failed to load template', err);
+        }
       }
-    }
+    };
+    loadTemplate();
   }, [id]);
 
   useEffect(() => {
     if (editorRef.current && template.message !== editorRef.current.innerHTML) {
       editorRef.current.innerHTML = template.message || '';
     }
-  }, [id]);
+  }, [template.message, id]);
 
-  const handleSave = () => {
+  useEffect(() => {
+    if (editorRef.current && !editorRef.current.innerHTML && template.message) {
+      editorRef.current.innerHTML = template.message;
+    }
+  }, [template.message]);
+
+  const handleSave = async () => {
     if (!template.name || !template.title || !template.message) {
       setFeedback({ type: 'error', message: 'Please fill in all required fields.' });
       return;
     }
 
-    const savedTemplates = JSON.parse(localStorage.getItem('notification_templates') || '[]');
-    let updated;
-    
-    if (id) {
-      updated = savedTemplates.map(t => t.id.toString() === id ? { ...template } : t);
-    } else {
-      const newTemplate = {
-        ...template,
-        id: Date.now(),
-        createdAt: new Date().toISOString()
-      };
-      updated = [newTemplate, ...savedTemplates];
-    }
+    try {
+      if (id) {
+        await api.patch(`/email-templates/${id}`, template);
+      } else {
+        await api.post('/email-templates', template);
+      }
+      setFeedback({ type: 'success', message: 'Template saved successfully!' });
 
-    localStorage.setItem('notification_templates', JSON.stringify(updated));
-    setFeedback({ type: 'success', message: 'Template saved successfully!' });
-    
-    setTimeout(() => {
-      navigate('/notifications/templates');
-    }, 1500);
+      setTimeout(() => {
+        navigate('/notifications/templates');
+      }, 1500);
+    } catch (err) {
+      console.error('Failed to save template', err);
+      setFeedback({ type: 'error', message: 'Failed to save template.' });
+    }
   };
 
   const execCommand = (command, value = null) => {
@@ -85,75 +103,112 @@ const TemplateDesignerPage = () => {
 
   const getPreviewHtml = () => {
     const year = new Date().getFullYear();
-    const footerImageUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777462000/difmo_footer_services.png';
-    
+    const bannerUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777468072/difmo_banner_final.png';
+
     return `
-      <div style="font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 0; color: #1e293b; width: 100%; min-height: 100%;">
-        <div style="width: 100%; max-width: 1000px; margin: 0 auto; background-color: #ffffff; overflow: hidden; border-bottom: 1px solid #e2e8f0;">
-          <div style="padding: 60px 40px; text-align: center; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
-            <div style="margin-bottom: 25px;">
-              <span style="font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #ffffff; text-transform: uppercase;">
-                <span style="color: #f59e0b;">DIFMO</span>
-              </span>
-            </div>
-            <h1 style="margin: 0; font-size: 36px; font-weight: 800; color: #ffffff; line-height: 1.2;">${template.title || 'Notification Subject'}</h1>
-          </div>
-          
-          <div style="padding: 60px 40px; min-height: 400px;">
-            <div style="font-size: 18px; color: #334155; line-height: 1.8; margin-bottom: 40px;">
-              ${template.message || 'The notification message content will appear here...'}
-            </div>
-            
-            <div style="margin-top: 60px; border-top: 1px solid #f1f5f9; padding-top: 40px; text-align: left;">
-              <p style="margin: 0; font-size: 14px; color: #64748b;">If you have any questions, feel free to reply to this email.</p>
-              <p style="margin: 10px 0 0 0; font-weight: 700; color: #0f172a; font-size: 18px;">Team DIFMO</p>
-            </div>
-          </div>
-          
-          <div style="line-height: 0;">
-            <img src="${footerImageUrl}" alt="DIFMO" style="width: 100%; height: auto; display: block;">
+      <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: #fff; color: #1e293b; margin: 0; padding: 20px; box-sizing: border-box; min-height: 100%;">
+        <div style="max-width: 700px; margin: 0 auto; background: #fff; box-sizing: border-box;">
+
+          <!-- Body -->
+          <div style="font-size: 16px; line-height: 1.6; color: #334155;">
+            ${template.message || 'The notification message content will appear here...'}
           </div>
 
-          <div style="padding: 40px 20px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
-            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
-              <tr>
-                <td align="center">
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="padding: 0 20px; text-align: center;">
-                        <a href="mailto:info@difmo.com" style="text-decoration: none; color: #0f172a; font-size: 14px; font-weight: 700;">
-                          <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" width="18" style="display: block; margin: 0 auto 8px auto;">
-                          info@difmo.com
-                        </a>
-                      </td>
-                      <td style="padding: 0 20px; text-align: center;">
-                        <a href="https://www.difmo.com" style="text-decoration: none; color: #0f172a; font-size: 14px; font-weight: 700;">
-                          <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" width="18" style="display: block; margin: 0 auto 8px auto;">
-                          www.difmo.com
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-            
-            <div style="text-align: center; margin-top: 20px;">
-              <a href="#" style="display: inline-block; margin: 0 12px; text-decoration: none;">
-                <img src="https://cdn-icons-png.flaticon.com/512/145/145807.png" width="28" height="28" alt="LinkedIn">
-              </a>
-              <a href="#" style="display: inline-block; margin: 0 12px; text-decoration: none;">
-                <img src="https://cdn-icons-png.flaticon.com/512/145/145802.png" width="28" height="28" alt="Facebook">
-              </a>
-              <a href="#" style="display: inline-block; margin: 0 12px; text-decoration: none;">
-                <img src="https://cdn-icons-png.flaticon.com/512/145/145812.png" width="28" height="28" alt="Twitter">
-              </a>
+          <!-- Signature -->
+          <div style="margin-top: 48px; padding-top: 28px; border-top: 1px solid #f1f5f9;">
+            <img src="https://res.cloudinary.com/dxju8ikk4/image/upload/v1777469595/difmo_vector_icon.png"
+                 width="100" height="100"
+                 style="border-radius: 50%; object-fit: cover; display: block; margin-bottom: 20px;">
+
+            <div style="border-top: 1px solid #1e293b; padding-top: 22px; max-width: 650px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <!-- Left: Identity -->
+                  <td width="55%" valign="top">
+                    <p style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: #000; letter-spacing: -0.4px;">Team DIFMO</p>
+                    <p style="margin: 0 0 1px; font-size: 15px; color: #1e293b; font-weight: 500;">Corporate Support</p>
+                    <p style="margin: 0 0 12px; font-size: 14px; color: #475569; font-style: italic;">Communications &amp; Experience</p>
+                    <p style="margin: 0 0 14px; font-size: 15px; font-weight: 800; color: #000;">DIFMO Pvt Ltd</p>
+                    <a href="https://www.difmo.com/contact" style="color: #d03f13ff; font-size: 14px; font-weight: 700; text-decoration: none;">
+                      Let's meet
+                    </a>
+                  </td>
+
+                  <!-- Right: Contact -->
+                  <td width="45%" valign="top">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="32" valign="top" style="padding-bottom: 14px;">
+                          <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                            <span style="color: #fff; font-size: 11px; font-weight: 800;">E</span>
+                          </div>
+                        </td>
+                        <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                          <a href="mailto:info@difmo.com" style="color: #000; text-decoration: none;">info@difmo.com</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="32" valign="top" style="padding-bottom: 14px;">
+                          <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                            <span style="color: #fff; font-size: 11px; font-weight: 800;">A</span>
+                          </div>
+                        </td>
+                        <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                          4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="32" valign="top" style="padding-bottom: 14px;">
+                          <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                            <span style="color: #fff; font-size: 11px; font-weight: 800;">W</span>
+                          </div>
+                        </td>
+                        <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                          <a href="https://www.difmo.com" style="color: #d03f13ff; text-decoration: none;">difmo.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </div>
+            <div style="border-top: 1px solid #1e293b; margin-top: 22px; max-width: 650px;"></div>
           </div>
-          
-          <div style="padding: 40px; text-align: center; background-color: #f1f5f9; border-top: 1px solid #e2e8f0;">
-            <p style="margin: 0; font-size: 12px; color: #94a3b8; letter-spacing: 1px;">&copy; ${year} DIFMO PRIVATE LIMITED. ALL RIGHTS RESERVED.</p>
+
+          <!-- Banner -->
+          <div style="margin-top: 36px; border-radius: 10px; overflow: hidden; line-height: 0;">
+            <img src="${bannerUrl}" alt="Our Services" style="width: 100%; height: auto; display: block;">
           </div>
+
+          <!-- Social Links -->
+          <div style="margin-top: 28px;">
+            <a href="#" style="display: inline-block; margin-right: 14px;">
+              <img src="https://cdn-icons-png.flaticon.com/512/145/145807.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+            </a>
+            <a href="#" style="display: inline-block; margin-right: 14px;">
+              <img src="https://cdn-icons-png.flaticon.com/512/145/145802.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+            </a>
+            <a href="#" style="display: inline-block; margin-right: 14px;">
+              <img src="https://cdn-icons-png.flaticon.com/512/145/145812.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+            </a>
+          </div>
+
+          <!-- Legal -->
+          <div style="margin-top: 36px; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+            <p style="margin: 0;">
+              This email, along with any attachments, documents, project files, source code, designs, business strategies, client information, and other transmitted materials, contains confidential and proprietary information belonging to <b>DIFMO</b>. It is intended solely for the use of the individual, organization, or entity to whom it is addressed.
+              <br/><br/>
+              Any unauthorized access, review, copying, disclosure, distribution, modification, or use of this information is strictly prohibited and may be unlawful.
+              <br/><br/>
+              If you have received this communication in error, please notify us immediately by replying to this email or contacting our support team at <b>info@difmo.com, mailto:info@difmo.com</b>, and permanently delete all copies of this message and its attachments from your system.
+              <br/><br/>
+              Difmo Private Limited is committed to protecting client data, intellectual property, and business confidentiality across all services including AI solutions, web development, mobile applications, cloud services, cybersecurity, and smart technology solutions.
+              <br/><br/>
+              <b>© ${year} Difmo Private Limited. All rights reserved.</b>
+            </p>
+            <p style="margin: 8px 0 0;">&copy; ${year} DIFMO PRIVATE LIMITED. ALL RIGHTS RESERVED.</p>
+          </div>
+
         </div>
       </div>
     `;
@@ -174,7 +229,7 @@ const TemplateDesignerPage = () => {
           {/* Top Bar */}
           <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => navigate('/notifications/templates')}
                 className="p-2 bg-white rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 transition-colors shadow-sm"
               >
@@ -209,7 +264,7 @@ const TemplateDesignerPage = () => {
 
           {feedback && (
             <div className={`mb-6 p-4 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${feedback.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}>
-              {feedback.type === 'success' ? <CheckCircle2 size={20} /> : <CircleAlert size={20} />}
+              {feedback.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
               <p className="text-sm font-medium">{feedback.message}</p>
             </div>
           )}
@@ -234,7 +289,7 @@ const TemplateDesignerPage = () => {
                     <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                       <Type size={16} className="text-blue-500" /> Content Editor
                     </h2>
-                    <button 
+                    <button
                       onClick={() => setShowForm(false)}
                       className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-all"
                       title="Hide Editor"
@@ -265,7 +320,7 @@ const TemplateDesignerPage = () => {
 
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message Body (Rich Text)</label>
-                      
+
                       <div className="flex flex-wrap items-center gap-1 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-t-xl">
                         <button type="button" onClick={() => execCommand('bold')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Bold">
                           <Bold size={16} />
@@ -297,6 +352,106 @@ const TemplateDesignerPage = () => {
                         data-placeholder="Type your message here..."
                       />
                     </div>
+
+                    {/* Signature Settings Section */}
+                    <div className="pt-6 border-t border-slate-100">
+                      <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        ✍️ Edit Signature Details
+                      </h3>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Signature Team</label>
+                          <input
+                            value={template.signatureTeam || 'Team DIFMO'}
+                            onChange={(e) => setTemplate({ ...template, signatureTeam: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Corporate Role / Dept</label>
+                          <input
+                            value={template.signatureDept || 'Corporate Support'}
+                            onChange={(e) => setTemplate({ ...template, signatureDept: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Tagline / Subtitle</label>
+                          <input
+                            value={template.signatureRole || 'Communications & Experience'}
+                            onChange={(e) => setTemplate({ ...template, signatureRole: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Company Name</label>
+                          <input
+                            value={template.signatureCompany || 'DIFMO Pvt Ltd'}
+                            onChange={(e) => setTemplate({ ...template, signatureCompany: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Meet Button Text</label>
+                          <input
+                            value={template.signatureMeetText || "Let's meet"}
+                            onChange={(e) => setTemplate({ ...template, signatureMeetText: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Meet Button Link</label>
+                          <input
+                            value={template.signatureMeetLink || 'https://www.difmo.com/contact'}
+                            onChange={(e) => setTemplate({ ...template, signatureMeetLink: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Contact Email</label>
+                          <input
+                            value={template.signatureEmail || 'info@difmo.com'}
+                            onChange={(e) => setTemplate({ ...template, signatureEmail: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Website Address</label>
+                          <input
+                            value={template.signatureWebsite || 'difmo.com'}
+                            onChange={(e) => setTemplate({ ...template, signatureWebsite: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Website Link</label>
+                          <input
+                            value={template.signatureWebsiteLink || 'https://www.difmo.com'}
+                            onChange={(e) => setTemplate({ ...template, signatureWebsiteLink: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Office Address</label>
+                        <textarea
+                          value={template.signatureAddress || '4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India'}
+                          onChange={(e) => setTemplate({ ...template, signatureAddress: e.target.value })}
+                          rows={2}
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm resize-none"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -316,9 +471,9 @@ const TemplateDesignerPage = () => {
                   </div>
                 </div>
                 <div className="flex-1 bg-slate-100/50 overflow-auto flex justify-center">
-                  <div 
+                  <div
                     className="w-full shadow-2xl h-fit border border-black/5"
-                    dangerouslySetInnerHTML={{ __html: getPreviewHtml() }} 
+                    dangerouslySetInnerHTML={{ __html: getPreviewHtml() }}
                   />
                 </div>
               </div>

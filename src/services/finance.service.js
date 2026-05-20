@@ -120,8 +120,8 @@ const financeService = {
         const response = await apiClient.delete(`${API_ENDPOINTS.LEAVES.BASE}/${id}`);
         return response.data;
     },
-    sendPayrollEmail: async (id) => {
-        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}/send-email`);
+    sendPayrollEmail: async (id, payload) => {
+        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}/send-email`, payload);
         return response.data;
     },
 };

@@ -28,6 +28,7 @@ import LandingPage from './features/landing/pages/LandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import CompanyProfile from './features/company/pages/CompanyProfilePage';
 import RolesManagement from './features/settings/pages/RolesManagementPage';
+import UserPermissionsPage from './features/settings/pages/UserPermissionsPage';
 import PayrollPage from './features/payroll/pages/PayrollPage';
 import AddProject from "./features/projects/pages/AddProjectPage";
 import Project from "./features/projects/pages/ProjectListPage";
@@ -195,6 +196,11 @@ const Routes = () => {
           <Route path="/settings/roles" element={
             <ProtectedRoute>
               <RolesManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/settings/user-permissions" element={
+            <ProtectedRoute>
+              <UserPermissionsPage />
             </ProtectedRoute>
           } />
 

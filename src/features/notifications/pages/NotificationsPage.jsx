@@ -12,71 +12,134 @@ import { Checkbox } from '../../../components/ui/Checkbox';
 
 const getPreviewHtml = (title, message) => {
   const year = new Date().getFullYear();
-  const footerImageUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777462000/difmo_footer_services.png';
-  
+  const bannerUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777468072/difmo_banner_final.png';
+
+  // Retrieve global active template if any
+  let activeTpl = {};
+  const globalActiveId = localStorage.getItem('global_active_template_id');
+  if (globalActiveId && globalActiveId !== 'default') {
+    const savedTemplates = JSON.parse(localStorage.getItem('notification_templates') || '[]');
+    const found = savedTemplates.find(t => t.id.toString() === globalActiveId.toString());
+    if (found) {
+      activeTpl = found;
+    }
+  }
+
+  const sigTeam = activeTpl.signatureTeam || 'Team DIFMO';
+  const sigDept = activeTpl.signatureDept || 'Corporate Support';
+  const sigRole = activeTpl.signatureRole || 'Communications & Experience';
+  const sigCompany = activeTpl.signatureCompany || 'DIFMO Pvt Ltd';
+  const sigMeetText = activeTpl.signatureMeetText || "Let's meet";
+  const sigMeetLink = activeTpl.signatureMeetLink || 'https://www.difmo.com/contact';
+  const sigEmail = activeTpl.signatureEmail || 'info@difmo.com';
+  const sigAddress = activeTpl.signatureAddress || '4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India';
+  const sigWebsite = activeTpl.signatureWebsite || 'difmo.com';
+  const sigWebsiteLink = activeTpl.signatureWebsiteLink || 'https://www.difmo.com';
+
   return `
-    <div style="font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 20px 0; color: #1e293b; width: 100%;">
-      <div style="width: 100%; max-width: 800px; margin: 0 auto; background-color: #ffffff; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-        <div style="padding: 40px 20px; text-align: center; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
-          <div style="margin-bottom: 15px;">
-            <span style="font-size: 20px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-transform: uppercase;">
-              <span style="color: #f59e0b;">DIFMO</span>
-            </span>
-          </div>
-          <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; line-height: 1.2;">${title}</h1>
-        </div>
-        
-        <div style="padding: 40px;">
-          <div style="font-size: 16px; color: #334155; line-height: 1.8; margin-bottom: 30px;">
-            ${message}
-          </div>
-          
-          <div style="margin-top: 40px; border-top: 1px solid #f1f5f9; padding-top: 30px; text-align: left;">
-            <p style="margin: 0; font-weight: 700; color: #0f172a; font-size: 16px;">Team DIFMO</p>
-          </div>
-        </div>
-        
-        <div style="line-height: 0;">
-          <img src="${footerImageUrl}" alt="DIFMO" style="width: 100%; height: auto; display: block;">
+    <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: #fff; color: #1e293b; margin: 0; padding: 20px; box-sizing: border-box; min-height: 100%;">
+      <div style="max-width: 700px; margin: 0 auto; background: #fff; box-sizing: border-box;">
+
+        <!-- Body -->
+        <div style="font-size: 16px; line-height: 1.6; color: #334155;">
+          ${message}
         </div>
 
-        <div style="padding: 30px 20px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
-          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
-            <tr>
-              <td align="center">
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="padding: 0 15px; text-align: center;">
-                      <a href="mailto:info@difmo.com" style="text-decoration: none; color: #0f172a; font-size: 12px; font-weight: 700;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" width="16" style="display: block; margin: 0 auto 5px auto;">
-                        info@difmo.com
-                      </a>
-                    </td>
-                    <td style="padding: 0 15px; text-align: center;">
-                      <a href="https://www.difmo.com" style="text-decoration: none; color: #0f172a; font-size: 12px; font-weight: 700;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" width="16" style="display: block; margin: 0 auto 5px auto;">
-                        www.difmo.com
-                      </a>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-          
-          <div style="text-align: center;">
-            <a href="#" style="display: inline-block; margin: 0 8px;">
-              <img src="https://cdn-icons-png.flaticon.com/512/145/145807.png" width="20" height="20" alt="LinkedIn">
-            </a>
-            <a href="#" style="display: inline-block; margin: 0 8px;">
-              <img src="https://cdn-icons-png.flaticon.com/512/145/145802.png" width="20" height="20" alt="Facebook">
-            </a>
+        <!-- Signature -->
+        <div style="margin-top: 48px; padding-top: 28px; border-top: 1px solid #f1f5f9;">
+          <img src="https://res.cloudinary.com/dxju8ikk4/image/upload/v1777469595/difmo_vector_icon.png"
+               width="100" height="100"
+               style="border-radius: 50%; object-fit: cover; display: block; margin-bottom: 20px;">
+
+          <div style="border-top: 1px solid #1e293b; padding-top: 22px; max-width: 650px;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <!-- Left: Identity -->
+                <td width="55%" valign="top">
+                  <p style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: #000; letter-spacing: -0.4px;">${sigTeam}</p>
+                  <p style="margin: 0 0 1px; font-size: 15px; color: #1e293b; font-weight: 500;">${sigDept}</p>
+                  <p style="margin: 0 0 12px; font-size: 14px; color: #475569; font-style: italic;">${sigRole}</p>
+                  <p style="margin: 0 0 14px; font-size: 15px; font-weight: 800; color: #000;">${sigCompany}</p>
+                  <a href="${sigMeetLink}" style="color: #d03f13ff; font-size: 14px; font-weight: 700; text-decoration: none;">
+                    ${sigMeetText}
+                  </a>
+                </td>
+
+                <!-- Right: Contact -->
+                <td width="45%" valign="top">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td width="32" valign="top" style="padding-bottom: 14px;">
+                        <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                          <span style="color: #fff; font-size: 11px; font-weight: 800;">E</span>
+                        </div>
+                      </td>
+                      <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                        <a href="mailto:${sigEmail}" style="color: #000; text-decoration: none;">${sigEmail}</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="32" valign="top" style="padding-bottom: 14px;">
+                        <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                          <span style="color: #fff; font-size: 11px; font-weight: 800;">A</span>
+                        </div>
+                      </td>
+                      <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                        ${sigAddress}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="32" valign="top" style="padding-bottom: 14px;">
+                        <div style="width: 24px; height: 24px; background: #000; border-radius: 50%; text-align: center; line-height: 24px;">
+                          <span style="color: #fff; font-size: 11px; font-weight: 800;">W</span>
+                        </div>
+                      </td>
+                      <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
+                        <a href="${sigWebsiteLink}" style="color: #d03f13ff; text-decoration: none;">${sigWebsite}</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           </div>
+          <div style="border-top: 1px solid #1e293b; margin-top: 22px; max-width: 650px;"></div>
         </div>
-        
-        <div style="padding: 30px; text-align: center; background-color: #f1f5f9; border-top: 1px solid #e2e8f0;">
-          <p style="margin: 0; font-size: 10px; color: #94a3b8; letter-spacing: 1px;">&copy; ${year} DIFMO PRIVATE LIMITED. ALL RIGHTS RESERVED.</p>
+
+        <!-- Banner -->
+        <div style="margin-top: 36px; border-radius: 10px; overflow: hidden; line-height: 0;">
+          <img src="${bannerUrl}" alt="Our Services" style="width: 100%; height: auto; display: block;">
         </div>
+
+        <!-- Social Links -->
+        <div style="margin-top: 28px;">
+          <a href="#" style="display: inline-block; margin-right: 14px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/145/145807.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+          </a>
+          <a href="#" style="display: inline-block; margin-right: 14px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/145/145802.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+          </a>
+          <a href="#" style="display: inline-block; margin-right: 14px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/145/145812.png" width="22" style="opacity: 0.75; vertical-align: middle;">
+          </a>
+        </div>
+
+        <!-- Legal -->
+        <div style="margin-top: 36px; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+          <p style="margin: 0;">
+            This email, along with any attachments, documents, project files, source code, designs, business strategies, client information, and other transmitted materials, contains confidential and proprietary information belonging to <b>DIFMO</b>. It is intended solely for the use of the individual, organization, or entity to whom it is addressed.
+            <br/><br/>
+            Any unauthorized access, review, copying, disclosure, distribution, modification, or use of this information is strictly prohibited and may be unlawful.
+            <br/><br/>
+            If you have received this communication in error, please notify us immediately by replying to this email or contacting our support team at <b>info@difmo.com, mailto:info@difmo.com</b>, and permanently delete all copies of this message and its attachments from your system.
+            <br/><br/>
+            Difmo Private Limited is committed to protecting client data, intellectual property, and business confidentiality across all services including AI solutions, web development, mobile applications, cloud services, cybersecurity, and smart technology solutions.
+            <br/><br/>
+            <b>© ${year} Difmo Private Limited. All rights reserved.</b>
+          </p>
+          <p style="margin: 8px 0 0;">&copy; ${year} DIFMO PRIVATE LIMITED. ALL RIGHTS RESERVED.</p>
+        </div>
+
       </div>
     </div>
   `;
@@ -107,6 +170,7 @@ const NotificationsPage = () => {
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [useCustomLayout, setUseCustomLayout] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [showTemplates, setShowTemplates] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
@@ -180,7 +244,7 @@ const NotificationsPage = () => {
     };
 
     loadAdminData();
-    
+
     const savedTemplates = localStorage.getItem('notification_templates');
     if (savedTemplates) {
       setTemplates(JSON.parse(savedTemplates));
@@ -270,7 +334,11 @@ const NotificationsPage = () => {
       metadata: {
         type: 'ADMIN_BROADCAST',
         audience: composeForm.audience,
-        sentFrom: 'notifications-page'
+        sentFrom: 'notifications-page',
+        useCustomHtml: composeForm.channel === 'email' || composeForm.channel === 'both',
+        customHtml: (composeForm.channel === 'email' || composeForm.channel === 'both')
+          ? getPreviewHtml(composeForm.title.trim(), composeForm.message.trim())
+          : undefined
       }
     };
 
@@ -288,6 +356,7 @@ const NotificationsPage = () => {
       await notificationService.send(payload);
       setFeedback({ type: 'success', message: 'Notification campaign sent successfully.' });
       setComposeForm(defaultComposeForm);
+      setUseCustomLayout(false);
       setSelectedRecipientIds([]);
       await refreshHistory();
     } catch (error) {
@@ -315,6 +384,7 @@ const NotificationsPage = () => {
       audience: tpl.audience || 'employees',
       channel: tpl.channel || 'email'
     });
+    setUseCustomLayout(true);
     setShowTemplates(false);
     setFeedback({ type: 'success', message: `Loaded template: ${tpl.title}` });
   };
@@ -401,7 +471,7 @@ const NotificationsPage = () => {
                       <h2 className="text-lg font-semibold text-slate-900">Compose Campaign</h2>
                       <p className="mt-1 text-sm text-slate-500">Use a standard broadcast flow to target the right audience.</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setShowTemplates(!showTemplates)}
                       className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
                     >
@@ -456,6 +526,19 @@ const NotificationsPage = () => {
                       />
                     </Field>
 
+                    {/* Toggle Option for Custom Designed Template */}
+                    {(composeForm.channel === 'email' || composeForm.channel === 'both') && (
+                      <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl transition-all shadow-sm">
+                        <Checkbox
+                          id="useCustomLayout"
+                          checked={useCustomLayout}
+                          onChange={() => setUseCustomLayout(!useCustomLayout)}
+                          label="Use Admin Panel Custom Designed Layout"
+                          description="Sends using the premium header/footer email layout."
+                        />
+                      </div>
+                    )}
+
                     <div className="grid gap-4 md:grid-cols-2">
                       <Field label="Audience">
                         <select
@@ -494,8 +577,8 @@ const NotificationsPage = () => {
                               type="button"
                               onClick={() => handleComposeChange('selectionMode', option.key)}
                               className={`flex-1 rounded-md px-3 py-2 text-sm transition-colors ${composeForm.selectionMode === option.key
-                                  ? 'bg-white font-semibold text-slate-900 shadow-sm'
-                                  : 'text-slate-500 hover:text-slate-900'
+                                ? 'bg-white font-semibold text-slate-900 shadow-sm'
+                                : 'text-slate-500 hover:text-slate-900'
                                 }`}
                             >
                               {option.label}
@@ -551,8 +634,8 @@ const NotificationsPage = () => {
 
                     {feedback && (
                       <div className={`rounded-lg border px-3 py-2 text-sm ${feedback.type === 'success'
-                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                          : 'border-rose-200 bg-rose-50 text-rose-700'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                        : 'border-rose-200 bg-rose-50 text-rose-700'
                         }`}>
                         {feedback.message}
                       </div>

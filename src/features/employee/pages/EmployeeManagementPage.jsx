@@ -189,7 +189,10 @@ const EmployeeManagement = () => {
         skills: employeeData.skills || [],
         permissionIds: employeeData.permissionIds || [],
         avatar: employeeData.avatar || '',
-        documents: employeeData.documents || []
+        documents: employeeData.documents || [],
+        startTime: employeeData.startTime || '',
+        endTime: employeeData.endTime || '',
+        checkInTime: employeeData.checkInTime || ''
       };
 
       if (modalState.mode === 'add') {

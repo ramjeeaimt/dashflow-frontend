@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Search, Plus, Pencil, Trash2, Layout, Calendar, Clock, ChevronRight, Filter } from 'lucide-react';
+import { Mail, Search, Plus, Pencil, Trash2, Layout, Calendar, Clock, ChevronRight, Filter, Crown } from 'lucide-react';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import useAuthStore from '../../../store/useAuthStore';
+import api from '../../../api/client';
 
 const EmailTemplatesPage = () => {
   const navigate = useNavigate();
@@ -13,23 +14,51 @@ const EmailTemplatesPage = () => {
   const [templates, setTemplates] = useState([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  
+  const [globalActiveTemplateId, setGlobalActiveTemplateId] = useState(user?.company?.activeEmailTemplateId || 'default');
+
+  const handleSetGlobal = async (id) => {
+    try {
+      setGlobalActiveTemplateId(id);
+      await api.patch(`/system-company/${user.company.id}`, { activeEmailTemplateId: id === 'default' ? null : id });
+      
+      const updatedUser = { ...user, company: { ...user.company, activeEmailTemplateId: id === 'default' ? null : id } };
+      useAuthStore.setState({ user: updatedUser });
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Failed to set global template', err);
+    }
+  };
 
   const isAdmin = user?.roles?.some((role) => ['Admin', 'Super Admin', 'Manager'].includes(role.name)) || user?.email === 'admin@difmo.com';
 
   useEffect(() => {
-    // Load local templates
-    const saved = localStorage.getItem('notification_templates');
-    if (saved) {
-      setTemplates(JSON.parse(saved));
-    }
-    setIsLoading(false);
+    const fetchTemplates = async () => {
+      try {
+        const res = await api.get('/email-templates');
+        setTemplates(res.data || []);
+      } catch (err) {
+        console.error('Failed to load templates', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTemplates();
   }, []);
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this template?')) return;
-    const updated = templates.filter(t => t.id !== id);
-    setTemplates(updated);
-    localStorage.setItem('notification_templates', JSON.stringify(updated));
+    try {
+      await api.delete(`/email-templates/${id}`);
+      const updated = templates.filter(t => t.id !== id);
+      setTemplates(updated);
+      
+      if (globalActiveTemplateId === id.toString()) {
+        handleSetGlobal('default');
+      }
+    } catch (err) {
+      console.error('Failed to delete template', err);
+    }
   };
 
   const filteredTemplates = templates.filter(t => 
@@ -102,6 +131,38 @@ const EmailTemplatesPage = () => {
             </div>
           </div>
 
+          {/* ========== NEW: Global Active Layout Configurator ========== */}
+          <div className="mb-8 p-6 bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl border border-slate-700 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/20">
+                <Crown size={28} className="fill-amber-400/20 animate-pulse" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  Global Email Branding Layout
+                </h2>
+                <p className="text-xs text-slate-400 mt-1 max-w-[500px]">
+                  Choose which layout format is used by default for all system notifications, alerts, and salary payroll releases.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">Active Layout:</span>
+              <select
+                value={globalActiveTemplateId}
+                onChange={(e) => handleSetGlobal(e.target.value)}
+                className="bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer min-w-[240px]"
+              >
+                <option value="default">Default System Layout (Standard)</option>
+                {templates.map(tpl => (
+                  <option key={tpl.id} value={tpl.id.toString()}>
+                    Created Format: {tpl.name || tpl.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* Search and Filters */}
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative flex-1">
@@ -139,48 +200,63 @@ const EmailTemplatesPage = () => {
                 </button>
               </div>
             ) : (
-              filteredTemplates.map(tpl => (
-                <div key={tpl.id} className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all overflow-hidden flex flex-col">
-                  <div className="p-6 flex-1">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                        {tpl.type || 'Email'}
+              filteredTemplates.map(tpl => {
+                const isActive = globalActiveTemplateId === tpl.id.toString();
+                return (
+                  <div key={tpl.id} className={`group bg-white rounded-2xl border ${isActive ? 'border-amber-400 shadow-md shadow-amber-500/5 ring-2 ring-amber-500/10' : 'border-slate-200'} shadow-sm hover:shadow-xl hover:border-blue-200 transition-all overflow-hidden flex flex-col`}>
+                    {isActive && (
+                      <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-1.5 text-center text-[10px] font-extrabold text-slate-900 uppercase tracking-widest flex items-center justify-center gap-1">
+                        <Crown size={10} className="fill-slate-900" /> Global Active Layout
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          title="Edit"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(tpl.id)}
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                    )}
+                    <div className="p-6 flex-1">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                          {tpl.type || 'Email'}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button 
+                            onClick={() => handleSetGlobal(isActive ? 'default' : tpl.id.toString())}
+                            className={`p-2 rounded-lg transition-all ${isActive ? 'text-amber-500 hover:text-amber-600 bg-amber-50' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-50'}`}
+                            title={isActive ? "Deactivate Global Layout" : "Set as Global Active Layout"}
+                          >
+                            <Crown size={16} />
+                          </button>
+                          <button 
+                            onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Edit"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(tpl.id)}
+                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
+                      <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">{tpl.name}</h3>
+                      <p className="text-xs font-medium text-slate-500 mb-4 line-clamp-1 italic">"{tpl.title}"</p>
+                      <div className="text-sm text-slate-600 line-clamp-3 mb-6 min-h-[60px]" dangerouslySetInnerHTML={{ __html: tpl.message }} />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">{tpl.name}</h3>
-                    <p className="text-xs font-medium text-slate-500 mb-4 line-clamp-1 italic">"{tpl.title}"</p>
-                    <div className="text-sm text-slate-600 line-clamp-3 mb-6 min-h-[60px]" dangerouslySetInnerHTML={{ __html: tpl.message }} />
-                  </div>
-                  <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <Calendar size={14} />
-                      {new Date(tpl.createdAt).toLocaleDateString()}
+                    <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-slate-400">
+                        <Calendar size={14} />
+                        {new Date(tpl.createdAt).toLocaleDateString()}
+                      </div>
+                      <button 
+                        onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)}
+                        className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:gap-2 transition-all"
+                      >
+                        EDIT TEMPLATE <ChevronRight size={14} />
+                      </button>
                     </div>
-                    <button 
-                      onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)}
-                      className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:gap-2 transition-all"
-                    >
-                      EDIT TEMPLATE <ChevronRight size={14} />
-                    </button>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
