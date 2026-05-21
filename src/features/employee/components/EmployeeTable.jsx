@@ -263,7 +263,7 @@ const EmployeeTable = ({
                   />
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 cursor-pointer" onClick={() => onViewEmployee(employee)}>
                     <EmployeeAvatar employee={employee} size="md" />
                     <div>
                       <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{employee.name || `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || '—'}</p>

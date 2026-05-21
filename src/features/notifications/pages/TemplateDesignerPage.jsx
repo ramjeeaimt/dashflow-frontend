@@ -43,7 +43,9 @@ const TemplateDesignerPage = () => {
         try {
           const res = await api.get(`/email-templates/${id}`);
           if (res.data) {
-            setTemplate(res.data);
+            // Robustly unwrap data in case it's wrapped in a { data, statusCode, message } object
+            const templateData = (res.data.data && res.data.statusCode) ? res.data.data : res.data;
+            setTemplate(prev => ({ ...prev, ...templateData }));
           }
         } catch (err) {
           console.error('Failed to load template', err);
@@ -105,6 +107,17 @@ const TemplateDesignerPage = () => {
     const year = new Date().getFullYear();
     const bannerUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777468072/difmo_banner_final.png';
 
+    const sigTeam = template.signatureTeam || 'Team DIFMO';
+    const sigDept = template.signatureDept || 'Corporate Support';
+    const sigRole = template.signatureRole || 'Communications & Experience';
+    const sigCompany = template.signatureCompany || 'DIFMO Pvt Ltd';
+    const sigMeetText = template.signatureMeetText || "Let's meet";
+    const sigMeetLink = template.signatureMeetLink || 'https://www.difmo.com/contact';
+    const sigEmail = template.signatureEmail || 'info@difmo.com';
+    const sigAddress = template.signatureAddress || '4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India';
+    const sigWebsite = template.signatureWebsite || 'difmo.com';
+    const sigWebsiteLink = template.signatureWebsiteLink || 'https://www.difmo.com';
+
     return `
       <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: #fff; color: #1e293b; margin: 0; padding: 20px; box-sizing: border-box; min-height: 100%;">
         <div style="max-width: 700px; margin: 0 auto; background: #fff; box-sizing: border-box;">
@@ -125,12 +138,12 @@ const TemplateDesignerPage = () => {
                 <tr>
                   <!-- Left: Identity -->
                   <td width="55%" valign="top">
-                    <p style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: #000; letter-spacing: -0.4px;">Team DIFMO</p>
-                    <p style="margin: 0 0 1px; font-size: 15px; color: #1e293b; font-weight: 500;">Corporate Support</p>
-                    <p style="margin: 0 0 12px; font-size: 14px; color: #475569; font-style: italic;">Communications &amp; Experience</p>
-                    <p style="margin: 0 0 14px; font-size: 15px; font-weight: 800; color: #000;">DIFMO Pvt Ltd</p>
-                    <a href="https://www.difmo.com/contact" style="color: #d03f13ff; font-size: 14px; font-weight: 700; text-decoration: none;">
-                      Let's meet
+                    <p style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: #000; letter-spacing: -0.4px;">${sigTeam}</p>
+                    <p style="margin: 0 0 1px; font-size: 15px; color: #1e293b; font-weight: 500;">${sigDept}</p>
+                    <p style="margin: 0 0 12px; font-size: 14px; color: #475569; font-style: italic;">${sigRole}</p>
+                    <p style="margin: 0 0 14px; font-size: 15px; font-weight: 800; color: #000;">${sigCompany}</p>
+                    <a href="${sigMeetLink}" style="color: #d03f13ff; font-size: 14px; font-weight: 700; text-decoration: none;">
+                      ${sigMeetText}
                     </a>
                   </td>
 
@@ -144,7 +157,7 @@ const TemplateDesignerPage = () => {
                           </div>
                         </td>
                         <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
-                          <a href="mailto:info@difmo.com" style="color: #000; text-decoration: none;">info@difmo.com</a>
+                          <a href="mailto:${sigEmail}" style="color: #000; text-decoration: none;">${sigEmail}</a>
                         </td>
                       </tr>
                       <tr>
@@ -154,7 +167,7 @@ const TemplateDesignerPage = () => {
                           </div>
                         </td>
                         <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
-                          4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India
+                          ${sigAddress}
                         </td>
                       </tr>
                       <tr>
@@ -164,7 +177,7 @@ const TemplateDesignerPage = () => {
                           </div>
                         </td>
                         <td style="padding-bottom: 14px; font-size: 14px; font-weight: 600; color: #000; line-height: 1.5;">
-                          <a href="https://www.difmo.com" style="color: #d03f13ff; text-decoration: none;">difmo.com</a>
+                          <a href="${sigWebsiteLink}" style="color: #d03f13ff; text-decoration: none;">${sigWebsite}</a>
                         </td>
                       </tr>
                     </table>
@@ -200,7 +213,7 @@ const TemplateDesignerPage = () => {
               <br/><br/>
               Any unauthorized access, review, copying, disclosure, distribution, modification, or use of this information is strictly prohibited and may be unlawful.
               <br/><br/>
-              If you have received this communication in error, please notify us immediately by replying to this email or contacting our support team at <b>info@difmo.com, mailto:info@difmo.com</b>, and permanently delete all copies of this message and its attachments from your system.
+              If you have received this communication in error, please notify us immediately by replying to this email or contacting our support team at <b>${sigEmail}, mailto:${sigEmail}</b>, and permanently delete all copies of this message and its attachments from your system.
               <br/><br/>
               Difmo Private Limited is committed to protecting client data, intellectual property, and business confidentiality across all services including AI solutions, web development, mobile applications, cloud services, cybersecurity, and smart technology solutions.
               <br/><br/>

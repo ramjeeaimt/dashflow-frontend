@@ -65,12 +65,13 @@ const WorkFromHomeRequestList = ({ employeeId }) => {
                     <Icon name="History" size={14} className="text-indigo-400" /> Work From Home Request History
                 </h3>
             </div>
-            
+
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50/30 border-b border-slate-50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                             <th className="px-8 py-4">Dates</th>
+                            <th className="px-8 py-4">Employee</th>
                             <th className="px-8 py-4">Reason</th>
                             <th className="px-8 py-4">Status</th>
                             <th className="px-8 py-4">Admin Remarks</th>
@@ -83,6 +84,9 @@ const WorkFromHomeRequestList = ({ employeeId }) => {
                                 <td className="px-8 py-5">
                                     <div className="text-xs font-bold text-slate-900">{req.startDate}</div>
                                     <div className="text-[10px] text-slate-400 font-medium">to {req.endDate}</div>
+                                </td>
+                                <td className="px-8 py-5">
+                                    <p className="text-sm font-bold text-slate-900">{req.employee?.user?.firstName} {req.employee?.user?.lastName}</p>
                                 </td>
                                 <td className="px-8 py-5">
                                     <p className="text-xs text-slate-600 max-w-xs truncate" title={req.reason}>
@@ -104,7 +108,7 @@ const WorkFromHomeRequestList = ({ employeeId }) => {
                                     )}
                                 </td>
                                 <td className="px-8 py-5 text-right">
-                                    <button 
+                                    <button
                                         onClick={() => handleDelete(req.id)}
                                         className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
                                         title="Delete Record"

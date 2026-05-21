@@ -16,8 +16,8 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
       };
 
       reset({
-        checkInTime: attendance.checkInTime !== '--' ? formatForInput(attendance.checkInTime) : '09:00',
-        checkOutTime: attendance.checkOutTime !== '--' ? formatForInput(attendance.checkOutTime) : '17:00',
+        checkInTime: attendance.checkInTime && attendance.checkInTime !== '--' ? formatForInput(attendance.checkInTime) : '09:00',
+        checkOutTime: attendance.checkOutTime && attendance.checkOutTime !== '--' ? formatForInput(attendance.checkOutTime) : '',
         status: attendance.status || 'present',
         notes: '' // Clear notes so they enter a fresh reason
       });

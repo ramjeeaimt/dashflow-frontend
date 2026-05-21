@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useAttendanceStore from '../../../../store/useAttendanceStore';
 import Icon from '../../../components/AppIcon';
 import AppImage from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
@@ -14,6 +15,20 @@ const CheckInOutWidget = ({
   const [workMode, setWorkMode] = useState('office');
   const [notes, setNotes] = useState('');
   const [showCamera, setShowCamera] = useState(false);
+  const [canCheckInWithoutLocation, setCanCheckInWithoutLocation] = useState(false);
+  const { hasApprovedWFH } = useAttendanceStore();
+
+  useEffect(() => {
+    const checkWFH = async () => {
+      if (workMode === 'wfh' && employeeData?.id) {
+        const approved = await hasApprovedWFH(employeeData.id);
+        setCanCheckInWithoutLocation(approved);
+      } else {
+        setCanCheckInWithoutLocation(false);
+      }
+    };
+    checkWFH();
+  }, [workMode, employeeData?.id, hasApprovedWFH]);
 
   const workModes = [
     {
@@ -89,7 +104,7 @@ const CheckInOutWidget = ({
       {/* Status Display */}
       <div className="text-center mb-8">
         <div className={`inline-flex items-center space-x-2 px-6 py-3 rounded-full text-lg font-medium ${attendanceStatus?.isCheckedIn
-            ? 'bg-success/10 text-success border border-success/20' : 'bg-muted text-muted-foreground border border-border'
+          ? 'bg-success/10 text-success border border-success/20' : 'bg-muted text-muted-foreground border border-border'
           }`}>
           <Icon
             name={attendanceStatus?.isCheckedIn ? 'UserCheck' : 'UserX'}
@@ -122,7 +137,7 @@ const CheckInOutWidget = ({
                 key={mode?.value}
                 onClick={() => setWorkMode(mode?.value)}
                 className={`p-4 rounded-lg border text-left transition-all duration-150 ${workMode === mode?.value
-                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border bg-card hover:bg-muted/50'
+                  ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border bg-card hover:bg-muted/50'
                   }`}
               >
                 <div className="flex items-center space-x-3">
@@ -149,7 +164,7 @@ const CheckInOutWidget = ({
             <span className="text-sm font-medium text-foreground">Location</span>
           </div>
           <span className={`text-xs px-2 py-1 rounded-full ${location?.verified
-              ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+            ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
             }`}>
             {location?.verified ? 'Verified' : 'Unverified'}
           </span>
@@ -175,10 +190,10 @@ const CheckInOutWidget = ({
       <div className="space-y-3">
         <Button
           onClick={handleAction}
-          disabled={!location?.verified && workMode === 'office'}
+          disabled={!location?.verified && workMode === 'office' && !canCheckInWithoutLocation}
           className={`w-full py-4 text-lg font-medium ${attendanceStatus?.isCheckedIn
-              ? 'bg-error hover:bg-error/90 text-error-foreground'
-              : 'bg-success hover:bg-success/90 text-success-foreground'
+            ? 'bg-error hover:bg-error/90 text-error-foreground'
+            : 'bg-success hover:bg-success/90 text-success-foreground'
             }`}
         >
           <Icon
@@ -228,7 +243,7 @@ const CheckInOutWidget = ({
       {attendanceStatus?.isCheckedIn && (
         <div className="mt-6 pt-6 border-t border-border">
           <div className={`flex items-center justify-between p-4 rounded-lg ${attendanceStatus?.isOnBreak
-              ? 'bg-warning/10 border border-warning/20' : 'bg-muted/50'
+            ? 'bg-warning/10 border border-warning/20' : 'bg-muted/50'
             }`}>
             <div className="flex items-center space-x-2">
               <Icon

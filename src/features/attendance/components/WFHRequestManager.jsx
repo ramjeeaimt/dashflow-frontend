@@ -8,7 +8,8 @@ import WorkFromHomeRequestList from './WorkFromHomeRequestList';
 const WorkFromHomeRequestManager = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'history'
+    const [actionLoadingId, setActionLoadingId] = useState(null);
+    const [activeTab, setActiveTab] = useState('pending');
 
     const fetchPendingRequests = async () => {
         setLoading(true);
@@ -33,6 +34,7 @@ const WorkFromHomeRequestManager = () => {
         const adminComment = window.prompt(`Enter comment for ${status.toLowerCase()} (optional):`);
         if (adminComment === null) return;
 
+        setActionLoadingId(id);
         try {
             await api.patch(API_ENDPOINTS.WFH_REQUESTS.UPDATE_STATUS(id), { status, adminComment });
             toast.success(`Request ${status.toLowerCase()}ed`);
@@ -40,6 +42,8 @@ const WorkFromHomeRequestManager = () => {
         } catch (error) {
             console.error('Failed to update request:', error);
             toast.error('Operation failed');
+        } finally {
+            setActionLoadingId(null);
         }
     };
 
@@ -143,9 +147,14 @@ const WorkFromHomeRequestManager = () => {
                                         </button>
                                         <button 
                                             onClick={() => handleAction(req.id, 'APPROVED')}
-                                            className="px-6 py-2.5 bg-indigo-600 text-white text-[11px] font-black rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
+                                            className={`px-6 py-2.5 bg-indigo-600 text-white text-[11px] font-black rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 ${actionLoadingId === req.id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                            disabled={actionLoadingId === req.id}
                                         >
-                                            <Icon name="Check" size={14} />
+                                            {actionLoadingId === req.id ? (
+                                                <Icon name="Loader2" size={14} className="animate-spin mr-1" />
+                                            ) : (
+                                                <Icon name="Check" size={14} />
+                                            )}
                                             Approve
                                         </button>
                                     </div>

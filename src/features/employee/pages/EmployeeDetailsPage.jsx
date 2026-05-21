@@ -76,7 +76,7 @@ const EmployeeDetailsPage = () => {
             await employeeService.update(id, { ...employee, roleIds: newRoleIds, sendPromotionEmail: action === 'grant' });
             const updated = await employeeService.getById(id);
             setEmployee(updated);
-        } catch (error) { console.error(error); } 
+        } catch (error) { console.error(error); }
         finally { setIsUpdating(false); }
     };
 
@@ -89,7 +89,7 @@ const EmployeeDetailsPage = () => {
     const timeline = [
         { title: 'Onboarded', date: employee.hireDate, icon: 'UserPlus', color: 'bg-blue-500' },
         { title: isIntern ? 'Started as Intern' : 'Started as Employee', date: employee.hireDate, icon: 'FileText', color: 'bg-slate-500' },
-        currentRoleIds.some(rid => roles.find(r => r.id === rid)?.name === 'Manager') && 
+        currentRoleIds.some(rid => roles.find(r => r.id === rid)?.name === 'Manager') &&
         { title: 'Promoted to Management', date: 'Active', icon: 'TrendingUp', color: 'bg-indigo-600' }
     ].filter(Boolean);
 
@@ -100,7 +100,7 @@ const EmployeeDetailsPage = () => {
 
             <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16 pb-12`}>
                 <div className="max-w-6xl mx-auto px-6 py-10">
-                    
+
                     {/* TOP ACTION BAR */}
                     <div className="flex items-center justify-between mb-10 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-4">
@@ -126,7 +126,7 @@ const EmployeeDetailsPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        
+
                         {/* LEFT: Profile & Timeline */}
                         <div className="lg:col-span-4 space-y-8">
                             <div className="bg-white rounded-3xl p-8 border border-slate-200/60 shadow-sm text-center">
@@ -159,7 +159,7 @@ const EmployeeDetailsPage = () => {
 
                         {/* RIGHT: Responsibilities & Controls */}
                         <div className="lg:col-span-8 space-y-8">
-                            
+
                             <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
                                 <div className="px-8 py-6 border-b border-slate-50 bg-slate-50/20 flex items-center justify-between">
                                     <h3 className="text-sm font-bold text-slate-800">Responsibility Management</h3>
@@ -210,7 +210,7 @@ const EmployeeDetailsPage = () => {
                                         <button className="text-indigo-600 font-bold text-xs opacity-0 group-hover:opacity-100">Edit Projects</button>
                                     </div>
                                     <div className="flex -space-x-2">
-                                        {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-400">P{i}</div>)}
+                                        {[1, 2, 3].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-400">P{i}</div>)}
                                     </div>
                                     <p className="text-xs text-slate-400 mt-4 font-medium">Assigned to 3 active projects</p>
                                 </div>
