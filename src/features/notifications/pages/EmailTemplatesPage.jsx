@@ -14,14 +14,26 @@ const EmailTemplatesPage = () => {
   const [templates, setTemplates] = useState([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [globalActiveTemplateId, setGlobalActiveTemplateId] = useState(user?.company?.activeEmailTemplateId || 'default');
+
+  // Sync global active template when user data changes
+  useEffect(() => {
+    setGlobalActiveTemplateId(user?.company?.activeEmailTemplateId || 'default');
+  }, [user]);
 
   const handleSetGlobal = async (id) => {
     try {
       setGlobalActiveTemplateId(id);
       await api.patch(`/system-company/${user.company.id}`, { activeEmailTemplateId: id === 'default' ? null : id });
-      
+
+      // Sync to localStorage for other components (e.g., PayrollPage)
+      if (id === 'default') {
+        localStorage.removeItem('global_active_template_id');
+      } else {
+        localStorage.setItem('global_active_template_id', id);
+      }
+
       const updatedUser = { ...user, company: { ...user.company, activeEmailTemplateId: id === 'default' ? null : id } };
       useAuthStore.setState({ user: updatedUser });
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -36,7 +48,14 @@ const EmailTemplatesPage = () => {
     const fetchTemplates = async () => {
       try {
         const res = await api.get('/email-templates');
-        setTemplates(res.data || []);
+        let fetchedTemplates = res.data;
+        // Unwrap nested data if backend or interceptor wrapped it unexpectedly
+        if (fetchedTemplates && fetchedTemplates.data && Array.isArray(fetchedTemplates.data)) {
+          fetchedTemplates = fetchedTemplates.data;
+        } else if (fetchedTemplates && fetchedTemplates.templates && Array.isArray(fetchedTemplates.templates)) {
+          fetchedTemplates = fetchedTemplates.templates;
+        }
+        setTemplates(Array.isArray(fetchedTemplates) ? fetchedTemplates : []);
       } catch (err) {
         console.error('Failed to load templates', err);
       } finally {
@@ -52,7 +71,7 @@ const EmailTemplatesPage = () => {
       await api.delete(`/email-templates/${id}`);
       const updated = templates.filter(t => t.id !== id);
       setTemplates(updated);
-      
+
       if (globalActiveTemplateId === id.toString()) {
         handleSetGlobal('default');
       }
@@ -61,8 +80,8 @@ const EmailTemplatesPage = () => {
     }
   };
 
-  const filteredTemplates = templates.filter(t => 
-    `${t.name} ${t.title}`.toLowerCase().includes(search.toLowerCase())
+  const filteredTemplates = templates.filter(t =>
+    `${t?.name || ''} ${t?.title || ''}`.toLowerCase().includes((search || '').toLowerCase())
   );
 
   return (
@@ -116,7 +135,7 @@ const EmailTemplatesPage = () => {
                 </div>
                 <h3 className="text-sm font-bold text-slate-800">Email Channel</h3>
               </div>
-              <p className="text-3xl font-bold text-slate-900">{templates.filter(t => t.type === 'email').length}</p>
+              <p className="text-3xl font-bold text-slate-900">{templates.filter(t => t?.type === 'email').length}</p>
             </div>
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
@@ -126,7 +145,7 @@ const EmailTemplatesPage = () => {
                 <h3 className="text-sm font-bold text-slate-800">Recently Updated</h3>
               </div>
               <p className="text-sm font-medium text-slate-500">
-                {templates.length > 0 ? new Date(templates[0].createdAt).toLocaleDateString() : 'N/A'}
+                {templates.length > 0 && templates[0]?.createdAt ? new Date(templates[0].createdAt).toLocaleDateString() : 'N/A'}
               </p>
             </div>
           </div>
@@ -182,9 +201,9 @@ const EmailTemplatesPage = () => {
           {/* Templates Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
-               [1,2,3].map(i => (
-                 <div key={i} className="h-64 bg-slate-200 rounded-2xl animate-pulse" />
-               ))
+              [1, 2, 3].map(i => (
+                <div key={i} className="h-64 bg-slate-200 rounded-2xl animate-pulse" />
+              ))
             ) : filteredTemplates.length === 0 ? (
               <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-dashed border-slate-300">
                 <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
@@ -201,9 +220,10 @@ const EmailTemplatesPage = () => {
               </div>
             ) : (
               filteredTemplates.map(tpl => {
-                const isActive = globalActiveTemplateId === tpl.id.toString();
+                const isActive = globalActiveTemplateId === tpl?.id?.toString();
+                if (!tpl) return null;
                 return (
-                  <div key={tpl.id} className={`group bg-white rounded-2xl border ${isActive ? 'border-amber-400 shadow-md shadow-amber-500/5 ring-2 ring-amber-500/10' : 'border-slate-200'} shadow-sm hover:shadow-xl hover:border-blue-200 transition-all overflow-hidden flex flex-col`}>
+                  <div key={tpl.id || Math.random()} className={`group bg-white rounded-2xl border ${isActive ? 'border-amber-400 shadow-md shadow-amber-500/5 ring-2 ring-amber-500/10' : 'border-slate-200'} shadow-sm hover:shadow-xl hover:border-blue-200 transition-all overflow-hidden flex flex-col`}>
                     {isActive && (
                       <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-1.5 text-center text-[10px] font-extrabold text-slate-900 uppercase tracking-widest flex items-center justify-center gap-1">
                         <Crown size={10} className="fill-slate-900" /> Global Active Layout
@@ -215,21 +235,21 @@ const EmailTemplatesPage = () => {
                           {tpl.type || 'Email'}
                         </div>
                         <div className="flex items-center gap-1">
-                          <button 
+                          <button
                             onClick={() => handleSetGlobal(isActive ? 'default' : tpl.id.toString())}
                             className={`p-2 rounded-lg transition-all ${isActive ? 'text-amber-500 hover:text-amber-600 bg-amber-50' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-50'}`}
                             title={isActive ? "Deactivate Global Layout" : "Set as Global Active Layout"}
                           >
                             <Crown size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)}
                             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                             title="Edit"
                           >
                             <Pencil size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(tpl.id)}
                             className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
                             title="Delete"
@@ -238,16 +258,16 @@ const EmailTemplatesPage = () => {
                           </button>
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">{tpl.name}</h3>
-                      <p className="text-xs font-medium text-slate-500 mb-4 line-clamp-1 italic">"{tpl.title}"</p>
-                      <div className="text-sm text-slate-600 line-clamp-3 mb-6 min-h-[60px]" dangerouslySetInnerHTML={{ __html: tpl.message }} />
+                      <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">{tpl?.name || 'Unnamed Template'}</h3>
+                      <p className="text-xs font-medium text-slate-500 mb-4 line-clamp-1 italic">"{tpl?.title || 'No Title'}"</p>
+                      <div className="text-sm text-slate-600 line-clamp-3 mb-6 min-h-[60px]" dangerouslySetInnerHTML={{ __html: tpl?.message || '' }} />
                     </div>
                     <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs text-slate-400">
                         <Calendar size={14} />
                         {new Date(tpl.createdAt).toLocaleDateString()}
                       </div>
-                      <button 
+                      <button
                         onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)}
                         className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:gap-2 transition-all"
                       >

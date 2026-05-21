@@ -7,6 +7,7 @@ import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import useAuthStore from '../../../store/useAuthStore';
 import financeService from '../../../services/finance.service';
 import { employeeService } from '../../../services/employee.service';
+import api from '../../../api/client';
 import PayrollDetailsModal from '../components/PayrollDetailsModal';
 
 const PayrollPage = () => {
@@ -20,6 +21,7 @@ const PayrollPage = () => {
 
     // ========== NEW: Email template states ==========
     const [selectedTemplateId, setSelectedTemplateId] = useState('default');
+    const [pendingTemplateId, setPendingTemplateId] = useState('default'); // holds selection until applied
     const [templates, setTemplates] = useState([]);
 
     // ========== NEW: Search filter state ==========
@@ -167,12 +169,38 @@ const PayrollPage = () => {
             fetchPayroll();
             fetchAllEmployees();
         }
-        // Load custom email templates
-        const saved = localStorage.getItem('notification_templates');
-        if (saved) {
-            setTemplates(JSON.parse(saved));
-        }
+        // Load persisted template or global active template on mount / when user changes
     }, [user, selectedMonth, selectedYear]);
+
+    useEffect(() => {
+        // Determine global active template ID (from user or localStorage)
+        const globalActive = localStorage.getItem('global_active_template_id') || (user?.company?.activeEmailTemplateId ? user.company.activeEmailTemplateId.toString() : null);
+        const saved = localStorage.getItem('selected_email_template_id');
+        const initial = saved ?? (globalActive && globalActive !== 'default' ? globalActive : 'default');
+        setSelectedTemplateId(initial);
+        setPendingTemplateId(initial);
+
+        // Load custom email templates from backend (fallback to localStorage)
+        const loadTemplates = async () => {
+            try {
+                const resp = await api.get('/email-templates');
+                let fetched = resp.data;
+                // Unwrap if needed
+                if (fetched && fetched.data && Array.isArray(fetched.data)) {
+                    fetched = fetched.data;
+                } else if (fetched && fetched.templates && Array.isArray(fetched.templates)) {
+                    fetched = fetched.templates;
+                }
+                setTemplates(Array.isArray(fetched) ? fetched : []);
+                localStorage.setItem('notification_templates', JSON.stringify(fetched));
+            } catch (err) {
+                console.error('Failed to fetch templates from backend, using localStorage', err);
+                const saved = localStorage.getItem('notification_templates');
+                if (saved) setTemplates(JSON.parse(saved));
+            }
+        };
+        loadTemplates();
+    }, [user]);
 
     const fetchAllEmployees = async () => {
         setIsEmployeesLoading(true);
@@ -379,7 +407,7 @@ const PayrollPage = () => {
                     const empName = `${row.employee?.user?.firstName || ''} ${row.employee?.user?.lastName || ''}`.trim() || 'Employee';
                     const netSalaryFormatted = Number(row.netPayable || row.netSalary || row.basicSalary || 0).toFixed(2);
                     customHtml = renderCustomPayrollHtml(activeTpl.message, empName, selectedMonth, selectedYear, netSalaryFormatted, activeTpl);
-                    
+
                     if (customNotes && customNotes.trim() !== '') {
                         customHtml = customHtml.replace(
                             '<!-- Signature -->',
@@ -447,6 +475,27 @@ const PayrollPage = () => {
             notes: ''
         });
         setIsManualModalOpen(true);
+    };
+
+    // Apply selected template from pending state
+    const applyTemplate = async (templateId = pendingTemplateId) => {
+        // Use provided templateId (or fallback to pending)
+        setSelectedTemplateId(templateId);
+        setPendingTemplateId(templateId);
+        localStorage.setItem('selected_email_template_id', templateId);
+        // Persist globally for the company
+        try {
+            await api.patch(`/system-company/${user?.company?.id}`, {
+                activeEmailTemplateId: templateId === 'default' ? null : templateId,
+            });
+            if (templateId === 'default') {
+                localStorage.removeItem('global_active_template_id');
+            } else {
+                localStorage.setItem('global_active_template_id', templateId);
+            }
+        } catch (err) {
+            console.error('Failed to persist active email template:', err);
+        }
     };
 
     const handleEditPayroll = (record) => {
@@ -576,8 +625,13 @@ const PayrollPage = () => {
                             <div className="flex items-center gap-2 w-full sm:w-auto bg-card border border-border rounded-lg px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-primary">
                                 <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Email Format:</span>
                                 <select
-                                    value={selectedTemplateId}
-                                    onChange={(e) => setSelectedTemplateId(e.target.value)}
+                                    value={pendingTemplateId}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setPendingTemplateId(val);
+                                        // Auto-apply the selected template
+                                        applyTemplate(val);
+                                    }}
                                     className="bg-transparent border-0 text-xs font-bold text-foreground focus:outline-none focus:ring-0 cursor-pointer min-w-[200px]"
                                 >
                                     <option value="default">

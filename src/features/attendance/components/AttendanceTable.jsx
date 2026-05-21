@@ -494,14 +494,14 @@ const AttendanceTable = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {employee?.notes ? (
                       <div className="max-w-[250px] overflow-hidden text-ellipsis">
-                         {employee.notes.split('|').map((note, i) => {
-                            const isEditLog = note.includes('[Edited on');
-                            return (
-                                <div key={i} className={`text-[10px] truncate ${isEditLog ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}>
-                                    {note.trim()}
-                                </div>
-                            );
-                         })}
+                        {employee.notes.split('|').map((note, i) => {
+                          const isEditLog = note.includes('[Edited on');
+                          return (
+                            <div key={i} className={`text-[10px] truncate ${isEditLog ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}>
+                              {note.trim()}
+                            </div>
+                          );
+                        })}
                       </div>
                     ) : <span className="text-xs font-bold text-slate-300">—</span>}
                   </td>
