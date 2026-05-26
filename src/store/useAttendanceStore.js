@@ -60,12 +60,13 @@ const useAttendanceStore = create((set, get) => ({
                     checkOutTime: record?.checkOutTime || '--',
                     workDuration: record?.workHours ? `${Math.floor(parseFloat(record.workHours))}h ${Math.round((parseFloat(record.workHours) % 1) * 60)}m` : '--',
                     breakDuration: '0m',
-                    status: record?.status || 'not_checked_in',
+                    status: record?.status || ((emp.leaves && emp.leaves.length > 0) ? 'on_leave' : 'not_checked_in'),
                     location: record?.location || 'Office',
                     date: record?.date || todayDate,
                     notes: record?.notes || '',
                     profileImage: emp.user?.avatar,
-                    hasRecord: !!record
+                    hasRecord: !!record,
+                    isOnLeave: emp.leaves && emp.leaves.length > 0
                 };
             });
 

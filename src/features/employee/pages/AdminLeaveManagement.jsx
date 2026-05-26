@@ -197,11 +197,21 @@ const AdminLeaveManagement = () => {
 };
 
 const LeaveRow = ({ leave, onUpdate, onDelete, isExpanded, onToggle, adminNote, setAdminNote }) => {
+    const [isUpdating, setIsUpdating] = useState(null);
     const lId = leave._id || leave.id;
     const firstName = leave.employee?.user?.firstName || "Unknown";
     const lastName = leave.employee?.user?.lastName || "";
     const fullName = `${firstName} ${lastName}`;
     const empCode = leave.employee?.employeeCode || "N/A";
+
+    const handleUpdateClick = async (status) => {
+        setIsUpdating(status);
+        try {
+            await onUpdate(lId, status);
+        } finally {
+            setIsUpdating(null);
+        }
+    };
 
     return (
         <>
@@ -257,18 +267,28 @@ const LeaveRow = ({ leave, onUpdate, onDelete, isExpanded, onToggle, adminNote, 
                         <div className="h-6 w-[1px] bg-slate-100 mx-1" />
 
                         <button 
-                            onClick={() => onUpdate(lId, 'APPROVED')}
-                            className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                            onClick={() => handleUpdateClick('APPROVED')}
+                            disabled={isUpdating !== null}
+                            className={`p-2.5 rounded-xl transition-all disabled:opacity-50 ${isUpdating === 'APPROVED' ? 'text-emerald-500 bg-emerald-50 cursor-wait' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'}`}
                             title="Approve"
                         >
-                            <Check size={18}/>
+                            {isUpdating === 'APPROVED' ? (
+                                <div className="w-[18px] h-[18px] border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <Check size={18}/>
+                            )}
                         </button>
                         <button 
-                            onClick={() => onUpdate(lId, 'REJECTED')}
-                            className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                            onClick={() => handleUpdateClick('REJECTED')}
+                            disabled={isUpdating !== null}
+                            className={`p-2.5 rounded-xl transition-all disabled:opacity-50 ${isUpdating === 'REJECTED' ? 'text-rose-500 bg-rose-50 cursor-wait' : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'}`}
                             title="Reject"
                         >
-                            <X size={18}/>
+                            {isUpdating === 'REJECTED' ? (
+                                <div className="w-[18px] h-[18px] border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <X size={18}/>
+                            )}
                         </button>
 
                         <div className="h-6 w-[1px] bg-slate-100 mx-1" />
