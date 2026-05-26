@@ -468,12 +468,14 @@ const AttendanceTable = ({
                         employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
                           employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
                             employee?.status === 'wfh' ? 'border-indigo-100 bg-indigo-50 text-indigo-700' :
-                              'border-slate-100 bg-slate-50 text-slate-600'
+                              employee?.status === 'on_leave' ? 'border-purple-100 bg-purple-50 text-purple-700' :
+                                'border-slate-100 bg-slate-50 text-slate-600'
                         }`}>
                         <div className={`w-1.5 h-1.5 rounded-none ${employee?.status === 'present' ? 'bg-emerald-500' :
                           employee?.status === 'late' ? 'bg-amber-500' :
                             employee?.status === 'absent' ? 'bg-rose-500' :
-                              employee?.status === 'wfh' ? 'bg-indigo-500' : 'bg-slate-400'
+                              employee?.status === 'wfh' ? 'bg-indigo-500' : 
+                                employee?.status === 'on_leave' ? 'bg-purple-500' : 'bg-slate-400'
                           }`}></div>
                         {employee?.status?.replace('_', ' ')}
                       </span>
@@ -536,12 +538,15 @@ const AttendanceTable = ({
                     {!employee.hasRecord ? (
                       <button
                         onClick={(e) => {
+                          if (employee.isOnLeave) return;
                           e.stopPropagation();
                           onCheckIn(employee.employeeId || employee.id);
                         }}
-                        className="px-4 py-1.5 text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wider rounded-none hover:bg-blue-700 transition-all shadow-sm"
+                        disabled={employee.isOnLeave}
+                        className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-none transition-all shadow-sm ${employee.isOnLeave ? 'bg-slate-300 text-white cursor-not-allowed opacity-70' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                        title={employee.isOnLeave ? 'Employee is on approved leave today' : 'Check In'}
                       >
-                        Check In
+                        {employee.isOnLeave ? 'On Leave' : 'Check In'}
                       </button>
                     ) : !employee.checkOutTime || employee.checkOutTime === '--' ? (
                       <button

@@ -14,6 +14,32 @@ const Profile = () => {
   const [isEditingCompany, setIsEditingCompany] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeSection, setActiveSection] = useState('profile');
+  const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
+  const [passwordStatus, setPasswordStatus] = useState({ loading: false, error: null, success: false });
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordStatus({ loading: false, error: "Passwords do not match", success: false });
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordStatus({ loading: false, error: "Password must be at least 6 characters", success: false });
+      return;
+    }
+    
+    setPasswordStatus({ loading: true, error: null, success: false });
+    try {
+      await apiClient.patch('/auth/change-password', {
+        newPassword: passwordData.newPassword
+      });
+      setPasswordStatus({ loading: false, error: null, success: true });
+      setPasswordData({ newPassword: '', confirmPassword: '' });
+      setTimeout(() => setPasswordStatus(prev => ({ ...prev, success: false })), 3000);
+    } catch (err) {
+      setPasswordStatus({ loading: false, error: err.response?.data?.message || "Failed to update password", success: false });
+    }
+  };
 
   // Fetch profile on mount
   useEffect(() => {
@@ -254,12 +280,56 @@ const Profile = () => {
                 )}
 
                 {activeSection === 'account' && (
-                  <div className="py-20 text-center">
-                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon name="Shield" size={32} className="text-slate-300" />
+                  <div className="max-w-xl">
+                    <div className="mb-8">
+                      <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                        <Icon name="Shield" size={20} className="text-blue-600" /> Security & Credentials
+                      </h3>
+                      <p className="text-slate-500 text-sm mt-1">Update your password to keep your account secure.</p>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">Security & Credentials</h3>
-                    <p className="text-slate-500 max-w-sm mx-auto mt-2 text-sm">Security settings and password management are coming soon. Contact system admin for immediate changes.</p>
+
+                    <form onSubmit={handlePasswordChange} className="space-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-200">
+                      {passwordStatus.error && (
+                        <div className="p-3 text-sm text-red-700 bg-red-50 rounded-lg border border-red-100">
+                          {passwordStatus.error}
+                        </div>
+                      )}
+                      {passwordStatus.success && (
+                        <div className="p-3 text-sm text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-100">
+                          Password updated successfully!
+                        </div>
+                      )}
+
+                      <Input 
+                        label="New Password" 
+                        name="newPassword" 
+                        type="password"
+                        placeholder="Enter new password"
+                        value={passwordData.newPassword} 
+                        onChange={(e) => setPasswordData(prev => ({...prev, newPassword: e.target.value}))} 
+                        required
+                      />
+                      <Input 
+                        label="Confirm New Password" 
+                        name="confirmPassword" 
+                        type="password"
+                        placeholder="Confirm new password"
+                        value={passwordData.confirmPassword} 
+                        onChange={(e) => setPasswordData(prev => ({...prev, confirmPassword: e.target.value}))} 
+                        required
+                      />
+                      
+                      <div className="pt-2 flex justify-end">
+                        <button 
+                          type="submit" 
+                          disabled={passwordStatus.loading}
+                          className="px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-70 flex items-center gap-2"
+                        >
+                          {passwordStatus.loading && <Icon name="Loader2" size={16} className="animate-spin" />}
+                          Update Password
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 )}
               </div>

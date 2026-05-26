@@ -84,14 +84,9 @@ const financeService = {
     },
 
     getEmployeePayrolls: async (employeeId) => {
-
-        const res = await apiClient.get("/finance/payroll", {
+        const res = await apiClient.get(`${API_ENDPOINTS.FINANCE.BASE}/payroll`, {
             params: { employeeId }
         });
-        console.log("USER ID", user.id)
-
-        console.log("EMPLOYEE ID", employeeId)
-
         return res.data.data || res.data;
     },
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
-const LoginForm = ({ onSubmit, isLoading, error, clearError }) => {
+const LoginForm = ({ onSubmit, isLoading, error, clearError, onForgotPasswordClick }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -68,13 +68,13 @@ const LoginForm = ({ onSubmit, isLoading, error, clearError }) => {
                 </div>
             </div>
 
-            {/* <div className="flex items-center justify-end">
+            <div className="flex items-center justify-end">
                 <div className="text-sm">
-                    <button type="button" className="font-medium text-blue-600 hover:text-blue-500">
+                    <button type="button" onClick={onForgotPasswordClick} className="font-medium text-blue-600 hover:text-blue-500">
                         Forgot password?
                     </button>
-                </div> */}
-            {/* </div> */}
+                </div>
+            </div>
 
             <div>
                 <button

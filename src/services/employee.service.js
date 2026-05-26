@@ -64,7 +64,9 @@ export const employeeService = {
         });
         const resData = response.data;
         return resData?.data !== undefined ? resData.data : resData;
-    }
+    },
+
+    async setStatus(id, status) { const response = await apiClient.patch(`${API_ENDPOINTS.EMPLOYEES.BY_ID(id)}/status`, { status }); return response.data?.data ?? response.data; }
 };
 
 export default employeeService;

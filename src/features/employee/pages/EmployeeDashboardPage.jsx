@@ -4,6 +4,7 @@ import Sidebar from '../../../components/ui/Sidebar';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import attendanceService from '../../../services/attendance.service';
 import employeeService from '../../../services/employee.service';
+import overtimeService from '../../../services/overtime.service';
 import useAuthStore from '../../../store/useAuthStore';
 import {
     Clock,
@@ -378,20 +379,38 @@ const EmployeeDashboard = () => {
                                             )}
 
                                             {todayAttendance && !todayAttendance.checkOutTime && (
-                                                <button
-                                                    onClick={handleCheckOut}
-                                                    disabled={loading}
-                                                    className="w-full bg-red-500 text-white py-2.5 rounded-lg hover:bg-red-600 transition shadow-sm font-medium flex items-center justify-center space-x-2"
-                                                >
-                                                    {loading ? (
-                                                        <span className="animate-pulse">Checking Out...</span>
-                                                    ) : (
-                                                        <>
-                                                            <Icon name="LogOut" size={18} />
-                                                            <span>CHECK OUT NOW</span>
-                                                        </>
-                                                    )}
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={handleCheckOut}
+                                                        disabled={loading}
+                                                        className="w-full bg-red-500 text-white py-2.5 rounded-lg hover:bg-red-600 transition shadow-sm font-medium flex items-center justify-center space-x-2"
+                                                    >
+                                                        {loading ? (
+                                                            <span className="animate-pulse">Checking Out...</span>
+                                                        ) : (
+                                                            <>
+                                                                <Icon name="LogOut" size={18} />
+                                                                <span>CHECK OUT NOW</span>
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        onClick={async () => {
+                                                            try {
+                                                                const date = new Date().toISOString().split('T')[0];
+                                                                await overtimeService.createRequest({ date, hours: 2, description: 'Overtime request' });
+                                                                alert('Overtime request submitted');
+                                                            } catch (e) {
+                                                                console.error('Overtime request failed', e);
+                                                                alert('Failed to submit overtime request');
+                                                            }
+                                                        }}
+                                                        className="w-full bg-purple-600 text-white py-2.5 rounded-lg hover:bg-purple-700 transition shadow-sm font-medium flex items-center justify-center space-x-2 mt-2"
+                                                    >
+                                                        <Icon name="Clock" size={18} />
+                                                        <span>REQUEST OVERTIME</span>
+                                                    </button>
+                                                </>
                                             )}
 
                                             {todayAttendance && todayAttendance.checkOutTime && (
