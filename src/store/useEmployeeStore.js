@@ -3,6 +3,7 @@ import employeeService from '../services/employee.service';
 
 const transformEmployee = (emp) => ({
     id: emp.id,
+    employeeCode: emp.employeeCode,
     name: `${emp.user?.firstName || ''} ${emp.user?.lastName || ''}`.trim() || emp.user?.email,
     firstName: emp.user?.firstName || '',
     lastName: emp.user?.lastName || '',

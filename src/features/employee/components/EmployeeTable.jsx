@@ -267,7 +267,13 @@ const EmployeeTable = ({
                     <EmployeeAvatar employee={employee} size="md" />
                     <div>
                       <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">{employee.name || `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || '—'}</p>
-
+                      {employee.employeeCode ? (
+                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">{employee.employeeCode}</p>
+                      ) : (
+                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 opacity-60 flex items-center gap-1">
+                          <Icon name="AlertCircle" size={10} /> ID Not Set
+                        </p>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -333,6 +339,13 @@ const EmployeeTable = ({
                 <EmployeeAvatar employee={employee} size="lg" />
                 <div>
                   <p className="text-base font-bold text-slate-900">{employee.name || '—'}</p>
+                  {employee.employeeCode ? (
+                    <p className="text-[10px] text-blue-500 font-bold uppercase mt-0.5">{employee.employeeCode}</p>
+                  ) : (
+                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5 opacity-60 flex items-center gap-1">
+                      <Icon name="AlertCircle" size={10} /> ID Not Set
+                    </p>
+                  )}
                   <p className="text-xs text-slate-400 font-medium mt-0.5">{employee.email || '—'}</p>
                 </div>
               </div>

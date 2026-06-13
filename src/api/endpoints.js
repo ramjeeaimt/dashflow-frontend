@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
         BASE: '/employees',
         BY_ID: (id) => `/employees/${id}`,
         STATS: '/employees/stats/count',
+        LAST_CODE: '/employees/last-code',
     },
     PROJECTS: {
         BASE: '/projects',

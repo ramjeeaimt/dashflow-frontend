@@ -168,6 +168,7 @@ const EmployeeManagement = () => {
   const handleSaveEmployee = async (employeeData) => {
     try {
       const payload = {
+        employeeCode: employeeData.employeeCode || '',
         firstName: employeeData.firstName || '',
         lastName: employeeData.lastName || '',
         email: employeeData.email || '',

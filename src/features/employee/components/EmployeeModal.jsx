@@ -17,6 +17,7 @@ const EmployeeModal = ({
   onSave
 }) => {
   const [formData, setFormData] = useState({
+    employeeCode: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -54,16 +55,26 @@ const EmployeeModal = ({
   const [designations, setDesignations] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [availableManagers, setAvailableManagers] = useState([]);
+  const [lastEmployeeCode, setLastEmployeeCode] = useState(null);
 
-  // Refs for file uploads
+  // Refs for file uploads and scrolling
   const avatarInputRef = useRef(null);
   const docInputRef = useRef(null);
+  const contentRef = useRef(null);
 
   const { user: currentUser } = useAuthStore();
+
+  // Scroll to top when changing tabs
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (employee && mode !== 'add') {
       setFormData({
+        employeeCode: employee?.employeeCode || '',
         firstName: employee?.firstName || '',
         lastName: employee?.lastName || '',
         email: employee?.email || '',
@@ -91,6 +102,7 @@ const EmployeeModal = ({
       });
     } else if (mode === 'add') {
       setFormData({
+        employeeCode: '',
         firstName: '',
         lastName: '',
         email: '',
@@ -126,13 +138,18 @@ const EmployeeModal = ({
     const fetchData = async () => {
       setPermissionsLoading(true);
       try {
-        const [deptRes, roleRes, designRes, permissionRes, employeeRes] = await Promise.all([
+        const [deptRes, roleRes, designRes, permissionRes, employeeRes, lastCodeRes] = await Promise.all([
           apiClient.get(API_ENDPOINTS.DEPARTMENTS.BASE),
           apiClient.get(API_ENDPOINTS.ACCESS_CONTROL.ROLES, { params: { companyId: currentUser?.company?.id } }),
           apiClient.get(API_ENDPOINTS.DESIGNATIONS.BASE, { params: { companyId: currentUser?.company?.id } }),
           apiClient.get(API_ENDPOINTS.ACCESS_CONTROL.PERMISSIONS),
-          apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, { params: { companyId: currentUser?.company?.id } })
+          apiClient.get(API_ENDPOINTS.EMPLOYEES.BASE, { params: { companyId: currentUser?.company?.id } }),
+          apiClient.get(API_ENDPOINTS.EMPLOYEES.LAST_CODE, { params: { companyId: currentUser?.company?.id } })
         ]);
+
+        if (lastCodeRes?.data?.lastCode) {
+          setLastEmployeeCode(lastCodeRes.data.lastCode);
+        }
 
         const rolesData = roleRes.data?.data || roleRes.data || [];
         setRoles(rolesData);
@@ -302,9 +319,16 @@ const EmployeeModal = ({
 
 
   const handleInputChange = (field, value) => {
+    let finalValue = typeof value === 'function' ? value(prev[field]) : value;
+    
+    // Force employeeCode to be uppercase
+    if (field === 'employeeCode' && typeof finalValue === 'string') {
+      finalValue = finalValue.toUpperCase();
+    }
+
     setFormData(prev => ({
       ...prev,
-      [field]: typeof value === 'function' ? value(prev[field]) : value
+      [field]: finalValue
     }));
     if (errors?.[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -315,6 +339,7 @@ const EmployeeModal = ({
 
   const validateForm = () => {
     const newErrors = {};
+    if (!formData?.employeeCode?.trim()) newErrors.employeeCode = 'Employee ID is required';
     if (!formData?.firstName?.trim()) newErrors.firstName = 'First name is required';
     if (!formData?.lastName?.trim()) newErrors.lastName = 'Last name is required';
     if (!formData?.email?.trim()) newErrors.email = 'Email is required';
@@ -326,7 +351,7 @@ const EmployeeModal = ({
 
     if (Object.keys(newErrors).length > 0) {
       // Auto-switch to the first tab that has an error so the user sees it immediately
-      if (newErrors.firstName || newErrors.lastName || newErrors.email) {
+      if (newErrors.employeeCode || newErrors.firstName || newErrors.lastName || newErrors.email) {
         setActiveTab('basic');
       } else if (newErrors.department || newErrors.roleIds || newErrors.hireDate) {
         setActiveTab('employment');
@@ -409,18 +434,22 @@ const EmployeeModal = ({
 
           {/* Content Area */}
           <div className="flex-1 flex flex-col overflow-hidden bg-white">
-            <div className="p-4 sm:p-8 overflow-y-auto flex-1 custom-scrollbar">
+            <div ref={contentRef} className="p-4 sm:p-8 overflow-y-auto flex-1 custom-scrollbar">
               {activeTab === 'basic' && (
                 <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-8 pb-6 md:pb-10 border-b border-slate-100">
                     <div className="relative group">
                       <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
-                        <div className="w-full h-full rounded-full overflow-hidden relative">
-                          <img
-                            src={formData?.avatar || 'https://via.placeholder.com/150'}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="w-full h-full rounded-full overflow-hidden relative flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-4xl">
+                          {formData?.avatar ? (
+                            <img
+                              src={formData.avatar}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span>{formData?.firstName?.charAt(0)?.toUpperCase() || '?'}</span>
+                          )}
                           {uploadingProfile && (
                             <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
                               <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin shadow-lg"></div>
@@ -455,6 +484,28 @@ const EmployeeModal = ({
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-500 ml-1">Employee ID (Required)</label>
+                      <input
+                        className={`w-full px-4 py-2.5 bg-slate-50 border text-sm font-semibold uppercase rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all ${
+                          errors?.employeeCode ? 'border-rose-500' : 'border-slate-200'
+                        }`}
+                        value={formData?.employeeCode}
+                        onChange={(e) => handleInputChange('employeeCode', e?.target?.value)}
+                        disabled={isReadOnly}
+                        placeholder="e.g. DIF000015"
+                      />
+                      {errors?.employeeCode ? (
+                        <p className="text-xs text-rose-500 font-medium ml-1">{errors.employeeCode}</p>
+                      ) : (
+                        mode === 'add' && lastEmployeeCode && (
+                          <p className="text-xs text-blue-600 font-medium ml-1 mt-1">Last assigned ID: {lastEmployeeCode}</p>
+                        )
+                      )}
+                    </div>
+                    {/* Empty div to maintain grid layout since employee ID is wide or keep it as one column */}
+                    <div className="hidden md:block"></div>
+
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 ml-1">First Name</label>
                       <input
@@ -862,21 +913,42 @@ const EmployeeModal = ({
                 >
                   Cancel
                 </button>
-                {(mode === 'edit' || mode === 'add') && (
+                {tabs.findIndex(t => t.id === activeTab) > 0 && (
                   <button
                     type="button"
-                    onClick={handleSave}
-                    disabled={isSaving || isLoading}
-                    className={`flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center ${isSaving || isLoading
-                      ? 'bg-blue-400 cursor-not-allowed shadow-none'
-                      : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'
-                      }`}
+                    onClick={() => setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id)}
+                    className="flex-1 md:flex-none px-6 py-2.5 bg-slate-100 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl hover:bg-slate-200 transition-all shadow-sm active:scale-95 flex items-center space-x-2 justify-center"
                   >
-                    {(isSaving || isLoading) && (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    )}
-                    <span>{isSaving ? 'Processing...' : (mode === 'add' ? 'Create' : 'Save')}</span>
+                    <span>Previous</span>
                   </button>
+                )}
+                {(mode === 'edit' || mode === 'add') && (
+                  <>
+                    {tabs.findIndex(t => t.id === activeTab) < tabs.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id)}
+                        className="flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center bg-blue-600 hover:bg-blue-700 shadow-blue-100"
+                      >
+                        <span>Next</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleSave}
+                        disabled={isSaving || isLoading}
+                        className={`flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center ${isSaving || isLoading
+                          ? 'bg-blue-400 cursor-not-allowed shadow-none'
+                          : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100'
+                          }`}
+                      >
+                        {(isSaving || isLoading) && (
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        )}
+                        <span>{isSaving ? 'Processing...' : (mode === 'add' ? 'Create' : 'Save')}</span>
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
