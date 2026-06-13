@@ -2,10 +2,16 @@ import React, { useEffect } from "react";
 import Routes from "./Routes";
 import useAuthStore from "./store/useAuthStore";
 import useNotificationStore from "./store/useNotificationStore";
+import usePushNotifications from "./hooks/usePushNotifications";
+
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { fetchProfile, token, user, isLoading } = useAuthStore();
   const { listen, stopListening } = useNotificationStore();
+  
+  // Initialize Push Notifications (handles permission & FCM token syncing automatically)
+  usePushNotifications(user?.id);
 
   useEffect(() => {
     if (token) {
@@ -36,6 +42,7 @@ function App() {
 
   return (
     <div className="professional-ui">
+      <Toaster />
       <Routes />
     </div>
   );

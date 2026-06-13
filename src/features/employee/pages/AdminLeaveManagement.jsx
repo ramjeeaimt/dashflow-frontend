@@ -14,7 +14,10 @@ const AdminLeaveManagement = () => {
     const [filterStatus, setFilterStatus] = useState("ALL");
     const [expandedRow, setExpandedRow] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [adminNote, setAdminNote] = useState({}); 
+    
+    // New Modal State for Decisions
+    const [decisionModal, setDecisionModal] = useState({ isOpen: false, type: null, leaveId: null, note: '' });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -41,22 +44,24 @@ const AdminLeaveManagement = () => {
 
     useEffect(() => { fetchAllLeaves(); }, []);
 
-    const handleStatusUpdate = async (id, status) => {
+    const handleStatusUpdate = async (id, status, note) => {
         if (!id) return alert("Error: ID not found!");
-        const note = adminNote[id] || ""; 
         
+        setIsSubmitting(true);
         try {
-            await financeService.updateLeaveStatus(id, status, note);
+            await financeService.updateLeaveStatus(id, status, note || "");
             setLeaves(prev => prev.map(l => 
                 (l._id === id || l.id === id) 
-                    ? { ...l, status: status.toUpperCase(), adminComment: note } 
+                    ? { ...l, status: status.toUpperCase(), adminComment: note || "" } 
                     : l
             ));
             setExpandedRow(null);
-            alert(`Status updated to ${status}!`);
+            setDecisionModal({ isOpen: false, type: null, leaveId: null, note: '' });
         } catch (err) {
             console.error("Handler Error:", err);
             alert("Update failed!");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -168,12 +173,10 @@ const AdminLeaveManagement = () => {
                                             <LeaveRow 
                                                 key={leave._id || leave.id} 
                                                 leave={leave} 
-                                                onUpdate={handleStatusUpdate}
                                                 onDelete={handleDeleteLeave}
                                                 isExpanded={expandedRow === (leave._id || leave.id)}
                                                 onToggle={() => setExpandedRow(expandedRow === (leave._id || leave.id) ? null : (leave._id || leave.id))}
-                                                adminNote={adminNote}
-                                                setAdminNote={setAdminNote}
+                                                onOpenDecisionModal={(type, id) => setDecisionModal({ isOpen: true, type, leaveId: id, note: '' })}
                                             />
                                         ))
                                     ) : (
@@ -192,26 +195,68 @@ const AdminLeaveManagement = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Decision Modal */}
+            {decisionModal.isOpen && (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className={`p-6 border-b ${decisionModal.type === 'APPROVED' ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
+                            <h3 className={`text-xl font-black flex items-center gap-2 ${decisionModal.type === 'APPROVED' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                {decisionModal.type === 'APPROVED' ? <Check size={24} /> : <X size={24} />}
+                                {decisionModal.type === 'APPROVED' ? 'Approve Leave Request' : 'Reject Leave Request'}
+                            </h3>
+                            <p className={`text-xs mt-1 font-bold tracking-wide uppercase ${decisionModal.type === 'APPROVED' ? 'text-emerald-600/70' : 'text-rose-600/70'}`}>
+                                Please provide a mandatory note below
+                            </p>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <textarea 
+                                autoFocus
+                                placeholder={decisionModal.type === 'APPROVED' ? "Type approval note/conditions here..." : "Type rejection reason here..."}
+                                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner resize-none"
+                                rows="4"
+                                value={decisionModal.note}
+                                onChange={(e) => setDecisionModal(prev => ({ ...prev, note: e.target.value }))}
+                            />
+                            <div className="flex gap-3 pt-2">
+                                <button 
+                                    onClick={() => setDecisionModal({ isOpen: false, type: null, leaveId: null, note: '' })}
+                                    disabled={isSubmitting}
+                                    className="flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 hover:text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={() => handleStatusUpdate(decisionModal.leaveId, decisionModal.type, decisionModal.note)}
+                                    disabled={isSubmitting}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-white shadow-md transition-all disabled:opacity-70 disabled:cursor-wait ${
+                                        decisionModal.type === 'APPROVED' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20' : 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20'
+                                    }`}
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        'Confirm'
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-const LeaveRow = ({ leave, onUpdate, onDelete, isExpanded, onToggle, adminNote, setAdminNote }) => {
-    const [isUpdating, setIsUpdating] = useState(null);
+const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }) => {
     const lId = leave._id || leave.id;
     const firstName = leave.employee?.user?.firstName || "Unknown";
     const lastName = leave.employee?.user?.lastName || "";
     const fullName = `${firstName} ${lastName}`;
     const empCode = leave.employee?.employeeCode || "N/A";
-
-    const handleUpdateClick = async (status) => {
-        setIsUpdating(status);
-        try {
-            await onUpdate(lId, status);
-        } finally {
-            setIsUpdating(null);
-        }
-    };
 
     return (
         <>
@@ -266,32 +311,25 @@ const LeaveRow = ({ leave, onUpdate, onDelete, isExpanded, onToggle, adminNote, 
                         
                         <div className="h-6 w-[1px] bg-slate-100 mx-1" />
 
-                        <button 
-                            onClick={() => handleUpdateClick('APPROVED')}
-                            disabled={isUpdating !== null}
-                            className={`p-2.5 rounded-xl transition-all disabled:opacity-50 ${isUpdating === 'APPROVED' ? 'text-emerald-500 bg-emerald-50 cursor-wait' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'}`}
-                            title="Approve"
-                        >
-                            {isUpdating === 'APPROVED' ? (
-                                <div className="w-[18px] h-[18px] border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <Check size={18}/>
-                            )}
-                        </button>
-                        <button 
-                            onClick={() => handleUpdateClick('REJECTED')}
-                            disabled={isUpdating !== null}
-                            className={`p-2.5 rounded-xl transition-all disabled:opacity-50 ${isUpdating === 'REJECTED' ? 'text-rose-500 bg-rose-50 cursor-wait' : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'}`}
-                            title="Reject"
-                        >
-                            {isUpdating === 'REJECTED' ? (
-                                <div className="w-[18px] h-[18px] border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <X size={18}/>
-                            )}
-                        </button>
-
-                        <div className="h-6 w-[1px] bg-slate-100 mx-1" />
+                        {leave.status === 'PENDING' && (
+                            <>
+                                <button 
+                                    onClick={() => onOpenDecisionModal('APPROVED', lId)}
+                                    className="p-2.5 rounded-xl transition-all text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                                    title="Approve"
+                                >
+                                    <Check size={18}/>
+                                </button>
+                                <button 
+                                    onClick={() => onOpenDecisionModal('REJECTED', lId)}
+                                    className="p-2.5 rounded-xl transition-all text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                                    title="Reject"
+                                >
+                                    <X size={18}/>
+                                </button>
+                                <div className="h-6 w-[1px] bg-slate-100 mx-1" />
+                            </>
+                        )}
 
                         <button 
                             onClick={() => onDelete(lId)}
@@ -318,15 +356,18 @@ const LeaveRow = ({ leave, onUpdate, onDelete, isExpanded, onToggle, adminNote, 
                             </div>
                             <div className="space-y-3">
                                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                    <MessageSquare size={12} /> Administrator's Decision Remark
+                                    <MessageSquare size={12} /> Administrator Note
                                 </h4>
-                                <textarea 
-                                    placeholder="Add a remark for the employee..."
-                                    className="w-full p-5 bg-white border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm resize-none"
-                                    rows="3"
-                                    value={adminNote[lId] || ""}
-                                    onChange={(e) => setAdminNote({...adminNote, [lId]: e.target.value})}
-                                />
+                                {leave.status !== 'PENDING' ? (
+                                    <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 text-sm text-slate-800 font-medium shadow-sm leading-relaxed whitespace-pre-wrap">
+                                        {leave.adminComment || "No administrator note provided."}
+                                    </div>
+                                ) : (
+                                    <div className="bg-amber-50 p-5 rounded-2xl border border-amber-200 text-sm text-amber-800 font-medium shadow-sm flex items-center gap-3">
+                                        <Clock size={20} className="text-amber-500" />
+                                        <span>Click the Approve or Reject action buttons to enter a decision note.</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </td>

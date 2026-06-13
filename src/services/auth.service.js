@@ -19,7 +19,18 @@ export const authService = {
         return resData?.data || resData;
     },
 
-    logout: () => {
+    logout: async () => {
+        try {
+            const fcmToken = localStorage.getItem('fcm_token');
+            if (fcmToken) {
+                const { notificationService } = await import('./notification.service');
+                await notificationService.removeFcmToken(fcmToken);
+                localStorage.removeItem('fcm_token');
+            }
+        } catch (error) {
+            console.error("Failed to remove FCM token on logout:", error);
+        }
+
         localStorage.removeItem('token');
         localStorage.removeItem('user');
     },

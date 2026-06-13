@@ -157,10 +157,24 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                     <div key={idx} className="bg-white border border-slate-100 p-4 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-300 transition-all group">
                       <div className="flex items-start gap-4">
                         <div className={`mt-1 w-2 h-2 rounded-full ${getStatusColor(leave.status)}`} />
-                        <div>
+                        <div className="flex-1">
                           <h4 className="text-sm font-bold text-slate-800 capitalize">{leave.type} Leave</h4>
                           <p className="text-[11px] text-slate-400 font-medium">{leave.startDate} — {leave.endDate}</p>
                           <p className="text-xs text-slate-500 mt-2 line-clamp-1 italic">"{leave.reason}"</p>
+                          
+                          {/* Display Admin Note if it exists */}
+                          {leave.adminComment && (
+                            <div className={`mt-3 p-3 rounded-lg border text-xs font-medium leading-relaxed
+                              ${leave.status === 'APPROVED' ? 'bg-emerald-50/50 border-emerald-100 text-emerald-800' : 
+                                leave.status === 'REJECTED' ? 'bg-rose-50/50 border-rose-100 text-rose-800' : 
+                                'bg-slate-50 border-slate-200 text-slate-700'}`}
+                            >
+                              <span className="block text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">
+                                Administrator Note
+                              </span>
+                              {leave.adminComment}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="flex md:flex-col items-center md:items-end justify-between gap-1">

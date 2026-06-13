@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAIiVAwMK3_npFhcIEFTPeFuchTjOQlNqw",
-  authDomain: "dashflow-243f5.firebaseapp.com",
-  projectId: "dashflow-243f5",
-  storageBucket: "dashflow-243f5.firebasestorage.app",
-  messagingSenderId: "873665968411",
-  appId: "1:873665968411:web:8173eb27bb69de0f6f7bbe",
-  measurementId: "G-6QLNB9SGWG"
+  apiKey: "AIzaSyBh-iPDjfgl7_yan7nOZQK-6YOJNx22aiY",
+  authDomain: "dash-flow-8a6dd.firebaseapp.com",
+  projectId: "dash-flow-8a6dd",
+  storageBucket: "dash-flow-8a6dd.firebasestorage.app",
+  messagingSenderId: "1077355823086",
+  appId: "1:1077355823086:web:8ac50a1e536e7b27f958ff",
+  measurementId: "G-95QVXFSSVM"
 };
 
 // Initialize Firebase
@@ -19,5 +19,7 @@ const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 const db = getFirestore(app);
 const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
 
-export { app, db, messaging, getToken, onMessage };
+const VAPID_KEY = 'BBhfsFp4bKk3d1y2KXFisjsW6Cq_y96r4BtqjAESkOPFVOQWUADZ0-8OIXbimToM-XuGVE4hC6r44jE3vNyp2u0';
+
+export { app, db, messaging, getToken, onMessage, VAPID_KEY };
 export default app;

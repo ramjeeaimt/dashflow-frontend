@@ -38,6 +38,13 @@ export const notificationService = {
             deviceId
         });
         return response.data;
+    },
+
+    removeFcmToken: async (token) => {
+        const response = await apiClient.delete(API_ENDPOINTS.NOTIFICATIONS.FCM_TOKEN, {
+            data: { token }
+        });
+        return response.data;
     }
 };
 
