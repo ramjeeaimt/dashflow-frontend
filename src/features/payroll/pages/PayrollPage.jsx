@@ -1,3 +1,4 @@
+import { toast } from 'react-hot-toast';
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
@@ -9,14 +10,26 @@ import financeService from '../../../services/finance.service';
 import { employeeService } from '../../../services/employee.service';
 import api from '../../../api/client';
 import PayrollDetailsModal from '../components/PayrollDetailsModal';
-
+import PayrollReviewModal from '../components/PayrollReviewModal';
 const PayrollPage = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [payrollData, setPayrollData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isEmployeesLoading, setIsEmployeesLoading] = useState(true);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const saved = localStorage.getItem('payableMonth');
+        return saved ? parseInt(saved, 10) : new Date().getMonth() + 1;
+    });
+    const [selectedYear, setSelectedYear] = useState(() => {
+        const saved = localStorage.getItem('payableYear');
+        return saved ? parseInt(saved, 10) : new Date().getFullYear();
+    });
+
+    useEffect(() => {
+        localStorage.setItem('payableMonth', selectedMonth.toString());
+        localStorage.setItem('payableYear', selectedYear.toString());
+    }, [selectedMonth, selectedYear]);
+
     const { user } = useAuthStore();
 
     // ========== NEW: Email template states ==========
@@ -31,9 +44,17 @@ const PayrollPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentPayrollId, setCurrentPayrollId] = useState(null);
     const [sendingEmails, setSendingEmails] = useState({});
+    const [regeneratingIds, setRegeneratingIds] = useState({});
+    const [creatingManualIds, setCreatingManualIds] = useState({});
+
+    // ========== NEW: Review Modal state ==========
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [reviewPayroll, setReviewPayroll] = useState(null);
+    const [reviewModalMode, setReviewModalMode] = useState('send');
 
     // ========== NEW: Manual payroll modal state ==========
     const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+    const [isBulkConfirmModalOpen, setIsBulkConfirmModalOpen] = useState(false);
     const [employeesList, setEmployeesList] = useState([]);
     const [manualFormData, setManualFormData] = useState({
         employeeId: '',
@@ -44,7 +65,7 @@ const PayrollPage = () => {
         netSalary: '',
         month: selectedMonth,
         year: selectedYear,
-        status: 'pending',
+        status: 'draft',
         notes: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,62 +111,22 @@ const PayrollPage = () => {
     }, [isManualModalOpen, user]);
 
     const generatePayroll = async () => {
-        // ... (your existing generatePayroll logic, unchanged)
         try {
             setIsLoading(true);
 
-            // 🔹 1. Check already generated
-            const existing = await financeService.getPayroll(
-                user.company.id,
-                selectedMonth,
-                selectedYear
-            );
+            // 🔹 Generate payroll via Backend
+            // The backend is smart enough to skip existing drafts and finalized records
+            await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id);
 
-            if (existing.length > 0) {
-                alert("Payroll already generated for this month ");
-                return;
-            }
+            toast.success("Bulk payroll generation completed successfully");
+            setIsBulkConfirmModalOpen(false);
 
-            // 🔹 2. Get employees
-            const employees = await employeeService.getAll({
-                companyId: user.company.id
-            });
-
-            if (!employees.length) {
-                alert("No employees found ");
-                return;
-            }
-
-            // 🔹 3. Generate payroll
-            const requests = employees.map(emp => {
-                const basicSalary = parseFloat(emp.salary) || 20000;
-                const allowances = 3000;
-                const deductions = 1000;
-
-                return financeService.createPayroll({
-                    employeeId: emp.id,
-                    companyId: user.company.id,
-                    basicSalary,
-                    allowances,
-                    deductions,
-                    netSalary: basicSalary + allowances - deductions,
-                    month: selectedMonth,
-                    year: selectedYear,
-                    status: "pending"
-                });
-            });
-
-            // Parallel API calls (FAST)
-            await Promise.all(requests);
-
-            alert("Payroll generated successfully ");
-
-            //  Refresh
+            // Refresh
             fetchPayroll();
 
         } catch (error) {
             console.error("Payroll generation failed:", error);
-            alert("Error generating payroll ");
+            toast.error("Error generating payroll ");
         } finally {
             setIsLoading(false);
         }
@@ -228,11 +209,13 @@ const PayrollPage = () => {
                 isGenerated: !!existingPayroll,
                 employee: emp,
                 employeeId: emp.id,
-                basicSalary: existingPayroll?.basicSalary || emp.salary || 20000,
-                allowances: existingPayroll?.allowances || 0,
-                deductions: existingPayroll?.deductions || 0,
-                netSalary: existingPayroll?.netSalary || (emp.salary || 20000),
-                status: existingPayroll?.status || 'not-generated',
+                basicSalary: existingPayroll ? Math.round(existingPayroll.basicSalary ?? (emp.salary || 0)) : Math.round(emp.salary || 0),
+                allowances: existingPayroll ? Math.round(existingPayroll.allowances ?? 0) : 0,
+                deductions: existingPayroll ? Math.round(existingPayroll.deductions ?? 0) : 0,
+                leaveDeduction: existingPayroll ? Math.round(existingPayroll.leaveDeduction ?? 0) : 0,
+                halfDeduction: existingPayroll ? Math.round(existingPayroll.halfDeduction ?? 0) : 0,
+                netSalary: existingPayroll ? Math.round(existingPayroll.netSalary ?? 0) : Math.round(emp.salary || 0),
+                status: (existingPayroll?.status === 'pending' ? 'draft' : existingPayroll?.status === 'paid' ? 'sent' : existingPayroll?.status) || 'not-generated',
                 month: existingPayroll?.month || selectedMonth,
                 year: existingPayroll?.year || selectedYear,
                 record: existingPayroll
@@ -423,35 +406,55 @@ const PayrollPage = () => {
             }
 
             await financeService.sendPayrollEmail(id, payload);
-            alert('Email sent successfully');
+            toast.success('Email sent successfully');
         } catch (error) {
             console.error('Failed to send email:', error);
-            alert('Error sending email');
+            toast.error('Error sending email');
         } finally {
             setSendingEmails(prev => ({ ...prev, [id]: false }));
+        }
+    };
+
+    const handleFinalizeAndSend = async (payrollId, payslipHtml, emailBodyHtml) => {
+        try {
+            await api.post(`/finance/payroll/${payrollId}/send`, {
+                payslipHtml,
+                emailBodyHtml
+            });
+            toast.success('Payslip generated as PDF and sent to employee successfully.');
+            fetchPayroll();
+        } catch (error) {
+            console.error('Failed to finalize payroll:', error);
+            toast.error('Error sending payroll PDF.');
+            throw error;
+        }
+    };
+
+    const handleSaveCustomHtml = async (payrollId, payslipHtml, emailBodyHtml) => {
+        try {
+            await financeService.saveCustomHtml(payrollId, payslipHtml, emailBodyHtml);
+            toast.success("Customizations saved successfully.");
+            fetchPayroll();
+        } catch (error) {
+            console.error("Error saving custom HTML:", error);
+            toast.error("Failed to save customizations.");
         }
     };
 
     const handleGenerateIndividual = async (row) => {
         try {
             setIsLoading(true);
-            const basicSalary = parseFloat(row.basicSalary) || 20000;
-            await financeService.createPayroll({
-                employeeId: row.employeeId,
-                companyId: user.company.id,
-                basicSalary: basicSalary,
-                allowances: 3000,
-                deductions: 1000,
-                netSalary: basicSalary + 3000 - 1000,
-                month: selectedMonth,
-                year: selectedYear,
-                status: "pending"
-            });
-            alert("Payroll generated for " + row.employee.user?.firstName);
+            await financeService.bulkGenerateRealPayroll(
+                selectedMonth,
+                selectedYear,
+                user.company.id,
+                row.employeeId
+            );
+            toast.success("Payroll generated for " + row.employee.user?.firstName);
             fetchPayroll();
         } catch (error) {
             console.error("Individual generation failed:", error);
-            alert("Error generating payroll");
+            toast.error("Error generating payroll");
         } finally {
             setIsLoading(false);
         }
@@ -471,7 +474,7 @@ const PayrollPage = () => {
             netSalary: '',
             month: selectedMonth,
             year: selectedYear,
-            status: 'pending',
+            status: 'draft',
             notes: ''
         });
         setIsManualModalOpen(true);
@@ -521,50 +524,69 @@ const PayrollPage = () => {
 
         try {
             await financeService.deletePayroll(id);
-            alert('Payroll record deleted successfully');
+            toast.success('Payroll record deleted successfully');
             fetchPayroll();
         } catch (error) {
             console.error('Failed to delete payroll:', error);
-            alert('Error deleting payroll');
+            toast.error('Error deleting payroll');
         }
     };
 
     const handleManualInputChange = (e) => {
         const { name, value } = e.target;
-        setManualFormData(prev => ({ ...prev, [name]: value }));
+        setManualFormData(prev => {
+            const updated = { ...prev, [name]: value };
+
+            // Auto-calculate Net Salary if a financial component changes
+            if (['basicSalary', 'allowances', 'deductions', 'overtime'].includes(name)) {
+                const basic = parseFloat(updated.basicSalary) || 0;
+                const allowances = parseFloat(updated.allowances) || 0;
+                const deductions = parseFloat(updated.deductions) || 0;
+                const overtime = parseFloat(updated.overtime) || 0;
+                updated.netSalary = basic + allowances + overtime - deductions;
+            }
+
+            return updated;
+        });
     };
 
     const handleManualSubmit = async (e) => {
         e.preventDefault();
         if (!manualFormData.employeeId) {
-            alert('Please select an employee');
+            toast.error('Please select an employee');
             return;
         }
         setIsSubmitting(true);
         try {
+            const basic = parseFloat(manualFormData.basicSalary) || 0;
+            const allowances = parseFloat(manualFormData.allowances) || 0;
+            const deductions = parseFloat(manualFormData.deductions) || 0;
+            const overtime = parseFloat(manualFormData.overtime) || 0;
+            const calculatedNetSalary = basic + allowances + overtime - deductions;
+
             const payload = {
                 ...manualFormData,
-                basicSalary: parseFloat(manualFormData.basicSalary) || 0,
-                allowances: parseFloat(manualFormData.allowances) || 0,
-                deductions: parseFloat(manualFormData.deductions) || 0,
-                overtime: parseFloat(manualFormData.overtime) || 0,
-                netSalary: parseFloat(manualFormData.netSalary) || 0,
+                basicSalary: basic,
+                allowances: allowances,
+                deductions: deductions,
+                overtime: overtime,
+                netSalary: calculatedNetSalary,
                 companyId: user.company.id,
                 month: parseInt(manualFormData.month),
                 year: parseInt(manualFormData.year)
             };
             if (isEditing) {
                 await financeService.updatePayroll(currentPayrollId, payload);
-                alert('Payroll record updated successfully');
+                toast.success('Payroll record updated successfully');
             } else {
                 await financeService.createPayroll(payload);
-                alert('Payroll record created successfully');
+                toast.success('Payroll record created successfully');
             }
             setIsManualModalOpen(false);
             fetchPayroll(); // Refresh list
         } catch (error) {
             console.error('Failed to create manual payroll:', error);
-            alert('Error creating payroll');
+            toast.error('Error creating payroll');
         } finally {
             setIsSubmitting(false);
         }
@@ -621,32 +643,8 @@ const PayrollPage = () => {
                                 </select>
                             </div>
 
-                            {/* ========== NEW: Branded Email Format Selector ========== */}
-                            <div className="flex items-center gap-2 w-full sm:w-auto bg-card border border-border rounded-lg px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-primary">
-                                <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Email Format:</span>
-                                <select
-                                    value={pendingTemplateId}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        setPendingTemplateId(val);
-                                        // Auto-apply the selected template
-                                        applyTemplate(val);
-                                    }}
-                                    className="bg-transparent border-0 text-xs font-bold text-foreground focus:outline-none focus:ring-0 cursor-pointer min-w-[200px]"
-                                >
-                                    <option value="default">
-                                        {localStorage.getItem('global_active_template_id') ? 'Default (👑 Global Active)' : 'Default (Standard)'}
-                                    </option>
-                                    {templates.map(tpl => (
-                                        <option key={tpl.id} value={tpl.id.toString()}>
-                                            Created: {tpl.name || tpl.title || 'Unnamed Template'}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
                             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                                <Button onClick={generatePayroll} iconName="Plus" className="w-full sm:w-auto">Generate Payroll</Button>
-                                <Button onClick={handleManuallyPayroll} variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">Manually Generate</Button>
+                                <Button onClick={() => setIsBulkConfirmModalOpen(true)} iconName="Plus" className="w-full sm:w-auto">Generate Bulk Payroll</Button>
                             </div>
                         </div>
                     </div>
@@ -720,14 +718,33 @@ const PayrollPage = () => {
                                                     <td className="px-3 sm:px-6 py-4 text-sm text-green-600">
                                                         {row.isGenerated ? `+₹${row.allowances}` : '-'}
                                                     </td>
-                                                    <td className="px-3 sm:px-6 py-4 text-sm text-red-600">
-                                                        {row.isGenerated ? `-₹${row.deductions}` : '-'}
+                                                    <td className="px-3 sm:px-6 py-4 text-sm text-red-600 relative group cursor-pointer">
+                                                        {row.isGenerated ? (
+                                                            <>
+                                                                <span className="border-b border-dashed border-red-300">-₹{row.deductions}</span>
+                                                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col bg-slate-800 text-white text-xs rounded shadow-xl p-3 z-50 min-w-[200px]">
+                                                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px] mb-2 border-b border-slate-600 pb-1">Deduction Breakdown</div>
+                                                                    <div className="flex justify-between mb-1">
+                                                                        <span className="text-slate-300">Leaves & Absences:</span>
+                                                                        <span className="font-semibold text-red-300">₹{row.leaveDeduction || 0}</span>
+                                                                    </div>
+                                                                    <div className="flex justify-between">
+                                                                        <span className="text-slate-300">Half-Days:</span>
+                                                                        <span className="font-semibold text-red-300">₹{row.halfDeduction || 0}</span>
+                                                                    </div>
+                                                                    <div className="border-t border-slate-600 mt-2 pt-1 flex justify-between font-bold">
+                                                                        <span>Total:</span>
+                                                                        <span className="text-red-400">₹{row.deductions || 0}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        ) : '-'}
                                                     </td>
                                                     <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
                                                         {row.isGenerated ? `₹${row.netSalary}` : `₹${row.basicSalary}`}
                                                     </td>
                                                     <td className="px-3 sm:px-6 py-4">
-                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${row.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${row.status === 'sent' ? 'bg-green-100 text-green-800' :
                                                             row.status === 'not-generated' ? 'bg-slate-100 text-slate-500' : 'bg-yellow-100 text-yellow-800'
                                                             }`}>
                                                             {row.status.replace('-', ' ')}
@@ -736,46 +753,138 @@ const PayrollPage = () => {
                                                     <td className="px-3 sm:px-6 py-4">
                                                         <div className="flex items-center justify-end space-x-2">
                                                             {!row.isGenerated ? (
-                                                                <button
-                                                                    onClick={() => handleGenerateIndividual(row)}
-                                                                    className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-primary/90 transition-all uppercase tracking-wider"
-                                                                >
-                                                                    Generate
-                                                                </button>
-                                                            ) : (
                                                                 <>
                                                                     <button
-                                                                        onClick={() => handleSendIndividualEmail(row.id)}
-                                                                        disabled={sendingEmails[row.id]}
-                                                                        className={`p-2 rounded-lg transition-all ${sendingEmails[row.id] ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
-                                                                        title="Send Email"
+                                                                        onClick={() => handleGenerateIndividual(row)}
+                                                                        className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-primary/90 transition-all uppercase tracking-wider"
                                                                     >
-                                                                        {sendingEmails[row.id] ? <Icon name="Loader2" size={18} className="animate-spin" /> : <Icon name="Mail" size={18} />}
+                                                                        Generate
                                                                     </button>
                                                                     <button
+                                                                        onClick={async () => {
+                                                                            if (creatingManualIds[row.employeeId]) return;
+                                                                            try {
+                                                                                setCreatingManualIds(prev => ({ ...prev, [row.employeeId]: true }));
+                                                                                // 1. Generate the calculated draft using backend logic
+                                                                                await financeService.bulkGenerateRealPayroll(
+                                                                                    selectedMonth, 
+                                                                                    selectedYear, 
+                                                                                    user.company.id, 
+                                                                                    row.employeeId
+                                                                                );
+                                                                                
+                                                                                // 2. Fetch fresh data to get the generated record
+                                                                                const freshPayrolls = await financeService.getPayroll(user.company.id, selectedMonth, selectedYear);
+                                                                                const newRecord = freshPayrolls.find(p => p.employeeId === row.employeeId);
+                                                                                
+                                                                                if (newRecord) {
+                                                                                    // 3. Immediately open the HTML/PDF editor for the new draft
+                                                                                    setReviewPayroll(newRecord);
+                                                                                    setReviewModalMode('edit');
+                                                                                    setIsReviewModalOpen(true);
+                                                                                    fetchPayroll(); // update table in background
+                                                                                } else {
+                                                                                    toast.error('Draft created, but failed to open PDF editor.');
+                                                                                    fetchPayroll();
+                                                                                }
+                                                                            } catch (err) {
+                                                                                console.error(err);
+                                                                                toast.error('Failed to initialize manual payroll');
+                                                                            } finally {
+                                                                                setCreatingManualIds(prev => ({ ...prev, [row.employeeId]: false }));
+                                                                            }
+                                                                        }}
+                                                                        disabled={creatingManualIds[row.employeeId]}
+                                                                        className="flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold rounded-lg transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                    >
+                                                                        {creatingManualIds[row.employeeId] ? (
+                                                                            <>
+                                                                                <Icon name="Loader2" size={12} className="animate-spin" />
+                                                                                Creating...
+                                                                            </>
+                                                                        ) : (
+                                                                            "Create Manual"
+                                                                        )}
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    {row.status === 'draft' ? (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={async () => {
+                                                                                    if (regeneratingIds[row.id]) return;
+                                                                                    try {
+                                                                                        setRegeneratingIds(prev => ({ ...prev, [row.id]: true }));
+                                                                                        await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id, row.employeeId);
+                                                                                        await fetchPayroll();
+                                                                                        toast.success('Payroll recalculated successfully!');
+                                                                                    } catch(err) {
+                                                                                        console.error(err);
+                                                                                        toast.error('Failed to regenerate payroll.');
+                                                                                    } finally {
+                                                                                        setRegeneratingIds(prev => ({ ...prev, [row.id]: false }));
+                                                                                    }
+                                                                                }}
+                                                                                disabled={regeneratingIds[row.id]}
+                                                                                className="flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-lg hover:bg-slate-200 transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                            >
+                                                                                {regeneratingIds[row.id] ? (
+                                                                                    <>
+                                                                                        <Icon name="Loader2" size={12} className="animate-spin" />
+                                                                                        Regenerating...
+                                                                                    </>
+                                                                                ) : (
+                                                                                    "Regenerate"
+                                                                                )}
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    setReviewPayroll(row.record);
+                                                                                    setReviewModalMode('send');
+                                                                                    setIsReviewModalOpen(true);
+                                                                                }}
+                                                                                className="px-3 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg hover:bg-amber-600 transition-all uppercase tracking-wider whitespace-nowrap"
+                                                                            >
+                                                                                Review & Send
+                                                                            </button>
+                                                                        </>
+                                                                    ) : row.status === 'sent' ? (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setReviewPayroll(row.record);
+                                                                                setReviewModalMode('send');
+                                                                                setIsReviewModalOpen(true);
+                                                                            }}
+                                                                            className="px-3 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg hover:bg-amber-600 transition-all uppercase tracking-wider whitespace-nowrap"
+                                                                        >
+                                                                            Update & Resend
+                                                                        </button>
+                                                                    ) : null}
+                                                                    <button
                                                                         onClick={() => {
-                                                                            setSelectedPayroll(row.record);
-                                                                            setIsDetailsModalOpen(true);
+                                                                            setReviewPayroll(row.record);
+                                                                            setReviewModalMode('view');
+                                                                            setIsReviewModalOpen(true);
                                                                         }}
                                                                         className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                                                         title="View"
                                                                     >
                                                                         <Icon name="Eye" size={18} />
                                                                     </button>
-                                                                    <button
-                                                                        onClick={() => handleEditPayroll(row.record)}
-                                                                        className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-                                                                        title="Edit"
-                                                                    >
-                                                                        <Icon name="Pencil" size={18} />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleDeletePayroll(row.id)}
-                                                                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                                                        title="Delete"
-                                                                    >
-                                                                        <Icon name="Trash2" size={18} />
-                                                                    </button>
+                                                                    {row.status === 'draft' && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setReviewPayroll(row.record);
+                                                                                setReviewModalMode('edit');
+                                                                                setIsReviewModalOpen(true);
+                                                                            }}
+                                                                            className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                                            title="Edit Customizations"
+                                                                        >
+                                                                            <Icon name="Pencil" size={18} />
+                                                                        </button>
+                                                                    )}
                                                                 </>
                                                             )}
                                                         </div>
@@ -830,8 +939,8 @@ const PayrollPage = () => {
                                     <select
                                         name="month"
                                         value={manualFormData.month}
-                                        onChange={handleManualInputChange}
-                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm"
+                                        disabled
+                                        className="w-full bg-slate-100 text-slate-500 border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
                                     >
                                         {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                                     </select>
@@ -841,10 +950,10 @@ const PayrollPage = () => {
                                     <select
                                         name="year"
                                         value={manualFormData.year}
-                                        onChange={handleManualInputChange}
-                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm"
+                                        disabled
+                                        className="w-full bg-slate-100 text-slate-500 border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
                                     >
-                                        {[2023, 2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
+                                        {[2023, 2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
                                 </div>
 
@@ -919,9 +1028,8 @@ const PayrollPage = () => {
                                         onChange={handleManualInputChange}
                                         className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm"
                                     >
-                                        <option value="pending">Pending</option>
-                                        <option value="paid">Paid</option>
-                                        <option value="paid">Processing</option>
+                                        <option value="draft">Draft</option>
+                                        <option value="sent">Sent</option>
                                     </select>
                                 </div>
 
@@ -959,6 +1067,51 @@ const PayrollPage = () => {
                 payroll={selectedPayroll}
                 onSendEmail={handleSendIndividualEmail}
             />
+
+            <PayrollReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => {
+                    setIsReviewModalOpen(false);
+                    setReviewPayroll(null);
+                }}
+                payroll={reviewPayroll}
+                onSend={handleFinalizeAndSend}
+                onSave={handleSaveCustomHtml}
+                mode={reviewModalMode}
+            />
+
+            {/* Bulk Confirm Modal */}
+            {isBulkConfirmModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-card rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="p-6">
+                            <h3 className="text-xl font-bold text-foreground mb-2">Confirm Bulk Generation</h3>
+                            <p className="text-sm text-muted-foreground mb-6">
+                                Are you sure you want to generate payroll for all active employees for {months.find(m => m.value === selectedMonth)?.label} {selectedYear}? This will calculate their salary based on actual attendance records.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setIsBulkConfirmModalOpen(false)}
+                                    disabled={isLoading}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        setIsBulkConfirmModalOpen(false);
+                                        generatePayroll();
+                                    }}
+                                    disabled={isLoading}
+                                    className="bg-primary text-white"
+                                >
+                                    Confirm
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

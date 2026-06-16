@@ -55,9 +55,12 @@ const AttendancePolicySettings = () => {
     halfDayPayPercent: 50,
     enableLateEmailAlert: true,
     attendanceAlertEmails: '',
+    casualLeavesPerYear: 12,
+    workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
   });
 
   const [newEmailInput, setNewEmailInput] = useState('');
+  const [isEditingSchedule, setIsEditingSchedule] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -75,6 +78,8 @@ const AttendancePolicySettings = () => {
             halfDayPayPercent: c.halfDayPayPercent ?? 50,
             enableLateEmailAlert: c.enableLateEmailAlert ?? true,
             attendanceAlertEmails: c.attendanceAlertEmails || '',
+            casualLeavesPerYear: c.casualLeavesPerYear ?? 12,
+            workingDays: c.workingDays || ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
           });
         }
       } catch (e) {
@@ -267,6 +272,101 @@ const AttendancePolicySettings = () => {
         </div>
       </div>
 
+      {/* Work Schedule */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <Icon name="Calendar" size={16} className="text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Work Schedule</p>
+              <p className="text-xs text-slate-400">Define the standard operating days for your company</p>
+            </div>
+          </div>
+          {!isEditingSchedule && (
+            <button
+              type="button"
+              onClick={() => setIsEditingSchedule(true)}
+              className="text-sm font-medium flex items-center gap-1.5 text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <Icon name="Edit2" size={16} />
+              Edit Schedule
+            </button>
+          )}
+        </div>
+        <div className="px-6">
+          <FieldGroup
+            label="Working Days"
+            hint="Select the days your company operates. This affects attendance tracking and payroll calculations."
+          >
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'monday', label: 'Monday' },
+                { id: 'tuesday', label: 'Tuesday' },
+                { id: 'wednesday', label: 'Wednesday' },
+                { id: 'thursday', label: 'Thursday' },
+                { id: 'friday', label: 'Friday' },
+                { id: 'saturday', label: 'Saturday' },
+                { id: 'sunday', label: 'Sunday' }
+              ].map(day => {
+                const isSelected = (form.workingDays || []).includes(day.id);
+                return (
+                  <button
+                    key={day.id}
+                    type="button"
+                    disabled={!isEditingSchedule}
+                    onClick={() => {
+                      if (!isEditingSchedule) return;
+                      const currentDays = form.workingDays || [];
+                      if (currentDays.includes(day.id)) {
+                        set('workingDays', currentDays.filter(d => d !== day.id));
+                      } else {
+                        set('workingDays', [...currentDays, day.id]);
+                      }
+                    }}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                      isSelected
+                        ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                    } ${!isEditingSchedule ? 'opacity-80 cursor-default hover:bg-white hover:border-slate-200' : ''}`}
+                  >
+                    {day.label}
+                  </button>
+                );
+              })}
+            </div>
+            {isEditingSchedule && (!form.workingDays || form.workingDays.length === 0) && (
+              <p className="text-xs text-rose-500 mt-2">Please select at least one working day.</p>
+            )}
+            
+            {isEditingSchedule && (
+              <div className="mt-5 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await handleSave();
+                    setIsEditingSchedule(false);
+                  }}
+                  disabled={saving}
+                  className="px-5 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2 disabled:opacity-60"
+                >
+                  {saving ? 'Saving...' : 'Update Schedule'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingSchedule(false)}
+                  disabled={saving}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </FieldGroup>
+        </div>
+      </div>
+
       {/* Check-in Window */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
@@ -345,13 +445,42 @@ const AttendancePolicySettings = () => {
         </div>
       </div>
 
+      {/* Leave Policy */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <Icon name="Calendar" size={16} className="text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Leave Policy</p>
+            <p className="text-xs text-slate-400">Configure leave allowances</p>
+          </div>
+        </div>
+        <div className="px-6">
+          <FieldGroup
+            label="Casual Leaves per Year"
+            hint="The total number of paid casual leaves an employee receives per year."
+          >
+            <NumberInput
+              value={form.casualLeavesPerYear}
+              onChange={(v) => set('casualLeavesPerYear', v)}
+              min={0}
+              max={365}
+              unit="days/year"
+            />
+          </FieldGroup>
+        </div>
+      </div>
+
       {/* Preview Box */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-8 text-xs text-slate-500 space-y-1.5">
         <p className="font-semibold text-slate-700 mb-2 text-sm">Policy Preview</p>
+        <p>• Company operates on <strong>{form.workingDays?.length || 0} days</strong> a week.</p>
         <p>• Employees can check in from <strong>{form.earlyCheckInBuffer} min before</strong> shift start.</p>
         <p>• Check-ins {form.checkInCutoffMinutes > 0 ? <>are blocked after <strong>{form.checkInCutoffMinutes} min</strong> past shift start.</> : <>have <strong>no time cutoff</strong>.</>}</p>
         <p>• An employee is marked <strong>Late</strong> if they check in more than <strong>{form.lateThresholdMinutes} min</strong> after shift start.</p>
         <p>• Working <strong>{form.halfDayMinHours}+ hours</strong> qualifies as a half-day, paid at <strong>{form.halfDayPayPercent}%</strong> of daily rate.</p>
+        <p>• Employees receive <strong>{form.casualLeavesPerYear} casual leaves</strong> per year.</p>
         <p>• Late arrival email warnings are <strong>{form.enableLateEmailAlert ? 'enabled' : 'disabled'}</strong>.</p>
       </div>
 

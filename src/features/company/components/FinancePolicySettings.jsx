@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
+import uploadService from '../../../features/upload/uploadService';
 import Icon from '../../../components/AppIcon';
 
 const FieldGroup = ({ label, hint, children }) => (
@@ -22,9 +23,70 @@ const FinancePolicySettings = () => {
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
     payrollAlertEmails: '',
+    allowanceAmount: 0,
+    overtimePolicy: 'fixed',
+    overtimeRatePerHour: 0,
+    overtimeMultiplier: 100.0,
   });
 
   const [newEmailInput, setNewEmailInput] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [signatureUrl, setSignatureUrl] = useState('');
+  const [emailTemplate, setEmailTemplate] = useState(`<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .footer { margin-top: 30px; font-size: 14px; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+        .logo { max-width: 150px; }
+        .signature { max-width: 150px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Add Logo Link Below -->
+            <img src="" alt="Company Logo" class="logo" />
+        </div>
+        
+        <div class="content">
+            <h2>Payslip for [Month]</h2>
+            <p>Dear [Employee Name],</p>
+            <p>Please find attached your payslip for the month. You can customize the HTML here to match your brand's voice and design.</p>
+            <p>Make sure to copy the image links generated above and paste them into the <code>src</code> attributes of the images.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,</p>
+            <!-- Add Signature Link Below -->
+            <img src="" alt="Company Signature" class="signature" />
+            <p><strong>Company Owner</strong></p>
+        </div>
+    </div>
+        </div>
+    </div>
+</body>
+</html>`);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const [salaryEmailBodyTemplate, setSalaryEmailBodyTemplate] = useState(`<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <p>Dear [Employee Name],</p>
+    <p>Please find attached your salary slip for the month of [Month].</p>
+    <br/>
+    <p>Best regards,</p>
+    <p><strong>Company Owner</strong></p>
+</body>
+</html>`);
+  const [showBodyPreview, setShowBodyPreview] = useState(false);
+  const [isEmailTemplateEditable, setIsEmailTemplateEditable] = useState(false);
+  const [isBodyTemplateEditable, setIsBodyTemplateEditable] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -36,7 +98,15 @@ const FinancePolicySettings = () => {
         if (c) {
           setForm({
             payrollAlertEmails: c.payrollAlertEmails || '',
+            allowanceAmount: c.allowanceAmount ?? 0,
+            overtimePolicy: c.overtimePolicy || 'fixed',
+            overtimeRatePerHour: c.overtimeRatePerHour ?? 0,
+            overtimeMultiplier: c.overtimeMultiplier ?? 100.0,
           });
+          setLogoUrl(c.logo || '');
+          setSignatureUrl(c.payslipSignature || '');
+          if (c.payslipEmailTemplate) setEmailTemplate(c.payslipEmailTemplate);
+          if (c.salaryEmailBodyTemplate) setSalaryEmailBodyTemplate(c.salaryEmailBodyTemplate);
         }
       } catch (e) {
         console.error('Failed to load finance policy', e);
@@ -54,13 +124,23 @@ const FinancePolicySettings = () => {
     try {
       setSaving(true);
       setSaved(false);
-      await api.patch(`/system-company/${user.company.id}`, form);
+      const payload = {
+        ...form,
+        overtimeMultiplier: form.overtimeMultiplier === '' ? 0 : form.overtimeMultiplier,
+        allowanceAmount: form.allowanceAmount === '' ? 0 : form.allowanceAmount,
+        overtimeRatePerHour: form.overtimeRatePerHour === '' ? 0 : form.overtimeRatePerHour,
+        logo: logoUrl,
+        payslipSignature: signatureUrl,
+        payslipEmailTemplate: emailTemplate,
+        salaryEmailBodyTemplate: salaryEmailBodyTemplate,
+      };
+      await api.patch(`/system-company/${user.company.id}`, payload);
       
       const updatedUser = {
         ...user,
         company: {
           ...user.company,
-          ...form,
+          ...payload,
         }
       };
       useAuthStore.setState({ user: updatedUser });
@@ -108,6 +188,36 @@ const FinancePolicySettings = () => {
     } catch (err) {
       console.error('Failed to save email automatically', err);
     }
+  };
+
+  const handleFileUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        setSaving(true);
+        const response = await uploadService.uploadImage(file);
+        const url = response?.data?.url || response?.url;
+        
+        if (url) {
+          if (type === 'logo') setLogoUrl(url);
+          if (type === 'signature') setSignatureUrl(url);
+        } else {
+          console.error("Upload response missing URL", response);
+          alert('Upload failed: Did not receive image URL from server.');
+        }
+      } catch (err) {
+        console.error('Failed to upload image:', err);
+        alert('Failed to upload image. Please try again.');
+      } finally {
+        setSaving(false);
+      }
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    alert('Image link copied to clipboard!');
   };
 
   const handleRemoveEmail = async (emailToRemove) => {
@@ -202,6 +312,328 @@ const FinancePolicySettings = () => {
               )}
             </div>
           </FieldGroup>
+        </div>
+      </div>
+
+      {/* Payroll Policies */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+            <Icon name="Settings" size={16} className="text-indigo-600" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Payroll Policies</p>
+            <p className="text-xs text-slate-400">Configure global allowances and overtime calculations.</p>
+          </div>
+        </div>
+        <div className="px-6">
+          <FieldGroup
+            label="Allowance Amount"
+            hint="Standard monthly allowance added to every generated payslip (positive integer)."
+          >
+            <div className="relative max-w-sm">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                <Icon name="IndianRupee" size={14} />
+              </span>
+              <input
+                type="number"
+                min="0"
+                value={form.allowanceAmount === 0 && form.allowanceAmount !== '' ? 0 : form.allowanceAmount}
+                onChange={(e) => {
+                  const valStr = e.target.value;
+                  set('allowanceAmount', valStr === '' ? '' : (parseInt(valStr) || 0));
+                }}
+                className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+              />
+            </div>
+          </FieldGroup>
+
+          <FieldGroup
+            label="Overtime Policy"
+            hint="Choose how overtime pay is calculated."
+          >
+            <div className="max-w-sm">
+              <select
+                value={form.overtimePolicy}
+                onChange={(e) => set('overtimePolicy', e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 bg-white"
+              >
+                <option value="fixed">Fixed Rate</option>
+                <option value="variable">Variable Rate (Based on exact working days & hours)</option>
+              </select>
+            </div>
+          </FieldGroup>
+
+          {form.overtimePolicy === 'fixed' && (
+            <FieldGroup
+              label="Overtime Rate Per Hour"
+              hint="The fixed amount paid for every hour of overtime."
+            >
+              <div className="relative max-w-sm">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                  <Icon name="IndianRupee" size={14} />
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.overtimeRatePerHour === 0 && form.overtimeRatePerHour !== '' ? 0 : form.overtimeRatePerHour}
+                  onChange={(e) => {
+                    const valStr = e.target.value;
+                    set('overtimeRatePerHour', valStr === '' ? '' : (parseInt(valStr) || 0));
+                  }}
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                />
+              </div>
+            </FieldGroup>
+          )}
+
+          {form.overtimePolicy === 'variable' && (
+            <FieldGroup
+              label="Overtime Rate Percentage"
+              hint="Percentage of the base hourly rate applied for overtime hours (e.g., 100% = normal rate, 200% = double time)."
+            >
+              <div className="relative max-w-sm">
+                <input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={form.overtimeMultiplier === 0 && form.overtimeMultiplier !== '' ? 0 : form.overtimeMultiplier}
+                  onChange={(e) => {
+                    const valStr = e.target.value;
+                    if (valStr === '') {
+                      set('overtimeMultiplier', '');
+                    } else {
+                      set('overtimeMultiplier', parseFloat(valStr));
+                    }
+                  }}
+                  className="w-full pl-3 pr-9 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                />
+                <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 pointer-events-none">
+                  <span className="font-bold text-xs">%</span>
+                </span>
+              </div>
+            </FieldGroup>
+          )}
+        </div>
+      </div>
+
+      {/* Payslip Email Template */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <Icon name="Mail" size={16} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Payslip Attachment Template</p>
+              <p className="text-xs text-slate-400">Configure branding and HTML format for the generated payslip PDF attachment.</p>
+            </div>
+          </div>
+        </div>
+        <div className="px-6 py-6 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Logo Upload */}
+                <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                        <Icon name="Image" size={16} /> Company Logo
+                    </h3>
+                    <div className="space-y-4">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload(e, 'logo')}
+                            className="block w-full text-sm text-slate-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-50 file:text-blue-700
+                                hover:file:bg-blue-100 transition-all cursor-pointer"
+                        />
+                        {logoUrl && (
+                            <div className="mt-3">
+                                <p className="text-xs text-slate-500 mb-1">Generated Image Link:</p>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        readOnly 
+                                        value={logoUrl} 
+                                        className="text-xs bg-white border border-slate-300 rounded px-2 py-1 w-full"
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => copyToClipboard(logoUrl)}
+                                        className="bg-slate-200 hover:bg-slate-300 px-3 rounded text-xs font-medium transition-colors"
+                                    >
+                                        Copy
+                                    </button>
+                                </div>
+                                <div className="mt-4 p-3 bg-white border border-slate-200 rounded flex justify-center">
+                                    <img src={logoUrl} alt="Logo Preview" className="max-h-20 object-contain" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Signature Upload */}
+                <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                        <Icon name="Edit3" size={16} /> Owner Signature
+                    </h3>
+                    <div className="space-y-4">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload(e, 'signature')}
+                            className="block w-full text-sm text-slate-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-50 file:text-blue-700
+                                hover:file:bg-blue-100 transition-all cursor-pointer"
+                        />
+                        {signatureUrl && (
+                            <div className="mt-3">
+                                <p className="text-xs text-slate-500 mb-1">Generated Image Link:</p>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        readOnly 
+                                        value={signatureUrl} 
+                                        className="text-xs bg-white border border-slate-300 rounded px-2 py-1 w-full"
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => copyToClipboard(signatureUrl)}
+                                        className="bg-slate-200 hover:bg-slate-300 px-3 rounded text-xs font-medium transition-colors"
+                                    >
+                                        Copy
+                                    </button>
+                                </div>
+                                <div className="mt-4 p-3 bg-white border border-slate-200 rounded flex justify-center">
+                                    <img src={signatureUrl} alt="Signature Preview" className="max-h-20 object-contain" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Email Template Editor */}
+            <div className="border border-slate-200 rounded-lg overflow-hidden mt-6">
+                <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center">
+                    <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                        <Icon name="Code" size={16} /> HTML Format
+                    </h3>
+                    <div className="flex gap-4 items-center">
+                        {!showPreview && (
+                            <button
+                                type="button"
+                                onClick={() => setIsEmailTemplateEditable(!isEmailTemplateEditable)}
+                                className={`text-sm font-medium flex items-center gap-1 ${isEmailTemplateEditable ? 'text-green-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                <Icon name="Edit2" size={16} />
+                                {isEmailTemplateEditable ? 'Editing...' : 'Edit Code'}
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setShowPreview(!showPreview)}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                        >
+                            <Icon name={showPreview ? 'Code' : 'Eye'} size={16} />
+                            {showPreview ? 'Edit HTML' : 'Show Preview'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="p-0">
+                    {showPreview ? (
+                        <div className="bg-white p-8 overflow-auto max-h-[500px]">
+                            <div className="border border-dashed border-slate-300 rounded-lg p-4 bg-[#f8fafc]">
+                                <p className="text-xs text-slate-500 mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
+                                <div 
+                                    className="bg-white shadow-sm mx-auto"
+                                    dangerouslySetInnerHTML={{ __html: emailTemplate }} 
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <textarea
+                            value={emailTemplate}
+                            onChange={(e) => setEmailTemplate(e.target.value)}
+                            readOnly={!isEmailTemplateEditable}
+                            className={`w-full h-[400px] p-5 font-mono text-sm text-slate-700 bg-slate-900 !text-green-400 focus:outline-none ${!isEmailTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
+                            spellCheck="false"
+                        />
+                    )}
+                </div>
+            </div>
+        </div>
+      </div>
+      {/* Salary Email Body Template */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <Icon name="Mail" size={16} className="text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Salary Email Body Template</p>
+              <p className="text-xs text-slate-400">Configure the actual HTML body of the email that the employee will receive along with the payslip attachment.</p>
+            </div>
+          </div>
+        </div>
+        <div className="px-6 py-6 space-y-8">
+            <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center">
+                    <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                        <Icon name="Code" size={16} /> Email Body HTML Format
+                    </h3>
+                    <div className="flex gap-4 items-center">
+                        {!showBodyPreview && (
+                            <button
+                                type="button"
+                                onClick={() => setIsBodyTemplateEditable(!isBodyTemplateEditable)}
+                                className={`text-sm font-medium flex items-center gap-1 ${isBodyTemplateEditable ? 'text-green-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                <Icon name="Edit2" size={16} />
+                                {isBodyTemplateEditable ? 'Editing...' : 'Edit Code'}
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setShowBodyPreview(!showBodyPreview)}
+                            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                        >
+                            <Icon name={showBodyPreview ? 'Code' : 'Eye'} size={16} />
+                            {showBodyPreview ? 'Edit HTML' : 'Show Preview'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="p-0">
+                    {showBodyPreview ? (
+                        <div className="bg-white p-8 overflow-auto max-h-[500px]">
+                            <div className="border border-dashed border-slate-300 rounded-lg p-4 bg-[#f8fafc]">
+                                <p className="text-xs text-slate-500 mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
+                                <div 
+                                    className="bg-white shadow-sm mx-auto"
+                                    dangerouslySetInnerHTML={{ __html: salaryEmailBodyTemplate }} 
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <textarea
+                            value={salaryEmailBodyTemplate}
+                            onChange={(e) => setSalaryEmailBodyTemplate(e.target.value)}
+                            readOnly={!isBodyTemplateEditable}
+                            className={`w-full h-[400px] p-5 font-mono text-sm text-slate-700 bg-slate-900 !text-green-400 focus:outline-none ${!isBodyTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
+                            spellCheck="false"
+                        />
+                    )}
+                </div>
+            </div>
         </div>
       </div>
 

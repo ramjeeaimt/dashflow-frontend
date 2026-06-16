@@ -53,19 +53,35 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
         }
     };
 
+    const getEffectiveWorkHours = (checkInTime, checkOutTime) => {
+        if (!checkInTime || !checkOutTime) return null;
+        try {
+            const inStr = String(checkInTime).includes('T') ? String(checkInTime) : `1970-01-01T${checkInTime}Z`;
+            const outStr = String(checkOutTime).includes('T') ? String(checkOutTime) : `1970-01-01T${checkOutTime}Z`;
+            const inDate = new Date(inStr);
+            const outDate = new Date(outStr);
+            let wh = (outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60);
+            
+            if (wh > 6) wh -= 1;
+            return Math.round(wh * 100) / 100;
+        } catch (e) {
+            return null;
+        }
+    };
+
     const calculateStats = (attendance, approvedLeaves, year, monthStr) => {
         const y = parseInt(year);
         const m = parseInt(monthStr);
-        
-        // Present days (any record that isn't explicitly marked absent)
-        const presentCount = attendance.filter(r => 
-            ['present', 'late', 'early_checkin', 'early_departure'].includes(r.status)
+
+        // Present days (any record where they checked in)
+        const presentCount = attendance.filter(r =>
+            ['present', 'late', 'early_checkin', 'early_departure', 'wfh', 'half-day'].includes(r.status)
         ).length;
 
-        // Leave days (total duration of approved leaves in this month)
-        // For simplicity, we count the number of leave entries that fell in this month
-        // In a real scenario, we would iterate dates, but here we use entries as a proxy
-        const leaveCount = approvedLeaves.length;
+        // Leave days (any record explicitly marked as leave)
+        const leaveCount = attendance.filter(r => 
+            ['leave', 'on_leave'].includes(r.status)
+        ).length;
 
         // Calculate working days in month (excluding Sundays)
         const daysInMonth = new Date(y, m, 0).getDate();
@@ -79,10 +95,30 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
         // Ensuring we don't go below zero
         const absentCount = Math.max(0, workingDaysCount - (presentCount + leaveCount));
 
+        let totalDailyOvertime = 0;
+        let totalDailyUndertime = 0;
+
+        attendance.forEach(record => {
+            const wh = getEffectiveWorkHours(record.checkInTime, record.checkOutTime);
+            if (wh !== null) {
+                // Only calculate over/undertime for present/late days
+                if (['present', 'late', 'early_checkin', 'early_departure', 'wfh'].includes(record.status)) {
+                    if (wh > 8) {
+                        totalDailyOvertime += (wh - 8);
+                    } else if (wh < 8) {
+                        totalDailyUndertime += (8 - wh);
+                    }
+                }
+            }
+        });
+
+        const finalOvertime = Math.max(0, totalDailyOvertime - totalDailyUndertime);
+
         setStats({
             present: presentCount,
             absent: absentCount,
-            leaves: leaveCount
+            leaves: leaveCount,
+            overtime: Math.round(finalOvertime * 10) / 10
         });
     };
 
@@ -125,7 +161,7 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                         />
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                         <div className="flex items-center px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-md shadow-sm">
                             <span className="text-xs font-semibold text-emerald-600 uppercase tracking-tighter mr-2">Present</span>
                             <span className="text-sm font-bold text-emerald-700">{stats.present}</span>
@@ -137,6 +173,10 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                         <div className="flex items-center px-3 py-1.5 bg-sky-50 border border-sky-100 rounded-md shadow-sm">
                             <span className="text-xs font-semibold text-sky-600 uppercase tracking-tighter mr-2">Leaves</span>
                             <span className="text-sm font-bold text-sky-700">{stats.leaves}</span>
+                        </div>
+                        <div className="flex items-center px-3 py-1.5 bg-purple-50 border border-purple-100 rounded-md shadow-sm">
+                            <span className="text-xs font-semibold text-purple-600 uppercase tracking-tighter mr-2">Overtime</span>
+                            <span className="text-sm font-bold text-purple-700">{stats.overtime ? `${stats.overtime}h` : '0h'}</span>
                         </div>
                     </div>
                 </div>
@@ -178,9 +218,9 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                                                 {formatTime12h(record.checkOutTime)}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-foreground text-center tabular-nums">
-                                                {record.workHours ? (
+                                                {record.checkInTime && record.checkOutTime ? (
                                                     <span className="bg-muted px-2 py-0.5 rounded text-xs font-medium">
-                                                        {record.workHours}h
+                                                        {getEffectiveWorkHours(record.checkInTime, record.checkOutTime)}h
                                                     </span>
                                                 ) : '--'}
                                             </td>

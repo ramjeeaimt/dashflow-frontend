@@ -58,7 +58,19 @@ const useAttendanceStore = create((set, get) => ({
                     department: emp.department?.name || 'N/A',
                     checkInTime: record?.checkInTime || '--',
                     checkOutTime: record?.checkOutTime || '--',
-                    workDuration: record?.workHours ? `${Math.floor(parseFloat(record.workHours))}h ${Math.round((parseFloat(record.workHours) % 1) * 60)}m` : '--',
+                    workDuration: (() => {
+                        if (!record?.checkInTime || !record?.checkOutTime || record.checkOutTime === '--') return '--';
+                        try {
+                            const inStr = String(record.checkInTime).includes('T') ? String(record.checkInTime) : `1970-01-01T${record.checkInTime}Z`;
+                            const outStr = String(record.checkOutTime).includes('T') ? String(record.checkOutTime) : `1970-01-01T${record.checkOutTime}Z`;
+                            let wh = (new Date(outStr).getTime() - new Date(inStr).getTime()) / (1000 * 60 * 60);
+                            if (wh > 6) wh -= 1;
+                            if (wh < 0) wh = 0;
+                            return `${Math.floor(wh)}h ${Math.round((wh % 1) * 60)}m`;
+                        } catch (e) {
+                            return '--';
+                        }
+                    })(),
                     breakDuration: '0m',
                     status: record?.status || ((emp.leaves && emp.leaves.length > 0) ? 'on_leave' : 'not_checked_in'),
                     location: record?.location || 'Office',

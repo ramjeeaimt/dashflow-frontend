@@ -74,13 +74,20 @@ const financeService = {
         return response.data;
     },
 
-    //create a payroll
     createPayroll: async (data) => {
         const response = await apiClient.post(
             `${API_ENDPOINTS.FINANCE.BASE}/payroll`,
             data
         );
         return response.data.data || response.data;
+    },
+
+    bulkGenerateRealPayroll: async (month, year, companyId, employeeId) => {
+        const payload = { month, year };
+        if (companyId) payload.companyId = companyId;
+        if (employeeId) payload.employeeId = employeeId;
+        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/bulk-generate`, payload);
+        return response.data;
     },
 
     getEmployeePayrolls: async (employeeId) => {
@@ -100,6 +107,12 @@ const financeService = {
 
     updatePayroll: async (id, data) => {
         const response = await apiClient.patch(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}`, data);
+        return response.data.data || response.data;
+    },
+
+    saveCustomHtml: async (id, customPayslipHtml, customEmailBodyHtml) => {
+        const payload = { customPayslipHtml, customEmailBodyHtml };
+        const response = await apiClient.put(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}/custom-html`, payload);
         return response.data.data || response.data;
     },
 
