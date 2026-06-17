@@ -42,10 +42,11 @@ export const useLeaveStore = create((set, get) => ({
         leaves: [newLeave, ...state.leaves], 
         isLoading: false 
       }));
-      return true;
+      return { success: true };
     } catch (err) {
-      set({ isLoading: false, error: err.response?.data?.message || 'Error creating leave' });
-      return false;
+      const errorMsg = err.response?.data?.message || 'Error creating leave';
+      set({ isLoading: false, error: errorMsg });
+      return { success: false, error: errorMsg };
     }
   },
 
@@ -75,9 +76,9 @@ updateLeaveStatus: async (id, status, adminComment = "") => {
 },
 
   // Helper for conflicts
-  getConflict: (leave) => {
-    const allLeaves = get().leaves;
-    return allLeaves.find(l => 
+  getConflict: (leave: any) => {
+    const allLeaves = (get() as any).leaves;
+    return allLeaves.find((l: any) => 
       l.employeeId === leave.employeeId && 
       l.status === 'APPROVED' && 
       l.id !== leave.id &&

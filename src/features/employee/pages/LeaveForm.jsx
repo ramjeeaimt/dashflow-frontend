@@ -29,13 +29,15 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await submitLeave({ ...formData, employeeId: activeId, status: 'PENDING' });
-    if (success) {
+    const result = await submitLeave({ ...formData, employeeId: activeId, status: 'PENDING' });
+    if (result.success) {
       setIsSuccess(true);
       setFormData({ startDate: '', endDate: '', type: 'casual', reason: '' });
       fetchEmployeeLeaves(activeId);
+      alert("Leave application submitted successfully!");
+    } else {
+      alert(`Failed to submit leave application: ${result.error || "Please try again."}`);
     }
-    alert(success ? "Leave application submitted successfully!" : "Failed to submit leave application. Please try again.");
   };
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

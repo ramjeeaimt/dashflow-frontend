@@ -101,20 +101,21 @@ const FinanceDashboardPage = () => {
             const summaryData = summaryRes?.data || summaryRes || {};
             const expensesData = Array.isArray(expensesRes?.data || expensesRes)
                 ? (expensesRes?.data || expensesRes) : [];
-            const payrollsData = Array.isArray(payrollsRes) ? payrollsRes : (payrollsRes?.data || []);
+            const payrollsData = (Array.isArray(payrollsRes) ? payrollsRes : (payrollsRes?.data || []))
+                .filter(p => p.status === 'paid' || p.status === 'sent');
 
-            const totalCredit = expensesData.reduce((acc, e) => acc + (e.type === 'credit' ? Number(e.amount || 0) : 0), 0);
-            const totalDebit = expensesData.reduce((acc, e) => acc + (e.type !== 'credit' ? Number(e.amount || 0) : 0), 0);
-            const totalPayroll = payrollsData.reduce((acc, p) => acc + Number(p.netSalary || p.amount || p.total || 0), 0);
-            const turnover = summaryData.turnover || totalCredit;
+            const totalCredit = expensesData.reduce((acc, e) => acc + (e.type === 'credit' && e.status === 'approved' ? Number(e.amount || 0) : 0), 0);
+            const totalDebit = expensesData.reduce((acc, e) => acc + (e.type !== 'credit' && e.status === 'approved' ? Number(e.amount || 0) : 0), 0);
+            const totalPayroll = payrollsData.reduce((acc, p) => acc + (p.financeStatus === 'approved' ? Number(p.netSalary || p.amount || p.total || 0) : 0), 0);
+            const turnover = totalCredit;
 
             setSummary({
                 ...summaryData,
                 turnover,
                 totalCredit,
                 totalDebit,
-                totalExpenses: summaryData.totalExpenses || totalDebit,
-                totalPayroll: summaryData.totalPayroll || totalPayroll,
+                totalExpenses: totalDebit,
+                totalPayroll: totalPayroll,
             });
 
             setExpenses(expensesData);
@@ -123,7 +124,7 @@ const FinanceDashboardPage = () => {
             // Category pie data
             const categoryMap = {};
             expensesData.forEach(exp => {
-                if (exp.type !== 'credit') {
+                if (exp.type !== 'credit' && exp.status === 'approved') {
                     const cat = exp.category || 'Misc';
                     categoryMap[cat] = (categoryMap[cat] || 0) + Number(exp.amount || 0);
                 }
@@ -156,7 +157,7 @@ const FinanceDashboardPage = () => {
             expensesData.forEach(exp => {
                 const d = safeParse(exp.date);
                 const key = `${d.getFullYear()}-${d.getMonth()}`;
-                if (trendMap[key]) {
+                if (trendMap[key] && exp.status === 'approved') {
                     if (exp.type === 'credit') trendMap[key].revenue += Number(exp.amount || 0);
                     else trendMap[key].expenses += Number(exp.amount || 0);
                 }
@@ -166,7 +167,7 @@ const FinanceDashboardPage = () => {
                 const pMonth = p.month ? p.month - 1 : safeParse(p.createdAt).getMonth();
                 const pYear = p.year || safeParse(p.createdAt).getFullYear();
                 const key = `${pYear}-${pMonth}`;
-                if (trendMap[key]) trendMap[key].payroll += Number(p.netSalary || p.amount || p.total || 0);
+                if (trendMap[key] && p.financeStatus === 'approved') trendMap[key].payroll += Number(p.netSalary || p.amount || p.total || 0);
             });
 
             setTrendData(Object.values(trendMap).sort((a, b) => a.year !== b.year ? a.year - b.year : a.monthNum - b.monthNum));
@@ -210,7 +211,7 @@ const FinanceDashboardPage = () => {
             date: p.month && p.year ? new Date(p.year, p.month - 1, 1) : safeParse(p.createdAt),
             dateStr: p.createdAt,
             amount: Number(p.netSalary || p.amount || p.total || 0),
-            status: p.status || 'approved',
+            status: p.financeStatus || 'pending',
             employee: p.employee,
             description: `Month: ${p.month || '?'}/${p.year || '?'} | Gross: ${formatCurrency(p.grossSalary || p.amount)} | Net: ${formatCurrency(p.netSalary || p.amount)}`,
             currency: 'INR',
@@ -431,7 +432,7 @@ const FinanceDashboardPage = () => {
                                 <h3 className="text-2xl font-bold text-slate-800 tracking-tight leading-none mb-1.5">
                                     {isLoading ? <span className="h-7 w-28 bg-slate-100 rounded animate-pulse block" /> : formatCurrency(summary?.totalPayroll)}
                                 </h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{payrolls.length} disbursements</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{payrolls.filter(p => p.financeStatus === 'approved').length} disbursements</p>
                             </div>
                             <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
                                 <Wallet size={22} />
@@ -589,8 +590,8 @@ const FinanceDashboardPage = () => {
                                     <table className="w-full text-left">
                                         <thead>
                                             <tr className="bg-slate-50/60 border-b border-slate-100">
-                                                {['Transaction', 'Category', 'Date', 'Type', 'Amount', 'Actions'].map(h => (
-                                                    <th key={h} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 ${h === 'Actions' ? 'text-center' : ''}`}>{h}</th>
+                                                {['Transaction', 'Category', 'Date', 'Type', 'Status', 'Amount', 'Actions'].map(h => (
+                                                    <th key={h} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 ${['Actions', 'Status', 'Type'].includes(h) ? 'text-center' : ''}`}>{h}</th>
                                                 ))}
                                             </tr>
                                         </thead>
@@ -598,7 +599,7 @@ const FinanceDashboardPage = () => {
                                             {isLoading ? (
                                                 Array.from({ length: 5 }).map((_, i) => (
                                                     <tr key={i}>
-                                                        {Array.from({ length: 5 }).map((_, j) => (
+                                                        {Array.from({ length: 7 }).map((_, j) => (
                                                             <td key={j} className="px-6 py-4"><div className="h-4 bg-slate-100 rounded animate-pulse w-24" /></td>
                                                         ))}
                                                     </tr>
@@ -903,10 +904,16 @@ const TransactionRow = ({ t, formatCurrency, onView, onEdit, onDelete }) => (
         <td className="px-6 py-4 text-[11px] font-semibold text-slate-600">
             {isValid(t.date) ? format(t.date, 'MMM dd, yyyy') : '—'}
         </td>
-        <td className="px-6 py-4">
-            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
+        <td className="px-6 py-4 text-center">
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
                 }`}>
                 {t.rawType === 'credit' ? 'Credit' : t._type === 'payroll' ? 'Payroll' : 'Debit'}
+            </span>
+        </td>
+        <td className="px-6 py-4 text-center">
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                }`}>
+                {t.status === 'approved' ? 'Done' : 'Pending'}
             </span>
         </td>
         <td className={`px-6 py-4 text-sm font-bold ${t.rawType === 'credit' ? 'text-emerald-600' : 'text-slate-800'}`}>

@@ -17,7 +17,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
         date: new Date().toISOString().split('T')[0],
         type: 'debit',
         currency: 'INR',
-        status: 'approved'
+        status: 'pending'
     });
 
     const categories = [
@@ -58,7 +58,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
                 date: new Date().toISOString().split('T')[0],
                 type: 'debit',
                 currency: 'INR',
-                status: 'approved'
+                status: 'pending'
             });
         }
     }, [expenseToEdit, isOpen]);

@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { 
-  Check, X, Clock, AlertCircle, ChevronDown, ChevronUp, 
-  Info, Search, Filter, Download, UserCheck, CalendarDays,
-  MoreVertical, MessageSquare, ShieldAlert, Trash2
+import {
+    Check, X, Clock, AlertCircle, ChevronDown, ChevronUp,
+    Info, Search, Filter, Download, UserCheck, CalendarDays,
+    MoreVertical, MessageSquare, ShieldAlert, Trash2
 } from "lucide-react";
-import financeService from "services/finance.service"; 
+import financeService from "services/finance.service";
 import Sidebar from "components/ui/Sidebar";
 import Header from "components/ui/Header";
 
@@ -14,7 +14,7 @@ const AdminLeaveManagement = () => {
     const [filterStatus, setFilterStatus] = useState("ALL");
     const [expandedRow, setExpandedRow] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    
+
     // New Modal State for Decisions
     const [decisionModal, setDecisionModal] = useState({ isOpen: false, type: null, leaveId: null, note: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,13 +46,13 @@ const AdminLeaveManagement = () => {
 
     const handleStatusUpdate = async (id, status, note) => {
         if (!id) return alert("Error: ID not found!");
-        
+
         setIsSubmitting(true);
         try {
             await financeService.updateLeaveStatus(id, status, note || "");
-            setLeaves(prev => prev.map(l => 
-                (l._id === id || l.id === id) 
-                    ? { ...l, status: status.toUpperCase(), adminComment: note || "" } 
+            setLeaves(prev => prev.map(l =>
+                (l._id === id || l.id === id)
+                    ? { ...l, status: status.toUpperCase(), adminComment: note || "" }
                     : l
             ));
             setExpandedRow(null);
@@ -83,8 +83,8 @@ const AdminLeaveManagement = () => {
             const firstName = l.employee?.user?.firstName || "";
             const lastName = l.employee?.user?.lastName || "";
             const fullName = `${firstName} ${lastName}`.toLowerCase();
-            const nameMatch = fullName.includes(searchTerm.toLowerCase()) || 
-                             (l.employee?.employeeCode || "").toLowerCase().includes(searchTerm.toLowerCase());
+            const nameMatch = fullName.includes(searchTerm.toLowerCase()) ||
+                (l.employee?.employeeCode || "").toLowerCase().includes(searchTerm.toLowerCase());
             return statusMatch && nameMatch;
         });
     }, [leaves, filterStatus, searchTerm]);
@@ -92,22 +92,22 @@ const AdminLeaveManagement = () => {
     const stats = useMemo(() => ({
         pending: leaves.filter(l => l.status === "PENDING").length,
         approved: leaves.filter(l => l.status === "APPROVED").length,
-        onLeaveToday: leaves.filter(l => l.status === "APPROVED").length, 
+        onLeaveToday: leaves.filter(l => l.status === "APPROVED").length,
     }), [leaves]);
 
     return (
         <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
             <Header onToggleSidebar={toggleMobileSidebar} />
-            <Sidebar 
-                isCollapsed={sidebarCollapsed} 
+            <Sidebar
+                isCollapsed={sidebarCollapsed}
                 onToggleCollapse={handleToggleSidebar}
                 isMobileOpen={isMobileSidebarOpen}
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
-            
+
             <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} pt-16 pb-8`}>
                 <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-8">
-                    
+
                     {/* Stats Header */}
                     <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 pb-4">
                         <div>
@@ -118,9 +118,9 @@ const AdminLeaveManagement = () => {
                             <p className="text-sm text-slate-500 font-medium mt-1">Manage employee leave requests and approvals.</p>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full xl:w-auto">
-                            <StatBox label="Pending Review" value={stats.pending} color="amber" icon={<Clock size={16}/>} />
-                            <StatBox label="Active Approved" value={stats.approved} color="emerald" icon={<UserCheck size={16}/>} />
-                            <StatBox label="Out Today" value={stats.onLeaveToday} color="rose" icon={<CalendarDays size={16}/>} />
+                            <StatBox label="Pending Review" value={stats.pending} color="amber" icon={<Clock size={16} />} />
+                            <StatBox label="Active Approved" value={stats.approved} color="emerald" icon={<UserCheck size={16} />} />
+                            <StatBox label="Out Today" value={stats.onLeaveToday} color="rose" icon={<CalendarDays size={16} />} />
                         </div>
                     </div>
 
@@ -131,11 +131,10 @@ const AdminLeaveManagement = () => {
                                 <button
                                     key={s}
                                     onClick={() => setFilterStatus(s)}
-                                    className={`px-6 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${
-                                        filterStatus === s 
-                                        ? "bg-white text-indigo-600 shadow-md border border-slate-100" 
-                                        : "text-slate-400 hover:text-slate-600"
-                                    }`}
+                                    className={`px-6 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${filterStatus === s
+                                            ? "bg-white text-indigo-600 shadow-md border border-slate-100"
+                                            : "text-slate-400 hover:text-slate-600"
+                                        }`}
                                 >
                                     {s}
                                 </button>
@@ -143,9 +142,9 @@ const AdminLeaveManagement = () => {
                         </div>
                         <div className="relative w-full md:w-80">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                            <input 
-                                type="text" 
-                                placeholder="Search employees..." 
+                            <input
+                                type="text"
+                                placeholder="Search employees..."
                                 className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:bg-white focus:border-indigo-500 outline-none transition-all"
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -170,9 +169,9 @@ const AdminLeaveManagement = () => {
                                         <SkeletonRows />
                                     ) : filteredLeaves.length > 0 ? (
                                         filteredLeaves.map((leave) => (
-                                            <LeaveRow 
-                                                key={leave._id || leave.id} 
-                                                leave={leave} 
+                                            <LeaveRow
+                                                key={leave._id || leave.id}
+                                                leave={leave}
                                                 onDelete={handleDeleteLeave}
                                                 isExpanded={expandedRow === (leave._id || leave.id)}
                                                 onToggle={() => setExpandedRow(expandedRow === (leave._id || leave.id) ? null : (leave._id || leave.id))}
@@ -210,7 +209,7 @@ const AdminLeaveManagement = () => {
                             </p>
                         </div>
                         <div className="p-6 space-y-4">
-                            <textarea 
+                            <textarea
                                 autoFocus
                                 placeholder={decisionModal.type === 'APPROVED' ? "Type approval note/conditions here..." : "Type rejection reason here..."}
                                 className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner resize-none"
@@ -219,19 +218,18 @@ const AdminLeaveManagement = () => {
                                 onChange={(e) => setDecisionModal(prev => ({ ...prev, note: e.target.value }))}
                             />
                             <div className="flex gap-3 pt-2">
-                                <button 
+                                <button
                                     onClick={() => setDecisionModal({ isOpen: false, type: null, leaveId: null, note: '' })}
                                     disabled={isSubmitting}
                                     className="flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 hover:text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Cancel
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => handleStatusUpdate(decisionModal.leaveId, decisionModal.type, decisionModal.note)}
                                     disabled={isSubmitting}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-white shadow-md transition-all disabled:opacity-70 disabled:cursor-wait ${
-                                        decisionModal.type === 'APPROVED' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20' : 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20'
-                                    }`}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-white shadow-md transition-all disabled:opacity-70 disabled:cursor-wait ${decisionModal.type === 'APPROVED' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20' : 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20'
+                                        }`}
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -292,56 +290,55 @@ const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }
                     </div>
                 </td>
                 <td className="px-8 py-5">
-                    <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                        leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                        leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
-                    }`}>
+                    <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                            leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
+                        }`}>
                         {leave.status}
                     </span>
                 </td>
                 <td className="px-8 py-5 text-right">
                     <div className="flex justify-end items-center gap-2">
-                        <button 
-                            onClick={onToggle} 
+                        <button
+                            onClick={onToggle}
                             className={`p-2.5 rounded-xl transition-all ${isExpanded ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-100 text-slate-400 hover:text-indigo-600'}`}
                             title="Notes"
                         >
-                            <MessageSquare size={16}/>
+                            <MessageSquare size={16} />
                         </button>
-                        
+
                         <div className="h-6 w-[1px] bg-slate-100 mx-1" />
 
                         {leave.status === 'PENDING' && (
                             <>
-                                <button 
+                                <button
                                     onClick={() => onOpenDecisionModal('APPROVED', lId)}
                                     className="p-2.5 rounded-xl transition-all text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
                                     title="Approve"
                                 >
-                                    <Check size={18}/>
+                                    <Check size={18} />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => onOpenDecisionModal('REJECTED', lId)}
                                     className="p-2.5 rounded-xl transition-all text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                                     title="Reject"
                                 >
-                                    <X size={18}/>
+                                    <X size={18} />
                                 </button>
                                 <div className="h-6 w-[1px] bg-slate-100 mx-1" />
                             </>
                         )}
 
-                        <button 
+                        <button
                             onClick={() => onDelete(lId)}
                             className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                             title="Delete"
                         >
-                            <Trash2 size={16}/>
+                            <Trash2 size={16} />
                         </button>
                     </div>
                 </td>
             </tr>
-            
+
             {isExpanded && (
                 <tr className="bg-indigo-50/10">
                     <td colSpan="5" className="px-12 py-8 border-l-4 border-indigo-500">
@@ -393,7 +390,7 @@ const StatBox = ({ label, value, color, icon }) => (
 );
 
 const SkeletonRows = () => (
-    [1,2,3,4,5].map(i => (
+    [1, 2, 3, 4, 5].map(i => (
         <tr key={i}>
             <td colSpan="5" className="px-8 py-6">
                 <div className="h-12 bg-slate-100 w-full rounded-xl animate-pulse" />

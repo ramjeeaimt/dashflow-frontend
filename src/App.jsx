@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast";
 function App() {
   const { fetchProfile, token, user, isLoading } = useAuthStore();
   const { listen, stopListening } = useNotificationStore();
-  
+
   // Initialize Push Notifications (handles permission & FCM token syncing automatically)
   usePushNotifications(user?.id);
 

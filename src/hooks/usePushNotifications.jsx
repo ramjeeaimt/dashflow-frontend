@@ -31,7 +31,7 @@ export const usePushNotifications = (userId) => {
 
                     // Send to backend
                     await notificationService.saveFcmToken(token, 'web', navigator.userAgent);
-                    
+
                     // Save locally so we can delete it on logout
                     localStorage.setItem('fcm_token', token);
                 } else {

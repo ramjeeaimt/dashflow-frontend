@@ -12,6 +12,7 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
         overtime: 0,
         netSalary: 0,
         status: 'pending',
+        financeStatus: 'pending',
         notes: '',
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear()
@@ -31,6 +32,7 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                 overtime: Number(raw.overtime || 0),
                 netSalary: Number(raw.netSalary || 0),
                 status: (raw.status || 'pending').toLowerCase(),
+                financeStatus: (raw.financeStatus || 'pending').toLowerCase(),
                 notes: raw.notes || '',
                 month: raw.month || new Date().getMonth() + 1,
                 year: raw.year || new Date().getFullYear()
@@ -44,6 +46,7 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                 overtime: 0,
                 netSalary: 0,
                 status: 'pending',
+                financeStatus: 'pending',
                 notes: '',
                 month: new Date().getMonth() + 1,
                 year: new Date().getFullYear()
@@ -244,17 +247,16 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase">Payment Status</label>
+                            <label className="text-[11px] font-bold text-slate-500 uppercase">Finance Status</label>
                             <div className="relative">
                                 <select
-                                    name="status"
-                                    value={formData.status}
+                                    name="financeStatus"
+                                    value={formData.financeStatus}
                                     onChange={handleChange}
                                     className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 appearance-none outline-none focus:border-blue-600"
                                 >
                                     <option value="pending">Pending</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="processing">Processing</option>
+                                    <option value="approved">Done</option>
                                 </select>
                             </div>
                         </div>
@@ -266,7 +268,8 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                     name="month"
                                     value={formData.month}
                                     onChange={handleChange}
-                                    className="flex-1 bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-600"
+                                    disabled
+                                    className="flex-1 bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 outline-none opacity-70 cursor-not-allowed"
                                 >
                                     {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => (
                                         <option key={m} value={i + 1}>{m}</option>
@@ -276,7 +279,8 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                     name="year"
                                     value={formData.year}
                                     onChange={handleChange}
-                                    className="w-20 sm:w-24 bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-600"
+                                    disabled
+                                    className="w-20 sm:w-24 bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 outline-none opacity-70 cursor-not-allowed"
                                 >
                                     {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
                                 </select>
