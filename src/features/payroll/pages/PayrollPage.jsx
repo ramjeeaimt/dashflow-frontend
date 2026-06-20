@@ -55,6 +55,7 @@ const PayrollPage = () => {
     // ========== NEW: Manual payroll modal state ==========
     const [isManualModalOpen, setIsManualModalOpen] = useState(false);
     const [isBulkConfirmModalOpen, setIsBulkConfirmModalOpen] = useState(false);
+    const [regenerateConfirmModal, setRegenerateConfirmModal] = useState({ isOpen: false, row: null });
     const [employeesList, setEmployeesList] = useState([]);
     const [manualFormData, setManualFormData] = useState({
         employeeId: '',
@@ -417,11 +418,15 @@ const PayrollPage = () => {
 
     const handleFinalizeAndSend = async (payrollId, payslipHtml, emailBodyHtml) => {
         try {
-            await api.post(`/finance/payroll/${payrollId}/send`, {
+            const response = await api.post(`/finance/payroll/${payrollId}/send`, {
                 payslipHtml,
                 emailBodyHtml
             });
-            toast.success('Payslip generated as PDF and sent to employee successfully.');
+            console.log("Payroll Send Response:", response.data);
+            if (response.data?.fallbackUsed) {
+                console.warn(`Fallback PDF used: ${response.data.fallbackReason}`);
+            }
+            toast.success('Payslip generated as PDF and sent to employee successfully.', { position: 'top-right' });
             fetchPayroll();
         } catch (error) {
             console.error('Failed to finalize payroll:', error);
@@ -812,20 +817,7 @@ const PayrollPage = () => {
                                                                     {row.status === 'draft' ? (
                                                                         <>
                                                                             <button
-                                                                                onClick={async () => {
-                                                                                    if (regeneratingIds[row.id]) return;
-                                                                                    try {
-                                                                                        setRegeneratingIds(prev => ({ ...prev, [row.id]: true }));
-                                                                                        await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id, row.employeeId);
-                                                                                        await fetchPayroll();
-                                                                                        toast.success('Payroll recalculated successfully!');
-                                                                                    } catch(err) {
-                                                                                        console.error(err);
-                                                                                        toast.error('Failed to regenerate payroll.');
-                                                                                    } finally {
-                                                                                        setRegeneratingIds(prev => ({ ...prev, [row.id]: false }));
-                                                                                    }
-                                                                                }}
+                                                                                onClick={() => setRegenerateConfirmModal({ isOpen: true, row })}
                                                                                 disabled={regeneratingIds[row.id]}
                                                                                 className="flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-lg hover:bg-slate-200 transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                                                                             >
@@ -1103,6 +1095,50 @@ const PayrollPage = () => {
                                         generatePayroll();
                                     }}
                                     disabled={isLoading}
+                                    className="bg-primary text-white"
+                                >
+                                    Confirm
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Regenerate Confirm Modal */}
+            {regenerateConfirmModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-card rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="p-6">
+                            <h3 className="text-xl font-bold text-foreground mb-2">Confirm Regeneration</h3>
+                            <p className="text-sm text-muted-foreground mb-6">
+                                Are you sure you want to regenerate this payroll record? This will recalculate deductions based on the latest attendance and leave data.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setRegenerateConfirmModal({ isOpen: false, row: null })}
+                                    disabled={regeneratingIds[regenerateConfirmModal.row?.id]}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={async () => {
+                                        const row = regenerateConfirmModal.row;
+                                        setRegenerateConfirmModal({ isOpen: false, row: null });
+                                        if (regeneratingIds[row.id]) return;
+                                        try {
+                                            setRegeneratingIds(prev => ({ ...prev, [row.id]: true }));
+                                            await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id, row.employeeId);
+                                            await fetchPayroll();
+                                            toast.success('Payroll recalculated successfully!');
+                                        } catch(err) {
+                                            console.error(err);
+                                            toast.error('Failed to regenerate payroll.');
+                                        } finally {
+                                            setRegeneratingIds(prev => ({ ...prev, [row.id]: false }));
+                                        }
+                                    }}
                                     className="bg-primary text-white"
                                 >
                                     Confirm
