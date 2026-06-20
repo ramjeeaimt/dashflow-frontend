@@ -164,11 +164,19 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
             // To capture live input changes into the HTML, we must sync input values to their attributes.
             const payslipInputs = payslipRef.current.querySelectorAll('input, textarea');
             payslipInputs.forEach(input => {
-                input.setAttribute('value', input.value);
+                if (input.tagName.toLowerCase() === 'textarea') {
+                    input.textContent = input.value;
+                } else {
+                    input.setAttribute('value', input.value);
+                }
             });
             const emailInputs = emailBodyRef.current.querySelectorAll('input, textarea');
             emailInputs.forEach(input => {
-                input.setAttribute('value', input.value);
+                if (input.tagName.toLowerCase() === 'textarea') {
+                    input.textContent = input.value;
+                } else {
+                    input.setAttribute('value', input.value);
+                }
             });
 
             const finalPayslipHtml = payslipRef.current.innerHTML;
@@ -189,11 +197,19 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
         try {
             const payslipInputs = payslipRef.current.querySelectorAll('input, textarea');
             payslipInputs.forEach(input => {
-                input.setAttribute('value', input.value);
+                if (input.tagName.toLowerCase() === 'textarea') {
+                    input.textContent = input.value;
+                } else {
+                    input.setAttribute('value', input.value);
+                }
             });
             const emailInputs = emailBodyRef.current.querySelectorAll('input, textarea');
             emailInputs.forEach(input => {
-                input.setAttribute('value', input.value);
+                if (input.tagName.toLowerCase() === 'textarea') {
+                    input.textContent = input.value;
+                } else {
+                    input.setAttribute('value', input.value);
+                }
             });
 
             const finalPayslipHtml = payslipRef.current.innerHTML;
