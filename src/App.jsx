@@ -28,6 +28,34 @@ function App() {
     };
   }, [user?.id, listen, stopListening]);
 
+  // Global event listener to restrict number inputs
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'number') {
+        // Prevent typing 'e', 'E', '+', '-'
+        if (['e', 'E', '+', '-'].includes(e.key)) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    const handleWheel = (e) => {
+      if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'number') {
+        // Prevent scrolling to change numbers
+        e.target.blur();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    // Use capture phase to ensure we catch it before it changes the value
+    document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('wheel', handleWheel, { capture: true });
+    };
+  }, []);
+
   // Show loading screen while fetching profile on initial load
   if (token && !user && isLoading) {
     return (
