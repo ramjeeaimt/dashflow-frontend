@@ -55,7 +55,7 @@ const ProjectEdit = () => {
 
             const assignedEmployeeIds = data.assignedEmployees
                 ? data.assignedEmployees.map(emp => emp.id)
-                : (data.assignedEmployeeIds || []);
+                : (data.assignedEmployeeIds || data.assignedPeople || []);
 
             setProject({ ...data, assignedPeople, assignedEmployeeIds });
             setSelectedEmployees(assignedEmployeeIds);

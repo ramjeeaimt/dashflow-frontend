@@ -147,9 +147,8 @@ const EmployeeModal = ({
           apiClient.get(API_ENDPOINTS.EMPLOYEES.LAST_CODE, { params: { companyId: currentUser?.company?.id } })
         ]);
 
-        if (lastCodeRes?.data?.lastCode) {
-          setLastEmployeeCode(lastCodeRes.data.lastCode);
-        }
+        // We will calculate last employee code from employeesData instead of relying on the lastCode endpoint
+        // in case the endpoint returns null or fails.
 
         const rolesData = roleRes.data?.data || roleRes.data || [];
         setRoles(rolesData);
@@ -181,6 +180,43 @@ const EmployeeModal = ({
         setDepartments(deptsData.map(d => ({ value: d.id, label: d.name })));
 
         const employeesData = employeeRes.data?.data || employeeRes.data || [];
+        
+        // Calculate last employee code and auto-generate next
+        if (employeesData.length > 0) {
+          // Find the highest employee code that matches the DIFxxxx format
+          const codes = employeesData
+            .map(emp => emp.employeeCode)
+            .filter(code => code && typeof code === 'string');
+            
+          if (codes.length > 0) {
+            // Sort to find the latest
+            const lastCode = codes.sort((a, b) => {
+               // Extract numbers if they follow a format like DIF00010
+               const numA = parseInt(a.replace(/[^0-9]/g, '')) || 0;
+               const numB = parseInt(b.replace(/[^0-9]/g, '')) || 0;
+               return numB - numA; // Descending
+            })[0];
+            
+            setLastEmployeeCode(lastCode);
+            
+            // Auto-fill the next code if in add mode and currently empty
+            if (mode === 'add' && !formData.employeeCode) {
+               const prefixMatch = lastCode.match(/^([A-Za-z]+)/);
+               const prefix = prefixMatch ? prefixMatch[1] : 'DIF';
+               const numberPart = parseInt(lastCode.replace(/[^0-9]/g, '')) || 0;
+               const nextNumber = numberPart + 1;
+               // Pad with zeros, assuming 4 digits or matching the previous length
+               const numLength = lastCode.replace(/[^0-9]/g, '').length || 4;
+               const nextCode = `${prefix}${String(nextNumber).padStart(numLength, '0')}`;
+               
+               setFormData(prev => ({
+                 ...prev,
+                 employeeCode: nextCode
+               }));
+            }
+          }
+        }
+
         // Filter for managers only (role designation)
         const managersList = employeesData
           .filter(emp =>
@@ -353,13 +389,23 @@ const EmployeeModal = ({
       // Auto-switch to the first tab that has an error so the user sees it immediately
       if (newErrors.employeeCode || newErrors.firstName || newErrors.lastName || newErrors.email) {
         setActiveTab('basic');
-      } else if (newErrors.department || newErrors.roleIds || newErrors.hireDate) {
+      } else if (newErrors.departmentId || newErrors.roleIds || newErrors.hireDate) {
         setActiveTab('employment');
       }
       return false;
     }
 
     return true;
+  };
+
+  const hasTabError = (tabId) => {
+    if (tabId === 'basic') {
+      return !!(errors.employeeCode || errors.firstName || errors.lastName || errors.email);
+    }
+    if (tabId === 'employment') {
+      return !!(errors.departmentId || errors.roleIds || errors.hireDate);
+    }
+    return false;
   };
 
   const handleSave = async () => {
@@ -416,19 +462,23 @@ const EmployeeModal = ({
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Information Sections</p>
             </div>
             <nav className="flex md:flex-col p-2 md:p-3 space-y-0 md:space-y-1 space-x-2 md:space-x-0 overflow-x-auto md:overflow-x-visible no-scrollbar">
-              {tabs?.map((tab) => (
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`flex-shrink-0 md:flex-shrink-1 flex items-center space-x-3 px-4 py-2.5 md:py-3 text-left text-xs md:text-sm font-semibold rounded-xl transition-all ${activeTab === tab?.id
-                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100 md:border-transparent'
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                >
-                  <Icon name={tab?.icon} size={18} />
-                  <span>{tab?.label}</span>
-                </button>
-              ))}
+              {tabs?.map((tab) => {
+                const hasError = hasTabError(tab.id);
+                return (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`flex-shrink-0 md:flex-shrink-1 flex items-center space-x-3 px-4 py-2.5 md:py-3 text-left text-xs md:text-sm font-semibold rounded-xl transition-all ${activeTab === tab?.id
+                      ? hasError ? 'bg-rose-50 text-rose-700 shadow-sm border border-rose-100 md:border-transparent' : 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100 md:border-transparent'
+                      : hasError ? 'text-rose-600 hover:bg-rose-50' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                  >
+                    <Icon name={tab?.icon} size={18} />
+                    <span>{tab?.label}</span>
+                    {hasError && <div className="w-1.5 h-1.5 rounded-full bg-rose-500 ml-auto" />}
+                  </button>
+                );
+              })}
             </nav>
           </div>
 
@@ -496,6 +546,11 @@ const EmployeeModal = ({
                       />
                       {errors?.employeeCode ? (
                         <p className="text-xs text-rose-500 font-medium ml-1">{errors.employeeCode}</p>
+                      ) : permissionsLoading ? (
+                        <div className="flex items-center space-x-2 ml-1 mt-1.5">
+                          <div className="w-3 h-3 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                          <p className="text-[11px] text-slate-500 font-medium tracking-tight">Fetching last ID...</p>
+                        </div>
                       ) : (
                         mode === 'add' && lastEmployeeCode && (
                           <p className="text-xs text-blue-600 font-medium ml-1 mt-1">Last assigned ID: {lastEmployeeCode}</p>

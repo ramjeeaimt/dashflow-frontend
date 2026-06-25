@@ -23,6 +23,7 @@ const AddProject = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
   const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
+  const [clientMode, setClientMode] = useState("existing");
 
   const [dynamicFields, setDynamicFields] = useState({
     1: [], 2: [], 3: [], 4: []
@@ -125,7 +126,9 @@ const AddProject = () => {
           ? selectedEmployeeIds
           : (formData.assignedPeople ? formData.assignedPeople.split(",") : []),
         assignedEmployeeIds: selectedEmployeeIds,
-        description: formData.notes
+        description: formData.notes,
+        githubLink: formData.links?.github,
+        deploymentLink: formData.links?.deployment
       };
       await createProject(payload);
       navigate("/projects");
@@ -339,53 +342,90 @@ const AddProject = () => {
             {step === 2 && (
               <div className="space-y-6 animate-in fade-in">
                 <SectionHeader title="Client Details" icon={<User size={16} className="text-indigo-600" />} />
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="flex flex-col gap-1.5 relative">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <User size={12} /> Client Name
-                    </label>
-                    <input
-                      name="clientName"
-                      value={formData.clientName}
-                      autoComplete="off"
-                      onChange={(e) => { handleChange(e); setShowSuggestions(true); }}
-                      onFocus={() => setShowSuggestions(true)}
-                      onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
-                      placeholder="Start typing..."
+                
+                <div className="flex items-center gap-6 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="clientMode" 
+                      value="existing" 
+                      checked={clientMode === 'existing'} 
+                      onChange={() => setClientMode('existing')} 
+                      className="accent-indigo-600 w-4 h-4"
                     />
-                    {showSuggestions && formData.clientName && (
-                      <div className="absolute top-full left-0 w-full bg-white border border-slate-200 mt-1 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto">
-                        {clientSuggestions.filter(c => c.name.toLowerCase().includes(formData.clientName.toLowerCase())).map((client, i) => (
-                          <div
-                            key={i}
-                            onClick={() => {
-                              setFormData({
-                                ...formData,
-                                clientName: client.name,
-                                clientEmail: client.email,
-                                contactInfo: client.contact,
-                                clientDetails: { ...formData.clientDetails, companyName: client.company }
-                              });
-                              setShowSuggestions(false);
-                            }}
-                            className="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b last:border-none flex flex-col transition-colors"
-                          >
-                            <span className="font-bold text-sm text-slate-800">{client.name}</span>
-                            <span className="text-xs text-slate-400">{client.email}</span>
-                          </div>
+                    Select Existing Client
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="clientMode" 
+                      value="new" 
+                      checked={clientMode === 'new'} 
+                      onChange={() => {
+                        setClientMode('new');
+                        setFormData({
+                          ...formData,
+                          clientName: "",
+                          clientEmail: "",
+                          contactInfo: "",
+                          clientDetails: { ...formData.clientDetails, companyName: "", clientWebsite: "" }
+                        });
+                      }} 
+                      className="accent-indigo-600 w-4 h-4"
+                    />
+                    Add New Client
+                  </label>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                  {clientMode === 'existing' ? (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <User size={14} /> Client Name
+                      </label>
+                      <select
+                        value={formData.clientName}
+                        onChange={(e) => {
+                          const selected = clientSuggestions.find(c => c.name === e.target.value);
+                          if (selected) {
+                            setFormData({
+                              ...formData,
+                              clientName: selected.name,
+                              clientEmail: selected.email,
+                              contactInfo: selected.contact,
+                              clientDetails: { ...formData.clientDetails, companyName: selected.company }
+                            });
+                          } else {
+                            setFormData({
+                              ...formData,
+                              clientName: "",
+                              clientEmail: "",
+                              contactInfo: "",
+                              clientDetails: { ...formData.clientDetails, companyName: "" }
+                            });
+                          }
+                        }}
+                        className="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all cursor-pointer"
+                      >
+                        <option value="">-- Select a Client --</option>
+                        {clientSuggestions.map((client, i) => (
+                          <option key={i} value={client.name}>
+                            {client.name} {client.email ? `(${client.email})` : ''}
+                          </option>
                         ))}
-                      </div>
-                    )}
-                  </div>
-                  <InputField label="Client Email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} type="email" placeholder="client@company.com" icon={<Mail size={14} />} />
-                  <InputField label="Contact Info" name="contactInfo" value={formData.contactInfo} onChange={handleChange} placeholder="+91 XXXXXXXXXX" icon={<Phone size={14} />} />
+                      </select>
+                    </div>
+                  ) : (
+                    <InputField label="Client Name" name="clientName" value={formData.clientName} onChange={handleChange} placeholder="Enter client name" icon={<User size={14} />} />
+                  )}
+                  <InputField label="Client Email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} type="email" placeholder="client@company.com" icon={<Mail size={14} />} disabled={clientMode === 'existing'} />
+                  <InputField label="Contact Info" name="contactInfo" value={formData.contactInfo} onChange={handleChange} placeholder="+91 XXXXXXXXXX" icon={<Phone size={14} />} disabled={clientMode === 'existing'} />
                 </div>
 
                 <SectionHeader title="Company Info" icon={<Building2 size={16} className="text-indigo-600" />} />
                 <div className="grid md:grid-cols-2 gap-6">
-                  <InputField label="Company Name" value={formData.clientDetails.companyName} onChange={(e) => handleNestedChange("clientDetails", "companyName", e.target.value)} placeholder="Client's company name" icon={<Building2 size={14} />} />
-                  <InputField label="Website" value={formData.clientDetails.clientWebsite} onChange={(e) => handleNestedChange("clientDetails", "clientWebsite", e.target.value)} placeholder="https://..." icon={<Globe size={14} />} />
+                  <InputField label="Company Name" value={formData.clientDetails.companyName} onChange={(e) => handleNestedChange("clientDetails", "companyName", e.target.value)} placeholder="Client's company name" icon={<Building2 size={14} />} disabled={clientMode === 'existing'} />
+                  <InputField label="Website" value={formData.clientDetails.clientWebsite} onChange={(e) => handleNestedChange("clientDetails", "clientWebsite", e.target.value)} placeholder="https://..." icon={<Globe size={14} />} disabled={clientMode === 'existing'} />
                 </div>
                 <DynamicInputsArea step={2} fields={dynamicFields[2]} onAdd={() => addDynamicInput(2)} onChange={handleDynamicInputChange} onRemove={removeDynamicInput} />
               </div>

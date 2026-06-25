@@ -43,7 +43,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
             // Mapping project data
             const assignedIds = pData.assignedEmployees 
                 ? pData.assignedEmployees.map(e => e.id)
-                : (pData.assignedEmployeeIds || []);
+                : (pData.assignedEmployeeIds || pData.assignedPeople || []);
 
             setProject({
                 ...pData,
