@@ -13,11 +13,7 @@ const EmployeeFilters = ({
   resultCount 
 }) => {
 
-   React.useEffect(() => {
-    if (!filters.status) {
-      onFilterChange('status', 'active');
-    }
-  }, []); 
+
 
   const departmentOptions = [
     { value: '', label: 'All Departments' },
@@ -51,6 +47,7 @@ const EmployeeFilters = ({
   ];
 
   const statusOptions = [
+    { value: '', label: 'All Statuses' },
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
     { value: 'pending', label: 'Pending' },

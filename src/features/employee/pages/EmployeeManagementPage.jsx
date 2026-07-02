@@ -12,6 +12,7 @@ import {
 import { useAttendanceStore } from 'features/attendance';
 import useAuthStore from '../../../store/useAuthStore';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
+import toast from 'react-hot-toast';
 
 const EmployeeManagement = () => {
   const navigate = useNavigate();
@@ -53,9 +54,9 @@ const EmployeeManagement = () => {
 
   useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
-      fetchEmployees(user.company.id, filters);
+      fetchEmployees(user.company.id);
     }
-  }, [filters, user, isAuthenticated, fetchEmployees]);
+  }, [user, isAuthenticated, fetchEmployees]);
 
   const filteredAndSortedEmployees = useMemo(() => {
     let filtered = employees.filter((employee) => {
@@ -63,7 +64,14 @@ const EmployeeManagement = () => {
         employee?.name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         employee?.email?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         employee?.id?.toString()?.includes(searchTerm);
-      return matchesSearch;
+      
+      const matchesDepartment = !filters.department || employee?.departmentId === filters.department || employee?.department?.toLowerCase() === filters.department.toLowerCase();
+      const matchesBranch = !filters.branch || employee?.branch?.toLowerCase() === filters.branch.toLowerCase();
+      const matchesType = !filters.employmentType || employee?.employmentType?.toLowerCase() === filters.employmentType.toLowerCase();
+      const normalizeStatus = (s) => s?.toLowerCase()?.replace(/[-_]/g, '') || '';
+      const matchesStatus = !filters.status || normalizeStatus(employee?.status) === normalizeStatus(filters.status);
+
+      return matchesSearch && matchesDepartment && matchesBranch && matchesType && matchesStatus;
     });
 
     filtered.sort((a, b) => {
@@ -78,7 +86,7 @@ const EmployeeManagement = () => {
       return 0;
     });
     return filtered;
-  }, [employees, searchTerm, sortConfig]);
+  }, [employees, searchTerm, sortConfig, filters]);
 
   const handleSort = (key) => {
     setSortConfig((prev) => ({
@@ -194,13 +202,17 @@ const EmployeeManagement = () => {
         documents: employeeData.documents || [],
         startTime: employeeData.startTime || '',
         endTime: employeeData.endTime || '',
-        checkInTime: employeeData.checkInTime || ''
+        checkInTime: employeeData.checkInTime || '',
+        employeeType: employeeData.employeeType || 'office',
+        workFromHome: employeeData.workFromHome || false
       };
 
       if (modalState.mode === 'add') {
         await createEmployee(payload, user.company.id);
+        toast.success('Employee created successfully!');
       } else if (modalState.mode === 'edit') {
         await updateEmployee(modalState.employee.id, payload, user.company.id);
+        toast.success('Employee updated successfully!');
       }
       handleCloseModal();
     } catch (err) {
@@ -208,6 +220,7 @@ const EmployeeManagement = () => {
         err?.response?.data?.message ||
         err?.message ||
         'Failed to save employee. Please try again.';
+      toast.error(message);
       throw new Error(message);
     }
   };
@@ -292,7 +305,7 @@ const EmployeeManagement = () => {
 
           <div className="mt-4 overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-md">
             <EmployeeActions
-              employees={filteredAndSortedEmployees}
+              employees={employees}
               selectedEmployees={selectedEmployees}
               onAddEmployee={handleAddEmployee}
               onBulkAction={handleBulkAction}

@@ -32,7 +32,9 @@ const transformEmployee = (emp) => ({
     permissionIds: emp.user?.permissions?.map(p => typeof p === 'string' ? p : (p?.id || p)) || [],
     startTime: emp.startTime,
     endTime: emp.endTime,
-    checkInTime: emp.checkInTime
+    checkInTime: emp.checkInTime,
+    employeeType: emp.employeeType,
+    workFromHome: emp.workFromHome
 });
 
 const useEmployeeStore = create((set, get) => ({

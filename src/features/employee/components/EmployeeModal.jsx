@@ -98,6 +98,8 @@ const EmployeeModal = ({
         startTime: employee?.startTime || '',
         endTime: employee?.endTime || '',
         customDesignation: '',
+        employeeType: employee?.employeeType || 'office',
+        workFromHome: employee?.workFromHome || false,
         documents: employee?.documents || [] // Load existing docs
       });
     } else if (mode === 'add') {
@@ -414,7 +416,21 @@ const EmployeeModal = ({
     setIsSaving(true);
     setIsLoading(true);
     try {
-      const finalDesignationId = formData.designationId === 'other' ? formData.customDesignation : formData.designationId;
+      let finalDesignationId = formData.designationId === 'other' ? formData.customDesignation : formData.designationId;
+
+      const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+      
+      if (finalDesignationId && !isUUID(finalDesignationId)) {
+        try {
+          const res = await apiClient.post(API_ENDPOINTS.DESIGNATIONS.BASE, {
+            name: finalDesignationId,
+            companyId: currentUser?.company?.id
+          });
+          finalDesignationId = res.data?.data?.id || res.data?.id || finalDesignationId;
+        } catch (err) {
+          console.error("Failed to create custom designation:", err);
+        }
+      }
 
       const employeeData = {
         ...formData,
@@ -679,7 +695,7 @@ const EmployeeModal = ({
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 ml-1">Work Setting</label>
                       <div className="flex space-x-4 pt-1">
-                        {['office', 'field', 'remote'].map((type) => (
+                        {['office', 'hybrid', 'remote'].map((type) => (
                           <label key={type} className="flex items-center space-x-2 cursor-pointer group">
                             <input
                               type="radio"
@@ -690,7 +706,7 @@ const EmployeeModal = ({
                               disabled={isReadOnly}
                               className="w-4 h-4 border-slate-300 text-blue-600 focus:ring-blue-100 transition-all"
                             />
-                            <span className="text-xs font-semibold capitalize text-slate-600 group-hover:text-slate-900">{type}</span>
+                            <span className="text-xs font-semibold capitalize text-slate-600 group-hover:text-slate-900">{type === 'hybrid' ? 'Field / Hybrid' : type}</span>
                           </label>
                         ))}
                       </div>
@@ -700,11 +716,21 @@ const EmployeeModal = ({
                       <label className="text-xs font-semibold text-slate-500 ml-1">Work From Home</label>
                       <div className="flex items-center space-x-3 pt-1">
                         <button
+                          type="button"
                           disabled={isReadOnly}
-                          onClick={() => handleInputChange('workFromHome', !formData.workFromHome)}
+                          onClick={() => {
+                            const newWfhValue = !formData.workFromHome;
+                            handleInputChange('workFromHome', newWfhValue);
+                            // Auto-sync the employeeType based on the user's request
+                            if (newWfhValue) {
+                              handleInputChange('employeeType', 'hybrid');
+                            } else {
+                              handleInputChange('employeeType', 'office');
+                            }
+                          }}
                           className={`relative inline-flex h-5 w-10 items-center rounded-full transition-all duration-300 ${formData.workFromHome ? 'bg-blue-600' : 'bg-slate-200'}`}
                         >
-                          <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${formData.workFromHome ? 'translate-x-5.5' : 'translate-x-1'}`} />
+                          <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${formData.workFromHome ? 'translate-x-[22px]' : 'translate-x-1'}`} />
                         </button>
                         <span className="text-xs font-semibold text-slate-600">{formData.workFromHome ? 'Enabled' : 'Disabled'}</span>
                       </div>

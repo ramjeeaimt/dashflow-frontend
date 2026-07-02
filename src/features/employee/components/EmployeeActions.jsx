@@ -43,10 +43,10 @@ const EmployeeActions = ({
   // Calculate counts dynamically
   const employeeCounts = useMemo(() => {
     const total = employees.length;
-    const active = employees.filter(e => e.status === 'active').length;
-    const inactive = employees.filter(e => e.status === 'inactive').length;
-    const pending = employees.filter(e => e.status === 'pending').length;
-    const terminated = employees.filter(e => e.status === 'terminated').length;
+    const active = employees.filter(e => e.status?.toLowerCase() === 'active').length;
+    const inactive = employees.filter(e => e.status?.toLowerCase() === 'in-active' || e.status?.toLowerCase() === 'inactive').length;
+    const pending = employees.filter(e => e.status?.toLowerCase() === 'pending').length;
+    const terminated = employees.filter(e => e.status?.toLowerCase() === 'terminated').length;
 
     return { total, active, inactive, pending, terminated };
   }, [employees]);

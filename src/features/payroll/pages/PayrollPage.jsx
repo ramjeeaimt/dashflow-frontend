@@ -188,7 +188,7 @@ const PayrollPage = () => {
         setIsEmployeesLoading(true);
         try {
             const employees = await employeeService.getAll({ companyId: user.company.id });
-            setEmployeesList(employees.filter(e => e.status === 'active'));
+            setEmployeesList(employees.filter(e => e.status?.toLowerCase() === 'active'));
         } catch (error) {
             console.error('Failed to fetch employees:', error);
         } finally {
