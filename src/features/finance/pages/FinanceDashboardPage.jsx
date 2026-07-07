@@ -341,12 +341,12 @@ const FinanceDashboardPage = () => {
     const AreaTooltip = ({ active, payload, label }) => {
         if (!active || !payload?.length) return null;
         return (
-            <div className="bg-white border border-slate-100 shadow-xl rounded-xl p-4 text-sm">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{label}</p>
+            <div className="bg-card border border-border shadow-sm rounded-xl p-4 text-sm">
+                <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-2">{label}</p>
                 {payload.map((entry, i) => (
                     <div key={i} className="flex items-center justify-between gap-8 mt-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: entry.color }}>{entry.name}</span>
-                        <span className="font-bold text-slate-900">{formatCurrency(entry.value)}</span>
+                        <span className="font-bold text-foreground">{formatCurrency(entry.value)}</span>
                     </div>
                 ))}
             </div>
@@ -354,7 +354,7 @@ const FinanceDashboardPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
+        <div className="min-h-screen bg-background">
             <Header onToggleSidebar={toggleMobileSidebar} />
             <Sidebar
                 isCollapsed={sidebarCollapsed}
@@ -370,20 +370,20 @@ const FinanceDashboardPage = () => {
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Finance</h1>
-                            <p className="text-slate-500 text-sm mt-1">Monitoring and managing your company's financial activities</p>
+                            <h1 className="text-3xl font-bold text-foreground tracking-tight">Finance</h1>
+                            <p className="text-muted-foreground text-sm mt-1">Monitoring and managing your company's financial activities</p>
                         </div>
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={fetchFinanceData}
-                                className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 bg-white text-slate-600 font-semibold rounded-xl text-sm hover:bg-slate-50 transition-all"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 border border-border bg-card text-muted-foreground font-semibold rounded-xl text-sm hover:bg-muted/60 transition-all"
                             >
                                 <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
                                 Refresh
                             </button>
                             <button
                                 onClick={() => { setEditingExpense(null); setIsExpenseModalOpen(true); }}
-                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-sm shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95"
+                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold rounded-xl text-sm shadow-sm hover:bg-primary/90 transition-all "
                             >
                                 <Plus size={18} strokeWidth={3} />
                                 New Entry
@@ -394,53 +394,53 @@ const FinanceDashboardPage = () => {
                     {/* Summary Cards */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                         {/* Turnover / Income */}
-                        <div className="bg-white p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+                        <div className="bg-card p-5 border border-border shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
                             <div>
-                                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">Total Income</p>
-                                <h3 className="text-2xl font-bold text-slate-800 tracking-tight leading-none mb-1.5">
-                                    {isLoading ? <span className="h-7 w-28 bg-slate-100 rounded animate-pulse block" /> : formatCurrency(summary?.turnover)}
+                                <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Total Income</p>
+                                <h3 className="text-2xl font-bold text-foreground tracking-tight leading-none mb-1.5">
+                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(summary?.turnover)}
                                 </h3>
                                 <div className="flex items-center text-[10px] font-bold text-emerald-600 uppercase tracking-tight">
                                     <ArrowUpRight size={12} className="mr-1" /> Credits Received
                                 </div>
                             </div>
-                            <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                            <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center text-primary transition-transform">
                                 <TrendingUp size={22} />
                             </div>
                         </div>
 
                         {/* Expenses */}
-                        <div className="bg-white p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+                        <div className="bg-card p-5 border border-border shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
                             <div>
                                 <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wider mb-1">Total Expenses</p>
-                                <h3 className="text-2xl font-bold text-slate-800 tracking-tight leading-none mb-1.5">
-                                    {isLoading ? <span className="h-7 w-28 bg-slate-100 rounded animate-pulse block" /> : formatCurrency(summary?.totalExpenses)}
+                                <h3 className="text-2xl font-bold text-foreground tracking-tight leading-none mb-1.5">
+                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(summary?.totalExpenses)}
                                 </h3>
                                 <div className="flex items-center text-[10px] font-bold text-rose-500 uppercase tracking-tight">
                                     <TrendingDown size={12} className="mr-1" /> Operational Spend
                                 </div>
                             </div>
-                            <div className="w-11 h-11 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 group-hover:scale-110 transition-transform">
+                            <div className="w-11 h-11 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 transition-transform">
                                 <Receipt size={22} />
                             </div>
                         </div>
 
                         {/* Payroll */}
-                        <div className="bg-white p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+                        <div className="bg-card p-5 border border-border shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
                             <div>
                                 <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Total Payroll</p>
-                                <h3 className="text-2xl font-bold text-slate-800 tracking-tight leading-none mb-1.5">
-                                    {isLoading ? <span className="h-7 w-28 bg-slate-100 rounded animate-pulse block" /> : formatCurrency(summary?.totalPayroll)}
+                                <h3 className="text-2xl font-bold text-foreground tracking-tight leading-none mb-1.5">
+                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(summary?.totalPayroll)}
                                 </h3>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{payrolls.filter(p => p.financeStatus === 'approved').length} disbursements</p>
+                                <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-tight">{payrolls.filter(p => p.financeStatus === 'approved').length} disbursements</p>
                             </div>
-                            <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                            <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 transition-transform">
                                 <Wallet size={22} />
                             </div>
                         </div>
 
                         {/* Net Profit */}
-                        <div className={`p-5 shadow-lg flex items-center justify-between group ${netProfit >= 0 ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-rose-600 shadow-rose-600/20'}`}>
+                        <div className={`p-5 shadow-sm flex items-center justify-between group ${netProfit >= 0 ? 'bg-emerald-600 ' : 'bg-rose-600 '}`}>
                             <div>
                                 <p className="text-[10px] font-bold text-white/70 uppercase tracking-wider mb-1">Net Profit</p>
                                 <h3 className="text-2xl font-bold text-white tracking-tight leading-none mb-1.5">
@@ -451,26 +451,26 @@ const FinanceDashboardPage = () => {
                                     {netProfit >= 0 ? 'Healthy' : 'Deficit'}
                                 </div>
                             </div>
-                            <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                            <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center text-white transition-transform">
                                 <DollarSign size={22} />
                             </div>
                         </div>
                     </div>
 
                     {/* Tab Navigation */}
-                    <div className="flex items-center gap-1 bg-white border border-slate-100 rounded-xl p-1 w-fit shadow-sm">
+                    <div className="flex items-center gap-1 bg-card border border-border rounded-xl p-1 w-fit shadow-sm">
                         <button
                             onClick={() => setActiveTab('overview')}
-                            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'overview' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <BarChart2 size={16} /> Overview
                         </button>
                         <button
                             onClick={() => setActiveTab('history')}
-                            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'history' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'history' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             <Activity size={16} /> Full Activity Log
-                            <span className="ml-1 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            <span className="ml-1 bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">
                                 {allTransactions.length}
                             </span>
                         </button>
@@ -482,14 +482,14 @@ const FinanceDashboardPage = () => {
                             {/* Charts */}
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {/* Revenue vs Expenses Area Chart */}
-                                <div className="lg:col-span-2 bg-white p-6 border border-slate-100 shadow-sm">
+                                <div className="lg:col-span-2 bg-card p-6 border border-border shadow-sm">
                                     <div className="flex justify-between items-start mb-6">
                                         <div>
-                                            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Monthly Cash Flow</h3>
-                                            <p className="text-slate-500 text-xs mt-0.5">Income vs Expenses vs Payroll — Last 6 months</p>
+                                            <h3 className="text-lg font-bold text-foreground tracking-tight">Monthly Cash Flow</h3>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Income vs Expenses vs Payroll — Last 6 months</p>
                                         </div>
                                         <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider flex-wrap justify-end">
-                                            <div className="flex items-center gap-1.5 text-blue-600"><div className="w-3 h-1 bg-blue-600 rounded" /> Income</div>
+                                            <div className="flex items-center gap-1.5 text-primary"><div className="w-3 h-1 bg-primary rounded" /> Income</div>
                                             <div className="flex items-center gap-1.5 text-rose-500"><div className="w-3 h-1 bg-rose-400 rounded" /> Expenses</div>
                                             <div className="flex items-center gap-1.5 text-amber-500"><div className="w-3 h-1 bg-amber-400 rounded" /> Payroll</div>
                                         </div>
@@ -524,10 +524,10 @@ const FinanceDashboardPage = () => {
                                 </div>
 
                                 {/* Category Breakdown */}
-                                <div className="bg-white p-6 border border-slate-100 shadow-sm flex flex-col">
+                                <div className="bg-card p-6 border border-border shadow-sm flex flex-col">
                                     <div className="mb-4">
-                                        <h3 className="text-lg font-bold text-slate-900">Expense Breakdown</h3>
-                                        <p className="text-slate-500 text-xs mt-0.5">Spending by category</p>
+                                        <h3 className="text-lg font-bold text-foreground">Expense Breakdown</h3>
+                                        <p className="text-muted-foreground text-xs mt-0.5">Spending by category</p>
                                     </div>
                                     {categoryData.length > 0 ? (
                                         <>
@@ -544,9 +544,9 @@ const FinanceDashboardPage = () => {
                                                                 if (!active || !payload?.length) return null;
                                                                 const d = payload[0].payload;
                                                                 return (
-                                                                    <div className="bg-white p-3 shadow-xl border border-slate-100 rounded-xl text-xs">
-                                                                        <p className="font-bold text-slate-400 uppercase tracking-wider mb-1">{d.name}</p>
-                                                                        <p className="font-bold text-slate-900 text-base">{formatCurrency(d.value)}</p>
+                                                                    <div className="bg-card p-3 shadow-sm border border-border rounded-xl text-xs">
+                                                                        <p className="font-bold text-muted-foreground/70 uppercase tracking-wider mb-1">{d.name}</p>
+                                                                        <p className="font-bold text-foreground text-base">{formatCurrency(d.value)}</p>
                                                                     </div>
                                                                 );
                                                             }}
@@ -559,29 +559,29 @@ const FinanceDashboardPage = () => {
                                                     <div key={i} className="flex items-center justify-between text-xs">
                                                         <div className="flex items-center gap-2">
                                                             <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-                                                            <span className="font-semibold text-slate-700 truncate max-w-[100px]">{item.name}</span>
+                                                            <span className="font-semibold text-foreground truncate max-w-[100px]">{item.name}</span>
                                                         </div>
-                                                        <span className="font-bold text-slate-900">{formatCurrency(item.value)}</span>
+                                                        <span className="font-bold text-foreground">{formatCurrency(item.value)}</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">No expense data</div>
+                                        <div className="flex-1 flex items-center justify-center text-muted-foreground/70 text-sm">No expense data</div>
                                     )}
                                 </div>
                             </div>
 
                             {/* Recent Transactions Preview (last 5) */}
-                            <div className="bg-white border border-slate-100 shadow-sm overflow-hidden">
+                            <div className="bg-card border border-border shadow-sm overflow-hidden">
                                 <div className="p-6 border-b border-slate-50 flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-lg font-bold text-slate-900">Recent Transactions</h3>
-                                        <p className="text-slate-500 text-xs mt-0.5">Latest 5 financial activities</p>
+                                        <h3 className="text-lg font-bold text-foreground">Recent Transactions</h3>
+                                        <p className="text-muted-foreground text-xs mt-0.5">Latest 5 financial activities</p>
                                     </div>
                                     <button
                                         onClick={() => setActiveTab('history')}
-                                        className="text-blue-600 text-sm font-bold hover:underline"
+                                        className="text-primary text-sm font-bold hover:underline"
                                     >
                                         View All →
                                     </button>
@@ -589,9 +589,9 @@ const FinanceDashboardPage = () => {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-slate-50/60 border-b border-slate-100">
+                                            <tr className="bg-muted/60 border-b border-border">
                                                 {['Transaction', 'Category', 'Date', 'Type', 'Status', 'Amount', 'Actions'].map(h => (
-                                                    <th key={h} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 ${['Actions', 'Status', 'Type'].includes(h) ? 'text-center' : ''}`}>{h}</th>
+                                                    <th key={h} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 ${['Actions', 'Status', 'Type'].includes(h) ? 'text-center' : ''}`}>{h}</th>
                                                 ))}
                                             </tr>
                                         </thead>
@@ -600,7 +600,7 @@ const FinanceDashboardPage = () => {
                                                 Array.from({ length: 5 }).map((_, i) => (
                                                     <tr key={i}>
                                                         {Array.from({ length: 7 }).map((_, j) => (
-                                                            <td key={j} className="px-6 py-4"><div className="h-4 bg-slate-100 rounded animate-pulse w-24" /></td>
+                                                            <td key={j} className="px-6 py-4"><div className="h-4 bg-muted rounded animate-pulse w-24" /></td>
                                                         ))}
                                                     </tr>
                                                 ))
@@ -623,20 +623,20 @@ const FinanceDashboardPage = () => {
 
                     {/* HISTORY / FULL ACTIVITY TAB */}
                     {activeTab === 'history' && (
-                        <div className="bg-white border border-slate-100 shadow-sm overflow-hidden">
+                        <div className="bg-card border border-border shadow-sm overflow-hidden">
                             {/* Filter Bar */}
-                            <div className="p-6 border-b border-slate-100">
+                            <div className="p-6 border-b border-border">
                                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                                     <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-3">
                                         {/* Search */}
                                         <div className="relative col-span-2 lg:col-span-1">
-                                            <Icon name="Search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <Icon name="Search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
                                             <input
                                                 type="text"
                                                 placeholder="Search transactions..."
                                                 value={searchTerm}
                                                 onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                                className="w-full bg-muted/60 border border-border rounded-lg pl-9 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-ring focus:border-blue-400 outline-none transition-all"
                                             />
                                         </div>
 
@@ -644,7 +644,7 @@ const FinanceDashboardPage = () => {
                                         <select
                                             value={filterType}
                                             onChange={e => { setFilterType(e.target.value); setCurrentPage(1); }}
-                                            className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                            className="bg-muted/60 border border-border rounded-lg px-3 py-2.5 text-sm font-medium text-foreground focus:ring-2 focus:ring-ring outline-none"
                                         >
                                             <option value="All">All Types</option>
                                             <option value="credit">Credit (Income)</option>
@@ -656,7 +656,7 @@ const FinanceDashboardPage = () => {
                                         <select
                                             value={filterCategory}
                                             onChange={e => { setFilterCategory(e.target.value); setCurrentPage(1); }}
-                                            className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                            className="bg-muted/60 border border-border rounded-lg px-3 py-2.5 text-sm font-medium text-foreground focus:ring-2 focus:ring-ring outline-none"
                                         >
                                             {knownCategories.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
@@ -667,14 +667,14 @@ const FinanceDashboardPage = () => {
                                                 type="date"
                                                 value={startDate}
                                                 onChange={e => { setStartDate(e.target.value); setCurrentPage(1); }}
-                                                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                                className="flex-1 bg-muted/60 border border-border rounded-lg px-3 py-2.5 text-xs font-medium text-foreground focus:ring-2 focus:ring-ring outline-none"
                                             />
-                                            <span className="text-slate-400 text-xs font-bold">to</span>
+                                            <span className="text-muted-foreground/70 text-xs font-bold">to</span>
                                             <input
                                                 type="date"
                                                 value={endDate}
                                                 onChange={e => { setEndDate(e.target.value); setCurrentPage(1); }}
-                                                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                                className="flex-1 bg-muted/60 border border-border rounded-lg px-3 py-2.5 text-xs font-medium text-foreground focus:ring-2 focus:ring-ring outline-none"
                                             />
                                         </div>
                                     </div>
@@ -689,7 +689,7 @@ const FinanceDashboardPage = () => {
                                                 <X size={14} /> Clear
                                             </button>
                                         )}
-                                        <button className="p-2.5 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-100 transition-all" title="Export CSV">
+                                        <button className="p-2.5 bg-muted/60 border border-border text-muted-foreground rounded-lg hover:bg-muted transition-all" title="Export CSV">
                                             <Download size={18} />
                                         </button>
                                     </div>
@@ -697,11 +697,11 @@ const FinanceDashboardPage = () => {
 
                                 {/* Filter summary */}
                                 <div className="flex items-center justify-between mt-4">
-                                    <p className="text-xs text-slate-500 font-medium">
-                                        Showing <span className="font-bold text-slate-800">{filteredTransactions.length}</span> of <span className="font-bold text-slate-800">{allTransactions.length}</span> transactions
-                                        {hasActiveFilters && <span className="ml-1 text-blue-600">(filtered)</span>}
+                                    <p className="text-xs text-muted-foreground font-medium">
+                                        Showing <span className="font-bold text-foreground">{filteredTransactions.length}</span> of <span className="font-bold text-foreground">{allTransactions.length}</span> transactions
+                                        {hasActiveFilters && <span className="ml-1 text-primary">(filtered)</span>}
                                     </p>
-                                    <div className="flex items-center gap-4 text-xs font-semibold text-slate-500">
+                                    <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground">
                                         <span className="text-emerald-600">↑ Credit: {formatCurrency(filteredTransactions.filter(t => t.rawType === 'credit').reduce((s, t) => s + t.amount, 0))}</span>
                                         <span className="text-rose-600">↓ Debit: {formatCurrency(filteredTransactions.filter(t => t.rawType === 'debit').reduce((s, t) => s + t.amount, 0))}</span>
                                     </div>
@@ -712,15 +712,15 @@ const FinanceDashboardPage = () => {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
                                     <thead>
-                                        <tr className="bg-slate-50/60 border-b border-slate-100">
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 w-8">#</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Transaction</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Date</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Type</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Status</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">Amount</th>
-                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Actions</th>
+                                        <tr className="bg-muted/60 border-b border-border">
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 w-8">#</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Transaction</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Category</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Date</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 text-center">Type</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 text-center">Status</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 text-right">Amount</th>
+                                            <th className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50">
@@ -728,18 +728,18 @@ const FinanceDashboardPage = () => {
                                             Array.from({ length: 8 }).map((_, i) => (
                                                 <tr key={i}>
                                                     {Array.from({ length: 8 }).map((_, j) => (
-                                                        <td key={j} className="px-6 py-4"><div className="h-4 bg-slate-100 rounded animate-pulse" style={{ width: `${60 + Math.random() * 40}px` }} /></td>
+                                                        <td key={j} className="px-6 py-4"><div className="h-4 bg-muted rounded animate-pulse" style={{ width: `${60 + Math.random() * 40}px` }} /></td>
                                                     ))}
                                                 </tr>
                                             ))
                                         ) : pagedTransactions.length === 0 ? (
                                             <tr>
                                                 <td colSpan="8" className="px-6 py-16 text-center">
-                                                    <div className="flex flex-col items-center gap-3 text-slate-400">
+                                                    <div className="flex flex-col items-center gap-3 text-muted-foreground/70">
                                                         <Activity size={36} strokeWidth={1} />
                                                         <p className="text-sm font-semibold">No transactions found</p>
                                                         {hasActiveFilters && (
-                                                            <button onClick={resetFilters} className="text-blue-600 text-xs font-bold hover:underline">Clear filters</button>
+                                                            <button onClick={resetFilters} className="text-primary text-xs font-bold hover:underline">Clear filters</button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -748,47 +748,47 @@ const FinanceDashboardPage = () => {
                                             pagedTransactions.map((t, idx) => {
                                                 const rowNum = (currentPage - 1) * PAGE_SIZE + idx + 1;
                                                 return (
-                                                    <tr key={t.id || idx} className="hover:bg-slate-50/60 transition-colors">
-                                                        <td className="px-6 py-4 text-[11px] font-bold text-slate-300">{rowNum}</td>
+                                                    <tr key={t.id || idx} className="hover:bg-muted/60 transition-colors">
+                                                        <td className="px-6 py-4 text-[11px] font-bold text-muted-foreground/70">{rowNum}</td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center gap-3">
                                                                 <div className={`p-2 rounded-lg flex-shrink-0 ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-600' : t._type === 'payroll' ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'}`}>
                                                                     {t.rawType === 'credit' ? <ArrowDownRight size={16} /> : t._type === 'payroll' ? <Wallet size={16} /> : <CreditCard size={16} />}
                                                                 </div>
                                                                 <div className="min-w-0">
-                                                                    <p className="text-sm font-semibold text-slate-900 truncate max-w-[200px]">{t.title}</p>
-                                                                    <p className="text-[10px] text-slate-400 font-medium">{t.employee?.user?.firstName ? `${t.employee.user.firstName} ${t.employee.user.lastName || ''}` : 'System'}</p>
+                                                                    <p className="text-sm font-semibold text-foreground truncate max-w-[200px]">{t.title}</p>
+                                                                    <p className="text-[10px] text-muted-foreground/70 font-medium">{t.employee?.user?.firstName ? `${t.employee.user.firstName} ${t.employee.user.lastName || ''}` : 'System'}</p>
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <span className="text-[10px] font-bold bg-slate-100 px-2.5 py-1 rounded-full text-slate-600 uppercase tracking-tight whitespace-nowrap">
+                                                            <span className="text-[10px] font-bold bg-muted px-2.5 py-1 rounded-full text-muted-foreground uppercase tracking-tight whitespace-nowrap">
                                                                 {t.category}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 text-[11px] font-semibold text-slate-600 whitespace-nowrap">
+                                                        <td className="px-6 py-4 text-[11px] font-semibold text-muted-foreground whitespace-nowrap">
                                                             {isValid(t.date) ? format(t.date, 'MMM dd, yyyy') : '—'}
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
-                                                                }`}>
+ }`}>
                                                                 {t.rawType === 'credit' ? 'Credit' : t._type === 'payroll' ? 'Payroll' : 'Debit'}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                                                                }`}>
+ }`}>
                                                                 {t.status === 'approved' ? 'Done' : 'Pending'}
                                                             </span>
                                                         </td>
-                                                        <td className={`px-6 py-4 text-sm font-bold text-right whitespace-nowrap ${t.rawType === 'credit' ? 'text-emerald-600' : 'text-slate-800'}`}>
+                                                        <td className={`px-6 py-4 text-sm font-bold text-right whitespace-nowrap ${t.rawType === 'credit' ? 'text-emerald-600' : 'text-foreground'}`}>
                                                             {t.rawType === 'credit' ? '+' : '-'}{formatCurrency(t.amount)}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center justify-center gap-1">
                                                                 <button
                                                                     onClick={() => handleViewExpense(t)}
-                                                                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                    className="p-1.5 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                                                                     title="View details"
                                                                 >
                                                                     <Icon name="Eye" size={15} />
@@ -797,14 +797,14 @@ const FinanceDashboardPage = () => {
                                                                     <>
                                                                         <button
                                                                             onClick={() => t._type === 'payroll' ? handleEditPayroll(t) : handleEditExpense(t)}
-                                                                            className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                                                                            className="p-1.5 text-muted-foreground/70 hover:text-foreground hover:bg-muted rounded-lg transition-all"
                                                                             title={t._type === 'payroll' ? "Edit payroll" : "Edit expense"}
                                                                         >
                                                                             <Edit2 size={15} />
                                                                         </button>
                                                                         <button
                                                                             onClick={() => t._type === 'payroll' ? handleDeletePayroll(t) : handleDeleteExpense(t)}
-                                                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                                                                            className="p-1.5 text-muted-foreground/70 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
                                                                             title={t._type === 'payroll' ? "Delete payroll" : "Delete expense"}
                                                                         >
                                                                             <Trash2 size={15} />
@@ -823,15 +823,15 @@ const FinanceDashboardPage = () => {
 
                             {/* Pagination */}
                             {!isLoading && filteredTransactions.length > PAGE_SIZE && (
-                                <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-                                    <p className="text-xs text-slate-500 font-medium">
-                                        Page <span className="font-bold text-slate-700">{currentPage}</span> of <span className="font-bold text-slate-700">{totalPages}</span>
+                                <div className="px-6 py-4 border-t border-border flex items-center justify-between">
+                                    <p className="text-xs text-muted-foreground font-medium">
+                                        Page <span className="font-bold text-foreground">{currentPage}</span> of <span className="font-bold text-foreground">{totalPages}</span>
                                     </p>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                             disabled={currentPage === 1}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-muted-foreground border border-border rounded-lg hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                         >
                                             <ChevronLeft size={16} /> Prev
                                         </button>
@@ -842,7 +842,7 @@ const FinanceDashboardPage = () => {
                                                 <button
                                                     key={page}
                                                     onClick={() => setCurrentPage(page)}
-                                                    className={`w-8 h-8 text-sm font-bold rounded-lg transition-all ${currentPage === page ? 'bg-blue-600 text-white' : 'text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                                                    className={`w-8 h-8 text-sm font-bold rounded-lg transition-all ${currentPage === page ? 'bg-primary text-white' : 'text-muted-foreground border border-border hover:bg-muted/60'}`}
                                                 >
                                                     {page}
                                                 </button>
@@ -851,7 +851,7 @@ const FinanceDashboardPage = () => {
                                         <button
                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                             disabled={currentPage === totalPages}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-muted-foreground border border-border rounded-lg hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                         >
                                             Next <ChevronRight size={16} />
                                         </button>
@@ -886,50 +886,50 @@ const FinanceDashboardPage = () => {
 
 // Reusable compact transaction row for the Overview "Recent" table
 const TransactionRow = ({ t, formatCurrency, onView, onEdit, onDelete }) => (
-    <tr className="hover:bg-slate-50/60 transition-colors">
+    <tr className="hover:bg-muted/60 transition-colors">
         <td className="px-6 py-4">
             <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-600' : t._type === 'payroll' ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'}`}>
                     {t.rawType === 'credit' ? <ArrowDownRight size={15} /> : t._type === 'payroll' ? <Wallet size={15} /> : <CreditCard size={15} />}
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-slate-900 truncate max-w-[180px]">{t.title}</p>
-                    <p className="text-[10px] text-slate-400">{t.employee?.user?.firstName || 'System'}</p>
+                    <p className="text-sm font-semibold text-foreground truncate max-w-[180px]">{t.title}</p>
+                    <p className="text-[10px] text-muted-foreground/70">{t.employee?.user?.firstName || 'System'}</p>
                 </div>
             </div>
         </td>
         <td className="px-6 py-4">
-            <span className="text-[10px] font-bold bg-slate-100 px-2.5 py-1 rounded-full text-slate-600 uppercase">{t.category}</span>
+            <span className="text-[10px] font-bold bg-muted px-2.5 py-1 rounded-full text-muted-foreground uppercase">{t.category}</span>
         </td>
-        <td className="px-6 py-4 text-[11px] font-semibold text-slate-600">
+        <td className="px-6 py-4 text-[11px] font-semibold text-muted-foreground">
             {isValid(t.date) ? format(t.date, 'MMM dd, yyyy') : '—'}
         </td>
         <td className="px-6 py-4 text-center">
             <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.rawType === 'credit' ? 'bg-emerald-50 text-emerald-700' : t._type === 'payroll' ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'
-                }`}>
+ }`}>
                 {t.rawType === 'credit' ? 'Credit' : t._type === 'payroll' ? 'Payroll' : 'Debit'}
             </span>
         </td>
         <td className="px-6 py-4 text-center">
             <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight ${t.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                }`}>
+ }`}>
                 {t.status === 'approved' ? 'Done' : 'Pending'}
             </span>
         </td>
-        <td className={`px-6 py-4 text-sm font-bold ${t.rawType === 'credit' ? 'text-emerald-600' : 'text-slate-800'}`}>
+        <td className={`px-6 py-4 text-sm font-bold ${t.rawType === 'credit' ? 'text-emerald-600' : 'text-foreground'}`}>
             {t.rawType === 'credit' ? '+' : '-'}{formatCurrency(t.amount)}
         </td>
         <td className="px-6 py-4">
             <div className="flex items-center justify-center gap-1">
-                <button onClick={onView} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View">
+                <button onClick={onView} className="p-1.5 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" title="View">
                     <Icon name="Eye" size={14} />
                 </button>
                 {(t._type === 'expense' || t._type === 'payroll') && (
                     <>
-                        <button onClick={onEdit} className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all" title="Edit">
+                        <button onClick={onEdit} className="p-1.5 text-muted-foreground/70 hover:text-foreground hover:bg-muted rounded-lg transition-all" title="Edit">
                             <Edit2 size={14} />
                         </button>
-                        <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
+                        <button onClick={onDelete} className="p-1.5 text-muted-foreground/70 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
                             <Trash2 size={14} />
                         </button>
                     </>

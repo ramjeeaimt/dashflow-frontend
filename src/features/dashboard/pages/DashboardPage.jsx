@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
@@ -17,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 
 //  IMPORT EMPLOYEE MODAL & STORE
 import { EmployeeModal, useEmployeeStore } from 'features/employee';
+import { isAdminUser, isSystemAdmin } from '../../../config/roles';
 
 const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -31,14 +33,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   // Role context flags for UI text/visuals
-  const isManagement = can('read', 'employee') || user?.email === 'pritam@difmo.com';
-  const isFinance = can('read', 'expense') || user?.email === 'pritam@difmo.com';
-  const isTechnical = can('read', 'project') || user?.email === 'pritam@difmo.com';
+  const isManagement = can('read', 'employee') || isSystemAdmin(user);
+  const isFinance = can('read', 'expense') || isSystemAdmin(user);
+  const isTechnical = can('read', 'project') || isSystemAdmin(user);
 
   useEffect(() => {
     if (user?.company?.id) {
       // If user is Admin/Management, show company-wide metrics by passing null for userId
-      const isAdminView = can('manage', 'access-control') || user.roles?.some(r => r.name?.toUpperCase() === 'ADMIN') || user.email === 'admin@difmo.com';
+      const isAdminView = can('manage', 'access-control') || isAdminUser(user);
       const fetchUserId = isAdminView ? null : user.id;
 
       fetchDashboardData(user.company.id, isManagement || isFinance, fetchUserId);
@@ -59,33 +61,33 @@ const Dashboard = () => {
   // Management/Admin Metrics
   const adminMetricsData = [
     {
-      title: 'TOTAL EMPLOYEE',
+      title: 'Total employees',
       value: (metrics?.totalEmployees ?? 0).toString(),
-      description: 'Active Personnel',
+      description: 'Active headcount',
       icon: 'Users',
       color: 'primary',
       navigateTo: '/employee-management'
     },
     {
-      title: 'PRESENT TODAY',
+      title: 'Present today',
       value: (metrics?.presentToday ?? 0).toString(),
-      description: 'Currently On-Site',
+      description: 'Checked in',
       icon: 'UserCheck',
       color: 'success',
       navigateTo: '/attendance-management'
     },
     {
-      title: 'PRODUCTIVITY',
+      title: 'Productivity',
       value: `${metrics?.avgProductivity ?? 0}%`,
-      description: 'Target Achievement',
+      description: 'Task completion rate',
       icon: 'TrendingUp',
       color: 'purple',
       navigateTo: '/time-tracking'
     },
     {
-      title: 'ANALYTICS',
+      title: 'Active projects',
       value: (metrics?.activeProjects ?? 0).toString(),
-      description: 'System Activity',
+      description: 'In delivery',
       icon: 'Activity',
       color: 'warning',
       navigateTo: '/monitoring-dashboard'
@@ -179,7 +181,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-background">
       <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
@@ -189,12 +191,48 @@ const Dashboard = () => {
       />
 
       <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
-        } pt-16 pb-8`}>
-        <div className="p-4 sm:p-8 max-w-[1600px] mx-auto space-y-8">
+ } pt-16 pb-12`}>
+        <motion.div
+          className="px-4 sm:px-8 py-8 max-w-[1440px] mx-auto space-y-10"
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.07 } },
+          }}
+        >
 
-          {/* Management Metrics Row */}
+          {/* ── Greeting hero ─────────────────────────────────────────── */}
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+          >
+            <div>
+              <p className="text-xs text-muted-foreground mb-1.5">
+                {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              </p>
+              <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
+                {currentTime.getHours() < 12 ? 'Good morning' : currentTime.getHours() < 17 ? 'Good afternoon' : 'Good evening'}
+                {user?.firstName ? `, ${user.firstName}` : ''}
+              </h1>
+            </div>
+            {can('create', 'employee') && (
+              <button
+                onClick={() => setIsEmployeeModalOpen(true)}
+                className="inline-flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors self-start sm:self-auto"
+              >
+                <Icon name="UserPlus" size={15} />
+                Add employee
+              </button>
+            )}
+          </motion.div>
+
+          {/* ── Stat row ──────────────────────────────────────────────── */}
           {isManagement && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
+            >
               {adminMetricsData?.map((metric, index) => (
                 <MetricsCard
                   key={index}
@@ -206,119 +244,118 @@ const Dashboard = () => {
                   onClick={() => metric.navigateTo && navigate(metric.navigateTo)}
                 />
               ))}
-            </div>
+            </motion.div>
           )}
 
-
-          {/* Page Header Section */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-8">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-                {isManagement ? 'Enterprise Hub' : 'My Workspace'}
-              </h2>
-              <p className="text-slate-500 text-sm mt-1">
-                Welcome back, {user?.firstName}. Your unified control center is ready.
-              </p>
-            </div>
-          </div>
-
-          {/* Charts Row - Conditional display for CTO/Management */}
-          {(isManagement || isTechnical) && (
-            <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-              <div className="xl:col-span-3 bg-white p-6 rounded-none border border-slate-100 shadow-sm">
+          {/* ── Bento: main chart + quick-actions rail ────────────────── */}
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-4"
+          >
+            {(isManagement || isTechnical) && (
+              <div className="lg:col-span-2 bg-card p-6 rounded-lg border border-border card-shadow">
                 <AttendanceChart data={charts?.attendance} loading={loading} />
               </div>
-              <div className="xl:col-span-2 bg-white p-6 border border-slate-100 shadow-sm">
-                <ProductivityChart data={charts?.productivity} loading={loading} />
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Finance Section for CFO/CEO */}
-          {isFinance && financials && (
-            <div className="bg-white border border-slate-100 shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-500">
-              <FinancialSummaryCard data={financials} loading={loading} />
-            </div>
-          )}
-
-          {/* Quick Actions - Filtered by permission */}
-          {filteredQuickActions.length > 0 && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3">
-                  <div className="w-2 h-8 bg-blue-600"></div>
-                  Command Terminal
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredQuickActions?.map((action, index) => (
-                  <QuickActionCard
-                    key={index}
-                    title={action?.title}
-                    description={action?.description}
-                    icon={action?.icon}
-                    color={action?.color}
-                    badge={action?.badge}
-                    onClick={action?.onClick}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Activity Feed (For Management/Admin) */}
-          {isManagement && feed?.recentActivity && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3">
-                  <div className="w-2 h-8 bg-blue-600"></div>
-                  Recent Activity Feed
-                </h2>
-                <span className="text-xs text-slate-500 font-medium">Real-time Updates</span>
-              </div>
-
-              <div className="bg-white border border-slate-100 shadow-sm rounded-none p-6">
-                <div className="divide-y divide-slate-100">
-                  {feed.recentActivity.length > 0 ? (
-                    feed.recentActivity.map((log) => {
-                      let iconName = 'Info';
-                      let iconBg = 'bg-blue-50 text-blue-600';
-                      
-                      if (log.type === 'task') {
-                        iconName = 'CheckSquare';
-                        iconBg = 'bg-emerald-50 text-emerald-600';
-                      } else if (log.type === 'leave') {
-                        iconName = 'Calendar';
-                        iconBg = 'bg-amber-50 text-amber-600';
-                      }
-
-                      return (
-                        <div key={log.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4 group hover:bg-slate-50/30 px-2 transition-all">
-                          <div className="flex items-center gap-4">
-                            <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center shrink-0`}>
-                              <Icon name={iconName} size={18} />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-slate-800">{log.message}</p>
-                              <span className="text-xs text-slate-400 font-medium capitalize mt-0.5 block">{log.type} Activity</span>
-                            </div>
-                          </div>
-                          <span className="text-xs text-slate-400 font-bold shrink-0">{log.time}</span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-                      <Icon name="Inbox" size={32} className="text-slate-300 animate-pulse" />
-                      <p className="font-bold text-xs uppercase tracking-wider">No recent activities found</p>
-                    </div>
-                  )}
+            {filteredQuickActions.length > 0 && (
+              <div className={(isManagement || isTechnical) ? '' : 'lg:col-span-3'}>
+                <div className="bg-card rounded-lg border border-border card-shadow p-5 h-full">
+                  <h2 className="font-display text-sm font-semibold tracking-tight text-foreground mb-4">
+                    Quick actions
+                  </h2>
+                  <div className={`grid gap-2 ${(isManagement || isTechnical) ? 'grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
+                    {filteredQuickActions?.map((action, index) => (
+                      <button
+                        key={index}
+                        onClick={action?.onClick}
+                        className="w-full flex items-center gap-3 p-3 rounded-md border border-transparent hover:border-border hover:bg-muted/60 text-left transition-colors group"
+                      >
+                        <span className="w-8 h-8 rounded-md bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+                          <Icon name={action?.icon} size={16} />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-medium text-foreground truncate">{action?.title}</span>
+                          <span className="block text-xs text-muted-foreground truncate">{action?.description}</span>
+                        </span>
+                        <Icon
+                          name="ArrowRight"
+                          size={14}
+                          className="ml-auto text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+          </motion.div>
+
+          {/* ── Productivity + Finance row ────────────────────────────── */}
+          {((isManagement || isTechnical) || (isFinance && financials)) && (
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-4"
+            >
+              {(isManagement || isTechnical) && (
+                <div className="bg-card p-6 rounded-lg border border-border card-shadow">
+                  <ProductivityChart data={charts?.productivity} loading={loading} />
+                </div>
+              )}
+              {isFinance && financials && (
+                <div className={`bg-card rounded-lg border border-border card-shadow overflow-hidden ${(isManagement || isTechnical) ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
+                  <FinancialSummaryCard data={financials} loading={loading} />
+                </div>
+              )}
+            </motion.div>
           )}
-        </div>
+
+          {/* ── Activity timeline ─────────────────────────────────────── */}
+          {isManagement && feed?.recentActivity && (
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+              className="space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">Recent activity</h2>
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  Live
+                </span>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg card-shadow p-6">
+                {feed.recentActivity.length > 0 ? (
+                  <ol className="relative border-l border-border ml-3 space-y-6">
+                    {feed.recentActivity.map((log) => {
+                      let iconName = 'Info';
+                      if (log.type === 'task') iconName = 'CheckSquare';
+                      else if (log.type === 'leave') iconName = 'Calendar';
+
+                      return (
+                        <li key={log.id} className="relative pl-8">
+                          <span className="absolute -left-[13px] top-0 w-[26px] h-[26px] rounded-full bg-muted border border-border text-muted-foreground flex items-center justify-center">
+                            <Icon name={iconName} size={13} />
+                          </span>
+                          <div className="flex items-start justify-between gap-4">
+                            <p className="text-sm text-foreground leading-snug">{log.message}</p>
+                            <span className="text-xs text-muted-foreground shrink-0 font-data">{log.time}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground/80 capitalize">{log.type}</span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                ) : (
+                  <div className="py-12 text-center text-muted-foreground flex flex-col items-center gap-2">
+                    <Icon name="Inbox" size={28} />
+                    <p className="text-sm">Nothing yet — activity will appear here.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
       </main>
 
       {/*  EMPLOYEE MODAL */}

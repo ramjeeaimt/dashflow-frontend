@@ -110,36 +110,36 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50">
-            <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col border border-slate-200 shadow-2xl overflow-hidden">
+            <div className="bg-card w-full max-w-2xl max-h-[90vh] flex flex-col border border-border shadow-sm overflow-hidden">
                 {/* Header */}
-                <div className="px-4 sm:px-8 py-4 sm:py-6 bg-white text-black border-b border-slate-200 flex-shrink-0">
+                <div className="px-4 sm:px-8 py-4 sm:py-6 bg-card text-black border-b border-border flex-shrink-0">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-600 text-white flex-shrink-0">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-primary text-white flex-shrink-0">
                                 <Banknote size={24} />
                             </div>
                             <div className="min-w-0">
                                 <h2 className="text-lg sm:text-xl font-bold text-black uppercase tracking-tight truncate">
                                     {mode === 'edit' ? 'Edit Payroll' : 'Manual Entry'}
                                 </h2>
-                                <p className="text-[9px] sm:text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1 truncate">
+                                <p className="text-[9px] sm:text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mt-1 truncate">
                                     {mode === 'edit' ? `${fullName} — ${employee.employeeCode || 'System'}` : 'New Disbursement'}
                                 </p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors p-2 flex-shrink-0">
+                        <button onClick={onClose} className="text-muted-foreground/70 hover:text-muted-foreground transition-colors p-2 flex-shrink-0">
                             <X size={24} />
                         </button>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 bg-white">
+                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 bg-card">
                     {/* Employee Selector */}
                     {mode === 'create' && (
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Select Employee</label>
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Select Employee</label>
                             <div className="relative">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70">
                                     <Search size={18} />
                                 </div>
                                 <input
@@ -151,23 +151,23 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                         setIsDropdownOpen(true);
                                     }}
                                     onFocus={() => setIsDropdownOpen(true)}
-                                    className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 pl-12 text-sm font-bold text-slate-900 focus:bg-white focus:border-blue-600 outline-none transition-all"
+                                    className="w-full bg-muted/60 border border-border p-3 sm:p-4 pl-12 text-sm font-bold text-foreground focus:bg-card focus:border-primary outline-none transition-all"
                                 />
                                 {isDropdownOpen && filteredEmployees.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 z-50 max-h-60 overflow-y-auto shadow-xl">
+                                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border z-50 max-h-60 overflow-y-auto shadow-sm">
                                         {filteredEmployees.map(emp => (
                                             <button
                                                 key={emp.id}
                                                 type="button"
                                                 onClick={() => handleSelectEmployee(emp)}
-                                                className="w-full text-left p-4 hover:bg-slate-50 flex items-center gap-4 border-b border-slate-100 last:border-0"
+                                                className="w-full text-left p-4 hover:bg-muted/60 flex items-center gap-4 border-b border-border last:border-0"
                                             >
-                                                <div className="w-10 h-10 bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs flex-shrink-0">
+                                                <div className="w-10 h-10 bg-border flex items-center justify-center text-muted-foreground font-bold text-xs flex-shrink-0">
                                                     {emp.user?.firstName?.[0]}{emp.user?.lastName?.[0]}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-slate-900">{emp.user?.firstName} {emp.user?.lastName}</p>
-                                                    <p className="text-[10px] text-slate-500 uppercase">{emp.employeeCode}</p>
+                                                    <p className="text-sm font-bold text-foreground">{emp.user?.firstName} {emp.user?.lastName}</p>
+                                                    <p className="text-[10px] text-muted-foreground uppercase">{emp.employeeCode}</p>
                                                 </div>
                                             </button>
                                         ))}
@@ -180,7 +180,7 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                     {/* Financial Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                 <Wallet size={12} /> Basic Salary
                             </label>
                             <input
@@ -189,12 +189,12 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                 value={formData.basicSalary}
                                 onChange={handleChange}
                                 required
-                                className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-base font-bold text-slate-900 focus:bg-white focus:border-blue-600 outline-none"
+                                className="w-full bg-muted/60 border border-border p-3 sm:p-4 text-base font-bold text-foreground focus:bg-card focus:border-primary outline-none"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                 <TrendingUp size={12} className="text-emerald-600" /> Allowances
                             </label>
                             <input
@@ -202,12 +202,12 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                 name="allowances"
                                 value={formData.allowances}
                                 onChange={handleChange}
-                                className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-base font-bold text-emerald-700 focus:bg-white focus:border-emerald-600 outline-none"
+                                className="w-full bg-muted/60 border border-border p-3 sm:p-4 text-base font-bold text-emerald-700 focus:bg-card focus:border-emerald-600 outline-none"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                 <TrendingDown size={12} className="text-rose-600" /> Deductions
                             </label>
                             <input
@@ -215,12 +215,12 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                 name="deductions"
                                 value={formData.deductions}
                                 onChange={handleChange}
-                                className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-base font-bold text-rose-700 focus:bg-white focus:border-rose-600 outline-none"
+                                className="w-full bg-muted/60 border border-border p-3 sm:p-4 text-base font-bold text-rose-700 focus:bg-card focus:border-rose-600 outline-none"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-2">
                                 <Clock size={12} /> Overtime
                             </label>
                             <input
@@ -228,32 +228,32 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                 name="overtime"
                                 value={formData.overtime}
                                 onChange={handleChange}
-                                className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-base font-bold text-indigo-700 focus:bg-white focus:border-indigo-600 outline-none"
+                                className="w-full bg-muted/60 border border-border p-3 sm:p-4 text-base font-bold text-primary focus:bg-card focus:border-primary outline-none"
                             />
                         </div>
                     </div>
 
                     {/* Net Summary */}
-                    <div className="p-4 sm:p-6 bg-slate-50 flex items-center justify-between border border-slate-100">
+                    <div className="p-4 sm:p-6 bg-muted/60 flex items-center justify-between border border-border">
                         <div className="min-w-0">
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Net Payable</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Net Payable</p>
                             <div className="flex items-baseline gap-2 flex-wrap">
                                 <span className="text-2xl sm:text-4xl font-bold text-black truncate">₹{formData.netSalary.toLocaleString('en-IN')}</span>
-                                <span className="text-slate-500 font-bold text-xs">INR</span>
+                                <span className="text-muted-foreground font-bold text-xs">INR</span>
                             </div>
                         </div>
-                        <ShieldCheck size={32} className="text-slate-700 flex-shrink-0" strokeWidth={1.5} />
+                        <ShieldCheck size={32} className="text-foreground flex-shrink-0" strokeWidth={1.5} />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase">Finance Status</label>
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase">Finance Status</label>
                             <div className="relative">
                                 <select
                                     name="financeStatus"
                                     value={formData.financeStatus}
                                     onChange={handleChange}
-                                    className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 appearance-none outline-none focus:border-blue-600"
+                                    className="w-full bg-muted/60 border border-border p-3 sm:p-4 text-sm font-bold text-foreground appearance-none outline-none focus:border-primary"
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="approved">Done</option>
@@ -262,14 +262,14 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase">Cycle Period</label>
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase">Cycle Period</label>
                             <div className="flex gap-2">
                                 <select
                                     name="month"
                                     value={formData.month}
                                     onChange={handleChange}
                                     disabled
-                                    className="flex-1 bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 outline-none opacity-70 cursor-not-allowed"
+                                    className="flex-1 bg-muted/60 border border-border p-3 sm:p-4 text-sm font-bold text-foreground outline-none opacity-70 cursor-not-allowed"
                                 >
                                     {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => (
                                         <option key={m} value={i + 1}>{m}</option>
@@ -280,7 +280,7 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                                     value={formData.year}
                                     onChange={handleChange}
                                     disabled
-                                    className="w-20 sm:w-24 bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-bold text-slate-900 outline-none opacity-70 cursor-not-allowed"
+                                    className="w-20 sm:w-24 bg-muted/60 border border-border p-3 sm:p-4 text-sm font-bold text-foreground outline-none opacity-70 cursor-not-allowed"
                                 >
                                     {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
                                 </select>
@@ -289,24 +289,24 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase">Admin Notes</label>
+                        <label className="text-[11px] font-bold text-muted-foreground uppercase">Admin Notes</label>
                         <textarea
                             name="notes"
                             value={formData.notes}
                             onChange={handleChange}
                             rows="2"
                             placeholder="Internal remarks..."
-                            className="w-full bg-slate-50 border border-slate-200 p-3 sm:p-4 text-sm font-medium text-slate-700 focus:bg-white focus:border-blue-600 outline-none resize-none"
+                            className="w-full bg-muted/60 border border-border p-3 sm:p-4 text-sm font-medium text-foreground focus:bg-card focus:border-primary outline-none resize-none"
                         ></textarea>
                     </div>
                 </form>
 
                 {/* Footer */}
-                <div className="px-4 sm:px-8 py-4 sm:py-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-4 flex-shrink-0">
+                <div className="px-4 sm:px-8 py-4 sm:py-6 bg-muted/60 border-t border-border flex items-center justify-between gap-4 flex-shrink-0">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-4 sm:px-6 py-3 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-widest"
+                        className="px-4 sm:px-6 py-3 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wide"
                     >
                         Cancel
                     </button>
@@ -314,7 +314,7 @@ const PayrollEditModal = ({ isOpen, onClose, payroll, employees = [], onSave, mo
                         type="submit"
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-blue-600 text-white font-bold text-xs uppercase tracking-widest hover:bg-blue-700 disabled:bg-slate-300 transition-all"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-primary text-white font-bold text-xs uppercase tracking-wide hover:bg-primary/90 disabled:bg-slate-300 transition-all"
                     >
                         {isSubmitting ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin"></div>

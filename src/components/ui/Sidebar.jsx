@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import useAuthStore from '../../store/useAuthStore';
+import BrandMark, { BrandGlyph } from '../BrandMark';
+import { ROLES, isGlobalOwner as isGlobalOwnerUser, isSystemAdmin as isSystemAdminUser, hasRole, hasNonEmployeeRole } from '../../config/roles';
 
 const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, onMobileClose }) => {
   const navigate = useNavigate();
@@ -10,14 +12,13 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   const { user, can } = useAuthStore();
   const [openGroups, setOpenGroups] = useState({});
 
-  const isGlobalOwner = user?.email === 'hello@system.com';
-  const isSystemAdmin = ['info@difmo.com', 'admin@difmo.com', 'hello@system.com'].includes(user?.email);
-  const isCompanyAdmin = user?.email === 'pritam@difmo.com' || user?.roles?.some((role) => ['Admin', 'ADMIN'].includes(role.name));
+  const isGlobalOwner = isGlobalOwnerUser(user);
+  const isSystemAdmin = isSystemAdminUser(user);
+  const isCompanyAdmin = isSystemAdmin || hasRole(user, ROLES.ADMIN);
   const isAdmin = isCompanyAdmin ||
-    user?.roles?.some((role) => ['Super Admin', 'Manager', 'HR Manager', 'HR MANAGER'].includes(role.name)) ||
-    user?.roles?.some((role) => !['Employee', 'EMPLOYEE'].includes(role.name)) ||
+    hasRole(user, ROLES.SUPER_ADMIN, ROLES.MANAGER, ROLES.HR_MANAGER) ||
+    hasNonEmployeeRole(user) ||
     (user?.permissions && user.permissions.length > 0) ||
-    isSystemAdmin ||
     isGlobalOwner;
 
   const canAccess = (permission, alwaysShow = false) => {
@@ -236,10 +237,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <button
         key={item.key}
         onClick={() => handleLeafNavigation(item.path)}
-        className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${isActive
-          ? 'bg-primary text-primary-foreground shadow-sm'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+        className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-[13px] transition-colors ${isActive
+ ? 'bg-sidebar-active text-sidebar-foreground font-medium'
+ : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+ } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
         title={isCollapsed && !mobile ? item.label : undefined}
       >
         <Icon name={item.icon} size={17} />
@@ -255,23 +256,23 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <div key={item.key} className="space-y-1">
         <button
           onClick={() => handleGroupClick(item)}
-          className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${active
-            ? 'bg-slate-100 text-slate-900'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-            } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+          className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-[13px] transition-colors ${active
+ ? 'text-sidebar-foreground font-medium'
+ : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+ } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
           title={isCollapsed && !mobile ? item.label : undefined}
         >
           <Icon name={item.icon} size={17} />
           {(!isCollapsed || mobile) && (
             <>
               <span className="flex-1 truncate text-left">{item.label}</span>
-              <Icon name={expanded ? 'ChevronDown' : 'ChevronRight'} size={14} className="text-slate-400" />
+              <Icon name={expanded ? 'ChevronDown' : 'ChevronRight'} size={14} className="text-sidebar-muted" />
             </>
           )}
         </button>
 
         {(!isCollapsed || mobile) && expanded && (
-          <div className="ml-4 space-y-1 border-l border-slate-200 pl-3">
+          <div className="ml-4 space-y-1 border-l border-sidebar-border pl-3">
             {item.children.map((child) => {
               const childActive = isPathActive(child.path);
               return (
@@ -279,9 +280,9 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
                   key={child.key}
                   onClick={() => handleLeafNavigation(child.path)}
                   className={`w-full rounded-md px-3 py-2 text-left text-[12px] transition-colors ${childActive
-                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                    }`}
+ ? 'bg-sidebar-active text-sidebar-foreground font-medium'
+ : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+ }`}
                 >
                   {child.label}
                 </button>
@@ -298,7 +299,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       {normalizedSections.map((section) => (
         <div key={section.key} className="space-y-1.5">
           {(!isCollapsed || mobile) && (
-            <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+            <p className="px-3 text-[11px] font-medium uppercase tracking-wide text-sidebar-muted/70">
               {section.label}
             </p>
           )}
@@ -314,15 +315,15 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
     <>
       <div
         className={`lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+ }`}
         onClick={onMobileClose}
       />
 
-      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-border transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}>
-        <div className="flex items-center justify-between p-4 border-b border-border h-16">
-          <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-10 w-auto object-contain" />
-          <button onClick={onMobileClose} className="p-2 text-muted-foreground hover:bg-muted rounded-md">
+      <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+ }`}>
+        <div className="flex items-center justify-between p-4 border-b border-sidebar-border h-16">
+          <BrandMark variant="dark" />
+          <button onClick={onMobileClose} className="p-2 text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground rounded-md">
             <Icon name="X" size={20} />
           </button>
         </div>
@@ -331,21 +332,21 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         </nav>
       </aside>
 
-      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:h-screen lg:flex-col bg-card border-r border-border transition-all duration-300 overflow-hidden ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
-        }`}>
-        <div className="flex items-center justify-between p-4 border-b border-border min-h-[64px]">
+      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:h-screen lg:flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 overflow-hidden ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
+ }`}>
+        <div className="flex items-center justify-between p-4 border-b border-sidebar-border min-h-[64px]">
           {!isCollapsed ? (
-            <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-10 w-auto object-contain" />
+            <BrandMark variant="dark" />
           ) : (
             <div className="flex items-center justify-center w-full">
-              <img src="/assets/images/crm.logo1.png" alt="Logo" className="h-8 w-8 object-contain" />
+              <BrandGlyph size={26} />
             </div>
           )}
 
           <button
             onClick={onToggleCollapse}
-            className={`p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors duration-150 ${isCollapsed ? 'mx-auto mt-2' : ''
-              }`}
+            className={`p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-md transition-colors duration-150 ${isCollapsed ? 'mx-auto mt-2' : ''
+ }`}
           >
             <Icon name={isCollapsed ? 'ChevronRight' : 'ChevronLeft'} size={16} />
           </button>
@@ -356,14 +357,19 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         </nav>
 
         {!isCollapsed && (
-          <div className="border-t border-border p-4">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
-              <p className="text-[11px] font-semibold text-slate-900 truncate">
-                {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.email}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-500 truncate">
-                {isCompanyAdmin ? 'Admin Workspace' : isAdmin ? 'Staff Workspace' : 'Employee Workspace'}
-              </p>
+          <div className="border-t border-sidebar-border p-4">
+            <div className="flex items-center gap-3 rounded-md border border-sidebar-border bg-white/5 px-3 py-2.5">
+              <div className="w-8 h-8 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
+                {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-sidebar-foreground truncate">
+                  {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.email}
+                </p>
+                <p className="text-[11px] text-sidebar-muted truncate">
+                  {isCompanyAdmin ? 'Admin' : isAdmin ? 'Staff' : 'Employee'}
+                </p>
+              </div>
             </div>
           </div>
         )}

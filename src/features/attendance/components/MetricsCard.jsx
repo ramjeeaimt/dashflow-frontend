@@ -19,7 +19,7 @@ const MetricsCard = ({ title, value, change, changeType, icon, color = "primary"
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 card-shadow hover:shadow-lg transition-shadow duration-200">
+    <div className="bg-card border border-border rounded-lg p-6 card-shadow hover:shadow-sm transition-shadow duration-200">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>

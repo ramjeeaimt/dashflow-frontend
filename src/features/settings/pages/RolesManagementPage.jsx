@@ -167,7 +167,7 @@ const RolesManagement = () => {
                                 {permissions.length === 0 && (
                                     <button
                                         onClick={handleSeedPermissions}
-                                        className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-all shadow-sm active:scale-95 space-x-2 w-fit"
+                                        className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-all shadow-sm space-x-2 w-fit"
                                     >
                                         <Shield size={18} />
                                         <span>Initialize Permissions</span>
@@ -175,7 +175,7 @@ const RolesManagement = () => {
                                 )}
                                 <button
                                     onClick={() => handleOpenModal()}
-                                    className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-sm active:scale-95 space-x-2 w-fit"
+                                    className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition-all shadow-sm space-x-2 w-fit"
                                 >
                                     <Plus size={18} />
                                     <span>Create New Role</span>
@@ -186,7 +186,7 @@ const RolesManagement = () => {
                         {loading ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-48 bg-card rounded-2xl border border-border shadow-sm" />
+                                    <div key={i} className="h-48 bg-card rounded-lg border border-border shadow-sm" />
                                 ))}
                             </div>
                         ) : (
@@ -194,18 +194,18 @@ const RolesManagement = () => {
                                 {roles.map((role) => (
                                     <div
                                         key={role.id}
-                                        className="group bg-card rounded-2xl border border-border shadow-sm hover:shadow-xl hover:border-indigo-500/30 transition-all duration-300 p-6 flex flex-col relative overflow-hidden"
+                                        className="group bg-card rounded-lg border border-border shadow-sm hover:shadow-sm hover:border-primary/30 transition-all duration-300 p-6 flex flex-col relative overflow-hidden"
                                     >
-                                        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-500" />
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform duration-500" />
 
                                         <div className="flex items-start justify-between relative z-10">
-                                            <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 mb-4 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4 group-hover:bg-primary/90 group-hover:text-white transition-colors">
                                                 <Shield size={24} />
                                             </div>
                                             <div className="flex space-x-1">
                                                 <button
                                                     onClick={() => handleOpenModal(role)}
-                                                    className="p-2 text-muted-foreground hover:text-indigo-500 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                                                    className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
@@ -218,18 +218,18 @@ const RolesManagement = () => {
                                             </div>
                                         </div>
 
-                                        <h3 className="text-lg font-bold text-foreground group-hover:text-indigo-500 transition-colors uppercase tracking-wider">{role.name}</h3>
+                                        <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors uppercase tracking-wider">{role.name}</h3>
                                         <p className="text-muted-foreground text-sm mt-1 mb-4 flex-1 line-clamp-2">
                                             {role.description || 'No description provided for this role.'}
                                         </p>
 
                                         <div className="pt-4 border-t border-border flex items-center justify-between mt-auto relative z-10">
                                             <div className="flex -space-x-2">
-                                                <div className="w-8 h-8 rounded-full border-2 border-card bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-700">JD</div>
-                                                <div className="w-8 h-8 rounded-full border-2 border-card bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-600">AS</div>
+                                                <div className="w-8 h-8 rounded-full border-2 border-card bg-border flex items-center justify-center text-[10px] font-bold text-foreground">JD</div>
+                                                <div className="w-8 h-8 rounded-full border-2 border-card bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">AS</div>
                                                 <div className="w-8 h-8 rounded-full border-2 border-card bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-600">+5</div>
                                             </div>
-                                            <span className="text-xs font-bold text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-md uppercase">
+                                            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md uppercase">
                                                 {role.permissions?.length || 0} Permissions
                                             </span>
                                         </div>
@@ -243,17 +243,17 @@ const RolesManagement = () => {
                 {/* Role Editor Modal */}
                 {isModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+                        <div className="absolute inset-0 bg-sidebar/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
 
-                        <div className="bg-card w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden relative z-10 flex flex-col animate-in fade-in zoom-in duration-200">
-                            <div className="p-6 border-b border-border flex items-center justify-between bg-indigo-600 text-white">
+                        <div className="bg-card w-full max-w-4xl max-h-[90vh] rounded-lg shadow-sm overflow-hidden relative z-10 flex flex-col animate-in fade-in zoom-in duration-200">
+                            <div className="p-6 border-b border-border flex items-center justify-between bg-primary text-white">
                                 <div className="flex items-center space-x-3">
                                     <div className="p-2 bg-white/20 rounded-lg">
                                         <Lock size={20} />
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-bold">{currentRole ? 'Edit Role' : 'Create New Role'}</h2>
-                                        <p className="text-indigo-100 text-xs uppercase tracking-widest font-medium">Fine-grained access control</p>
+                                        <p className="text-primary-foreground/80 text-xs uppercase tracking-wide font-medium">Fine-grained access control</p>
                                     </div>
                                 </div>
                                 <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
@@ -271,7 +271,7 @@ const RolesManagement = () => {
                                                 required
                                                 value={roleForm.name}
                                                 onChange={(e) => setRoleForm({ ...roleForm, name: e.target.value })}
-                                                className="w-full px-4 py-3 bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-card transition-all font-medium"
+                                                className="w-full px-4 py-3 bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring focus:bg-card transition-all font-medium"
                                                 placeholder="e.g. Project Manager"
                                             />
                                         </div>
@@ -281,7 +281,7 @@ const RolesManagement = () => {
                                                 type="text"
                                                 value={roleForm.description}
                                                 onChange={(e) => setRoleForm({ ...roleForm, description: e.target.value })}
-                                                className="w-full px-4 py-3 bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-card transition-all font-medium"
+                                                className="w-full px-4 py-3 bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring focus:bg-card transition-all font-medium"
                                                 placeholder="What can this role do?"
                                             />
                                         </div>
@@ -290,7 +290,7 @@ const RolesManagement = () => {
                                     <div className="space-y-6">
                                         <div className="flex items-center justify-between">
                                             <label className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Permissions & Policies</label>
-                                            <div className="flex items-center space-x-2 text-xs text-muted-foreground font-bold uppercase tracking-widest bg-muted px-3 py-1 rounded-full">
+                                            <div className="flex items-center space-x-2 text-xs text-muted-foreground font-bold uppercase tracking-wide bg-muted px-3 py-1 rounded-full">
                                                 <Info size={12} />
                                                 <span>Select capabilities</span>
                                             </div>
@@ -298,7 +298,7 @@ const RolesManagement = () => {
 
                                         <div className="grid grid-cols-1 gap-8">
                                             {Object.keys(groupedPermissions).length === 0 ? (
-                                                <div className="flex flex-col items-center justify-center p-12 bg-muted/20 border border-dashed border-border rounded-3xl text-center">
+                                                <div className="flex flex-col items-center justify-center p-12 bg-muted/20 border border-dashed border-border rounded-lg text-center">
                                                     <AlertCircle size={48} className="text-amber-500 mb-4 opacity-50" />
                                                     <h3 className="text-lg font-bold text-foreground">No Permissions Found</h3>
                                                     <p className="text-muted-foreground text-sm max-w-xs mt-2">
@@ -307,7 +307,7 @@ const RolesManagement = () => {
                                                 </div>
                                             ) : (
                                                 Object.entries(groupedPermissions).map(([resource, perms]) => (
-                                                    <div key={resource} className="bg-muted/30 rounded-2xl border border-border p-6">
+                                                    <div key={resource} className="bg-muted/30 rounded-lg border border-border p-6">
                                                         <div className="flex items-center space-x-2 mb-4">
                                                             <span className="text-lg font-bold text-foreground capitalize">{resource}</span>
                                                             <div className="h-px flex-1 bg-border" />
@@ -321,11 +321,11 @@ const RolesManagement = () => {
                                                                         key={perm.id}
                                                                         onClick={() => handleTogglePermission(perm.id)}
                                                                         className={`group flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all duration-200 ${isSelected
-                                                                                ? 'bg-indigo-600 border-indigo-600 text-white shadow-md scale-105'
-                                                                                : 'bg-card border-border text-muted-foreground hover:border-indigo-500/50 hover:bg-muted/50'
-                                                                            }`}
+ ? 'bg-primary border-primary text-white shadow-md scale-105'
+ : 'bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-muted/50'
+ }`}
                                                                     >
-                                                                        <span className="text-[10px] uppercase font-black mb-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                                                                        <span className="text-[10px] uppercase font-semibold mb-1 opacity-70 group-hover:opacity-100 transition-opacity">
                                                                             {perm.action}
                                                                         </span>
                                                                         {isSelected && <Check size={14} className="mb-1" />}
@@ -355,7 +355,7 @@ const RolesManagement = () => {
                                         </button>
                                         <button
                                             type="submit"
-                                            className="flex-1 md:flex-none px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm"
+                                            className="flex-1 md:flex-none px-8 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all shadow-sm text-sm"
                                         >
                                             {currentRole ? 'Update Role' : 'Create Role'}
                                         </button>

@@ -36,7 +36,7 @@ const ProductivityBenchmark = () => {
       target: 6.0,
       trend: '+3%',
       icon: 'Clock',
-      color: 'text-blue-600',
+      color: 'text-primary',
       unit: 'hrs'
     },
     {
@@ -62,7 +62,7 @@ const ProductivityBenchmark = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload?.length) {
       return (
-        <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-sm">
           <p className="text-sm font-medium text-popover-foreground mb-2">{label}</p>
           {payload?.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry?.color }}>
@@ -95,8 +95,8 @@ const ProductivityBenchmark = () => {
               <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                 <span>Target: {metric?.target}{metric?.unit}</span>
                 <div className={`w-2 h-2 rounded-full ${
-                  metric?.value >= metric?.target ? 'bg-green-500' : 'bg-yellow-500'
-                }`}></div>
+ metric?.value >= metric?.target ? 'bg-green-500' : 'bg-yellow-500'
+ }`}></div>
               </div>
             </div>
           </div>
@@ -112,7 +112,7 @@ const ProductivityBenchmark = () => {
             </div>
             <div className="flex items-center space-x-4 text-sm">
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-primary rounded-full"></div>
                 <span className="text-muted-foreground">Current Week</span>
               </div>
               <div className="flex items-center space-x-2">
@@ -181,8 +181,8 @@ const ProductivityBenchmark = () => {
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-muted-foreground">Target: {dept?.target}%</span>
                     <span className={`text-sm font-medium ${
-                      dept?.score >= dept?.target ? 'text-green-600' : 'text-yellow-600'
-                    }`}>
+ dept?.score >= dept?.target ? 'text-green-600' : 'text-yellow-600'
+ }`}>
                       {dept?.score}%
                     </span>
                   </div>
@@ -234,11 +234,11 @@ const ProductivityBenchmark = () => {
                 <p className="text-xs text-yellow-700 mt-1">3 employees have idle time &gt; 30 minutes</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <Icon name="TrendingUp" size={16} className="text-blue-600 mt-0.5" />
+            <div className="flex items-start space-x-3 p-3 bg-primary/10 border border-border rounded-lg">
+              <Icon name="TrendingUp" size={16} className="text-primary mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-blue-900">Productivity Peak Identified</p>
-                <p className="text-xs text-blue-700 mt-1">Team performs best between 2-4 PM</p>
+                <p className="text-xs text-primary mt-1">Team performs best between 2-4 PM</p>
               </div>
             </div>
           </div>
@@ -250,11 +250,11 @@ const ProductivityBenchmark = () => {
                 <p className="text-xs text-green-700 mt-1">Engineering team exceeded weekly goals</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-              <Icon name="Users" size={16} className="text-purple-600 mt-0.5" />
+            <div className="flex items-start space-x-3 p-3 bg-primary/10 border border-border rounded-lg">
+              <Icon name="Users" size={16} className="text-primary mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-purple-900">Team Collaboration</p>
-                <p className="text-xs text-purple-700 mt-1">Increase in cross-department meetings</p>
+                <p className="text-xs text-primary mt-1">Increase in cross-department meetings</p>
               </div>
             </div>
           </div>

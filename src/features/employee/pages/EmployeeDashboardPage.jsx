@@ -220,8 +220,8 @@ const EmployeeDashboard = () => {
             />
 
             <main className={`transition-all duration-300 ${
-                    sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
-                } pt-16 pb-8`}>
+ sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+ } pt-16 pb-8`}>
                 <div className="p-4 sm:p-6 max-w-7xl mx-auto">
                     {/* Welcome Header */}
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
@@ -239,7 +239,7 @@ const EmployeeDashboard = () => {
                             <LeaveForm employeeId={user?.id} />
                         </div> */}
 
-                        <div className="flex items-center space-x-4 mt-4 lg:mt-0 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div className="flex items-center space-x-4 mt-4 lg:mt-0 bg-card p-3 rounded-lg shadow-sm border border-gray-100">
                             <Clock className="w-5 h-5 text-primary" />
                             <div className="text-right">
                                 <p className="text-sm font-semibold text-foreground">
@@ -262,11 +262,11 @@ const EmployeeDashboard = () => {
                                         Quick Attendance
                                     </h2>
                                     <div className={`px-3 py-1 rounded-full text-sm font-medium ${todayAttendance?.checkOutTime
-                                        ? 'bg-gray-100 text-gray-600'
-                                        : todayAttendance
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-blue-100 text-blue-700'
-                                        }`}>
+ ? 'bg-gray-100 text-gray-600'
+ : todayAttendance
+ ? 'bg-green-100 text-green-700'
+ : 'bg-primary/10 text-primary'
+ }`}>
                                         {todayAttendance?.checkOutTime
                                             ? 'Completed'
                                             : todayAttendance
@@ -297,8 +297,8 @@ const EmployeeDashboard = () => {
 
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
-                                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                                                        <Icon name="LogOut" size={14} className="text-blue-600" />
+                                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                                        <Icon name="LogOut" size={14} className="text-primary" />
                                                     </div>
                                                     <span className="text-sm font-medium">Check Out</span>
                                                 </div>
@@ -405,7 +405,7 @@ const EmployeeDashboard = () => {
                                                                 alert('Failed to submit overtime request');
                                                             }
                                                         }}
-                                                        className="w-full bg-purple-600 text-white py-2.5 rounded-lg hover:bg-purple-700 transition shadow-sm font-medium flex items-center justify-center space-x-2 mt-2"
+                                                        className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary/90 transition shadow-sm font-medium flex items-center justify-center space-x-2 mt-2"
                                                     >
                                                         <Icon name="Clock" size={18} />
                                                         <span>REQUEST OVERTIME</span>
@@ -459,11 +459,11 @@ const EmployeeDashboard = () => {
                                                         {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                                     </div>
                                                     <div className={`text-xs px-2 py-0.5 rounded-full ${record.status === 'present' ? 'bg-green-100 text-green-700' :
-                                                        record.status === 'late' ? 'bg-yellow-100 text-yellow-700' :
-                                                            record.status === 'early_departure' ? 'bg-orange-100 text-orange-700' :
-                                                                record.status === 'absent' ? 'bg-red-100 text-red-700' :
-                                                                    'bg-gray-100 text-gray-700'
-                                                        }`}>
+ record.status === 'late' ? 'bg-yellow-100 text-yellow-700' :
+ record.status === 'early_departure' ? 'bg-orange-100 text-orange-700' :
+ record.status === 'absent' ? 'bg-red-100 text-red-700' :
+ 'bg-gray-100 text-gray-700'
+ }`}>
                                                         {record.status?.replace('_', ' ').toUpperCase() || 'PRESENT'}
                                                     </div>
                                                 </div>

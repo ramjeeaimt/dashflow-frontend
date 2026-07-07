@@ -50,22 +50,22 @@ const AdminLeaveEditModal = ({ isOpen, onClose, leave, onUpdate }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-sidebar/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-card w-full max-w-xl rounded-lg shadow-sm overflow-hidden border border-border animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="px-8 py-6 border-b border-border flex items-center justify-between bg-muted/50">
                     <div>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                            <span className="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-sm">
+                        <h2 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
+                            <span className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center text-sm">
                                 <Calendar size={18} />
                             </span>
                             Edit Leave Record
                         </h2>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                        <p className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wide mt-1">
                             {leave.employee?.user?.firstName} {leave.employee?.user?.lastName} • {leave.employee?.employeeCode}
                         </p>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-xl transition-colors text-slate-400 hover:text-slate-900">
+                    <button onClick={onClose} className="p-2 hover:bg-border rounded-xl transition-colors text-muted-foreground/70 hover:text-foreground">
                         <X size={20} />
                     </button>
                 </div>
@@ -75,12 +75,12 @@ const AdminLeaveEditModal = ({ isOpen, onClose, leave, onUpdate }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Leave Type */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Leave Category</label>
+                            <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide ml-1">Leave Category</label>
                             <select
                                 name="leaveType"
                                 value={formData.leaveType}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/60 border border-border rounded-lg text-sm font-bold focus:bg-card focus:border-primary outline-none transition-all"
                                 required
                             >
                                 <option value="sick">Sick Leave</option>
@@ -94,12 +94,12 @@ const AdminLeaveEditModal = ({ isOpen, onClose, leave, onUpdate }) => {
 
                         {/* Status */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Current Status</label>
+                            <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide ml-1">Current Status</label>
                             <select
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/60 border border-border rounded-lg text-sm font-bold focus:bg-card focus:border-primary outline-none transition-all"
                                 required
                             >
                                 <option value="PENDING">Pending Approval</option>
@@ -110,24 +110,24 @@ const AdminLeaveEditModal = ({ isOpen, onClose, leave, onUpdate }) => {
 
                         {/* Dates */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
+                            <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide ml-1">Start Date</label>
                             <input
                                 type="date"
                                 name="startDate"
                                 value={formData.startDate}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/60 border border-border rounded-lg text-sm font-bold focus:bg-card focus:border-primary outline-none transition-all"
                                 required
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
+                            <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide ml-1">End Date</label>
                             <input
                                 type="date"
                                 name="endDate"
                                 value={formData.endDate}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                                className="w-full px-4 py-3 bg-muted/60 border border-border rounded-lg text-sm font-bold focus:bg-card focus:border-primary outline-none transition-all"
                                 required
                             />
                         </div>
@@ -135,13 +135,13 @@ const AdminLeaveEditModal = ({ isOpen, onClose, leave, onUpdate }) => {
 
                     {/* Reason */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reason for Leave</label>
+                        <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide ml-1">Reason for Leave</label>
                         <textarea
                             name="reason"
                             value={formData.reason}
                             onChange={handleChange}
                             rows="4"
-                            className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm font-medium outline-none focus:bg-white focus:border-indigo-500 transition-all resize-none shadow-inner"
+                            className="w-full p-5 bg-muted/60 border border-border rounded-lg text-sm font-medium outline-none focus:bg-card focus:border-primary transition-all resize-none shadow-inner"
                             placeholder="Enter the reason for leave..."
                             required
                         />
@@ -152,14 +152,14 @@ const AdminLeaveEditModal = ({ isOpen, onClose, leave, onUpdate }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-3 text-xs font-black text-slate-500 uppercase tracking-widest hover:text-slate-800 transition-colors"
+                            className="px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors"
                         >
                             Cancel Changes
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-8 py-3 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 disabled:opacity-50 flex items-center gap-2"
+                            className="px-8 py-3 bg-primary text-white text-xs font-semibold uppercase tracking-wide rounded-lg hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50 flex items-center gap-2"
                         >
                             {loading ? (
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

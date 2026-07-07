@@ -48,7 +48,7 @@ const ExportPanel = ({ onExport }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-lg shadow-lg z-50">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-lg shadow-sm z-50">
           <div className="p-4">
             <h4 className="font-medium text-foreground mb-3">Export Analytics</h4>
             <div className="space-y-2">

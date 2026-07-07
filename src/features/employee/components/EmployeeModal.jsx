@@ -453,29 +453,29 @@ const EmployeeModal = ({
   const modalTitle = mode === 'add' ? 'Add New Employee' : mode === 'edit' ? 'Edit Employee' : 'Employee Details';
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-0 md:p-4 animate-in fade-in duration-300">
-      <div className="bg-white rounded-none md:rounded-2xl w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] flex flex-col overflow-hidden text-slate-900 shadow-2xl border border-slate-100">
+    <div className="fixed inset-0 bg-sidebar/40 backdrop-blur-md flex items-center justify-center z-50 p-0 md:p-4 animate-in fade-in duration-300">
+      <div className="bg-card rounded-none md:rounded-lg w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] flex flex-col overflow-hidden text-foreground shadow-sm border border-border">
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-6 bg-white border-b border-slate-100">
+        <div className="flex items-center justify-between px-8 py-6 bg-card border-b border-border">
           <div className="flex items-center space-x-5">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
-              <Icon name="User" size={24} className="text-blue-600" />
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-border">
+              <Icon name="User" size={24} className="text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">{modalTitle}</h2>
-              {employee && <p className="text-xs font-semibold text-slate-400 mt-0.5">ID: {employee?.id || employee?._id}</p>}
+              <h2 className="text-xl font-bold text-foreground tracking-tight">{modalTitle}</h2>
+              {employee && <p className="text-xs font-semibold text-muted-foreground/70 mt-0.5">ID: {employee?.id || employee?._id}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="p-2.5 bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-xl border border-slate-100">
+          <button onClick={onClose} className="p-2.5 bg-muted/60 text-muted-foreground/70 hover:text-foreground hover:bg-muted transition-all rounded-xl border border-border">
             <Icon name="X" size={20} />
           </button>
         </div>
 
         <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
           {/* Side Tabs - Modern Style */}
-          <div className="w-full md:w-64 bg-slate-50/50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col">
-            <div className="p-4 md:p-5 border-b border-slate-100 hidden md:block">
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Information Sections</p>
+          <div className="w-full md:w-64 bg-muted/50 border-b md:border-b-0 md:border-r border-border flex flex-col">
+            <div className="p-4 md:p-5 border-b border-border hidden md:block">
+              <p className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wide">Information Sections</p>
             </div>
             <nav className="flex md:flex-col p-2 md:p-3 space-y-0 md:space-y-1 space-x-2 md:space-x-0 overflow-x-auto md:overflow-x-visible no-scrollbar">
               {tabs?.map((tab) => {
@@ -485,9 +485,9 @@ const EmployeeModal = ({
                     key={tab?.id}
                     onClick={() => setActiveTab(tab?.id)}
                     className={`flex-shrink-0 md:flex-shrink-1 flex items-center space-x-3 px-4 py-2.5 md:py-3 text-left text-xs md:text-sm font-semibold rounded-xl transition-all ${activeTab === tab?.id
-                      ? hasError ? 'bg-rose-50 text-rose-700 shadow-sm border border-rose-100 md:border-transparent' : 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100 md:border-transparent'
-                      : hasError ? 'text-rose-600 hover:bg-rose-50' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-                      }`}
+ ? hasError ? 'bg-rose-50 text-rose-700 shadow-sm border border-rose-100 md:border-transparent' : 'bg-primary/10 text-primary shadow-sm border border-border md:border-transparent'
+ : hasError ? 'text-rose-600 hover:bg-rose-50' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+ }`}
                   >
                     <Icon name={tab?.icon} size={18} />
                     <span>{tab?.label}</span>
@@ -499,14 +499,14 @@ const EmployeeModal = ({
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-white">
+          <div className="flex-1 flex flex-col overflow-hidden bg-card">
             <div ref={contentRef} className="p-4 sm:p-8 overflow-y-auto flex-1 custom-scrollbar">
               {activeTab === 'basic' && (
                 <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-8 pb-6 md:pb-10 border-b border-slate-100">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-8 pb-6 md:pb-10 border-b border-border">
                     <div className="relative group">
-                      <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
-                        <div className="w-full h-full rounded-full overflow-hidden relative flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-4xl">
+                      <div className="w-32 h-32 rounded-full overflow-hidden bg-muted/60 flex-shrink-0 border-4 border-white shadow-md ring-1 ring-slate-200 p-1 relative">
+                        <div className="w-full h-full rounded-full overflow-hidden relative flex items-center justify-center bg-primary/10 text-primary font-bold text-4xl">
                           {formData?.avatar ? (
                             <img
                               src={formData.avatar}
@@ -518,7 +518,7 @@ const EmployeeModal = ({
                           )}
                           {uploadingProfile && (
                             <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                              <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin shadow-lg"></div>
+                              <div className="w-8 h-8 border-4 border-primary/20 border-t-blue-600 rounded-full animate-spin shadow-sm"></div>
                             </div>
                           )}
                         </div>
@@ -526,24 +526,24 @@ const EmployeeModal = ({
                       {(mode === 'edit' || mode === 'add') && (
                         <button
                           onClick={() => avatarInputRef.current.click()}
-                          className="absolute -bottom-1 -right-1 bg-blue-600 text-white p-2.5 rounded-full hover:bg-blue-700 transition-all border-2 border-white shadow-lg"
+                          className="absolute -bottom-1 -right-1 bg-primary text-white p-2.5 rounded-full hover:bg-primary/90 transition-all border-2 border-white shadow-sm"
                         >
                           <Icon name="Camera" size={16} />
                         </button>
                       )}
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-slate-800 mb-4">Profile Picture</h3>
+                      <h3 className="text-sm font-bold text-foreground mb-4">Profile Picture</h3>
                       {(mode === 'edit' || mode === 'add') && (
                         <div className="space-y-3">
                           <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={(e) => handleFileChange(e, 'profileImage')} />
                           <button
                             onClick={() => avatarInputRef.current.click()}
-                            className="px-5 py-2 bg-white border border-slate-200 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all shadow-sm"
+                            className="px-5 py-2 bg-card border border-border text-xs font-semibold rounded-xl hover:bg-muted/60 transition-all shadow-sm"
                           >
                             Upload Photo
                           </button>
-                          <p className="text-[11px] text-slate-400 font-medium tracking-tight">JPG, PNG or GIF. Max size of 2MB.</p>
+                          <p className="text-[11px] text-muted-foreground/70 font-medium tracking-tight">JPG, PNG or GIF. Max size of 2MB.</p>
                         </div>
                       )}
                     </div>
@@ -551,10 +551,10 @@ const EmployeeModal = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Employee ID (Required)</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Employee ID (Required)</label>
                       <input
-                        className={`w-full px-4 py-2.5 bg-slate-50 border text-sm font-semibold uppercase rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all ${errors?.employeeCode ? 'border-rose-500' : 'border-slate-200'
-                          }`}
+                        className={`w-full px-4 py-2.5 bg-muted/60 border text-sm font-semibold uppercase rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all ${errors?.employeeCode ? 'border-rose-500' : 'border-border'
+ }`}
                         value={formData?.employeeCode}
                         onChange={(e) => handleInputChange('employeeCode', e?.target?.value)}
                         disabled={isReadOnly}
@@ -564,12 +564,12 @@ const EmployeeModal = ({
                         <p className="text-xs text-rose-500 font-medium ml-1">{errors.employeeCode}</p>
                       ) : permissionsLoading ? (
                         <div className="flex items-center space-x-2 ml-1 mt-1.5">
-                          <div className="w-3 h-3 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
-                          <p className="text-[11px] text-slate-500 font-medium tracking-tight">Fetching last ID...</p>
+                          <div className="w-3 h-3 border-2 border-primary/30 border-t-blue-600 rounded-full animate-spin"></div>
+                          <p className="text-[11px] text-muted-foreground font-medium tracking-tight">Fetching last ID...</p>
                         </div>
                       ) : (
                         mode === 'add' && lastEmployeeCode && (
-                          <p className="text-xs text-blue-600 font-medium ml-1 mt-1">Last assigned ID: {lastEmployeeCode}</p>
+                          <p className="text-xs text-primary font-medium ml-1 mt-1">Last assigned ID: {lastEmployeeCode}</p>
                         )
                       )}
                     </div>
@@ -577,47 +577,47 @@ const EmployeeModal = ({
                     <div className="hidden md:block"></div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">First Name</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">First Name</label>
                       <input
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                        className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-semibold rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all"
                         value={formData?.firstName} onChange={(e) => handleInputChange('firstName', e?.target?.value)} disabled={isReadOnly}
                       />
                       {errors?.firstName && <p className="text-xs text-rose-500 font-medium ml-1">{errors.firstName}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Last Name</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Last Name</label>
                       <input
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                        className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-semibold rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all"
                         value={formData?.lastName} onChange={(e) => handleInputChange('lastName', e?.target?.value)} disabled={isReadOnly}
                       />
                       {errors?.lastName && <p className="text-xs text-rose-500 font-medium ml-1">{errors.lastName}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Email Address</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Email Address</label>
                       <input
                         type="email"
-                        className={`w-full px-4 py-2.5 bg-slate-50 border text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all ${errors?.email ? 'border-rose-500' : 'border-slate-200'
-                          }`}
+                        className={`w-full px-4 py-2.5 bg-muted/60 border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all ${errors?.email ? 'border-rose-500' : 'border-border'
+ }`}
                         value={formData?.email} onChange={(e) => handleInputChange('email', e?.target?.value)} disabled={isReadOnly}
                       />
                       {errors?.email && <p className="text-xs text-rose-500 font-medium ml-1">{errors.email}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Phone Number</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Phone Number</label>
                       <input
                         type="tel"
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                        className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all"
                         value={formData?.phone} onChange={(e) => handleInputChange('phone', e?.target?.value)} disabled={isReadOnly}
                       />
                     </div>
                   </div>
 
                   {/* Skills Section */}
-                  <div className="pt-6 border-t border-slate-100">
-                    <label className="text-xs font-semibold text-slate-500 ml-1 mb-2 block">Skills & Competencies</label>
+                  <div className="pt-6 border-t border-border">
+                    <label className="text-xs font-semibold text-muted-foreground ml-1 mb-2 block">Skills & Competencies</label>
                     <textarea
                       placeholder="Enter skills separated by commas..."
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all min-h-[100px] resize-none"
+                      className="w-full px-4 py-3 bg-muted/60 border border-border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all min-h-[100px] resize-none"
                       value={formData?.skills?.join(', ')}
                       onChange={(e) => handleInputChange('skills', e.target.value.split(',').map(s => s.trim()))}
                       disabled={isReadOnly}
@@ -638,19 +638,19 @@ const EmployeeModal = ({
                       { label: 'Manager', key: 'manager', options: availableManagers }
                     ].map((f, i) => (
                       <div key={i} className="space-y-2">
-                        <label className="text-xs font-semibold text-slate-500 ml-1">{f.label}</label>
+                        <label className="text-xs font-semibold text-muted-foreground ml-1">{f.label}</label>
                         <div className="relative">
                           <select
                             value={formData[f.key]}
                             onChange={(e) => handleInputChange(f.key, e.target.value)}
                             disabled={isReadOnly}
-                            className={`w-full appearance-none px-4 py-2.5 bg-slate-50 border text-xs font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all cursor-pointer ${errors?.[f.key] ? 'border-rose-500' : 'border-slate-200'
-                              }`}
+                            className={`w-full appearance-none px-4 py-2.5 bg-muted/60 border text-xs font-semibold rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all cursor-pointer ${errors?.[f.key] ? 'border-rose-500' : 'border-border'
+ }`}
                           >
                             <option value="">Select {f.label}</option>
                             {f.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                           </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/70">
                             <Icon name="ChevronDown" size={14} />
                           </div>
                         </div>
@@ -662,7 +662,7 @@ const EmployeeModal = ({
                             <input
                               type="text"
                               placeholder="Enter custom designation..."
-                              className="w-full px-4 py-2.5 bg-white border border-blue-200 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                              className="w-full px-4 py-2.5 bg-card border border-border text-xs font-semibold rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all"
                               value={formData.customDesignation || ''}
                               onChange={(e) => handleInputChange('customDesignation', e.target.value)}
                               disabled={isReadOnly}
@@ -672,28 +672,28 @@ const EmployeeModal = ({
                       </div>
                     ))}
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Hire Date</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Hire Date</label>
                       <input
                         type="date"
                         value={formData?.hireDate}
                         onChange={(e) => handleInputChange('hireDate', e?.target?.value)}
                         disabled={isReadOnly}
-                        className={`w-full px-4 py-2 bg-slate-50 border text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all ${errors?.hireDate ? 'border-rose-500' : 'border-slate-200'
-                          }`}
+                        className={`w-full px-4 py-2 bg-muted/60 border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all ${errors?.hireDate ? 'border-rose-500' : 'border-border'
+ }`}
                       />
                       {errors?.hireDate && <p className="text-xs text-rose-500 font-medium ml-1">{errors.hireDate}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Salary</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Salary</label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">INR</span>
-                        <input type="number" value={formData?.salary} onChange={(e) => handleInputChange('salary', e?.target?.value)} disabled={isReadOnly} className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" />
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 text-xs font-bold">INR</span>
+                        <input type="number" value={formData?.salary} onChange={(e) => handleInputChange('salary', e?.target?.value)} disabled={isReadOnly} className="w-full pl-12 pr-4 py-2.5 bg-muted/60 border border-border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all" />
                       </div>
                     </div>
 
                     {/* Employee Type & WFH */}
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Work Setting</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Work Setting</label>
                       <div className="flex space-x-4 pt-1">
                         {['office', 'hybrid', 'remote'].map((type) => (
                           <label key={type} className="flex items-center space-x-2 cursor-pointer group">
@@ -704,16 +704,16 @@ const EmployeeModal = ({
                               checked={formData.employeeType === type}
                               onChange={(e) => handleInputChange('employeeType', e.target.value)}
                               disabled={isReadOnly}
-                              className="w-4 h-4 border-slate-300 text-blue-600 focus:ring-blue-100 transition-all"
+                              className="w-4 h-4 border-border text-primary focus:ring-ring/20 transition-all"
                             />
-                            <span className="text-xs font-semibold capitalize text-slate-600 group-hover:text-slate-900">{type === 'hybrid' ? 'Field / Hybrid' : type}</span>
+                            <span className="text-xs font-semibold capitalize text-muted-foreground group-hover:text-foreground">{type === 'hybrid' ? 'Field / Hybrid' : type}</span>
                           </label>
                         ))}
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Work From Home</label>
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Work From Home</label>
                       <div className="flex items-center space-x-3 pt-1">
                         <button
                           type="button"
@@ -728,55 +728,55 @@ const EmployeeModal = ({
                               handleInputChange('employeeType', 'office');
                             }
                           }}
-                          className={`relative inline-flex h-5 w-10 items-center rounded-full transition-all duration-300 ${formData.workFromHome ? 'bg-blue-600' : 'bg-slate-200'}`}
+                          className={`relative inline-flex h-5 w-10 items-center rounded-full transition-all duration-300 ${formData.workFromHome ? 'bg-primary' : 'bg-border'}`}
                         >
-                          <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${formData.workFromHome ? 'translate-x-[22px]' : 'translate-x-1'}`} />
+                          <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-card transition-transform duration-300 shadow-sm ${formData.workFromHome ? 'translate-x-[22px]' : 'translate-x-1'}`} />
                         </button>
-                        <span className="text-xs font-semibold text-slate-600">{formData.workFromHome ? 'Enabled' : 'Disabled'}</span>
+                        <span className="text-xs font-semibold text-muted-foreground">{formData.workFromHome ? 'Enabled' : 'Disabled'}</span>
                       </div>
                     </div>
 
                     {/* Working Hours - Added Square Styling */}
                     <div className="col-span-1 md:col-span-2 pt-4">
-                      <div className="bg-slate-50 border border-slate-200 p-6 rounded-none space-y-6">
-                        <div className="flex items-center space-x-3 border-b border-slate-200 pb-4">
-                          <div className="w-8 h-8 bg-blue-100 text-blue-600 flex items-center justify-center rounded-none border border-blue-200">
+                      <div className="bg-muted/60 border border-border p-6 rounded-none space-y-6">
+                        <div className="flex items-center space-x-3 border-b border-border pb-4">
+                          <div className="w-8 h-8 bg-primary/10 text-primary flex items-center justify-center rounded-none border border-border">
                             <Icon name="Clock" size={16} />
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Employee Working Hours</h4>
-                            <p className="text-[10px] text-slate-400 font-medium">Define the daily schedule for this employee</p>
+                            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Employee Working Hours</h4>
+                            <p className="text-[10px] text-muted-foreground/70 font-medium">Define the daily schedule for this employee</p>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="space-y-3">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-tight ml-0.5">Start Time</label>
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight ml-0.5">Start Time</label>
                             <div className="relative group">
                               <input
                                 type="time"
                                 value={formData.startTime}
                                 onChange={(e) => handleInputChange('startTime', e.target.value)}
                                 disabled={isReadOnly}
-                                className="w-full px-4 py-3 bg-white border border-slate-200 text-sm font-bold rounded-none focus:ring-0 focus:border-blue-500 outline-none transition-all hover:border-slate-300"
+                                className="w-full px-4 py-3 bg-card border border-border text-sm font-bold rounded-none focus:ring-0 focus:border-primary outline-none transition-all hover:border-border"
                               />
-                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-blue-500 transition-colors">
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/70 group-hover:text-primary transition-colors">
                                 <Icon name="LogIn" size={14} />
                               </div>
                             </div>
                           </div>
 
                           <div className="space-y-3">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-tight ml-0.5">End Time</label>
+                            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight ml-0.5">End Time</label>
                             <div className="relative group">
                               <input
                                 type="time"
                                 value={formData.endTime}
                                 onChange={(e) => handleInputChange('endTime', e.target.value)}
                                 disabled={isReadOnly}
-                                className="w-full px-4 py-3 bg-white border border-slate-200 text-sm font-bold rounded-none focus:ring-0 focus:border-blue-500 outline-none transition-all hover:border-slate-300"
+                                className="w-full px-4 py-3 bg-card border border-border text-sm font-bold rounded-none focus:ring-0 focus:border-primary outline-none transition-all hover:border-border"
                               />
-                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-blue-500 transition-colors">
+                              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/70 group-hover:text-primary transition-colors">
                                 <Icon name="LogOut" size={14} />
                               </div>
                             </div>
@@ -787,8 +787,8 @@ const EmployeeModal = ({
                   </div>
 
                   {/* System Roles */}
-                  <div className="pt-6 border-t border-slate-100">
-                    <label className="text-xs font-semibold text-slate-500 ml-1 mb-4 block">System Authorization Roles</label>
+                  <div className="pt-6 border-t border-border">
+                    <label className="text-xs font-semibold text-muted-foreground ml-1 mb-4 block">System Authorization Roles</label>
                     {errors?.roleIds && <p className="text-xs text-rose-500 font-medium ml-1 mb-3">{errors.roleIds}</p>}
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                       {roles.map(role => {
@@ -802,14 +802,14 @@ const EmployeeModal = ({
                               handleInputChange('roleIds', newRoles);
                             }}
                             className={`flex items-center space-x-3 p-4 border transition-all rounded-xl text-left ${isSelected
-                              ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-100'
-                              : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50/50'
-                              }`}
+ ? 'bg-primary/10 border-border ring-1 ring-ring/20'
+ : 'bg-card border-border text-muted-foreground hover:border-border hover:bg-muted/50'
+ }`}
                           >
-                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'bg-transparent border-slate-300'}`}>
+                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-border'}`}>
                               {isSelected && <Icon name="Check" size={10} className="text-white" />}
                             </div>
-                            <span className={`text-[11px] font-bold ${isSelected ? 'text-blue-700' : 'text-slate-600'}`}>{role.name}</span>
+                            <span className={`text-[11px] font-bold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>{role.name}</span>
                           </button>
                         );
                       })}
@@ -820,14 +820,14 @@ const EmployeeModal = ({
 
               {activeTab === 'permissions' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="flex items-center justify-between p-6 bg-slate-900 text-white rounded-2xl shadow-lg border border-slate-800 mb-6 group hover:shadow-xl transition-all">
+                  <div className="flex items-center justify-between p-6 bg-sidebar text-white rounded-lg shadow-sm border border-slate-800 mb-6 group hover:shadow-sm transition-all">
                     <div>
                       <h4 className="text-sm font-bold tracking-tight">Access Privilege Matrix</h4>
-                      <p className="text-xs text-slate-400 font-medium mt-1">Direct system overrides and inherited permissions</p>
+                      <p className="text-xs text-muted-foreground/70 font-medium mt-1">Direct system overrides and inherited permissions</p>
                     </div>
                     <div className="bg-white/10 px-5 py-2.5 rounded-xl border border-white/10 flex items-center space-x-3">
                       <span className="text-2xl font-bold font-mono text-blue-400">{formData.permissionIds.length.toString().padStart(2, '0')}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Overrides</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Overrides</span>
                     </div>
                   </div>
 
@@ -846,11 +846,11 @@ const EmployeeModal = ({
                         .map(p => p.id);
 
                       return (
-                        <div key={idx} className="border border-slate-200 bg-slate-50/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group">
-                          <div className="px-5 py-3 bg-white border-b border-slate-100 flex justify-between items-center">
-                            <span className="text-xs font-bold text-slate-800 tracking-tight uppercase">{resource}</span>
-                            <div className="p-1.5 bg-slate-50 rounded-lg group-hover:bg-blue-50 transition-colors">
-                              <Icon name="Database" size={14} className="text-slate-400 group-hover:text-blue-500" />
+                        <div key={idx} className="border border-border bg-muted/50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all group">
+                          <div className="px-5 py-3 bg-card border-b border-border flex justify-between items-center">
+                            <span className="text-xs font-bold text-foreground tracking-tight uppercase">{resource}</span>
+                            <div className="p-1.5 bg-muted/60 rounded-lg group-hover:bg-primary/10 transition-colors">
+                              <Icon name="Database" size={14} className="text-muted-foreground/70 group-hover:text-primary" />
                             </div>
                           </div>
                           <div className="p-4 grid grid-cols-2 gap-2.5">
@@ -868,11 +868,11 @@ const EmployeeModal = ({
                                     handleInputChange('permissionIds', newPerms);
                                   }}
                                   className={`flex items-center space-x-2.5 px-3 py-2 border transition-all rounded-lg text-left ${isInherited ? 'bg-emerald-50 border-emerald-100 text-emerald-700' :
-                                    isDirect ? 'bg-blue-600 border-blue-600 text-white shadow-sm ring-2 ring-blue-100' :
-                                      'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600'
-                                    }`}
+ isDirect ? 'bg-primary border-primary text-white shadow-sm ring-2 ring-ring/20' :
+ 'bg-card border-border text-muted-foreground/70 hover:border-border hover:text-muted-foreground'
+ }`}
                                 >
-                                  <div className={`w-1.5 h-1.5 rounded-full ${isInherited ? 'bg-emerald-500' : isDirect ? 'bg-white' : 'bg-slate-300'}`}></div>
+                                  <div className={`w-1.5 h-1.5 rounded-full ${isInherited ? 'bg-emerald-500' : isDirect ? 'bg-card' : 'bg-slate-300'}`}></div>
                                   <span className="text-[10px] font-bold capitalize">{perm.action}</span>
                                   {isInherited && <Icon name="Shield" size={10} className="ml-auto opacity-40 text-emerald-600" />}
                                 </button>
@@ -889,21 +889,21 @@ const EmployeeModal = ({
               {activeTab === 'contact' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-500 ml-1">Home Address</label>
+                    <label className="text-xs font-semibold text-muted-foreground ml-1">Home Address</label>
                     <textarea
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all min-h-[100px] resize-none"
+                      className="w-full px-4 py-3 bg-muted/60 border border-border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all min-h-[100px] resize-none"
                       value={formData?.address} onChange={(e) => handleInputChange('address', e?.target?.value)} disabled={isReadOnly}
                       placeholder="Enter full street, city, and zip code..."
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-100">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-border">
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Emergency Contact Person</label>
-                      <input className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" value={formData?.emergencyContact} onChange={(e) => handleInputChange('emergencyContact', e?.target?.value)} disabled={isReadOnly} />
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Emergency Contact Person</label>
+                      <input className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-semibold rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all" value={formData?.emergencyContact} onChange={(e) => handleInputChange('emergencyContact', e?.target?.value)} disabled={isReadOnly} />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 ml-1">Emergency Phone Number</label>
-                      <input className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" value={formData?.emergencyPhone} onChange={(e) => handleInputChange('emergencyPhone', e?.target?.value)} disabled={isReadOnly} />
+                      <label className="text-xs font-semibold text-muted-foreground ml-1">Emergency Phone Number</label>
+                      <input className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-medium rounded-xl focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all" value={formData?.emergencyPhone} onChange={(e) => handleInputChange('emergencyPhone', e?.target?.value)} disabled={isReadOnly} />
                     </div>
                   </div>
                 </div>
@@ -914,49 +914,49 @@ const EmployeeModal = ({
                   {(mode === 'edit' || mode === 'add') && (
                     <div
                       onClick={() => !uploadingDocs && docInputRef.current.click()}
-                      className={`border-2 border-dashed rounded-2xl p-12 text-center group transition-all ${uploadingDocs
-                        ? 'border-blue-400 bg-blue-50/30 cursor-wait'
-                        : 'border-slate-200 bg-slate-50 cursor-pointer hover:bg-blue-50/50 hover:border-blue-400'
-                        }`}
+                      className={`border-2 border-dashed rounded-lg p-12 text-center group transition-all ${uploadingDocs
+ ? 'border-blue-400 bg-primary/30 cursor-wait'
+ : 'border-border bg-muted/60 cursor-pointer hover:bg-primary/50 hover:border-blue-400'
+ }`}
                     >
                       <input type="file" multiple hidden ref={docInputRef} onChange={(e) => handleFileChange(e, 'doc')} disabled={uploadingDocs} />
                       {uploadingDocs ? (
                         <div className="space-y-4 py-2 animate-in fade-in duration-300">
-                          <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto shadow-md"></div>
-                          <p className="text-sm font-bold text-blue-600 tracking-tight">Processing your files...</p>
-                          <p className="text-[10px] text-slate-400 font-medium">Please wait a moment</p>
+                          <div className="w-12 h-12 border-4 border-primary/20 border-t-blue-600 rounded-full animate-spin mx-auto shadow-md"></div>
+                          <p className="text-sm font-bold text-primary tracking-tight">Processing your files...</p>
+                          <p className="text-[10px] text-muted-foreground/70 font-medium">Please wait a moment</p>
                         </div>
                       ) : (
                         <>
-                          <div className="w-16 h-16 bg-white rounded-2xl border border-slate-100 flex items-center justify-center text-slate-300 mx-auto mb-4 shadow-sm group-hover:text-blue-500 group-hover:scale-110 transition-all">
+                          <div className="w-16 h-16 bg-card rounded-lg border border-border flex items-center justify-center text-muted-foreground/70 mx-auto mb-4 shadow-sm group-hover:text-primary transition-all">
                             <Icon name="UploadCloud" size={32} />
                           </div>
-                          <span className="block text-sm font-bold text-slate-800 tracking-tight transition-colors">Upload Documents</span>
-                          <p className="text-xs text-slate-400 font-medium mt-2">PDF, DOCX or Images up to 10MB per file</p>
+                          <span className="block text-sm font-bold text-foreground tracking-tight transition-colors">Upload Documents</span>
+                          <p className="text-xs text-muted-foreground/70 font-medium mt-2">PDF, DOCX or Images up to 10MB per file</p>
                         </>
                       )}
                     </div>
                   )}
 
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Attached Files ({formData.documents.length})</span>
-                      <Icon name="Files" size={16} className="text-slate-300" />
+                    <div className="flex items-center justify-between border-b border-border pb-3">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide pl-1">Attached Files ({formData.documents.length})</span>
+                      <Icon name="Files" size={16} className="text-muted-foreground/70" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {formData.documents.map((doc, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-xl hover:shadow-md transition-all group">
+                        <div key={idx} className="flex items-center justify-between p-4 bg-card border border-border rounded-xl hover:shadow-md transition-all group">
                           <div className="flex items-center space-x-4 overflow-hidden">
-                            <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                            <div className="w-10 h-10 bg-muted/60 rounded-lg flex items-center justify-center text-muted-foreground/70 group-hover:bg-primary/90 group-hover:text-white transition-all">
                               <Icon name="FileText" size={18} />
                             </div>
                             <div className="truncate">
-                              <p className="text-xs font-bold text-slate-900 truncate tracking-tight">{doc.name}</p>
-                              <p className="text-[10px] font-semibold text-slate-400 uppercase">{doc.size}</p>
+                              <p className="text-xs font-bold text-foreground truncate tracking-tight">{doc.name}</p>
+                              <p className="text-[10px] font-semibold text-muted-foreground/70 uppercase">{doc.size}</p>
                             </div>
                           </div>
                           <div className="flex space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => window.open(doc.url)} className="p-2 border border-slate-100 rounded-lg hover:bg-slate-50 transition-all text-slate-500"><Icon name="Download" size={14} /></button>
+                            <button onClick={() => window.open(doc.url)} className="p-2 border border-border rounded-lg hover:bg-muted/60 transition-all text-muted-foreground"><Icon name="Download" size={14} /></button>
                             {!isReadOnly && <button onClick={() => removeDocument(idx)} className="p-2 border border-rose-50 rounded-lg text-rose-500 hover:bg-rose-50 transition-all"><Icon name="Trash2" size={14} /></button>}
                           </div>
                         </div>
@@ -973,20 +973,20 @@ const EmployeeModal = ({
                 <p className="text-sm font-medium">{apiError}</p>
               </div>
             )}
-            <div className="px-4 md:px-8 py-4 md:py-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="px-4 md:px-8 py-4 md:py-6 bg-muted/50 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center space-x-3 hidden md:flex">
                 <div className="flex -space-x-1">
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-50 bg-slate-200" />
+                    <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-50 bg-border" />
                   ))}
                 </div>
-                <span className="text-[11px] font-semibold text-slate-400">Collaborating with the HR team</span>
+                <span className="text-[11px] font-semibold text-muted-foreground/70">Collaborating with the HR team</span>
               </div>
               <div className="flex space-x-3 w-full md:w-auto">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 md:flex-none px-6 py-2.5 bg-white border border-slate-200 text-sm font-bold text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+                  className="flex-1 md:flex-none px-6 py-2.5 bg-card border border-border text-sm font-bold text-muted-foreground rounded-xl hover:bg-muted/60 transition-all shadow-sm "
                 >
                   Cancel
                 </button>
@@ -994,7 +994,7 @@ const EmployeeModal = ({
                   <button
                     type="button"
                     onClick={() => setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id)}
-                    className="flex-1 md:flex-none px-6 py-2.5 bg-slate-100 border border-slate-200 text-sm font-bold text-slate-600 rounded-xl hover:bg-slate-200 transition-all shadow-sm active:scale-95 flex items-center space-x-2 justify-center"
+                    className="flex-1 md:flex-none px-6 py-2.5 bg-muted border border-border text-sm font-bold text-muted-foreground rounded-xl hover:bg-border transition-all shadow-sm flex items-center space-x-2 justify-center"
                   >
                     <span>Previous</span>
                   </button>
@@ -1005,7 +1005,7 @@ const EmployeeModal = ({
                       <button
                         type="button"
                         onClick={() => setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id)}
-                        className="flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center bg-blue-600 hover:bg-blue-700 shadow-blue-100"
+                        className="flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center space-x-2 min-w-[140px] justify-center bg-primary hover:bg-primary/90 "
                       >
                         <span>Next</span>
                       </button>
@@ -1014,10 +1014,10 @@ const EmployeeModal = ({
                         type="button"
                         onClick={handleSave}
                         disabled={isSaving || isLoading}
-                        className={`flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 flex items-center space-x-2 min-w-[140px] justify-center ${isSaving || isLoading
-                          ? 'bg-blue-400 cursor-not-allowed shadow-none'
-                          : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100'
-                          }`}
+                        className={`flex-1 md:flex-none px-8 py-2.5 text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center space-x-2 min-w-[140px] justify-center ${isSaving || isLoading
+ ? 'bg-blue-400 cursor-not-allowed shadow-none'
+ : 'bg-emerald-600 hover:bg-emerald-700 '
+ }`}
                       >
                         {(isSaving || isLoading) && (
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

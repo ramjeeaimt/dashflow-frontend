@@ -228,7 +228,7 @@ const TemplateDesignerPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted/60">
       <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
@@ -244,15 +244,15 @@ const TemplateDesignerPage = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate('/notifications/templates')}
-                className="p-2 bg-white rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 transition-colors shadow-sm"
+                className="p-2 bg-card rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors shadow-sm"
               >
                 <ChevronLeft size={20} />
               </button>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70">
                   Email Templates
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+                <h1 className="mt-1 text-2xl font-semibold text-foreground">
                   {id ? 'Edit Template' : 'Design Template'}
                 </h1>
               </div>
@@ -261,14 +261,14 @@ const TemplateDesignerPage = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowForm(!showForm)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md ${showForm ? 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md ${showForm ? 'bg-card border border-border text-muted-foreground hover:bg-muted/60' : 'bg-primary text-white hover:bg-primary/90'}`}
               >
                 {showForm ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
                 {showForm ? 'Hide Editor' : 'Show Editor'}
               </button>
               <button
                 onClick={handleSave}
-                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all "
               >
                 <Save size={18} /> Save Template
               </button>
@@ -287,7 +287,7 @@ const TemplateDesignerPage = () => {
             {!showForm && (
               <button
                 onClick={() => setShowForm(true)}
-                className={`fixed ${sidebarCollapsed ? 'left-16' : 'left-60'} top-1/2 -translate-y-1/2 z-50 bg-blue-600 text-white p-3 rounded-r-2xl shadow-2xl hover:bg-blue-700 transition-all animate-in slide-in-from-left duration-300`}
+                className={`fixed ${sidebarCollapsed ? 'left-16' : 'left-60'} top-1/2 -translate-y-1/2 z-50 bg-primary text-white p-3 rounded-r-2xl shadow-sm hover:bg-primary/90 transition-all animate-in slide-in-from-left duration-300`}
                 title="Show Editor"
               >
                 <PanelLeftOpen size={24} />
@@ -297,14 +297,14 @@ const TemplateDesignerPage = () => {
             {/* Editor Side */}
             {showForm && (
               <div className="w-full lg:w-1/2 space-y-6 animate-in slide-in-from-left duration-500">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                  <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                      <Type size={16} className="text-blue-500" /> Content Editor
+                <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+                  <div className="border-b border-border bg-muted/50 px-6 py-4 flex items-center justify-between">
+                    <h2 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                      <Type size={16} className="text-primary" /> Content Editor
                     </h2>
                     <button
                       onClick={() => setShowForm(false)}
-                      className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-all"
+                      className="p-1.5 text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted rounded-md transition-all"
                       title="Hide Editor"
                     >
                       <PanelLeftClose size={18} />
@@ -312,47 +312,47 @@ const TemplateDesignerPage = () => {
                   </div>
                   <div className="p-6 space-y-6">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Template Name</label>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Template Name</label>
                       <input
                         value={template.name}
                         onChange={(e) => setTemplate({ ...template, name: e.target.value })}
                         placeholder="e.g., Monthly Salary Release"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-slate-800"
+                        className="w-full px-4 py-3 rounded-xl border border-border focus:border-primary focus:ring-4 focus:ring-ring transition-all outline-none text-foreground"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Subject Title</label>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Subject Title</label>
                       <input
                         value={template.title}
                         onChange={(e) => setTemplate({ ...template, title: e.target.value })}
                         placeholder="Subject of the email"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-slate-800 font-medium"
+                        className="w-full px-4 py-3 rounded-xl border border-border focus:border-primary focus:ring-4 focus:ring-ring transition-all outline-none text-foreground font-medium"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message Body (Rich Text)</label>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Message Body (Rich Text)</label>
 
-                      <div className="flex flex-wrap items-center gap-1 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-t-xl">
-                        <button type="button" onClick={() => execCommand('bold')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Bold">
+                      <div className="flex flex-wrap items-center gap-1 mb-2 p-1 bg-muted/60 border border-border rounded-t-xl">
+                        <button type="button" onClick={() => execCommand('bold')} className="p-2 hover:bg-card hover:shadow-sm rounded transition-all text-muted-foreground" title="Bold">
                           <Bold size={16} />
                         </button>
-                        <button type="button" onClick={() => execCommand('italic')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Italic">
+                        <button type="button" onClick={() => execCommand('italic')} className="p-2 hover:bg-card hover:shadow-sm rounded transition-all text-muted-foreground" title="Italic">
                           <Italic size={16} />
                         </button>
-                        <div className="w-[1px] h-6 bg-slate-200 mx-1" />
-                        <button type="button" onClick={() => execCommand('insertUnorderedList')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Bullet List">
+                        <div className="w-[1px] h-6 bg-border mx-1" />
+                        <button type="button" onClick={() => execCommand('insertUnorderedList')} className="p-2 hover:bg-card hover:shadow-sm rounded transition-all text-muted-foreground" title="Bullet List">
                           <List size={16} />
                         </button>
-                        <div className="w-[1px] h-6 bg-slate-200 mx-1" />
-                        <button type="button" onClick={() => execCommand('justifyLeft')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Align Left">
+                        <div className="w-[1px] h-6 bg-border mx-1" />
+                        <button type="button" onClick={() => execCommand('justifyLeft')} className="p-2 hover:bg-card hover:shadow-sm rounded transition-all text-muted-foreground" title="Align Left">
                           <AlignLeft size={16} />
                         </button>
-                        <button type="button" onClick={() => execCommand('justifyCenter')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Align Center">
+                        <button type="button" onClick={() => execCommand('justifyCenter')} className="p-2 hover:bg-card hover:shadow-sm rounded transition-all text-muted-foreground" title="Align Center">
                           <AlignCenter size={16} />
                         </button>
-                        <button type="button" onClick={() => execCommand('justifyRight')} className="p-2 hover:bg-white hover:shadow-sm rounded transition-all text-slate-600" title="Align Right">
+                        <button type="button" onClick={() => execCommand('justifyRight')} className="p-2 hover:bg-card hover:shadow-sm rounded transition-all text-muted-foreground" title="Align Right">
                           <AlignRight size={16} />
                         </button>
                       </div>
@@ -361,107 +361,107 @@ const TemplateDesignerPage = () => {
                         ref={editorRef}
                         contentEditable
                         onInput={handleEditorChange}
-                        className="w-full min-h-[400px] px-4 py-3 rounded-b-xl border border-t-0 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-slate-800 bg-white overflow-auto rich-editor"
+                        className="w-full min-h-[400px] px-4 py-3 rounded-b-xl border border-t-0 border-border focus:border-primary focus:ring-4 focus:ring-ring transition-all outline-none text-foreground bg-card overflow-auto rich-editor"
                         data-placeholder="Type your message here..."
                       />
                     </div>
 
                     {/* Signature Settings Section */}
-                    <div className="pt-6 border-t border-slate-100">
-                      <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <div className="pt-6 border-t border-border">
+                      <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                         ✍️ Edit Signature Details
                       </h3>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Signature Team</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Signature Team</label>
                           <input
                             value={template.signatureTeam || 'Team DIFMO'}
                             onChange={(e) => setTemplate({ ...template, signatureTeam: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Corporate Role / Dept</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Corporate Role / Dept</label>
                           <input
                             value={template.signatureDept || 'Corporate Support'}
                             onChange={(e) => setTemplate({ ...template, signatureDept: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Tagline / Subtitle</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Tagline / Subtitle</label>
                           <input
                             value={template.signatureRole || 'Communications & Experience'}
                             onChange={(e) => setTemplate({ ...template, signatureRole: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Company Name</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Company Name</label>
                           <input
                             value={template.signatureCompany || 'DIFMO Pvt Ltd'}
                             onChange={(e) => setTemplate({ ...template, signatureCompany: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Meet Button Text</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Meet Button Text</label>
                           <input
                             value={template.signatureMeetText || "Let's meet"}
                             onChange={(e) => setTemplate({ ...template, signatureMeetText: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Meet Button Link</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Meet Button Link</label>
                           <input
                             value={template.signatureMeetLink || 'https://www.difmo.com/contact'}
                             onChange={(e) => setTemplate({ ...template, signatureMeetLink: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Contact Email</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Contact Email</label>
                           <input
                             value={template.signatureEmail || 'info@difmo.com'}
                             onChange={(e) => setTemplate({ ...template, signatureEmail: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Website Address</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Website Address</label>
                           <input
                             value={template.signatureWebsite || 'difmo.com'}
                             onChange={(e) => setTemplate({ ...template, signatureWebsite: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Website Link</label>
+                          <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Website Link</label>
                           <input
                             value={template.signatureWebsiteLink || 'https://www.difmo.com'}
                             onChange={(e) => setTemplate({ ...template, signatureWebsiteLink: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm animate-all"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm animate-all"
                           />
                         </div>
                       </div>
 
                       <div className="mt-4">
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Office Address</label>
+                        <label className="block text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-1.5">Office Address</label>
                         <textarea
                           value={template.signatureAddress || '4/37 Vibhav Khand, Gomtinagr Lucknow, Uttar Pradesh 226016, India'}
                           onChange={(e) => setTemplate({ ...template, signatureAddress: e.target.value })}
                           rows={2}
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none text-slate-700 text-sm resize-none"
+                          className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-ring transition-all outline-none text-foreground text-sm resize-none"
                         />
                       </div>
                     </div>
@@ -472,20 +472,20 @@ const TemplateDesignerPage = () => {
 
             {/* Preview Side */}
             <div className={`transition-all duration-500 ${showForm ? 'w-full lg:w-1/2' : 'w-full'}`}>
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden min-h-[800px] flex flex-col relative">
-                <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4 flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden min-h-[800px] flex flex-col relative">
+                <div className="border-b border-border bg-muted/50 px-6 py-4 flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                     <Palette size={16} className="text-purple-500" /> Live Preview
                   </h2>
                   <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-border"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-border"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-border"></div>
                   </div>
                 </div>
-                <div className="flex-1 bg-slate-100/50 overflow-auto flex justify-center">
+                <div className="flex-1 bg-muted/50 overflow-auto flex justify-center">
                   <div
-                    className="w-full shadow-2xl h-fit border border-black/5"
+                    className="w-full shadow-sm h-fit border border-black/5"
                     dangerouslySetInnerHTML={{ __html: getPreviewHtml() }}
                   />
                 </div>

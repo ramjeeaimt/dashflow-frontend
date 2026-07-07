@@ -54,8 +54,8 @@ const UserProfileDropdown = () => {
     }
     // Fallback UI
     return (
-      <div className={`${sizeClass} rounded-full bg-indigo-600 flex items-center justify-center border border-indigo-700 shadow-sm`}>
-        <span className={`${textClass} font-black text-white tracking-tighter`}>
+      <div className={`${sizeClass} rounded-full bg-primary flex items-center justify-center border border-primary shadow-sm`}>
+        <span className={`${textClass} font-semibold text-white tracking-tighter`}>
           {userProfile?.initials}
         </span>
       </div>
@@ -102,33 +102,33 @@ const UserProfileDropdown = () => {
         </div>
 
         <div className="hidden sm:block text-left">
-          <p className="text-xs font-bold text-slate-800 leading-none">{userProfile?.name}</p>
-          {/* <p className="text-[10px] text-slate-400 font-medium mt-1">{userProfile?.role}</p> */}
+          <p className="text-xs font-bold text-foreground leading-none">{userProfile?.name}</p>
+          {/* <p className="text-[10px] text-muted-foreground/70 font-medium mt-1">{userProfile?.role}</p> */}
         </div>
 
         <Icon
           name="ChevronDown"
           size={14}
-          className={`hidden sm:block text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`hidden sm:block text-muted-foreground/70 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl shadow-slate-200/50 z-50 overflow-hidden">
+        <div className="absolute top-full right-0 mt-2 w-72 bg-card border border-border rounded-xl shadow-sm z-50 overflow-hidden">
           {/* User Info Header */}
           <button
             onClick={() => handleNavigation('/profile')}
-            className="w-full text-left p-4 bg-slate-50/50 border-b border-slate-100 hover:bg-slate-50 transition-colors flex items-center justify-between outline-none group"
+            className="w-full text-left p-4 bg-muted/50 border-b border-border hover:bg-muted/60 transition-colors flex items-center justify-between outline-none group"
           >
             <div className="flex items-center space-x-3">
               {renderAvatar("w-12 h-12", "text-base")}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-slate-900 truncate">{userProfile?.name}</p>
-                <p className="text-[11px] text-slate-500 truncate font-medium">{userProfile?.email}</p>
+                <p className="text-sm font-bold text-foreground truncate">{userProfile?.name}</p>
+                <p className="text-[11px] text-muted-foreground truncate font-medium">{userProfile?.email}</p>
               </div>
             </div>
-            <Icon name="ChevronRight" size={14} className="text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            <Icon name="ChevronRight" size={14} className="text-muted-foreground/70 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
           {/* Menu Items */}
@@ -137,25 +137,25 @@ const UserProfileDropdown = () => {
               <button
                 key={index}
                 onClick={item?.action}
-                className={`w-full flex items-start space-x-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors ${item?.variant === 'destructive' ? 'text-red-600' : 'text-slate-700'
-                  }`}
+                className={`w-full flex items-start space-x-3 px-4 py-3 text-left hover:bg-muted/60 transition-colors ${item?.variant === 'destructive' ? 'text-red-600' : 'text-foreground'
+ }`}
               >
                 <Icon
                   name={item?.icon}
                   size={16}
-                  className={`mt-0.5 ${item?.variant === 'destructive' ? 'text-red-500' : 'text-slate-400'}`}
+                  className={`mt-0.5 ${item?.variant === 'destructive' ? 'text-red-500' : 'text-muted-foreground/70'}`}
                 />
                 <div className="flex-1">
                   <p className="text-xs font-bold">{item?.label}</p>
-                  <p className="text-[10px] text-slate-400 font-medium">{item?.description}</p>
+                  <p className="text-[10px] text-muted-foreground/70 font-medium">{item?.description}</p>
                 </div>
               </button>
             ))}
           </div>
 
           {/* Footer */}
-          <div className="p-3 border-t border-slate-100 bg-slate-50/30">
-            <p className="text-[10px] text-slate-400 text-center font-bold uppercase tracking-widest">
+          <div className="p-3 border-t border-border bg-muted/30">
+            <p className="text-[10px] text-muted-foreground/70 text-center font-bold uppercase tracking-wide">
               CRM Systems • 2026
             </p>
           </div>

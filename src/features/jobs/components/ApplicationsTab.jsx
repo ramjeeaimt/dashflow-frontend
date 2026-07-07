@@ -7,17 +7,17 @@ import DataLoader from 'components/ui/DataLoader';
 const ALL_STATUSES = ['ALL', 'PENDING', 'REVIEWED', 'SHORTLISTED', 'CALL DONE', 'INTERVIEW DONE', 'GOOGLE MEET DONE', 'SELECTED', 'REJECTED'];
 
 const STATUS_CONFIG = {
-  PENDING: { cls: 'bg-slate-100 text-slate-600 border-slate-200', dot: 'bg-slate-400', icon: 'Clock' },
-  REVIEWED: { cls: 'bg-blue-50 text-blue-600 border-blue-200', dot: 'bg-blue-500', icon: 'Eye' },
-  SHORTLISTED: { cls: 'bg-violet-50 text-violet-600 border-violet-200', dot: 'bg-violet-500', icon: 'Star' },
-  'CALL DONE': { cls: 'bg-cyan-50 text-cyan-600 border-cyan-200', dot: 'bg-cyan-500', icon: 'Phone' },
+  PENDING: { cls: 'bg-muted text-muted-foreground border-border', dot: 'bg-slate-400', icon: 'Clock' },
+  REVIEWED: { cls: 'bg-primary/10 text-primary border-border', dot: 'bg-primary', icon: 'Eye' },
+  SHORTLISTED: { cls: 'bg-primary/10 text-primary border-border', dot: 'bg-primary', icon: 'Star' },
+  'CALL DONE': { cls: 'bg-primary/10 text-primary border-border', dot: 'bg-primary', icon: 'Phone' },
   'INTERVIEW DONE': { cls: 'bg-amber-50 text-amber-600 border-amber-200', dot: 'bg-amber-500', icon: 'Users' },
-  'GOOGLE MEET DONE': { cls: 'bg-indigo-50 text-indigo-600 border-indigo-200', dot: 'bg-indigo-500', icon: 'Video' },
+  'GOOGLE MEET DONE': { cls: 'bg-primary/10 text-primary border-border', dot: 'bg-primary', icon: 'Video' },
   SELECTED: { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: 'CheckCircle' },
   REJECTED: { cls: 'bg-red-50 text-red-600 border-red-200', dot: 'bg-red-400', icon: 'XCircle' },
 };
 
-const AVATAR_COLORS = ['bg-primary', 'bg-violet-500', 'bg-emerald-500', 'bg-amber-500', 'bg-cyan-500', 'bg-pink-500', 'bg-indigo-500', 'bg-rose-500'];
+const AVATAR_COLORS = ['bg-primary', 'bg-primary', 'bg-emerald-500', 'bg-amber-500', 'bg-primary', 'bg-primary', 'bg-primary', 'bg-rose-500'];
 
 const EMPTY_CANDIDATE = { job: '', name: '', email: '', phone: '', experience: '', location: '' };
 
@@ -131,7 +131,7 @@ export default function ApplicationsTab() {
 
   const stats = [
     { label: 'Total Applications', value: pagination.total, color: 'bg-primary/10 text-primary', icon: 'ClipboardList' },
-    { label: 'Shortlisted', value: apps.filter(a => (a.status || '').toUpperCase() === 'SHORTLISTED').length, color: 'bg-violet-100 text-violet-600', icon: 'Star' }, // NOTE: These sub-stats might needing backend counts too if more than one page is shortlisted
+    { label: 'Shortlisted', value: apps.filter(a => (a.status || '').toUpperCase() === 'SHORTLISTED').length, color: 'bg-primary/10 text-primary', icon: 'Star' }, // NOTE: These sub-stats might needing backend counts too if more than one page is shortlisted
     { label: 'Selected', value: apps.filter(a => (a.status || '').toUpperCase() === 'SELECTED' || (a.status || '').toUpperCase() === 'HIRED').length, color: 'bg-emerald-100 text-emerald-600', icon: 'CheckCircle' },
     { label: 'Rejected', value: apps.filter(a => (a.status || '').toUpperCase() === 'REJECTED').length, color: 'bg-red-100 text-red-600', icon: 'XCircle' },
   ];
@@ -148,7 +148,7 @@ export default function ApplicationsTab() {
         </div>
         <button
           onClick={() => setIsAddOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-sm shadow-blue-200"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-all shadow-sm "
         >
           <Icon name="UserPlus" size={18} />
           Add Candidate
@@ -158,7 +158,7 @@ export default function ApplicationsTab() {
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         {stats.map((s, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-lg p-5 flex items-center gap-4 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+          <div key={i} className="bg-card border border-gray-200 rounded-lg p-5 flex items-center gap-4 hover:shadow-md transition-all duration-300 ">
             <div className={`w-11 h-11 rounded-lg ${s.color} flex items-center justify-center flex-shrink-0`}>
               <Icon name={s.icon} size={22} />
             </div>
@@ -179,23 +179,23 @@ export default function ApplicationsTab() {
             placeholder="Search by name, role, or email..."
             value={filter.query}
             onChange={e => setFilter(f => ({ ...f, query: e.target.value }))}
-            className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all"
+            className="w-full pl-9 pr-4 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all"
           />
         </div>
         <select
           value={filter.status}
           onChange={e => setFilter(f => ({ ...f, status: e.target.value }))}
-          className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 cursor-pointer"
+          className="px-4 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 cursor-pointer"
         >
           {ALL_STATUSES.map(s => <option key={s}>{s}</option>)}
         </select>
         {/* View toggle */}
-        <div className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="flex items-center bg-card border border-gray-200 rounded-lg overflow-hidden">
           {[['table', 'LayoutList'], ['', 'Columns']].map(([v, icon]) => (
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all ${view === v ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all ${view === v ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
             >
               <Icon name={icon} size={15} />
               <span className="capitalize">{v}</span>
@@ -206,7 +206,7 @@ export default function ApplicationsTab() {
 
       {/* ── Table View ── */}
       {view === 'table' && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm animate-in fade-in duration-500">
+        <div className="bg-card border border-gray-200 rounded-xl overflow-hidden shadow-sm animate-in fade-in duration-500">
           {isLoading ? (
             <DataLoader message="Loading applications..." subMessage="Fetching the latest candidate profiles" size="medium" />
           ) : (
@@ -234,7 +234,7 @@ export default function ApplicationsTab() {
                             {app.avatar || app.name?.[0]?.toUpperCase() || 'C'}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{app.fullName || app.name}</p>
+                            <p className="font-semibold text-gray-900 group-hover:text-primary transition-colors">{app.fullName || app.name}</p>
                             <p className="text-xs text-gray-500">{app.experience} exp · {app.location}</p>
                           </div>
                         </div>
@@ -259,7 +259,7 @@ export default function ApplicationsTab() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setSelected(app)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                             title="View Details"
                           >
                             <Icon name="Eye" size={15} />
@@ -267,7 +267,7 @@ export default function ApplicationsTab() {
                           <select
                             value={statusUp}
                             onChange={e => changeStatus(app.id || app._id, e.target.value)}
-                            className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-blue-300 cursor-pointer text-gray-700"
+                            className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-card focus:outline-none focus:ring-1 focus:ring-blue-300 cursor-pointer text-gray-700"
                           >
                             {ALL_STATUSES.filter(s => s !== 'ALL').map(s => <option key={s}>{s}</option>)}
                           </select>
@@ -291,7 +291,7 @@ export default function ApplicationsTab() {
                 <button
                   onClick={() => fetchApps(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                  className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="p-1.5 rounded-lg border border-gray-200 bg-card text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <Icon name="ChevronLeft" size={16} />
                 </button>
@@ -300,9 +300,9 @@ export default function ApplicationsTab() {
                     key={i + 1}
                     onClick={() => fetchApps(i + 1)}
                     className={`min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${pagination.page === i + 1
-                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-200'
-                        : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                      }`}
+ ? 'bg-primary text-white shadow-sm '
+ : 'border border-gray-200 bg-card text-gray-600 hover:bg-gray-50'
+ }`}
                   >
                     {i + 1}
                   </button>
@@ -310,7 +310,7 @@ export default function ApplicationsTab() {
                 <button
                   onClick={() => fetchApps(pagination.page + 1)}
                   disabled={pagination.page === pagination.totalPages}
-                  className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="p-1.5 rounded-lg border border-gray-200 bg-card text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <Icon name="ChevronRight" size={16} />
                 </button>
@@ -339,11 +339,11 @@ export default function ApplicationsTab() {
                   </div>
                   <div className="space-y-3">
                     {colApps.length === 0 ? (
-                      <div className="bg-white border border-dashed border-gray-200 rounded-xl p-4 text-center text-xs text-gray-400">Empty</div>
+                      <div className="bg-card border border-dashed border-gray-200 rounded-xl p-4 text-center text-xs text-gray-400">Empty</div>
                     ) : colApps.map((app, idx) => {
                       const avatarColor = AVATAR_COLORS[apps.indexOf(app) % AVATAR_COLORS.length];
                       return (
-                        <div key={app.id || app._id} className="bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer" onClick={() => setSelected(app)}>
+                        <div key={app.id || app._id} className="bg-card border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer" onClick={() => setSelected(app)}>
                           <div className="flex items-center gap-2.5 mb-2">
                             <div className={`w-8 h-8 rounded-full ${avatarColor} flex items-center justify-center text-white text-xs font-bold`}>{app.avatar || app.name?.[0]?.toUpperCase() || 'C'}</div>
                             <div>
@@ -351,7 +351,7 @@ export default function ApplicationsTab() {
                               <p className="text-xs text-gray-500">{app.experience}</p>
                             </div>
                           </div>
-                          <p className="text-xs font-medium text-blue-600 mb-1">{app.job?.title || app.jobTitle || 'N/A'}</p>
+                          <p className="text-xs font-medium text-primary mb-1">{app.job?.title || app.jobTitle || 'N/A'}</p>
                           <p className="text-xs text-gray-400">{app.createdAt ? new Date(app.createdAt).toLocaleDateString() : (app.date || 'N/A')}</p>
                         </div>
                       );
@@ -369,8 +369,8 @@ export default function ApplicationsTab() {
       {selected && (
         <div className="fixed inset-0 z-[200] flex justify-end animate-in fade-in duration-200">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelected(null)} />
-          <div className="relative bg-white w-full max-w-md h-full shadow-2xl overflow-y-auto animate-in slide-in-from-right-full duration-300 border-l border-gray-200">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+          <div className="relative bg-card w-full max-w-md h-full shadow-sm overflow-y-auto animate-in slide-in-from-right-full duration-300 border-l border-gray-200">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-card z-10">
               <h3 className="font-bold text-lg text-gray-900">Candidate Profile</h3>
               <button onClick={() => setSelected(null)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
                 <Icon name="X" size={18} className="text-gray-500" />
@@ -379,7 +379,7 @@ export default function ApplicationsTab() {
             <div className="p-6">
               {/* Avatar */}
               <div className="flex items-center gap-4 mb-6">
-                <div className={`w-16 h-16 rounded-2xl ${AVATAR_COLORS[apps.indexOf(selected) % AVATAR_COLORS.length]} flex items-center justify-center text-white text-2xl font-bold shadow-md`}>
+                <div className={`w-16 h-16 rounded-lg ${AVATAR_COLORS[apps.indexOf(selected) % AVATAR_COLORS.length]} flex items-center justify-center text-white text-2xl font-bold shadow-md`}>
                   {selected.avatar || selected.name?.[0]?.toUpperCase() || 'C'}
                 </div>
                 <div>
@@ -401,8 +401,8 @@ export default function ApplicationsTab() {
                   { icon: 'CalendarDays', label: 'Applied On', value: selected.createdAt ? new Date(selected.createdAt).toLocaleDateString() : (selected.date || 'N/A') },
                 ].map(item => (
                   <div key={item.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-200 flex items-center justify-center flex-shrink-0">
-                      <Icon name={item.icon} size={15} className="text-blue-600" />
+                    <div className="w-8 h-8 rounded-lg bg-card shadow-sm border border-gray-200 flex items-center justify-center flex-shrink-0">
+                      <Icon name={item.icon} size={15} className="text-primary" />
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-medium">{item.label}</p>
@@ -423,7 +423,7 @@ export default function ApplicationsTab() {
                       <button
                         key={s}
                         onClick={() => changeStatus(selected.id || selected._id, s)}
-                        className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-semibold transition-all ${isActive ? sc.cls + ' ring-2 ring-offset-2 ring-blue-500' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300'}`}
+                        className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-semibold transition-all ${isActive ? sc.cls + ' ring-2 ring-offset-2 ring-ring' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300'}`}
                       >
                         <Icon name={sc.icon} size={12} className={isActive ? '' : 'opacity-70'} />
                         {s}
@@ -440,8 +440,8 @@ export default function ApplicationsTab() {
       {/* ── Add Candidate Modal ── */}
       {isAddOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+          <div className="bg-card border border-gray-200 rounded-lg w-full max-w-lg shadow-sm animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-card z-10">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Add Candidate</h3>
                 <p className="text-sm text-gray-500">Manually add a new application</p>
@@ -458,7 +458,7 @@ export default function ApplicationsTab() {
                     required
                     value={candidate.job}
                     onChange={e => setCandidate(c => ({ ...c, job: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all cursor-pointer shadow-sm"
+                    className="w-full px-4 py-2.5 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all cursor-pointer shadow-sm"
                   >
                     <option value="">Select a Job Posting</option>
                     {jobs.map(j => (
@@ -473,7 +473,7 @@ export default function ApplicationsTab() {
                     placeholder="e.g. Alice Smith"
                     value={candidate.name}
                     onChange={e => setCandidate(c => ({ ...c, name: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
+                    className="w-full px-4 py-2.5 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all shadow-sm"
                   />
                 </div>
                 <div>
@@ -484,7 +484,7 @@ export default function ApplicationsTab() {
                     placeholder="candidate@email.com"
                     value={candidate.email}
                     onChange={e => setCandidate(c => ({ ...c, email: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
+                    className="w-full px-4 py-2.5 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all shadow-sm"
                   />
                 </div>
                 <div>
@@ -493,7 +493,7 @@ export default function ApplicationsTab() {
                     placeholder="+91 98765 43210"
                     value={candidate.phone}
                     onChange={e => setCandidate(c => ({ ...c, phone: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
+                    className="w-full px-4 py-2.5 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all shadow-sm"
                   />
                 </div>
                 <div>
@@ -502,7 +502,7 @@ export default function ApplicationsTab() {
                     placeholder="e.g. 2.5 years"
                     value={candidate.experience}
                     onChange={e => setCandidate(c => ({ ...c, experience: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
+                    className="w-full px-4 py-2.5 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all shadow-sm"
                   />
                 </div>
                 <div>
@@ -511,16 +511,16 @@ export default function ApplicationsTab() {
                     placeholder="e.g. Pune, Remote"
                     value={candidate.location}
                     onChange={e => setCandidate(c => ({ ...c, location: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm"
+                    className="w-full px-4 py-2.5 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 transition-all shadow-sm"
                   />
                 </div>
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-2">
-                <button type="button" onClick={() => { setIsAddOpen(false); setCandidate(EMPTY_CANDIDATE); }} className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm">Cancel</button>
+                <button type="button" onClick={() => { setIsAddOpen(false); setCandidate(EMPTY_CANDIDATE); }} className="px-5 py-2.5 bg-card border border-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm">Cancel</button>
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 active:scale-95 transition-all shadow-sm shadow-blue-200 flex items-center justify-center gap-2 min-w-[140px]"
+                  className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 min-w-[140px]"
                 >
                   {isSubmitting && <Icon name="Loader2" size="16" className="animate-spin" />}
                   Add Candidate

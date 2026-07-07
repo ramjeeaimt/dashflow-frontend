@@ -159,7 +159,7 @@ const ManagerList = () => {
                     ))}
                     
                     {managers.length === 0 && (
-                        <div className="col-span-full border-2 border-dashed border-border rounded-2xl py-16 flex flex-col items-center justify-center text-center">
+                        <div className="col-span-full border-2 border-dashed border-border rounded-lg py-16 flex flex-col items-center justify-center text-center">
                             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                                 <Icon name="Users" size={32} className="text-muted-foreground" />
                             </div>
@@ -174,7 +174,7 @@ const ManagerList = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-                    <div className="bg-background p-8 rounded-2xl w-full max-w-xl shadow-2xl animate-in zoom-in duration-200">
+                    <div className="bg-background p-8 rounded-lg w-full max-w-xl shadow-sm animate-in zoom-in duration-200">
                         <div className="flex justify-between items-start mb-6">
                             <div>
                                 <h3 className="text-2xl font-bold">Promote to Manager</h3>
@@ -201,10 +201,10 @@ const ManagerList = () => {
                                 />
                             </div>
 
-                            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                            <div className="bg-primary/10 border-l-4 border-blue-400 p-4 rounded-r-lg">
                                 <div className="flex">
                                     <Icon name="Info" className="text-blue-400 mr-3" size={20} />
-                                    <p className="text-sm text-blue-700">
+                                    <p className="text-sm text-primary">
                                         Selected employees will be given a separate manager password: <span className="font-bold underline">pasword123</span>. They will still retain their original employee login.
                                     </p>
                                 </div>

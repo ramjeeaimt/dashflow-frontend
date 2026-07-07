@@ -96,7 +96,7 @@ const AdminLeaveManagement = () => {
     }), [leaves]);
 
     return (
-        <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
+        <div className="min-h-screen bg-muted/50 font-sans text-foreground">
             <Header onToggleSidebar={toggleMobileSidebar} />
             <Sidebar
                 isCollapsed={sidebarCollapsed}
@@ -111,11 +111,11 @@ const AdminLeaveManagement = () => {
                     {/* Stats Header */}
                     <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 pb-4">
                         <div>
-                            <div className="flex items-center gap-2 mb-2 text-indigo-600 font-black text-[10px] uppercase tracking-widest">
+                            <div className="flex items-center gap-2 mb-2 text-primary font-semibold text-[10px] uppercase tracking-wide">
                                 <ShieldAlert size={14} /> Admin Control Panel
                             </div>
-                            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Leave & Attendance</h1>
-                            <p className="text-sm text-slate-500 font-medium mt-1">Manage employee leave requests and approvals.</p>
+                            <h1 className="text-3xl font-semibold text-foreground tracking-tight">Leave & Attendance</h1>
+                            <p className="text-sm text-muted-foreground font-medium mt-1">Manage employee leave requests and approvals.</p>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full xl:w-auto">
                             <StatBox label="Pending Review" value={stats.pending} color="amber" icon={<Clock size={16} />} />
@@ -125,38 +125,38 @@ const AdminLeaveManagement = () => {
                     </div>
 
                     {/* Filter Toolbar */}
-                    <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                    <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-lg border border-border shadow-sm">
+                        <div className="flex bg-muted/60 p-1 rounded-xl border border-border">
                             {["ALL", "PENDING", "APPROVED", "REJECTED"].map((s) => (
                                 <button
                                     key={s}
                                     onClick={() => setFilterStatus(s)}
-                                    className={`px-6 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${filterStatus === s
-                                            ? "bg-white text-indigo-600 shadow-md border border-slate-100"
-                                            : "text-slate-400 hover:text-slate-600"
-                                        }`}
+                                    className={`px-6 py-2 rounded-lg text-[10px] font-semibold tracking-wide transition-all ${filterStatus === s
+ ? "bg-card text-primary shadow-md border border-border"
+ : "text-muted-foreground/70 hover:text-muted-foreground"
+ }`}
                                 >
                                     {s}
                                 </button>
                             ))}
                         </div>
                         <div className="relative w-full md:w-80">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70" size={16} />
                             <input
                                 type="text"
                                 placeholder="Search employees..."
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                                className="w-full pl-12 pr-4 py-3 bg-muted/60 border border-border rounded-xl text-sm font-medium focus:bg-card focus:border-primary outline-none transition-all"
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                     </div>
 
                     {/* Decision Table */}
-                    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50/50 border-b border-slate-100">
-                                    <tr className="text-slate-400 text-[10px] uppercase font-black tracking-widest">
+                                <thead className="bg-muted/50 border-b border-border">
+                                    <tr className="text-muted-foreground/70 text-[10px] uppercase font-semibold tracking-wide">
                                         <th className="px-8 py-5">Employee Info</th>
                                         <th className="px-8 py-5">Category</th>
                                         <th className="px-8 py-5">Schedule</th>
@@ -181,10 +181,10 @@ const AdminLeaveManagement = () => {
                                     ) : (
                                         <tr>
                                             <td colSpan="5" className="px-8 py-20 text-center">
-                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
+                                                <div className="w-16 h-16 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
                                                     <Search size={24} />
                                                 </div>
-                                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No matching leave records</p>
+                                                <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wide">No matching leave records</p>
                                             </td>
                                         </tr>
                                     )}
@@ -197,10 +197,10 @@ const AdminLeaveManagement = () => {
 
             {/* Decision Modal */}
             {decisionModal.isOpen && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 bg-sidebar/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-card rounded-lg w-full max-w-md shadow-sm overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className={`p-6 border-b ${decisionModal.type === 'APPROVED' ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-                            <h3 className={`text-xl font-black flex items-center gap-2 ${decisionModal.type === 'APPROVED' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                            <h3 className={`text-xl font-semibold flex items-center gap-2 ${decisionModal.type === 'APPROVED' ? 'text-emerald-700' : 'text-rose-700'}`}>
                                 {decisionModal.type === 'APPROVED' ? <Check size={24} /> : <X size={24} />}
                                 {decisionModal.type === 'APPROVED' ? 'Approve Leave Request' : 'Reject Leave Request'}
                             </h3>
@@ -212,7 +212,7 @@ const AdminLeaveManagement = () => {
                             <textarea
                                 autoFocus
                                 placeholder={decisionModal.type === 'APPROVED' ? "Type approval note/conditions here..." : "Type rejection reason here..."}
-                                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner resize-none"
+                                className="w-full p-4 bg-muted/60 border border-border rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all shadow-inner resize-none"
                                 rows="4"
                                 value={decisionModal.note}
                                 onChange={(e) => setDecisionModal(prev => ({ ...prev, note: e.target.value }))}
@@ -221,15 +221,15 @@ const AdminLeaveManagement = () => {
                                 <button
                                     onClick={() => setDecisionModal({ isOpen: false, type: null, leaveId: null, note: '' })}
                                     disabled={isSubmitting}
-                                    className="flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 hover:text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 py-3 px-4 rounded-xl font-semibold text-xs uppercase tracking-wide text-muted-foreground bg-muted hover:bg-border hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={() => handleStatusUpdate(decisionModal.leaveId, decisionModal.type, decisionModal.note)}
                                     disabled={isSubmitting}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-widest text-white shadow-md transition-all disabled:opacity-70 disabled:cursor-wait ${decisionModal.type === 'APPROVED' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20' : 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20'
-                                        }`}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-xs uppercase tracking-wide text-white shadow-md transition-all disabled:opacity-70 disabled:cursor-wait ${decisionModal.type === 'APPROVED' ? 'bg-emerald-500 hover:bg-emerald-600 ' : 'bg-rose-500 hover:bg-rose-600 '
+ }`}
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -258,41 +258,41 @@ const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }
 
     return (
         <>
-            <tr className={`group transition-all ${isExpanded ? 'bg-indigo-50/20' : 'hover:bg-slate-50/40'}`}>
+            <tr className={`group transition-all ${isExpanded ? 'bg-primary/20' : 'hover:bg-muted/40'}`}>
                 <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 bg-slate-900 text-white rounded-xl flex items-center justify-center font-black text-xs shadow-sm group-hover:scale-110 transition-transform">
+                        <div className="w-11 h-11 bg-sidebar text-white rounded-xl flex items-center justify-center font-semibold text-xs shadow-sm transition-transform">
                             {firstName.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                            <p className="font-black text-slate-900 text-sm leading-none">{fullName}</p>
-                            <p className="text-[10px] text-slate-400 mt-1.5 font-bold tracking-wider">{empCode}</p>
+                            <p className="font-semibold text-foreground text-sm leading-none">{fullName}</p>
+                            <p className="text-[10px] text-muted-foreground/70 mt-1.5 font-bold tracking-wider">{empCode}</p>
                         </div>
                     </div>
                 </td>
                 <td className="px-8 py-5">
-                    <span className="text-[10px] font-black text-slate-600 uppercase bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase bg-muted px-2 py-1 rounded-md border border-border">
                         {leave.type || leave.leaveType || 'General'}
                     </span>
                 </td>
                 <td className="px-8 py-5">
-                    <div className="text-xs font-black text-slate-700 flex items-center gap-1">
+                    <div className="text-xs font-semibold text-foreground flex items-center gap-1">
                         <span>{new Date(leave.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                         {leave.endDate && (
                             <>
-                                <span className="text-slate-300">-</span>
+                                <span className="text-muted-foreground/70">-</span>
                                 <span>{new Date(leave.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
                             </>
                         )}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-bold mt-1 uppercase">
+                    <div className="text-[10px] text-muted-foreground/70 font-bold mt-1 uppercase">
                         {leave.endDate ? 'Duration' : 'Starting Date'}
                     </div>
                 </td>
                 <td className="px-8 py-5">
-                    <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                            leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
-                        }`}>
+                    <span className={`px-3 py-1.5 rounded-full text-[9px] font-semibold uppercase tracking-wide border ${leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+ leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
+ }`}>
                         {leave.status}
                     </span>
                 </td>
@@ -300,37 +300,37 @@ const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }
                     <div className="flex justify-end items-center gap-2">
                         <button
                             onClick={onToggle}
-                            className={`p-2.5 rounded-xl transition-all ${isExpanded ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-100 text-slate-400 hover:text-indigo-600'}`}
+                            className={`p-2.5 rounded-xl transition-all ${isExpanded ? 'bg-primary text-white shadow-sm ' : 'bg-muted text-muted-foreground/70 hover:text-primary'}`}
                             title="Notes"
                         >
                             <MessageSquare size={16} />
                         </button>
 
-                        <div className="h-6 w-[1px] bg-slate-100 mx-1" />
+                        <div className="h-6 w-[1px] bg-muted mx-1" />
 
                         {leave.status === 'PENDING' && (
                             <>
                                 <button
                                     onClick={() => onOpenDecisionModal('APPROVED', lId)}
-                                    className="p-2.5 rounded-xl transition-all text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                                    className="p-2.5 rounded-xl transition-all text-muted-foreground/70 hover:text-emerald-600 hover:bg-emerald-50"
                                     title="Approve"
                                 >
                                     <Check size={18} />
                                 </button>
                                 <button
                                     onClick={() => onOpenDecisionModal('REJECTED', lId)}
-                                    className="p-2.5 rounded-xl transition-all text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                                    className="p-2.5 rounded-xl transition-all text-muted-foreground/70 hover:text-rose-600 hover:bg-rose-50"
                                     title="Reject"
                                 >
                                     <X size={18} />
                                 </button>
-                                <div className="h-6 w-[1px] bg-slate-100 mx-1" />
+                                <div className="h-6 w-[1px] bg-muted mx-1" />
                             </>
                         )}
 
                         <button
                             onClick={() => onDelete(lId)}
-                            className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                            className="p-2.5 text-muted-foreground/70 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                             title="Delete"
                         >
                             <Trash2 size={16} />
@@ -340,27 +340,27 @@ const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }
             </tr>
 
             {isExpanded && (
-                <tr className="bg-indigo-50/10">
-                    <td colSpan="5" className="px-12 py-8 border-l-4 border-indigo-500">
+                <tr className="bg-primary/10">
+                    <td colSpan="5" className="px-12 py-8 border-l-4 border-primary">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <div className="space-y-3">
-                                <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2">
+                                <h4 className="text-[10px] font-semibold text-primary uppercase tracking-wide flex items-center gap-2">
                                     <Info size={12} /> Employee Reason
                                 </h4>
-                                <div className="bg-white p-5 rounded-2xl border border-slate-200 text-sm text-slate-600 font-medium italic shadow-sm leading-relaxed">
+                                <div className="bg-card p-5 rounded-lg border border-border text-sm text-muted-foreground font-medium italic shadow-sm leading-relaxed">
                                     "{leave.reason || "No reason specified."}"
                                 </div>
                             </div>
                             <div className="space-y-3">
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <h4 className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide flex items-center gap-2">
                                     <MessageSquare size={12} /> Administrator Note
                                 </h4>
                                 {leave.status !== 'PENDING' ? (
-                                    <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 text-sm text-slate-800 font-medium shadow-sm leading-relaxed whitespace-pre-wrap">
+                                    <div className="bg-muted/60 p-5 rounded-lg border border-border text-sm text-foreground font-medium shadow-sm leading-relaxed whitespace-pre-wrap">
                                         {leave.adminComment || "No administrator note provided."}
                                     </div>
                                 ) : (
-                                    <div className="bg-amber-50 p-5 rounded-2xl border border-amber-200 text-sm text-amber-800 font-medium shadow-sm flex items-center gap-3">
+                                    <div className="bg-amber-50 p-5 rounded-lg border border-amber-200 text-sm text-amber-800 font-medium shadow-sm flex items-center gap-3">
                                         <Clock size={20} className="text-amber-500" />
                                         <span>Click the Approve or Reject action buttons to enter a decision note.</span>
                                     </div>
@@ -376,14 +376,14 @@ const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }
 
 // Sub-components
 const StatBox = ({ label, value, color, icon }) => (
-    <div className={`bg-white border border-slate-200 p-4 rounded-2xl flex items-center justify-between shadow-sm group hover:border-${color}-300 transition-all`}>
+    <div className={`bg-card border border-border p-4 rounded-lg flex items-center justify-between shadow-sm group hover:border-${color}-300 transition-all`}>
         <div>
-            <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">
                 {icon} {label}
             </div>
-            <p className="text-2xl font-black text-slate-900 leading-tight tracking-tight">{value}</p>
+            <p className="text-2xl font-semibold text-foreground leading-tight tracking-tight">{value}</p>
         </div>
-        <div className={`w-10 h-10 rounded-xl bg-${color}-50 flex items-center justify-center text-${color}-600 group-hover:scale-110 transition-transform`}>
+        <div className={`w-10 h-10 rounded-xl bg-${color}-50 flex items-center justify-center text-${color}-600 transition-transform`}>
             {icon}
         </div>
     </div>
@@ -393,7 +393,7 @@ const SkeletonRows = () => (
     [1, 2, 3, 4, 5].map(i => (
         <tr key={i}>
             <td colSpan="5" className="px-8 py-6">
-                <div className="h-12 bg-slate-100 w-full rounded-xl animate-pulse" />
+                <div className="h-12 bg-muted w-full rounded-xl animate-pulse" />
             </td>
         </tr>
     ))

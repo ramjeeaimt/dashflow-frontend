@@ -77,31 +77,31 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4">
-            <div className="bg-white w-full max-w-5xl max-h-[90vh] flex flex-col rounded-3xl shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-sidebar/60 backdrop-blur-md p-4">
+            <div className="bg-card w-full max-w-5xl max-h-[90vh] flex flex-col rounded-lg shadow-sm border border-border animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-8 border-b border-slate-50">
                     <div className="flex items-center space-x-5">
-                       <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                       <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-sm">
                           <Icon name="Calendar" size={28} />
                        </div>
                        <div>
-                          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Daily Attendance</h2>
-                          <p className="text-sm font-semibold text-slate-400 mt-0.5">
+                          <h2 className="text-2xl font-bold text-foreground tracking-tight">Daily Attendance</h2>
+                          <p className="text-sm font-semibold text-muted-foreground/70 mt-0.5">
                               {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                           </p>
                        </div>
                     </div>
-                    <button onClick={onClose} className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all">
+                    <button onClick={onClose} className="p-3 text-muted-foreground/70 hover:text-foreground hover:bg-muted/60 rounded-xl transition-all">
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* Content - Scrollable List */}
-                <div className="flex-1 overflow-y-auto p-8 bg-slate-50/20">
+                <div className="flex-1 overflow-y-auto p-8 bg-muted/20">
                     <div className="space-y-6">
-                        <div className="grid grid-cols-12 gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-4">
+                        <div className="grid grid-cols-12 gap-6 text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-4 px-4">
                             <div className="col-span-4 flex items-center space-x-2">
                                 <span>Employee</span>
                             </div>
@@ -117,22 +117,22 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                 const isExisting = data.isExisting;
 
                                 return (
-                                    <div key={emp.id} className={`grid grid-cols-12 gap-6 items-center p-5 rounded-2xl border transition-all ${isExisting ? 'bg-slate-50/50 border-slate-100 opacity-60' : 'bg-white border-slate-100 hover:border-blue-200 hover:shadow-md'}`}>
+                                    <div key={emp.id} className={`grid grid-cols-12 gap-6 items-center p-5 rounded-lg border transition-all ${isExisting ? 'bg-muted/50 border-border opacity-60' : 'bg-card border-border hover:border-border hover:shadow-md'}`}>
 
                                         {/* Employee Info */}
                                         <div className="col-span-4 flex items-center space-x-4">
                                             <EmployeeAvatar employee={{ employeeName: emp.name, ...emp }} size="md" />
                                             <div>
-                                                <div className="text-sm font-bold text-slate-900 tracking-tight">{emp.name}</div>
-                                                <div className="text-[11px] font-medium text-slate-400">{emp.employeeCode || emp.id}</div>
+                                                <div className="text-sm font-bold text-foreground tracking-tight">{emp.name}</div>
+                                                <div className="text-[11px] font-medium text-muted-foreground/70">{emp.employeeCode || emp.id}</div>
                                             </div>
                                         </div>
 
                                         {/* Status Selection */}
                                         <div className="col-span-3">
                                             {isExisting ? (
-                                                <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg w-fit">
-                                                    <Icon name="Check" size={12} className="text-blue-600" />
+                                                <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted text-muted-foreground rounded-lg w-fit">
+                                                    <Icon name="Check" size={12} className="text-primary" />
                                                     <span className="text-[10px] font-bold uppercase tracking-wider">{data.status}</span>
                                                 </div>
                                             ) : (
@@ -141,10 +141,10 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                                         <button
                                                             key={status}
                                                             onClick={() => handleStatusChange(emp.id, status)}
-                                                            className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-lg transition-all border active:scale-95 ${data.status === status
-                                                                ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-100'
-                                                                : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
-                                                                }`}
+                                                            className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-lg transition-all border ${data.status === status
+ ? 'bg-primary text-white border-primary shadow-md '
+ : 'bg-card text-muted-foreground/70 border-border hover:border-border'
+ }`}
                                                         >
                                                             {status}
                                                         </button>
@@ -160,7 +160,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                                 value={data.checkInTime || ''}
                                                 onChange={(e) => handleTimeChange(emp.id, 'checkInTime', e.target.value)}
                                                 disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
-                                                className="w-full px-4 py-2 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
+                                                className="w-full px-4 py-2 text-xs font-bold bg-muted/60 border border-border rounded-xl text-foreground focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
                                             />
                                         </div>
 
@@ -171,7 +171,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                                 value={data.checkOutTime || ''}
                                                 onChange={(e) => handleTimeChange(emp.id, 'checkOutTime', e.target.value)}
                                                 disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
-                                                className="w-full px-4 py-2 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
+                                                className="w-full px-4 py-2 text-xs font-bold bg-muted/60 border border-border rounded-xl text-foreground focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
                                             />
                                         </div>
 
@@ -183,7 +183,7 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                                                 onChange={(e) => handleTimeChange(emp.id, 'label', e.target.value)}
                                                 placeholder="Label..."
                                                 disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
-                                                className="w-full px-4 py-2 text-[10px] font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none disabled:opacity-30 transition-all"
+                                                className="w-full px-4 py-2 text-[10px] font-bold bg-muted/60 border border-border rounded-xl text-foreground focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none disabled:opacity-30 transition-all"
                                             />
                                         </div>
                                     </div>
@@ -194,17 +194,17 @@ const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAtten
                 </div>
 
                 {/* Footer */}
-                <div className="p-8 border-t border-slate-50 bg-white flex justify-end space-x-3 rounded-b-3xl">
+                <div className="p-8 border-t border-slate-50 bg-card flex justify-end space-x-3 rounded-b-3xl">
                     <button
                         onClick={onClose}
-                        className="px-6 py-2.5 text-sm font-bold text-slate-400 hover:text-slate-900 transition-all active:scale-95"
+                        className="px-6 py-2.5 text-sm font-bold text-muted-foreground/70 hover:text-foreground transition-all "
                     >
                         Discard Changes
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all flex items-center active:scale-95 disabled:opacity-50"
+                        className="px-8 py-2.5 bg-primary text-white text-sm font-bold rounded-xl shadow-sm hover:bg-primary/90 transition-all flex items-center disabled:opacity-50"
                     >
                         {loading ? (
                             <div className="flex items-center">

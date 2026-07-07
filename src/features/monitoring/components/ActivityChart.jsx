@@ -27,7 +27,7 @@ const ActivityChart = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload?.length) {
       return (
-        <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-sm">
           <p className="text-sm font-medium text-popover-foreground">{`Time: ${label}`}</p>
           {payload?.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry?.color }}>
@@ -44,7 +44,7 @@ const ActivityChart = () => {
     if (active && payload && payload?.length) {
       const data = payload?.[0];
       return (
-        <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-sm">
           <p className="text-sm font-medium text-popover-foreground">{data?.name}</p>
           <p className="text-sm text-muted-foreground">{`${data?.value} hours`}</p>
         </div>

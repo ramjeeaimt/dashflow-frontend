@@ -351,9 +351,9 @@ const CompanyRegistration = () => {
   }, [formData]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Hero Header - Reduced spacing */}
-      <div className="bg-white border-b border-border py-6 px-6">
+      <div className="bg-card border-b border-border py-6 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl mb-3">
             <Icon name="Building2" size={24} className="text-primary" />
@@ -379,7 +379,7 @@ const CompanyRegistration = () => {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border/50 overflow-hidden">
+          <div className="bg-card rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border/50 overflow-hidden">
             <div className="p-2 md:p-4">
               {renderStepContent()}
             </div>
@@ -408,7 +408,7 @@ const CompanyRegistration = () => {
       {/* Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-3xl p-10 text-center max-w-md mx-4 shadow-2xl">
+          <div className="bg-card border border-border rounded-lg p-10 text-center max-w-md mx-4 shadow-sm">
             <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
               <Icon name="Building2" size={40} className="text-primary animate-pulse" />
             </div>

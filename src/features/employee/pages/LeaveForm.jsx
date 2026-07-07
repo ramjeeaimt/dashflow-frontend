@@ -59,8 +59,8 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
       />
 
       <div className={`transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
-        } min-h-screen flex flex-col pt-16 pb-8`}>
+ sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+ } min-h-screen flex flex-col pt-16 pb-8`}>
         <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
 
         <main className="flex-1 px-4 sm:px-6 md:px-8 w-full">
@@ -69,11 +69,11 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
           <div className="flex flex-col gap-8 mb-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">My Leave Dashboard</h1>
-                <p className="text-sm text-slate-500 font-medium">Manage and track your leave applications</p>
+                <h1 className="text-2xl font-semibold text-foreground tracking-tight">My Leave Dashboard</h1>
+                <p className="text-sm text-muted-foreground font-medium">Manage and track your leave applications</p>
               </div>
               <div className="flex gap-2">
-                <div className="px-3 py-1.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-200">
+                <div className="px-3 py-1.5 bg-muted rounded-md text-[10px] font-bold text-muted-foreground uppercase tracking-wide border border-border">
                   Active Session: {activeId.slice(0, 6)}
                 </div>
               </div>
@@ -90,14 +90,14 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
             {/* 2. Left: Application Form (Flat Design) */}
-            <div className="lg:col-span-5 border border-slate-200 bg-white rounded-xl p-6">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+            <div className="lg:col-span-5 border border-border bg-card rounded-xl p-6">
+              <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground/70 mb-6 flex items-center gap-2">
                 <Plus size={14} /> Request Leave
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase">Category</label>
-                  <select name="type" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase">Category</label>
+                  <select name="type" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full h-10 px-3 bg-muted/60 border border-border rounded-lg text-sm outline-none focus:border-slate-900">
                     <option value="sick">Sick Leave</option>
                     <option value="casual">Casual Leave</option>
                     <option value="earned">Earned Leave</option>
@@ -105,19 +105,19 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase">From</label>
-                    <input type="date" required min={todayStr} value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900" />
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase">From</label>
+                    <input type="date" required min={todayStr} value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="w-full h-10 px-3 bg-muted/60 border border-border rounded-lg text-sm outline-none focus:border-slate-900" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase">To</label>
-                    <input type="date" required min={formData.startDate || todayStr} value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-slate-900" />
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase">To</label>
+                    <input type="date" required min={formData.startDate || todayStr} value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="w-full h-10 px-3 bg-muted/60 border border-border rounded-lg text-sm outline-none focus:border-slate-900" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase">Note</label>
-                  <textarea required value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none resize-none focus:border-slate-900" placeholder="Type your reason..."></textarea>
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase">Note</label>
+                  <textarea required value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} className="w-full h-24 p-3 bg-muted/60 border border-border rounded-lg text-sm outline-none resize-none focus:border-slate-900" placeholder="Type your reason..."></textarea>
                 </div>
-                <button type="submit" disabled={isLoading} className="w-full h-11 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black transition-all">
+                <button type="submit" disabled={isLoading} className="w-full h-11 bg-sidebar text-white rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-black transition-all">
                   {isLoading ? 'Sending...' : 'Submit Application'}
                 </button>
               </form>
@@ -128,19 +128,19 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
               {/* Search & Filter Bar */}
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" size={14} />
                   <input
                     type="text"
                     placeholder="Search by reason or type..."
-                    className="w-full h-10 pl-9 pr-4 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-slate-400"
+                    className="w-full h-10 pl-9 pr-4 bg-card border border-border rounded-lg text-xs outline-none focus:border-slate-400"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-2">
-                  <Filter size={14} className="text-slate-400 ml-1" />
+                <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-2">
+                  <Filter size={14} className="text-muted-foreground/70 ml-1" />
                   <select
-                    className="h-9 text-xs font-bold text-slate-600 outline-none bg-transparent pr-2"
+                    className="h-9 text-xs font-bold text-muted-foreground outline-none bg-transparent pr-2"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
                   >
@@ -156,22 +156,22 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
               <div className="space-y-3">
                 {filteredLeaves?.length > 0 ? (
                   filteredLeaves.map((leave, idx) => (
-                    <div key={idx} className="bg-white border border-slate-100 p-4 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-300 transition-all group">
+                    <div key={idx} className="bg-card border border-border p-4 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-border transition-all group">
                       <div className="flex items-start gap-4">
                         <div className={`mt-1 w-2 h-2 rounded-full ${getStatusColor(leave.status)}`} />
                         <div className="flex-1">
-                          <h4 className="text-sm font-bold text-slate-800 capitalize">{leave.type} Leave</h4>
-                          <p className="text-[11px] text-slate-400 font-medium">{leave.startDate} — {leave.endDate}</p>
-                          <p className="text-xs text-slate-500 mt-2 line-clamp-1 italic">"{leave.reason}"</p>
+                          <h4 className="text-sm font-bold text-foreground capitalize">{leave.type} Leave</h4>
+                          <p className="text-[11px] text-muted-foreground/70 font-medium">{leave.startDate} — {leave.endDate}</p>
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-1 italic">"{leave.reason}"</p>
                           
                           {/* Display Admin Note if it exists */}
                           {leave.adminComment && (
                             <div className={`mt-3 p-3 rounded-lg border text-xs font-medium leading-relaxed
-                              ${leave.status === 'APPROVED' ? 'bg-emerald-50/50 border-emerald-100 text-emerald-800' : 
-                                leave.status === 'REJECTED' ? 'bg-rose-50/50 border-rose-100 text-rose-800' : 
-                                'bg-slate-50 border-slate-200 text-slate-700'}`}
+ ${leave.status === 'APPROVED' ? 'bg-emerald-50/50 border-emerald-100 text-emerald-800' : 
+ leave.status === 'REJECTED' ? 'bg-rose-50/50 border-rose-100 text-rose-800' : 
+ 'bg-muted/60 border-border text-foreground'}`}
                             >
-                              <span className="block text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">
+                              <span className="block text-[9px] font-semibold uppercase tracking-wide mb-1 opacity-60">
                                 Administrator Note
                               </span>
                               {leave.adminComment}
@@ -180,16 +180,16 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                         </div>
                       </div>
                       <div className="flex md:flex-col items-center md:items-end justify-between gap-1">
-                        <span className={`text-[10px] font-black uppercase tracking-tighter ${getStatusText(leave.status)}`}>
+                        <span className={`text-[10px] font-semibold uppercase tracking-tighter ${getStatusText(leave.status)}`}>
                           {leave.status || 'PENDING'}
                         </span>
-                        <span className="text-[9px] font-mono text-slate-300">REF:{leave.id?.slice(-5)}</span>
+                        <span className="text-[9px] font-mono text-muted-foreground/70">REF:{leave.id?.slice(-5)}</span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-xl">
-                    <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">No matching records</p>
+                  <div className="py-20 text-center border-2 border-dashed border-border rounded-xl">
+                    <p className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wide">No matching records</p>
                   </div>
                 )}
               </div>
@@ -203,10 +203,10 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
 };
 
 // Helper Components & Logic
-const StatCard = ({ label, value, icon, color = "text-slate-900" }) => (
-  <div className="bg-white border border-slate-200 p-4  flex items-center justify-between">
+const StatCard = ({ label, value, icon, color = "text-foreground" }) => (
+  <div className="bg-card border border-border p-4 flex items-center justify-between">
     <div>
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+      <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">{label}</p>
       <h3 className={`text-xl font-bold mt-1 ${color}`}>{value || 0}</h3>
     </div>
     <div className="text-slate-200">{icon}</div>

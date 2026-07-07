@@ -13,8 +13,8 @@ const AttendanceStatus = ({ attendanceStatus, currentTime }) => {
       wfh: { 
         icon: 'Home', 
         label: 'Work From Home', 
-        color: 'text-blue-500',
-        bgColor: 'bg-blue-50 border-blue-200'
+        color: 'text-primary',
+        bgColor: 'bg-primary/10 border-border'
       },
       client_site: { 
         icon: 'MapPin', 
@@ -60,12 +60,12 @@ const AttendanceStatus = ({ attendanceStatus, currentTime }) => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-foreground">Current Status</h3>
         <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${
-          attendanceStatus?.isCheckedIn 
-            ? 'bg-success/10 text-success border border-success/20' :'bg-muted text-muted-foreground border border-border'
-        }`}>
+ attendanceStatus?.isCheckedIn 
+ ? 'bg-success/10 text-success border border-success/20' :'bg-muted text-muted-foreground border border-border'
+ }`}>
           <div className={`w-2 h-2 rounded-full ${
-            attendanceStatus?.isCheckedIn ? 'bg-success animate-pulse' : 'bg-muted-foreground'
-          }`}></div>
+ attendanceStatus?.isCheckedIn ? 'bg-success animate-pulse' : 'bg-muted-foreground'
+ }`}></div>
           <span>
             {attendanceStatus?.isCheckedIn ? 'Active' : 'Offline'}
           </span>
@@ -109,7 +109,7 @@ const AttendanceStatus = ({ attendanceStatus, currentTime }) => {
             {attendanceStatus?.location && (
               <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                 <div className="flex items-center space-x-2">
-                  <Icon name="MapPin" size={18} className="text-blue-500" />
+                  <Icon name="MapPin" size={18} className="text-primary" />
                   <span className="font-medium text-foreground">Location</span>
                 </div>
                 <span className="text-sm text-muted-foreground max-w-32 truncate" title={attendanceStatus?.location}>

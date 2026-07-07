@@ -4,6 +4,7 @@
 import React from "react";
 import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
 import useAuthStore from "./store/useAuthStore";
+import { isAdminUser } from "./config/roles";
 // import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./features/misc/pages/NotFoundPage";
@@ -57,7 +58,7 @@ import GlobalUsersPage from "features/admin/pages/GlobalUsersPage";
 
 const DashboardSwitcher = () => {
   const { user } = useAuthStore();
-  const isAdmin = user?.roles?.some(r => ['Admin', 'Super Admin', 'Manager', 'ADMIN'].includes(r.name)) || ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email);
+  const isAdmin = isAdminUser(user);
 
   if (isAdmin) {
     return <Dashboard />;

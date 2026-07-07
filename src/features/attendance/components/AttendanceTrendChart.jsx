@@ -24,8 +24,8 @@ const AttendanceTrendChart = ({ data, period }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload?.length) {
       return (
-        <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-xl p-4 shadow-xl shadow-slate-200/50">
-          <p className="text-slate-900 font-black text-xs uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
+        <div className="bg-white/90 backdrop-blur-md border border-border rounded-xl p-4 shadow-sm">
+          <p className="text-foreground font-semibold text-xs uppercase tracking-wide mb-3 border-b border-border pb-2">
             {formatDate(label)}
           </p>
           <div className="space-y-2">
@@ -33,9 +33,9 @@ const AttendanceTrendChart = ({ data, period }) => {
               <div key={index} className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry?.color }}></div>
-                  <span className="text-[11px] font-bold text-slate-500">{entry?.name}</span>
+                  <span className="text-[11px] font-bold text-muted-foreground">{entry?.name}</span>
                 </div>
-                <span className="text-xs font-black text-slate-900">{entry?.value}%</span>
+                <span className="text-xs font-semibold text-foreground">{entry?.value}%</span>
               </div>
             ))}
           </div>
@@ -46,16 +46,16 @@ const AttendanceTrendChart = ({ data, period }) => {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+    <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <div>
-          <h3 className="text-lg font-black text-slate-900 tracking-tight">Workforce Performance Trends</h3>
-          <p className="text-sm text-slate-400 font-medium mt-1">
+          <h3 className="text-lg font-semibold text-foreground tracking-tight">Workforce Performance Trends</h3>
+          <p className="text-sm text-muted-foreground/70 font-medium mt-1">
             Visualizing {period === 'weekly' ? 'weekly' : period === 'monthly' ? 'monthly' : 'daily'} patterns in attendance and productivity
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <LegendItem color="bg-indigo-500" label="Attendance" />
+          <LegendItem color="bg-primary" label="Attendance" />
           <LegendItem color="bg-emerald-500" label="Punctuality" />
           <LegendItem color="bg-amber-500" label="Productivity" />
         </div>
@@ -135,7 +135,7 @@ const AttendanceTrendChart = ({ data, period }) => {
 const LegendItem = ({ color, label }) => (
   <div className="flex items-center gap-2">
     <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-sm shadow-black/10`}></div>
-    <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">{label}</span>
+    <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{label}</span>
   </div>
 );
 

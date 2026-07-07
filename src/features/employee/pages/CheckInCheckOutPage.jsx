@@ -163,7 +163,7 @@ const QuickAttendance = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Check-out Time:</span>
                       <span className="font-medium flex items-center">
-                        <CheckCircle className="h-4 w-4 text-blue-500 mr-2" />
+                        <CheckCircle className="h-4 w-4 text-primary mr-2" />
                         {todayAttendance.checkOutTime}
                       </span>
                     </div>
@@ -233,7 +233,7 @@ const QuickAttendance = () => {
                     <button
                       onClick={handleCheckOut}
                       disabled={loading}
-                      className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                      className="flex-1 bg-primary text-white py-3 px-6 rounded-lg hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                     >
                       {loading ? 'Processing...' : 'Check Out'}
                     </button>
@@ -249,7 +249,7 @@ const QuickAttendance = () => {
             </div>
 
             {/* Info Card */}
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="mt-6 bg-primary/10 border border-border rounded-lg p-4">
               <p className="text-sm text-blue-800">
                 <strong>Tip:</strong> Make sure to check in when you start work and check out when you finish.
                 Your work hours will be automatically calculated.

@@ -21,6 +21,7 @@ import accessControlService from '../../../services/access-control.service';
 import useAuthStore from '../../../store/useAuthStore';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
+import { isAdminUser } from '../../../config/roles';
 
 const getPermissionSentence = (action, resource) => {
     const cleanAction = action === 'manage' ? 'manage' : action === 'read' ? 'view' : action === 'update' ? 'update' : action === 'create' ? 'create' : action;
@@ -228,23 +229,22 @@ const UserPermissionsPage = () => {
     }, [permissions]);
 
     // Check if the current user is an Admin
-    const isCurrentUserAdmin = loggedInUser?.roles?.some(r => ['Admin', 'Super Admin', 'Manager', 'ADMIN'].includes(r.name)) ||
-        ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(loggedInUser?.email);
+    const isCurrentUserAdmin = isAdminUser(loggedInUser);
 
     if (!isCurrentUserAdmin) {
         return (
-            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-                <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-slate-200 text-center shadow-xl">
-                    <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 mx-auto mb-6">
+            <div className="min-h-screen bg-muted/60 flex flex-col items-center justify-center p-6">
+                <div className="bg-card rounded-lg p-8 max-w-md w-full border border-border text-center shadow-sm">
+                    <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center text-red-600 mx-auto mb-6">
                         <Lock size={32} />
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-800">Access Denied</h2>
-                    <p className="text-slate-500 mt-2">
+                    <h2 className="text-2xl font-bold text-foreground">Access Denied</h2>
+                    <p className="text-muted-foreground mt-2">
                         Only administrators are authorized to access and modify user access control policies and permission layers.
                     </p>
                     <button
                         onClick={() => window.history.back()}
-                        className="mt-6 inline-flex items-center px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md active:scale-95"
+                        className="mt-6 inline-flex items-center px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all shadow-md "
                     >
                         Go Back
                     </button>
@@ -269,8 +269,8 @@ const UserPermissionsPage = () => {
                         {/* Title Section */}
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                <h1 className="text-3xl font-extrabold text-foreground tracking-tight flex items-center gap-3">
-                                    <KeyRound className="text-indigo-600" size={32} />
+                                <h1 className="text-3xl font-semibold text-foreground tracking-tight flex items-center gap-3">
+                                    <KeyRound className="text-primary" size={32} />
                                     User Access Control
                                 </h1>
                                 <p className="text-muted-foreground mt-1">Assign security roles and configure individual direct permission overlays for employees</p>
@@ -279,34 +279,34 @@ const UserPermissionsPage = () => {
 
                         {/* Quick Stats Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm flex items-center gap-5 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-full -mr-6 -mt-6" />
-                                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
+                            <div className="bg-card rounded-lg border border-border p-6 shadow-sm flex items-center gap-5 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-6 -mt-6" />
+                                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                                     <Users size={24} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total User Profiles</p>
-                                    <h3 className="text-3xl font-black text-foreground mt-1">{stats.total}</h3>
+                                    <h3 className="text-3xl font-semibold text-foreground mt-1">{stats.total}</h3>
                                 </div>
                             </div>
-                            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm flex items-center gap-5 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/5 rounded-full -mr-6 -mt-6" />
-                                <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500">
+                            <div className="bg-card rounded-lg border border-border p-6 shadow-sm flex items-center gap-5 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-6 -mt-6" />
+                                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                                     <Shield size={24} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">System Administrators</p>
-                                    <h3 className="text-3xl font-black text-foreground mt-1">{stats.admins}</h3>
+                                    <h3 className="text-3xl font-semibold text-foreground mt-1">{stats.admins}</h3>
                                 </div>
                             </div>
-                            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm flex items-center gap-5 relative overflow-hidden">
+                            <div className="bg-card rounded-lg border border-border p-6 shadow-sm flex items-center gap-5 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full -mr-6 -mt-6" />
                                 <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
                                     <Sliders size={24} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Custom Direct Overlays</p>
-                                    <h3 className="text-3xl font-black text-foreground mt-1">{stats.customPerms}</h3>
+                                    <h3 className="text-3xl font-semibold text-foreground mt-1">{stats.customPerms}</h3>
                                 </div>
                             </div>
                         </div>
@@ -315,8 +315,8 @@ const UserPermissionsPage = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                             {/* User List Panel (Left Side) */}
-                            <div className="lg:col-span-5 bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col max-h-[80vh]">
-                                <div className="p-5 border-b border-border bg-slate-50/50 space-y-4">
+                            <div className="lg:col-span-5 bg-card border border-border rounded-lg shadow-sm overflow-hidden flex flex-col max-h-[80vh]">
+                                <div className="p-5 border-b border-border bg-muted/50 space-y-4">
                                     <div className="relative">
                                         <Search className="absolute left-3.5 top-3.5 text-muted-foreground" size={18} />
                                         <input
@@ -324,7 +324,7 @@ const UserPermissionsPage = () => {
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             placeholder="Search users by name or email..."
-                                            className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-card transition-all font-medium text-sm"
+                                            className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring focus:bg-card transition-all font-medium text-sm"
                                         />
                                     </div>
                                     <div className="flex items-center gap-2 overflow-x-auto pb-1">
@@ -333,9 +333,9 @@ const UserPermissionsPage = () => {
                                                 key={roleFilter}
                                                 onClick={() => setSelectedRoleFilter(roleFilter)}
                                                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border shrink-0 ${selectedRoleFilter === roleFilter
-                                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                                                        : 'bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground'
-                                                    }`}
+ ? 'bg-primary border-primary text-white shadow-sm'
+ : 'bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground'
+ }`}
                                             >
                                                 {roleFilter === 'All' ? 'All Roles' : roleFilter}
                                             </button>
@@ -370,11 +370,11 @@ const UserPermissionsPage = () => {
                                                 <button
                                                     key={emp.id}
                                                     onClick={() => handleSelectEmployee(emp)}
-                                                    className={`w-full p-4 flex items-center justify-between text-left transition-all hover:bg-indigo-50/10 relative ${isSelected ? 'bg-indigo-50/40 border-l-4 border-l-indigo-600' : ''
-                                                        }`}
+                                                    className={`w-full p-4 flex items-center justify-between text-left transition-all hover:bg-primary/10 relative ${isSelected ? 'bg-primary/40 border-l-4 border-l-indigo-600' : ''
+ }`}
                                                 >
                                                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                                                        <div className="w-10 h-10 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-600 font-bold uppercase shrink-0">
+                                                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold uppercase shrink-0">
                                                             {emp.user?.avatar ? (
                                                                 <img src={emp.user.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover" />
                                                             ) : (
@@ -385,7 +385,7 @@ const UserPermissionsPage = () => {
                                                             <h4 className="font-bold text-foreground text-sm truncate flex items-center gap-2">
                                                                 {employeeName}
                                                                 {emp.user?.id === loggedInUser?.id && (
-                                                                    <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-black uppercase">You</span>
+                                                                    <span className="text-[10px] bg-border text-foreground px-1.5 py-0.5 rounded font-semibold uppercase">You</span>
                                                                 )}
                                                             </h4>
                                                             <p className="text-muted-foreground text-xs truncate mt-0.5">{emp.user?.email}</p>
@@ -393,25 +393,25 @@ const UserPermissionsPage = () => {
                                                                 {emp.user?.roles?.map((r) => (
                                                                     <span
                                                                         key={r.id}
-                                                                        className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${['Admin', 'Super Admin', 'ADMIN'].includes(r.name)
-                                                                                ? 'bg-red-50 border-red-200 text-red-600'
-                                                                                : r.name === 'Manager'
-                                                                                    ? 'bg-amber-50 border-amber-200 text-amber-600'
-                                                                                    : 'bg-slate-50 border-slate-200 text-slate-600'
-                                                                            }`}
+                                                                        className={`text-[9px] font-semibold uppercase px-2 py-0.5 rounded-full border ${['Admin', 'Super Admin', 'ADMIN'].includes(r.name)
+ ? 'bg-red-50 border-red-200 text-red-600'
+ : r.name === 'Manager'
+ ? 'bg-amber-50 border-amber-200 text-amber-600'
+ : 'bg-muted/60 border-border text-muted-foreground'
+ }`}
                                                                     >
                                                                         {r.name}
                                                                     </span>
                                                                 ))}
                                                                 {emp.user?.permissions?.length > 0 && (
-                                                                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-600">
+                                                                    <span className="text-[9px] font-semibold uppercase px-2 py-0.5 rounded-full bg-primary/10 border border-border text-primary">
                                                                         +{emp.user.permissions.length} Overlays
                                                                     </span>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <ChevronRight className={`text-slate-400 shrink-0 ml-2 transition-transform duration-300 ${isSelected ? 'translate-x-1 text-indigo-500' : ''}`} size={16} />
+                                                    <ChevronRight className={`text-muted-foreground/70 shrink-0 ml-2 transition-transform duration-300 ${isSelected ? 'translate-x-1 text-primary' : ''}`} size={16} />
                                                 </button>
                                             );
                                         })
@@ -422,12 +422,12 @@ const UserPermissionsPage = () => {
                             {/* Permission Editor Panel (Right Side) */}
                             <div className="lg:col-span-7 space-y-6">
                                 {selectedEmployee ? (
-                                    <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
+                                    <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
 
                                         {/* Header */}
-                                        <div className="p-6 border-b border-border bg-gradient-to-r from-indigo-500/5 to-indigo-600/5 flex items-center justify-between">
+                                        <div className="p-6 border-b border-border bg-primary flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md uppercase">
+                                                <div className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md uppercase">
                                                     {selectedEmployee.user?.firstName?.charAt(0) || 'U'}
                                                 </div>
                                                 <div>
@@ -435,14 +435,14 @@ const UserPermissionsPage = () => {
                                                         Manage Access Rules
                                                     </h3>
                                                     <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mt-0.5">
-                                                        Employee Code: <span className="text-indigo-600 font-extrabold">{selectedEmployee.employeeCode || 'N/A'}</span>
+                                                        Employee Code: <span className="text-primary font-semibold">{selectedEmployee.employeeCode || 'N/A'}</span>
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <button
                                                 onClick={handleResetToDefault}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted text-muted-foreground hover:text-foreground hover:bg-slate-200 rounded-lg text-xs font-bold transition-all"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted text-muted-foreground hover:text-foreground hover:bg-border rounded-lg text-xs font-bold transition-all"
                                                 title="Clears customized direct overlays, relying only on role permissions."
                                             >
                                                 <RotateCcw size={13} />
@@ -468,7 +468,7 @@ const UserPermissionsPage = () => {
                                             {/* Security Roles Row */}
                                             <div className="space-y-4">
                                                 <div className="flex items-center gap-2">
-                                                    <Shield size={18} className="text-indigo-600" />
+                                                    <Shield size={18} className="text-primary" />
                                                     <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">Security Roles</h4>
                                                 </div>
                                                 <p className="text-muted-foreground text-xs">Roles grant preset packages of permissions. Toggle roles below to set basic access levels.</p>
@@ -482,13 +482,13 @@ const UserPermissionsPage = () => {
                                                                 key={role.id}
                                                                 onClick={() => handleToggleRole(role.id)}
                                                                 className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
-                                                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
-                                                                        : 'bg-card border-border text-muted-foreground hover:border-indigo-500/50 hover:bg-muted/50'
-                                                                    }`}
+ ? 'bg-primary border-primary text-white shadow-md'
+ : 'bg-card border-border text-muted-foreground hover:border-primary/50 hover:bg-muted/50'
+ }`}
                                                             >
                                                                 <div>
-                                                                    <span className="text-xs uppercase font-extrabold tracking-wider block">{role.name}</span>
-                                                                    <span className={`text-[10px] mt-0.5 block line-clamp-1 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
+                                                                    <span className="text-xs uppercase font-semibold tracking-wider block">{role.name}</span>
+                                                                    <span className={`text-[10px] mt-0.5 block line-clamp-1 ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground/70'}`}>
                                                                         {role.description || `Has default permissions`}
                                                                     </span>
                                                                 </div>
@@ -502,7 +502,7 @@ const UserPermissionsPage = () => {
                                             {/* Direct Permission Overlay Row */}
                                             <div className="space-y-4">
                                                 <div className="flex items-center gap-2">
-                                                    <Sliders size={18} className="text-indigo-600" />
+                                                    <Sliders size={18} className="text-primary" />
                                                     <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">Direct Permissions Overlays</h4>
                                                 </div>
                                                 <p className="text-muted-foreground text-xs">Assign individual fine-grained capabilities directly to this user. Checked items will override or add on top of their roles.</p>
@@ -516,13 +516,13 @@ const UserPermissionsPage = () => {
                                                         return (
                                                             <div key={resource} className="bg-muted/30 border border-border rounded-xl p-5 space-y-4">
                                                                 <div className="flex items-center justify-between border-b border-border pb-3">
-                                                                    <span className="font-extrabold text-foreground capitalize tracking-wide flex items-center gap-2 text-sm">
+                                                                    <span className="font-semibold text-foreground capitalize tracking-wide flex items-center gap-2 text-sm">
                                                                         {resource} Management
                                                                     </span>
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => handleSelectAllPermissionsOfResource(resource, permissions)}
-                                                                        className="text-xs text-indigo-600 hover:text-indigo-700 font-bold uppercase tracking-wider"
+                                                                        className="text-xs text-primary hover:text-primary font-bold uppercase tracking-wider"
                                                                     >
                                                                         {isAllSelected ? 'Deselect All' : 'Select All'}
                                                                     </button>
@@ -534,22 +534,22 @@ const UserPermissionsPage = () => {
                                                                         return (
                                                                             <div 
                                                                                 key={perm.id} 
-                                                                                className="flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:bg-slate-50/50 transition-colors"
+                                                                                className="flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:bg-muted/50 transition-colors"
                                                                             >
-                                                                                <span className="text-xs font-semibold text-slate-700 capitalize">
+                                                                                <span className="text-xs font-semibold text-foreground capitalize">
                                                                                     {getPermissionSentence(perm.action, perm.resource)}
                                                                                 </span>
                                                                                 <button
                                                                                     type="button"
                                                                                     onClick={() => handleTogglePermission(perm.id)}
                                                                                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                                                        isChecked ? 'bg-indigo-600' : 'bg-slate-200'
-                                                                                    }`}
+ isChecked ? 'bg-primary' : 'bg-border'
+ }`}
                                                                                 >
                                                                                     <span
-                                                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out ${
-                                                                                            isChecked ? 'translate-x-5' : 'translate-x-0'
-                                                                                        }`}
+                                                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-card shadow transition duration-200 ease-in-out ${
+ isChecked ? 'translate-x-5' : 'translate-x-0'
+ }`}
                                                                                     />
                                                                                 </button>
                                                                             </div>
@@ -564,9 +564,9 @@ const UserPermissionsPage = () => {
                                         </div>
 
                                         {/* Bottom Actions Footer */}
-                                        <div className="p-6 bg-slate-50 border-t border-border flex items-center justify-between">
+                                        <div className="p-6 bg-muted/60 border-t border-border flex items-center justify-between">
                                             <div className="hidden sm:flex items-center text-muted-foreground space-x-2 text-xs italic">
-                                                <Info size={14} className="text-indigo-500" />
+                                                <Info size={14} className="text-primary" />
                                                 <span>Updating permissions updates the user's active session instantly.</span>
                                             </div>
                                             <div className="flex space-x-3 w-full sm:w-auto justify-end">
@@ -582,7 +582,7 @@ const UserPermissionsPage = () => {
                                                     type="button"
                                                     disabled={saving}
                                                     onClick={handleSaveChanges}
-                                                    className="flex-1 sm:flex-none px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md active:scale-95 text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                                                    className="flex-1 sm:flex-none px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all shadow-md text-xs flex items-center justify-center gap-2 disabled:opacity-50"
                                                 >
                                                     {saving ? (
                                                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -595,12 +595,12 @@ const UserPermissionsPage = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-card border border-border border-dashed rounded-2xl p-16 text-center text-muted-foreground space-y-4 flex flex-col items-center justify-center min-h-[400px]">
-                                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center text-indigo-500/60 shadow-inner">
+                                    <div className="bg-card border border-border border-dashed rounded-lg p-16 text-center text-muted-foreground space-y-4 flex flex-col items-center justify-center min-h-[400px]">
+                                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center text-primary/60 shadow-inner">
                                             <KeyRound size={28} />
                                         </div>
                                         <h3 className="text-lg font-bold text-foreground">Select an Employee</h3>
-                                        <p className="text-sm text-slate-500 max-w-sm">
+                                        <p className="text-sm text-muted-foreground max-w-sm">
                                             Choose an employee from the directory on the left to configure their organizational security roles and individual permission overrides.
                                         </p>
                                     </div>

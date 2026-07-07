@@ -16,10 +16,10 @@ const AttendanceChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 h-[450px] animate-pulse">
-        <div className="h-6 w-48 bg-slate-100 rounded-lg mb-2"></div>
-        <div className="h-4 w-64 bg-slate-50 rounded-lg mb-8"></div>
-        <div className="h-64 w-full bg-slate-50/50 rounded-lg"></div>
+      <div className="bg-card rounded-lg p-6 h-[450px] animate-pulse">
+        <div className="h-6 w-48 bg-muted rounded-lg mb-2"></div>
+        <div className="h-4 w-64 bg-muted/60 rounded-lg mb-8"></div>
+        <div className="h-64 w-full bg-muted/50 rounded-lg"></div>
       </div>
     );
   }
@@ -27,30 +27,30 @@ const AttendanceChart = ({ data, loading }) => {
   const chartData = data || [];
 
   return (
-    <div className="bg-white h-full flex flex-col">
+    <div className="bg-card h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
         <div className="space-y-1">
-          <h3 className="text-xl font-bold text-slate-800 tracking-tight">Attendance Dynamics</h3>
-          <p className="text-xs text-slate-400 font-medium">Daily presence trends and personnel manifest</p>
+          <h3 className="text-xl font-bold text-foreground tracking-tight">Attendance Dynamics</h3>
+          <p className="text-xs text-muted-foreground/70 font-medium">Daily presence trends and personnel manifest</p>
         </div>
-        <div className="flex items-center p-1 bg-slate-50 rounded-xl border border-slate-100">
+        <div className="flex items-center p-1 bg-muted/60 rounded-lg border border-border">
           <button
             onClick={() => setTimeRange('week')}
             className={`px-4 py-1.5 text-xs font-bold transition-all duration-200 rounded-lg ${
-              timeRange === 'week' 
-                ? 'bg-white text-blue-600 shadow-sm' 
-                : 'text-slate-400 hover:text-slate-600'
-            }`}
+ timeRange === 'week' 
+ ? 'bg-card text-primary shadow-sm' 
+ : 'text-muted-foreground/70 hover:text-muted-foreground'
+ }`}
           >
             Week
           </button>
           <button
             onClick={() => setTimeRange('month')}
             className={`px-4 py-1.5 text-xs font-bold transition-all duration-200 rounded-lg ${
-              timeRange === 'month' 
-                ? 'bg-white text-blue-600 shadow-sm' 
-                : 'text-slate-400 hover:text-slate-600'
-            }`}
+ timeRange === 'month' 
+ ? 'bg-card text-primary shadow-sm' 
+ : 'text-muted-foreground/70 hover:text-muted-foreground'
+ }`}
           >
             Month
           </button>
@@ -105,10 +105,10 @@ const AttendanceChart = ({ data, loading }) => {
 
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50">
         <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50"></div>
-          <span className="text-xs font-bold text-slate-500">Live Personnel Stream</span>
+          <div className="w-3 h-3 rounded-full bg-primary shadow-sm "></div>
+          <span className="text-xs font-bold text-muted-foreground">Live Personnel Stream</span>
         </div>
-        <button className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 group">
+        <button className="text-xs font-bold text-primary hover:text-primary transition-colors flex items-center gap-1 group">
           View Detailed Logs
           <Icon name="ArrowRight" size={14} className="transition-transform group-hover:translate-x-1" />
         </button>

@@ -122,17 +122,17 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
         {/* Right Column - Security / Info */}
         <div className="space-y-6">
           {isLinking ? (
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-8 space-y-4">
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100 mb-2">
+            <div className="bg-primary/10 border border-border rounded-lg p-8 space-y-4">
+              <div className="w-14 h-14 bg-card rounded-lg flex items-center justify-center text-primary shadow-sm border border-border mb-2">
                 <Icon name="Link" size={28} />
               </div>
               <h3 className="text-xl font-bold text-blue-900">Account Integration</h3>
-              <p className="text-blue-700 leading-relaxed">
+              <p className="text-primary leading-relaxed">
                 You're currently authenticated as <strong>{authenticatedUser.email}</strong>. 
                 We will link this new enterprise workspace to your existing profile for seamless management.
               </p>
               <div className="pt-2">
-                <span className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-white px-4 py-2 rounded-full border border-blue-200">
+                <span className="inline-flex items-center gap-2 text-xs font-bold text-primary bg-card px-4 py-2 rounded-full border border-border">
                   <Icon name="CheckCircle" size={14} />
                   IDENTITY VERIFIED
                 </span>
@@ -166,10 +166,10 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">Security Rating</span>
                     <span className={`text-sm font-bold uppercase tracking-wider ${
-                      passwordStrength?.strength === 1 ? 'text-error' :
-                      passwordStrength?.strength === 2 ? 'text-warning' :
-                      passwordStrength?.strength === 3 ? 'text-primary' : 'text-success'
-                    }`}>
+ passwordStrength?.strength === 1 ? 'text-error' :
+ passwordStrength?.strength === 2 ? 'text-warning' :
+ passwordStrength?.strength === 3 ? 'text-primary' : 'text-success'
+ }`}>
                       {passwordStrength?.label}
                     </span>
                   </div>
@@ -178,8 +178,8 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
                       <div
                         key={level}
                         className={`h-2 flex-1 rounded-full transition-all duration-500 ${
-                          level <= passwordStrength?.strength ? passwordStrength?.color : 'bg-border/50'
-                        }`}
+ level <= passwordStrength?.strength ? passwordStrength?.color : 'bg-border/50'
+ }`}
                       />
                     ))}
                   </div>
@@ -207,7 +207,7 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
               </div>
 
               {/* Security Tips */}
-              <div className="bg-success/5 border border-success/20 rounded-2xl p-6">
+              <div className="bg-success/5 border border-success/20 rounded-lg p-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center text-success mt-1 shrink-0">
                     <Icon name="ShieldCheck" size={20} />
@@ -228,31 +228,31 @@ const AdminAccountStep = ({ formData, setFormData, errors, setErrors }) => {
       </div>
 
       {/* Admin Privileges Notice */}
-      <div className="mt-12 bg-[#1E293B] text-white rounded-2xl p-8 overflow-hidden relative">
+      <div className="mt-12 bg-[#1E293B] text-white rounded-lg p-8 overflow-hidden relative">
         <Icon name="Crown" size={120} className="absolute -right-10 -bottom-10 opacity-5 text-white" />
         <div className="flex items-start space-x-6 relative z-10">
-          <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg">
+          <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm">
             <Icon name="Crown" size={24} />
           </div>
           <div>
             <h4 className="text-lg font-bold mb-2">Primary Administrator Authority</h4>
-            <p className="text-blue-100/70 text-sm mb-6 max-w-xl">
+            <p className="text-primary-foreground/70 text-sm mb-6 max-w-xl">
               You are establishing the root authority for this workspace. This account will have immutable access to core security, payroll, and infrastructure settings.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 text-xs font-medium text-blue-100">
+              <div className="flex items-center gap-3 text-xs font-medium text-primary-foreground/80">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 WORKSPACE GOVERNANCE
               </div>
-              <div className="flex items-center gap-3 text-xs font-medium text-blue-100">
+              <div className="flex items-center gap-3 text-xs font-medium text-primary-foreground/80">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 PAYROLL INFRASTRUCTURE
               </div>
-              <div className="flex items-center gap-3 text-xs font-medium text-blue-100">
+              <div className="flex items-center gap-3 text-xs font-medium text-primary-foreground/80">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 AUDIT & COMPLIANCE
               </div>
-              <div className="flex items-center gap-3 text-xs font-medium text-blue-100">
+              <div className="flex items-center gap-3 text-xs font-medium text-primary-foreground/80">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 RESOURCE ALLOCATION
               </div>

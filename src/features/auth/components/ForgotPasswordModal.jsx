@@ -51,7 +51,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in duration-200">
+            <div className="bg-card rounded-xl shadow-sm w-full max-w-md relative animate-in fade-in zoom-in duration-200">
                 <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -79,7 +79,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                             required
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-ring focus:border-primary text-sm"
                                             placeholder="you@company.com"
                                         />
                                     </div>
@@ -87,7 +87,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 transition-colors"
+                                    className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-70 transition-colors"
                                 >
                                     {isLoading ? 'Sending...' : 'Send OTP'}
                                 </button>
@@ -110,7 +110,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                         required
                                         value={otp}
                                         onChange={(e) => setOtp(e.target.value)}
-                                        className="block w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm text-center tracking-widest text-lg font-mono"
+                                        className="block w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-ring focus:border-primary text-sm text-center tracking-wide text-lg font-mono"
                                         placeholder="123456"
                                         maxLength={6}
                                     />
@@ -127,7 +127,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                             minLength={6}
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
-                                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-ring focus:border-primary text-sm"
                                             placeholder="••••••••"
                                         />
                                     </div>
@@ -135,7 +135,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 transition-colors"
+                                    className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-70 transition-colors"
                                 >
                                     {isLoading ? 'Resetting...' : 'Reset Password'}
                                 </button>
@@ -152,7 +152,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                             <p className="text-gray-600 mb-8">Your password has been successfully reset. You can now log in with your new password.</p>
                             <button
                                 onClick={handleClose}
-                                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                             >
                                 Continue to Login
                             </button>

@@ -15,7 +15,7 @@ const PayrollSlipView = () => {
   if (!selectedPayroll) return null;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded">
+    <div className="max-w-3xl mx-auto p-6 bg-card shadow rounded">
 
       <h2 className="text-xl font-semibold mb-4">
         Salary Slip

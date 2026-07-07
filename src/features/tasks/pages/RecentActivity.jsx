@@ -23,7 +23,7 @@ const RecentActivity = ({ activities, employees, onActivityClick }) => {
     switch(type) {
       case 'TASK_CREATED': return 'text-green-500';
       case 'TASK_DELETED': return 'text-red-500';
-      case 'TASK_UPDATED': return 'text-blue-500';
+      case 'TASK_UPDATED': return 'text-primary';
       case 'COMMENT_ADDED': return 'text-purple-500';
       case 'TASK_ASSIGNED': return 'text-orange-500';
       default: return 'text-gray-500';
@@ -81,10 +81,10 @@ const RecentActivity = ({ activities, employees, onActivityClick }) => {
                 </div>
                 {activity.data?.priority && (
                   <span className={`text-xs px-2 py-1 rounded-full ${
-                    activity.data.priority === 'high' ? 'bg-red-100 text-red-700' :
-                    activity.data.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-green-100 text-green-700'
-                  }`}>
+ activity.data.priority === 'high' ? 'bg-red-100 text-red-700' :
+ activity.data.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+ 'bg-green-100 text-green-700'
+ }`}>
                     {activity.data.priority}
                   </span>
                 )}

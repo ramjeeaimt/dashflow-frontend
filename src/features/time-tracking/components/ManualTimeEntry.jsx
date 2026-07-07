@@ -167,7 +167,7 @@ const ManualTimeEntry = ({ onAddEntry, onClose }) => {
   };
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+    <div className="bg-card border border-border rounded-lg p-6 card-shadow">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Manual Time Entry</h3>
@@ -285,8 +285,8 @@ const ManualTimeEntry = ({ onAddEntry, onClose }) => {
             placeholder="Describe what you worked on during this time..."
             rows={4}
             className={`w-full px-3 py-2 bg-input border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none ${
-              errors?.description ? 'border-destructive' : 'border-border'
-            }`}
+ errors?.description ? 'border-destructive' : 'border-border'
+ }`}
           />
           {errors?.description && (
             <p className="text-sm text-destructive mt-1">{errors?.description}</p>

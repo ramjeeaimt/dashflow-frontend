@@ -30,7 +30,7 @@ const AddClientModal = ({ isOpen, onClose, onAdd }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 animate-in fade-in zoom-in duration-300">
+      <div className="bg-card w-full max-w-md rounded-lg shadow-sm p-8 animate-in fade-in zoom-in duration-300">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Add New Client</h2>
@@ -49,7 +49,7 @@ const AddClientModal = ({ isOpen, onClose, onAdd }) => {
               <input 
                 type="text"
                 placeholder="John Doe"
-                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring transition ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                 value={formData.name}
                 onChange={(e) => {
                   setFormData({...formData, name: e.target.value});
@@ -67,7 +67,7 @@ const AddClientModal = ({ isOpen, onClose, onAdd }) => {
               <input 
                 type="email"
                 placeholder="john@example.com"
-                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring transition ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                 value={formData.email}
                 onChange={(e) => {
                   setFormData({...formData, email: e.target.value});
@@ -85,7 +85,7 @@ const AddClientModal = ({ isOpen, onClose, onAdd }) => {
               <input 
                 type="text"
                 placeholder="Company Name"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ring transition"
                 value={formData.company}
                 onChange={(e) => setFormData({...formData, company: e.target.value})}
               />
@@ -94,7 +94,7 @@ const AddClientModal = ({ isOpen, onClose, onAdd }) => {
 
           <button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 mt-2"
+            className="w-full bg-primary hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-semibold shadow-sm hover:shadow-sm transition-all duration-200 mt-2"
           >
             Create Client
           </button>

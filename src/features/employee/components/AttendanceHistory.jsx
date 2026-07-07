@@ -120,7 +120,7 @@ const AttendanceHistory = () => {
   const getWorkModeConfig = (mode) => {
     const configs = {
       office: { icon: 'Building', label: 'Office', color: 'text-primary' },
-      wfh: { icon: 'Home', label: 'WFH', color: 'text-blue-500' },
+      wfh: { icon: 'Home', label: 'WFH', color: 'text-primary' },
       client_site: { icon: 'MapPin', label: 'Client', color: 'text-orange-500' },
       field_work: { icon: 'Truck', label: 'Field', color: 'text-green-500' }
     };
@@ -151,16 +151,16 @@ const AttendanceHistory = () => {
             <button
               onClick={() => setViewMode('week')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors duration-150 ${
-                viewMode === 'week' ?'bg-card text-foreground shadow-sm' :'text-muted-foreground hover:text-foreground'
-              }`}
+ viewMode === 'week' ?'bg-card text-foreground shadow-sm' :'text-muted-foreground hover:text-foreground'
+ }`}
             >
               Week
             </button>
             <button
               onClick={() => setViewMode('month')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors duration-150 ${
-                viewMode === 'month' ?'bg-card text-foreground shadow-sm' :'text-muted-foreground hover:text-foreground'
-              }`}
+ viewMode === 'month' ?'bg-card text-foreground shadow-sm' :'text-muted-foreground hover:text-foreground'
+ }`}
             >
               Month
             </button>
@@ -257,7 +257,7 @@ const AttendanceHistory = () => {
 
               {record?.reason && (
                 <div className="mt-2 flex items-center space-x-2">
-                  <Icon name="Info" size={12} className="text-blue-500" />
+                  <Icon name="Info" size={12} className="text-primary" />
                   <span className="text-xs text-muted-foreground">{record?.reason}</span>
                 </div>
               )}

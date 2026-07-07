@@ -5,10 +5,10 @@ import { API_ENDPOINTS } from 'api/endpoints';
 import DataLoader from 'components/ui/DataLoader';
 
 const TYPE_COLORS = {
-  'Full-time': 'bg-blue-50 text-blue-700 border-blue-200',
+  'Full-time': 'bg-primary/10 text-primary border-border',
   'Part-time': 'bg-amber-50 text-amber-700 border-amber-200',
   'Internship': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Contract': 'bg-purple-50 text-purple-700 border-purple-200',
+  'Contract': 'bg-primary/10 text-primary border-border',
 };
 
 const STATUS_CONFIG = {
@@ -145,7 +145,7 @@ export default function JobsTab({ setActiveTab }) {
         </div>
         <button
           onClick={() => { setEditingJob(null); setForm(EMPTY_FORM); setIsOpen(true); }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
         >
           <Icon name="Plus" size="16" />
           Post New Job
@@ -155,12 +155,12 @@ export default function JobsTab({ setActiveTab }) {
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         {[
-          { label: 'Total Postings', value: stats.total, icon: 'Briefcase', color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Total Postings', value: stats.total, icon: 'Briefcase', color: 'text-primary', bg: 'bg-primary/10' },
           { label: 'Active Jobs', value: stats.active, icon: 'CheckCircle', color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Paused Jobs', value: stats.paused, icon: 'PauseCircle', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Total Applicants', value: stats.totalApplicants, icon: 'Users', color: 'text-purple-600', bg: 'bg-purple-50' },
+          { label: 'Total Applicants', value: stats.totalApplicants, icon: 'Users', color: 'text-primary', bg: 'bg-primary/10' },
         ].map((s, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3 hover:-translate-y-0.5 transition-all duration-300">
+          <div key={i} className="bg-card border border-gray-200 rounded-lg p-4 flex items-center gap-3 transition-all duration-300">
             <div className={`w-10 h-10 rounded-lg ${s.bg} flex items-center justify-center flex-shrink-0`}>
               <Icon name={s.icon} size="18" className={s.color} />
             </div>
@@ -181,13 +181,13 @@ export default function JobsTab({ setActiveTab }) {
             placeholder="Search job title or department..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+            className="w-full pl-9 pr-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring"
           />
         </div>
         <select
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
-          className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 cursor-pointer"
+          className="px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring cursor-pointer"
         >
           <option>All Status</option>
           <option>Active</option>
@@ -197,7 +197,7 @@ export default function JobsTab({ setActiveTab }) {
         <select
           value={filterType}
           onChange={e => setFilterType(e.target.value)}
-          className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 cursor-pointer"
+          className="px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring cursor-pointer"
         >
           <option>All Types</option>
           <option>Full-time</option>
@@ -211,7 +211,7 @@ export default function JobsTab({ setActiveTab }) {
       {isLoading ? (
         <DataLoader message="Loading job postings..." subMessage="Fetching the latest career opportunities" />
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white border border-gray-200 rounded-lg animate-in fade-in duration-500">
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-card border border-gray-200 rounded-lg animate-in fade-in duration-500">
           <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-3">
             <Icon name="Briefcase" size="24" className="text-gray-400" />
           </div>
@@ -225,11 +225,11 @@ export default function JobsTab({ setActiveTab }) {
             return (
               <div
                 key={job.id || job._id}
-                className="bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 group"
+                className="bg-card border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 group"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
-                    <Icon name="Briefcase" size="18" className="text-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                    <Icon name="Briefcase" size="18" className="text-primary" />
                   </div>
                   <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full border ${job.isActive ? STATUS_CONFIG.Active.cls : STATUS_CONFIG.Paused.cls}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${job.isActive ? STATUS_CONFIG.Active.dot : STATUS_CONFIG.Paused.dot}`} />
@@ -237,7 +237,7 @@ export default function JobsTab({ setActiveTab }) {
                   </span>
                 </div>
 
-                <h3 className="text-base font-medium text-gray-800 mb-0.5 group-hover:text-blue-700 transition-colors">{job.title}</h3>
+                <h3 className="text-base font-medium text-gray-800 mb-0.5 group-hover:text-primary transition-colors">{job.title}</h3>
                 <p className="text-xs text-gray-500 mb-3">{job.department || job.dept}</p>
 
                 <div className="space-y-1.5 mb-3">
@@ -279,7 +279,7 @@ export default function JobsTab({ setActiveTab }) {
                   </button>
                   <button
                     onClick={() => handleEdit(job)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-transparent hover:border-blue-200"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-primary/10 hover:bg-primary/10 text-primary transition-colors border border-transparent hover:border-border"
                     title="Edit Job"
                   >
                     <Icon name="Edit" size="12" />
@@ -287,7 +287,7 @@ export default function JobsTab({ setActiveTab }) {
                   </button>
                   <button
                     onClick={() => setActiveTab('applications')}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-violet-50 hover:bg-violet-100 text-violet-600 transition-colors border border-transparent hover:border-violet-200"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-md bg-primary/10 hover:bg-primary/10 text-primary transition-colors border border-transparent hover:border-border"
                     title="View Applications"
                   >
                     <Icon name="Users" size="12" />
@@ -310,8 +310,8 @@ export default function JobsTab({ setActiveTab }) {
       {/* Create Job Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white border border-gray-200 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300 shadow-xl">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+          <div className="bg-card border border-gray-200 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300 shadow-sm">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-card z-10">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">{editingJob ? 'Update Job Posting' : 'Post New Job'}</h3>
                 <p className="text-sm text-gray-500">{editingJob ? 'Correct the job details below' : 'Fill in the job details below'}</p>
@@ -329,7 +329,7 @@ export default function JobsTab({ setActiveTab }) {
                     placeholder="e.g. Senior React Developer"
                     value={form.title}
                     onChange={e => setForm({ ...form, title: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export default function JobsTab({ setActiveTab }) {
                     placeholder="e.g. Engineering"
                     value={form.department}
                     onChange={e => setForm({ ...form, department: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -347,7 +347,7 @@ export default function JobsTab({ setActiveTab }) {
                     placeholder="e.g. Remote, Onsite · Pune"
                     value={form.location}
                     onChange={e => setForm({ ...form, location: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -356,7 +356,7 @@ export default function JobsTab({ setActiveTab }) {
                     placeholder="e.g. 2-4 years"
                     value={form.experience}
                     onChange={e => setForm({ ...form, experience: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -365,7 +365,7 @@ export default function JobsTab({ setActiveTab }) {
                     placeholder="e.g. ₹8–12 LPA"
                     value={form.salary}
                     onChange={e => setForm({ ...form, salary: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -373,7 +373,7 @@ export default function JobsTab({ setActiveTab }) {
                   <select
                     value={form.type}
                     onChange={e => setForm({ ...form, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 cursor-pointer"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring cursor-pointer"
                   >
                     <option>Full-time</option>
                     <option>Part-time</option>
@@ -388,27 +388,27 @@ export default function JobsTab({ setActiveTab }) {
                     placeholder="Describe the role, responsibilities, and requirements..."
                     value={form.description}
                     onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none"
+                    className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring resize-none"
                   />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Responsibilities (comma separated)</label>
-                  <input value={form.responsibilities} onChange={e => setForm({ ...form, responsibilities: e.target.value })} placeholder="Develop frontend, Write APIs" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                  <input value={form.responsibilities} onChange={e => setForm({ ...form, responsibilities: e.target.value })} placeholder="Develop frontend, Write APIs" className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Requirements (comma separated)</label>
-                  <input value={form.requirements} onChange={e => setForm({ ...form, requirements: e.target.value })} placeholder="MERN Stack, React" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                  <input value={form.requirements} onChange={e => setForm({ ...form, requirements: e.target.value })} placeholder="MERN Stack, React" className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Application Start</label>
-                  <input type="date" value={form.applicationStartDate} onChange={e => setForm({ ...form, applicationStartDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                  <input type="date" value={form.applicationStartDate} onChange={e => setForm({ ...form, applicationStartDate: e.target.value })} className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Application End</label>
-                  <input type="date" value={form.applicationEndDate} onChange={e => setForm({ ...form, applicationEndDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm" />
+                  <input type="date" value={form.applicationEndDate} onChange={e => setForm({ ...form, applicationEndDate: e.target.value })} className="w-full px-3 py-2 bg-card border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} id="isActive" className="rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
+                  <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} id="isActive" className="rounded text-primary focus:ring-ring border-gray-300" />
                   <label htmlFor="isActive" className="text-sm font-medium text-gray-700 cursor-pointer">Active / Visible</label>
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function JobsTab({ setActiveTab }) {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-sm flex items-center justify-center gap-2 min-w-[100px]"
+                  className="px-5 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-all shadow-sm flex items-center justify-center gap-2 min-w-[100px]"
                 >
                   {isSubmitting && <Icon name="Loader2" size="14" className="animate-spin" />}
                   {editingJob ? 'Update Job' : 'Post Job'}
@@ -434,7 +434,7 @@ export default function JobsTab({ setActiveTab }) {
       {/* Delete Confirm Modal */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white border border-gray-200 rounded-xl w-full max-w-sm p-6 text-center shadow-xl animate-in zoom-in-95 duration-300">
+          <div className="bg-card border border-gray-200 rounded-xl w-full max-w-sm p-6 text-center shadow-sm animate-in zoom-in-95 duration-300">
             <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border border-red-100">
               <Icon name="Trash2" size="20" className="text-red-500" />
             </div>
@@ -446,7 +446,7 @@ export default function JobsTab({ setActiveTab }) {
                 type="button" 
                 onClick={doDelete} 
                 disabled={isSubmitting}
-                className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-all shadow-sm shadow-red-200 flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-all shadow-sm flex items-center justify-center gap-2"
               >
                 {isSubmitting && <Icon name="Loader2" size="14" className="animate-spin" />}
                 Delete

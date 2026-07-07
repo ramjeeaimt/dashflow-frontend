@@ -5,7 +5,7 @@ import Image from '../../../components/AppImage';
 const EmployeeStatusCard = ({ employee }) => {
   const getWorkModeColor = (mode) => {
     switch (mode) {
-      case 'WFH': return 'bg-blue-100 text-blue-800';
+      case 'WFH': return 'bg-primary/10 text-blue-800';
       case 'Office': return 'bg-green-100 text-green-800';
       case 'Client-site': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -82,7 +82,7 @@ const EmployeeStatusCard = ({ employee }) => {
             <Icon name="Camera" size={16} className="text-green-600" />
           )}
           {employee?.screenMonitoring && (
-            <Icon name="Monitor" size={16} className="text-blue-600" />
+            <Icon name="Monitor" size={16} className="text-primary" />
           )}
         </div>
       </div>

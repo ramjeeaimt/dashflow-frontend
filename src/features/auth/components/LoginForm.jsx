@@ -34,7 +34,7 @@ const LoginForm = ({ onSubmit, isLoading, error, clearError, onForgotPasswordCli
                             id="email"
                             type="email"
                             required
-                            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+                            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-ring focus:border-primary sm:text-sm transition duration-150 ease-in-out"
                             placeholder="you@company.com"
                             value={email}
                             onChange={(e) => { setEmail(e.target.value); clearError(); }}
@@ -52,7 +52,7 @@ const LoginForm = ({ onSubmit, isLoading, error, clearError, onForgotPasswordCli
                             id="password"
                             type={showPassword ? "text" : "password"}
                             required
-                            className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+                            className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-ring focus:border-primary sm:text-sm transition duration-150 ease-in-out"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => { setPassword(e.target.value); clearError(); }}
@@ -70,7 +70,7 @@ const LoginForm = ({ onSubmit, isLoading, error, clearError, onForgotPasswordCli
 
             <div className="flex items-center justify-end">
                 <div className="text-sm">
-                    <button type="button" onClick={onForgotPasswordClick} className="font-medium text-blue-600 hover:text-blue-500">
+                    <button type="button" onClick={onForgotPasswordClick} className="font-medium text-primary hover:text-primary">
                         Forgot password?
                     </button>
                 </div>
@@ -80,7 +80,7 @@ const LoginForm = ({ onSubmit, isLoading, error, clearError, onForgotPasswordCli
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring transition duration-150 ease-in-out ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
                     {isLoading ? (
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ const LoginForm = ({ onSubmit, isLoading, error, clearError, onForgotPasswordCli
                         </svg>
                     ) : (
                         <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                            <ArrowRight className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
+                            <ArrowRight className="h-5 w-5 text-primary group-hover:text-blue-400" />
                         </span>
                     )}
                     {isLoading ? 'Signing in...' : 'Sign in'}

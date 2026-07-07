@@ -52,7 +52,7 @@ const TaskTimeline = ({ tasks, activities, onTaskClick }) => {
     if (event.type === 'task') {
       switch(event.status) {
         case 'completed': return 'text-green-500';
-        case 'in-progress': return 'text-blue-500';
+        case 'in-progress': return 'text-primary';
         case 'pending': return 'text-yellow-500';
         default: return 'text-gray-500';
       }
@@ -107,17 +107,17 @@ const TaskTimeline = ({ tasks, activities, onTaskClick }) => {
                     {event.type === 'task' && (
                       <div className="flex gap-2 mt-2">
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          event.priority === 'high' ? 'bg-red-100 text-red-700' :
-                          event.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
+ event.priority === 'high' ? 'bg-red-100 text-red-700' :
+ event.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+ 'bg-green-100 text-green-700'
+ }`}>
                           {event.priority}
                         </span>
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          event.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          event.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
+ event.status === 'completed' ? 'bg-green-100 text-green-700' :
+ event.status === 'in-progress' ? 'bg-primary/10 text-primary' :
+ 'bg-yellow-100 text-yellow-700'
+ }`}>
                           {event.status}
                         </span>
                       </div>

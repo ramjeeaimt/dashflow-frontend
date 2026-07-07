@@ -40,8 +40,8 @@ const AttendanceSummary = ({ attendanceStatus, employeeData }) => {
         title: 'Team Player', 
         description: 'Helped 3 colleagues this week',
         icon: 'Users',
-        color: 'text-blue-500',
-        bgColor: 'bg-blue-50'
+        color: 'text-primary',
+        bgColor: 'bg-primary/10'
       }
     ]
   };
@@ -53,7 +53,7 @@ const AttendanceSummary = ({ attendanceStatus, employeeData }) => {
       time: '10:00 AM',
       type: 'meeting',
       icon: 'Users',
-      color: 'text-blue-500'
+      color: 'text-primary'
     },
     {
       id: 2,
@@ -197,7 +197,7 @@ const AttendanceSummary = ({ attendanceStatus, employeeData }) => {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Icon name="Calendar" size={16} className="text-blue-500" />
+              <Icon name="Calendar" size={16} className="text-primary" />
               <span className="text-sm text-foreground">Annual Leave</span>
             </div>
             <span className="text-sm font-medium text-foreground">
@@ -276,7 +276,7 @@ const AttendanceSummary = ({ attendanceStatus, employeeData }) => {
             onClick={() => window.location.href = '/leave-request'}
             className="flex items-center justify-center space-x-2 p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-150"
           >
-            <Icon name="Calendar" size={16} className="text-blue-500" />
+            <Icon name="Calendar" size={16} className="text-primary" />
             <span className="text-sm text-foreground">Request Leave</span>
           </button>
           

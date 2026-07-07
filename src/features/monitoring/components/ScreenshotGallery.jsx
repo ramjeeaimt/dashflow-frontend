@@ -69,7 +69,7 @@ const ScreenshotGallery = ({ employee }) => {
               <Image
               src={screenshot?.url}
               alt={screenshot?.alt}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+              className="w-full h-full object-cover transition-transform duration-200" />
 
             </div>
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-lg flex items-center justify-center">

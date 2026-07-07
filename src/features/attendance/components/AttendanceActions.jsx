@@ -75,7 +75,7 @@ const AttendanceActions = ({
   };
 
   return (
-    <div className="bg-white border-b border-slate-100 ">
+    <div className="bg-card border-b border-border ">
       {/* <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8"> */}
       {/* Left Side - Selection Info & Bulk Actions */}
       {/* <div className="flex-1 space-y-4"> */}
@@ -86,12 +86,12 @@ const AttendanceActions = ({
                 <button
                   key={action?.id}
                   onClick={() => onBulkAction(action?.id)}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all active:scale-95 flex items-center shadow-sm ${action.color === 'success' ? 'border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' :
-                    action.color === 'error' ? 'border-rose-100 bg-rose-50 text-rose-700 hover:bg-rose-100' :
-                      action.color === 'warning' ? 'border-amber-100 bg-amber-50 text-amber-700 hover:bg-amber-100' :
-                        action.color === 'purple' ? 'border-purple-100 bg-purple-50 text-purple-700 hover:bg-purple-100' :
-                          'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
-                    }`}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all flex items-center shadow-sm ${action.color === 'success' ? 'border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' :
+ action.color === 'error' ? 'border-rose-100 bg-rose-50 text-rose-700 hover:bg-rose-100' :
+ action.color === 'warning' ? 'border-amber-100 bg-amber-50 text-amber-700 hover:bg-amber-100' :
+ action.color === 'purple' ? 'border-border bg-primary/10 text-primary hover:bg-primary/10' :
+ 'border-border bg-muted/60 text-foreground hover:bg-muted'
+ }`}
                   title={action?.description}
                 >
                   <Icon name={action?.icon} size={14} className="mr-2" />
@@ -100,10 +100,10 @@ const AttendanceActions = ({
               ))}
             </div>
           ) : (
-            <div className="flex items-center space-x-3 text-slate-400 group">
-              <div className="w-6 h-px bg-slate-100"></div>
+            <div className="flex items-center space-x-3 text-muted-foreground/70 group">
+              <div className="w-6 h-px bg-muted"></div>
               <p className="text-xs font-semibold tracking-tight">Select records to perform bulk actions</p>
-              <div className="w-6 h-px bg-slate-100"></div>
+              <div className="w-6 h-px bg-muted"></div>
             </div>
           )} */}
       {/* </div> */}
@@ -113,7 +113,7 @@ const AttendanceActions = ({
       {/* Take Attendance */}
       {/* <button
             onClick={onTakeAttendance}
-            className="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all flex items-center active:scale-95"
+            className="px-6 py-2.5 bg-primary text-white text-xs font-bold rounded-xl shadow-sm hover:bg-primary/90 transition-all flex items-center "
           >
             <Icon name="ClipboardCheck" size={16} className="mr-2" />
             Take Attendance
@@ -122,7 +122,7 @@ const AttendanceActions = ({
       {/* Manual Entry */}
       {/* <button
             onClick={onManualEntry}
-            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all flex items-center active:scale-95"
+            className="px-6 py-2.5 bg-card border border-border text-foreground text-xs font-bold rounded-xl shadow-sm hover:bg-muted/60 transition-all flex items-center "
           >
             <Icon name="PlusCircle" size={16} className="mr-2" />
             Manual Entry
@@ -132,7 +132,7 @@ const AttendanceActions = ({
       {/* <div className="relative"> */}
       {/* <button
                onClick={() => setShowExportMenu(!showExportMenu)}
-               className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all flex items-center active:scale-95"
+               className="px-6 py-2.5 bg-card border border-border text-foreground text-xs font-bold rounded-xl shadow-sm hover:bg-muted/60 transition-all flex items-center "
             >
               <Icon name="Download" size={16} className="mr-2" />
               Export
@@ -140,9 +140,9 @@ const AttendanceActions = ({
             </button> */}
 
       {/* {showExportMenu && (
-              <div className="absolute right-0 top-full mt-3 w-72 bg-white border border-slate-100 shadow-2xl rounded-2xl z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
+              <div className="absolute right-0 top-full mt-3 w-72 bg-card border border-border shadow-sm rounded-lg z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
                 <div className="px-3 py-2.5 border-b border-slate-50 mb-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available Formats</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Available Formats</p>
                 </div>
                 {exportFormats?.map((format) => (
                   <button
@@ -151,14 +151,14 @@ const AttendanceActions = ({
                       onExportReport(format?.id);
                       setShowExportMenu(false);
                     }}
-                    className="w-full px-3 py-3 text-left hover:bg-slate-50 transition-all rounded-xl group flex items-start space-x-4"
+                    className="w-full px-3 py-3 text-left hover:bg-muted/60 transition-all rounded-xl group flex items-start space-x-4"
                   >
-                    <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <div className="p-2 bg-muted/60 rounded-lg group-hover:bg-primary/90 group-hover:text-white transition-all">
                       <Icon name={format?.icon} size={18} />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-slate-900">{format?.label}</div>
-                      <div className="text-[10px] font-medium text-slate-400 mt-0.5">{format?.description}</div>
+                      <div className="text-xs font-bold text-foreground">{format?.label}</div>
+                      <div className="text-[10px] font-medium text-muted-foreground/70 mt-0.5">{format?.description}</div>
                     </div>
                   </button>
                 ))}
@@ -168,7 +168,7 @@ const AttendanceActions = ({
 
       {/* <button
             onClick={() => console.log('Policy settings')}
-            className="p-2.5 bg-slate-50 border border-slate-200 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all shadow-sm"
+            className="p-2.5 bg-muted/60 border border-border text-muted-foreground/70 hover:text-foreground hover:bg-card rounded-xl transition-all shadow-sm"
             title="Settings"
           >
             <Icon name="Settings" size={20} />

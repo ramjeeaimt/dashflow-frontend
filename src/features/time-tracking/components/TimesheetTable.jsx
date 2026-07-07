@@ -145,7 +145,7 @@ const TimesheetTable = ({ entries, onEditEntry, onDeleteEntry }) => {
   const averageProductivity = mockEntries?.reduce((sum, entry) => sum + entry?.productivityScore, 0) / mockEntries?.length;
 
   return (
-    <div className="bg-card border border-border rounded-2xl card-shadow">
+    <div className="bg-card border border-border rounded-lg card-shadow">
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">

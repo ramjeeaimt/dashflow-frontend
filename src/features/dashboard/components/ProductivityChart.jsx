@@ -15,10 +15,10 @@ const ProductivityChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 h-[450px] animate-pulse">
-        <div className="h-6 w-48 bg-slate-100 rounded-lg mb-2"></div>
-        <div className="h-4 w-64 bg-slate-50 rounded-lg mb-8"></div>
-        <div className="h-64 w-full bg-slate-50/50 rounded-lg"></div>
+      <div className="bg-card rounded-lg p-6 h-[450px] animate-pulse">
+        <div className="h-6 w-48 bg-muted rounded-lg mb-2"></div>
+        <div className="h-4 w-64 bg-muted/60 rounded-lg mb-8"></div>
+        <div className="h-64 w-full bg-muted/50 rounded-lg"></div>
       </div>
     );
   }
@@ -30,17 +30,17 @@ const ProductivityChart = ({ data, loading }) => {
       chartData.length || 0;
 
   return (
-    <div className="bg-white h-full flex flex-col">
+    <div className="bg-card h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
         <div className="space-y-1">
-          <h3 className="text-xl font-bold text-slate-800 tracking-tight">Productivity Index</h3>
-          <p className="text-xs text-slate-400 font-medium">Performance vector analysis</p>
+          <h3 className="text-xl font-bold text-foreground tracking-tight">Productivity Index</h3>
+          <p className="text-xs text-muted-foreground/70 font-medium">Performance vector analysis</p>
         </div>
 
         <div className="flex items-center space-x-2">
           <button 
             onClick={() => setChartType(prev => prev === 'area' ? 'line' : 'area')}
-            className="p-2 bg-slate-50 border border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-sm"
+            className="p-2 bg-muted/60 border border-border text-muted-foreground/70 hover:text-primary hover:bg-card rounded-lg transition-all shadow-sm"
             title="Toggle Protocol"
           >
             <Icon name={chartType === "area" ? "TrendingUp" : "AreaChart"} size={18} strokeWidth={2.5} />
@@ -97,16 +97,16 @@ const ProductivityChart = ({ data, loading }) => {
 
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50">
         <div className="flex flex-col">
-          <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">AGGREGATE_EFFICIENCY</span>
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70 font-bold mb-1">AGGREGATE_EFFICIENCY</span>
           <div className="flex items-center space-x-3">
-            <span className="text-3xl font-bold text-slate-800 tracking-tight">{avgProductivity.toFixed(1)}%</span>
+            <span className="text-3xl font-bold text-foreground tracking-tight">{avgProductivity.toFixed(1)}%</span>
             <div className="flex items-center bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-lg">
               <Icon name="TrendingUp" size={10} className="mr-1" strokeWidth={3} />
               +2.4%
             </div>
           </div>
         </div>
-        <button className="text-xs font-bold text-slate-800 hover:text-blue-600 transition-colors flex items-center gap-1 group">
+        <button className="text-xs font-bold text-foreground hover:text-primary transition-colors flex items-center gap-1 group">
           Detailed Analysis
           <Icon name="ArrowRight" size={14} className="transition-transform group-hover:translate-x-1" />
         </button>

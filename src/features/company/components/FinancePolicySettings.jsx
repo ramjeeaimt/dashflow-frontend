@@ -5,11 +5,11 @@ import uploadService from '../../../features/upload/uploadService';
 import Icon from '../../../components/AppIcon';
 
 const FieldGroup = ({ label, hint, children }) => (
-  <div className="py-5 border-b border-slate-100 last:border-0">
+  <div className="py-5 border-b border-border last:border-0">
     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
       <div className="sm:w-64 flex-shrink-0">
-        <p className="text-sm font-semibold text-slate-800">{label}</p>
-        {hint && <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{hint}</p>}
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+        {hint && <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">{hint}</p>}
       </div>
       <div className="flex-1">{children}</div>
     </div>
@@ -236,25 +236,25 @@ const FinancePolicySettings = () => {
     }
   };
 
-  if (loading) return <div className="p-8 text-sm text-slate-400">Loading policy settings…</div>;
+  if (loading) return <div className="p-8 text-sm text-muted-foreground/70">Loading policy settings…</div>;
 
   return (
     <div className="max-w-3xl mx-auto">
       {/* Page title */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-slate-900">Finance Policy</h3>
-        <p className="text-sm text-slate-500 mt-1">Configure who should receive alerts regarding payroll generation and finance updates.</p>
+        <h3 className="text-lg font-semibold text-foreground">Finance Policy</h3>
+        <p className="text-sm text-muted-foreground mt-1">Configure who should receive alerts regarding payroll generation and finance updates.</p>
       </div>
 
       {/* Payroll Alerts */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
             <Icon name="DollarSign" size={16} className="text-emerald-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-900">Payroll Notifications</p>
-            <p className="text-xs text-slate-400">Manage who receives alerts when payroll is generated.</p>
+            <p className="text-sm font-semibold text-foreground">Payroll Notifications</p>
+            <p className="text-xs text-muted-foreground/70">Manage who receives alerts when payroll is generated.</p>
           </div>
         </div>
         <div className="px-6">
@@ -265,7 +265,7 @@ const FinancePolicySettings = () => {
             <div className="space-y-4 max-w-lg">
               <form onSubmit={handleAddEmail} className="flex gap-2">
                 <div className="relative flex-1">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-muted-foreground/70 pointer-events-none">
                     <Icon name="Mail" size={14} />
                   </span>
                   <input
@@ -273,12 +273,12 @@ const FinancePolicySettings = () => {
                     value={newEmailInput}
                     onChange={(e) => setNewEmailInput(e.target.value)}
                     placeholder="Enter email to add..."
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400 text-slate-800"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring placeholder-slate-400 text-foreground"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+                  className="px-4 py-2 bg-sidebar text-white text-sm font-semibold rounded-lg hover:bg-sidebar transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
                 >
                   <Icon name="Plus" size={14} />
                   <span>Add</span>
@@ -286,18 +286,18 @@ const FinancePolicySettings = () => {
               </form>
 
               {emailList.length > 0 ? (
-                <div className="flex flex-wrap gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100 min-h-[46px] items-center">
+                <div className="flex flex-wrap gap-2 bg-muted/60 p-3 rounded-lg border border-border min-h-[46px] items-center">
                   {emailList.map((email) => (
                     <div
                       key={email}
-                      className="flex items-center space-x-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-xs font-semibold text-slate-700 hover:border-slate-300 transition-all group/chip shadow-sm"
+                      className="flex items-center space-x-1.5 px-2.5 py-1 bg-card border border-border rounded-md text-xs font-semibold text-foreground hover:border-border transition-all group/chip shadow-sm"
                     >
-                      <Icon name="Mail" size={12} className="text-slate-400" />
+                      <Icon name="Mail" size={12} className="text-muted-foreground/70" />
                       <span>{email}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveEmail(email)}
-                        className="w-4 h-4 rounded flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-all"
+                        className="w-4 h-4 rounded flex items-center justify-center hover:bg-rose-50 text-muted-foreground/70 hover:text-rose-500 transition-all"
                         title={`Remove ${email}`}
                       >
                         <Icon name="X" size={12} />
@@ -306,8 +306,8 @@ const FinancePolicySettings = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-3 border border-dashed border-slate-200 rounded-lg bg-slate-50">
-                  <p className="text-xs font-medium text-slate-400">No admin emails added yet. Default admins will receive notifications.</p>
+                <div className="text-center py-3 border border-dashed border-border rounded-lg bg-muted/60">
+                  <p className="text-xs font-medium text-muted-foreground/70">No admin emails added yet. Default admins will receive notifications.</p>
                 </div>
               )}
             </div>
@@ -316,14 +316,14 @@ const FinancePolicySettings = () => {
       </div>
 
       {/* Payroll Policies */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-            <Icon name="Settings" size={16} className="text-indigo-600" />
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Icon name="Settings" size={16} className="text-primary" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-900">Payroll Policies</p>
-            <p className="text-xs text-slate-400">Configure global allowances and overtime calculations.</p>
+            <p className="text-sm font-semibold text-foreground">Payroll Policies</p>
+            <p className="text-xs text-muted-foreground/70">Configure global allowances and overtime calculations.</p>
           </div>
         </div>
         <div className="px-6">
@@ -332,7 +332,7 @@ const FinancePolicySettings = () => {
             hint="Standard monthly allowance added to every generated payslip (positive integer)."
           >
             <div className="relative max-w-sm">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-muted-foreground/70 pointer-events-none">
                 <Icon name="IndianRupee" size={14} />
               </span>
               <input
@@ -343,7 +343,7 @@ const FinancePolicySettings = () => {
                   const valStr = e.target.value;
                   set('allowanceAmount', valStr === '' ? '' : (parseInt(valStr) || 0));
                 }}
-                className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
               />
             </div>
           </FieldGroup>
@@ -356,7 +356,7 @@ const FinancePolicySettings = () => {
               <select
                 value={form.overtimePolicy}
                 onChange={(e) => set('overtimePolicy', e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground bg-card"
               >
                 <option value="fixed">Fixed Rate</option>
                 <option value="variable">Variable Rate (Based on exact working days & hours)</option>
@@ -370,7 +370,7 @@ const FinancePolicySettings = () => {
               hint="The fixed amount paid for every hour of overtime."
             >
               <div className="relative max-w-sm">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-muted-foreground/70 pointer-events-none">
                   <Icon name="IndianRupee" size={14} />
                 </span>
                 <input
@@ -381,7 +381,7 @@ const FinancePolicySettings = () => {
                     const valStr = e.target.value;
                     set('overtimeRatePerHour', valStr === '' ? '' : (parseInt(valStr) || 0));
                   }}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                 />
               </div>
             </FieldGroup>
@@ -406,9 +406,9 @@ const FinancePolicySettings = () => {
                       set('overtimeMultiplier', parseFloat(valStr));
                     }
                   }}
-                  className="w-full pl-3 pr-9 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                  className="w-full pl-3 pr-9 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                 />
-                <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 pointer-events-none">
+                <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground/70 pointer-events-none">
                   <span className="font-bold text-xs">%</span>
                 </span>
               </div>
@@ -418,23 +418,23 @@ const FinancePolicySettings = () => {
       </div>
 
       {/* Payslip Email Template */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Icon name="Mail" size={16} className="text-blue-600" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Icon name="Mail" size={16} className="text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-900">Payslip Attachment Template</p>
-              <p className="text-xs text-slate-400">Configure branding and HTML format for the generated payslip PDF attachment.</p>
+              <p className="text-sm font-semibold text-foreground">Payslip Attachment Template</p>
+              <p className="text-xs text-muted-foreground/70">Configure branding and HTML format for the generated payslip PDF attachment.</p>
             </div>
           </div>
         </div>
         <div className="px-6 py-6 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Logo Upload */}
-                <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                    <h3 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <div className="bg-muted/60 p-5 rounded-lg border border-border">
+                    <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                         <Icon name="Image" size={16} /> Company Logo
                     </h3>
                     <div className="space-y-4">
@@ -442,32 +442,32 @@ const FinancePolicySettings = () => {
                             type="file"
                             accept="image/*"
                             onChange={(e) => handleFileUpload(e, 'logo')}
-                            className="block w-full text-sm text-slate-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100 transition-all cursor-pointer"
+                            className="block w-full text-sm text-muted-foreground
+ file:mr-4 file:py-2 file:px-4
+ file:rounded-full file:border-0
+ file:text-sm file:font-semibold
+ file:bg-primary/10 file:text-primary
+ hover:file:bg-primary/10 transition-all cursor-pointer"
                         />
                         {logoUrl && (
                             <div className="mt-3">
-                                <p className="text-xs text-slate-500 mb-1">Generated Image Link:</p>
+                                <p className="text-xs text-muted-foreground mb-1">Generated Image Link:</p>
                                 <div className="flex gap-2">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={logoUrl} 
-                                        className="text-xs bg-white border border-slate-300 rounded px-2 py-1 w-full"
+                                        className="text-xs bg-card border border-border rounded px-2 py-1 w-full"
                                     />
                                     <button 
                                         type="button"
                                         onClick={() => copyToClipboard(logoUrl)}
-                                        className="bg-slate-200 hover:bg-slate-300 px-3 rounded text-xs font-medium transition-colors"
+                                        className="bg-border hover:bg-slate-300 px-3 rounded text-xs font-medium transition-colors"
                                     >
                                         Copy
                                     </button>
                                 </div>
-                                <div className="mt-4 p-3 bg-white border border-slate-200 rounded flex justify-center">
+                                <div className="mt-4 p-3 bg-card border border-border rounded flex justify-center">
                                     <img src={logoUrl} alt="Logo Preview" className="max-h-20 object-contain" />
                                 </div>
                             </div>
@@ -476,8 +476,8 @@ const FinancePolicySettings = () => {
                 </div>
 
                 {/* Signature Upload */}
-                <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                    <h3 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <div className="bg-muted/60 p-5 rounded-lg border border-border">
+                    <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                         <Icon name="Edit3" size={16} /> Owner Signature
                     </h3>
                     <div className="space-y-4">
@@ -485,32 +485,32 @@ const FinancePolicySettings = () => {
                             type="file"
                             accept="image/*"
                             onChange={(e) => handleFileUpload(e, 'signature')}
-                            className="block w-full text-sm text-slate-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100 transition-all cursor-pointer"
+                            className="block w-full text-sm text-muted-foreground
+ file:mr-4 file:py-2 file:px-4
+ file:rounded-full file:border-0
+ file:text-sm file:font-semibold
+ file:bg-primary/10 file:text-primary
+ hover:file:bg-primary/10 transition-all cursor-pointer"
                         />
                         {signatureUrl && (
                             <div className="mt-3">
-                                <p className="text-xs text-slate-500 mb-1">Generated Image Link:</p>
+                                <p className="text-xs text-muted-foreground mb-1">Generated Image Link:</p>
                                 <div className="flex gap-2">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={signatureUrl} 
-                                        className="text-xs bg-white border border-slate-300 rounded px-2 py-1 w-full"
+                                        className="text-xs bg-card border border-border rounded px-2 py-1 w-full"
                                     />
                                     <button 
                                         type="button"
                                         onClick={() => copyToClipboard(signatureUrl)}
-                                        className="bg-slate-200 hover:bg-slate-300 px-3 rounded text-xs font-medium transition-colors"
+                                        className="bg-border hover:bg-slate-300 px-3 rounded text-xs font-medium transition-colors"
                                     >
                                         Copy
                                     </button>
                                 </div>
-                                <div className="mt-4 p-3 bg-white border border-slate-200 rounded flex justify-center">
+                                <div className="mt-4 p-3 bg-card border border-border rounded flex justify-center">
                                     <img src={signatureUrl} alt="Signature Preview" className="max-h-20 object-contain" />
                                 </div>
                             </div>
@@ -520,9 +520,9 @@ const FinancePolicySettings = () => {
             </div>
 
             {/* Email Template Editor */}
-            <div className="border border-slate-200 rounded-lg overflow-hidden mt-6">
-                <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center">
-                    <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <div className="border border-border rounded-lg overflow-hidden mt-6">
+                <div className="bg-muted/60 border-b border-border px-5 py-3 flex justify-between items-center">
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                         <Icon name="Code" size={16} /> HTML Format
                     </h3>
                     <div className="flex gap-4 items-center">
@@ -530,7 +530,7 @@ const FinancePolicySettings = () => {
                             <button
                                 type="button"
                                 onClick={() => setIsEmailTemplateEditable(!isEmailTemplateEditable)}
-                                className={`text-sm font-medium flex items-center gap-1 ${isEmailTemplateEditable ? 'text-green-600' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`text-sm font-medium flex items-center gap-1 ${isEmailTemplateEditable ? 'text-green-600' : 'text-muted-foreground hover:text-foreground'}`}
                             >
                                 <Icon name="Edit2" size={16} />
                                 {isEmailTemplateEditable ? 'Editing...' : 'Edit Code'}
@@ -539,7 +539,7 @@ const FinancePolicySettings = () => {
                         <button
                             type="button"
                             onClick={() => setShowPreview(!showPreview)}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                            className="text-sm font-medium text-primary hover:text-primary flex items-center gap-1"
                         >
                             <Icon name={showPreview ? 'Code' : 'Eye'} size={16} />
                             {showPreview ? 'Edit HTML' : 'Show Preview'}
@@ -549,11 +549,11 @@ const FinancePolicySettings = () => {
 
                 <div className="p-0">
                     {showPreview ? (
-                        <div className="bg-white p-8 overflow-auto max-h-[500px]">
-                            <div className="border border-dashed border-slate-300 rounded-lg p-4 bg-[#f8fafc]">
-                                <p className="text-xs text-slate-500 mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
+                        <div className="bg-card p-8 overflow-auto max-h-[500px]">
+                            <div className="border border-dashed border-border rounded-lg p-4 bg-background">
+                                <p className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
                                 <div 
-                                    className="bg-white shadow-sm mx-auto"
+                                    className="bg-card shadow-sm mx-auto"
                                     dangerouslySetInnerHTML={{ __html: emailTemplate }} 
                                 />
                             </div>
@@ -563,7 +563,7 @@ const FinancePolicySettings = () => {
                             value={emailTemplate}
                             onChange={(e) => setEmailTemplate(e.target.value)}
                             readOnly={!isEmailTemplateEditable}
-                            className={`w-full h-[400px] p-5 font-mono text-sm text-slate-700 bg-slate-900 !text-green-400 focus:outline-none ${!isEmailTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
+                            className={`w-full h-[400px] p-5 font-mono text-sm text-foreground bg-sidebar !text-green-400 focus:outline-none ${!isEmailTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
                             spellCheck="false"
                         />
                     )}
@@ -572,22 +572,22 @@ const FinancePolicySettings = () => {
         </div>
       </div>
       {/* Salary Email Body Template */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <Icon name="Mail" size={16} className="text-indigo-600" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Icon name="Mail" size={16} className="text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-900">Salary Email Body Template</p>
-              <p className="text-xs text-slate-400">Configure the actual HTML body of the email that the employee will receive along with the payslip attachment.</p>
+              <p className="text-sm font-semibold text-foreground">Salary Email Body Template</p>
+              <p className="text-xs text-muted-foreground/70">Configure the actual HTML body of the email that the employee will receive along with the payslip attachment.</p>
             </div>
           </div>
         </div>
         <div className="px-6 py-6 space-y-8">
-            <div className="border border-slate-200 rounded-lg overflow-hidden">
-                <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center">
-                    <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <div className="border border-border rounded-lg overflow-hidden">
+                <div className="bg-muted/60 border-b border-border px-5 py-3 flex justify-between items-center">
+                    <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                         <Icon name="Code" size={16} /> Email Body HTML Format
                     </h3>
                     <div className="flex gap-4 items-center">
@@ -595,7 +595,7 @@ const FinancePolicySettings = () => {
                             <button
                                 type="button"
                                 onClick={() => setIsBodyTemplateEditable(!isBodyTemplateEditable)}
-                                className={`text-sm font-medium flex items-center gap-1 ${isBodyTemplateEditable ? 'text-green-600' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`text-sm font-medium flex items-center gap-1 ${isBodyTemplateEditable ? 'text-green-600' : 'text-muted-foreground hover:text-foreground'}`}
                             >
                                 <Icon name="Edit2" size={16} />
                                 {isBodyTemplateEditable ? 'Editing...' : 'Edit Code'}
@@ -604,7 +604,7 @@ const FinancePolicySettings = () => {
                         <button
                             type="button"
                             onClick={() => setShowBodyPreview(!showBodyPreview)}
-                            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                            className="text-sm font-medium text-primary hover:text-primary flex items-center gap-1"
                         >
                             <Icon name={showBodyPreview ? 'Code' : 'Eye'} size={16} />
                             {showBodyPreview ? 'Edit HTML' : 'Show Preview'}
@@ -614,11 +614,11 @@ const FinancePolicySettings = () => {
 
                 <div className="p-0">
                     {showBodyPreview ? (
-                        <div className="bg-white p-8 overflow-auto max-h-[500px]">
-                            <div className="border border-dashed border-slate-300 rounded-lg p-4 bg-[#f8fafc]">
-                                <p className="text-xs text-slate-500 mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
+                        <div className="bg-card p-8 overflow-auto max-h-[500px]">
+                            <div className="border border-dashed border-border rounded-lg p-4 bg-background">
+                                <p className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
                                 <div 
-                                    className="bg-white shadow-sm mx-auto"
+                                    className="bg-card shadow-sm mx-auto"
                                     dangerouslySetInnerHTML={{ __html: salaryEmailBodyTemplate }} 
                                 />
                             </div>
@@ -628,7 +628,7 @@ const FinancePolicySettings = () => {
                             value={salaryEmailBodyTemplate}
                             onChange={(e) => setSalaryEmailBodyTemplate(e.target.value)}
                             readOnly={!isBodyTemplateEditable}
-                            className={`w-full h-[400px] p-5 font-mono text-sm text-slate-700 bg-slate-900 !text-green-400 focus:outline-none ${!isBodyTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
+                            className={`w-full h-[400px] p-5 font-mono text-sm text-foreground bg-sidebar !text-green-400 focus:outline-none ${!isBodyTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
                             spellCheck="false"
                         />
                     )}
@@ -648,7 +648,7 @@ const FinancePolicySettings = () => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all disabled:opacity-60"
+          className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-xl shadow-sm transition-all disabled:opacity-60"
         >
           <Icon name="Save" size={16} />
           {saving ? 'Saving…' : 'Save Policy'}

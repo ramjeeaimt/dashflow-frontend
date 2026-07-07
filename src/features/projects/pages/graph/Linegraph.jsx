@@ -18,11 +18,11 @@ const CustomTooltip = ({ active, payload, label, growthData }) => {
         const diff = value - previousValue;
 
         return (
-            <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-xl">
-                <p className="text-xs font-bold text-slate-400 mb-2">{label}</p>
+            <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
+                <p className="text-xs font-bold text-muted-foreground/70 mb-2">{label}</p>
                 <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-slate-800">{value}</span>
-                    <span className="text-xs text-slate-500 font-medium">Projects</span>
+                    <span className="text-3xl font-bold text-foreground">{value}</span>
+                    <span className="text-xs text-muted-foreground font-medium">Projects</span>
                 </div>
                 {diff !== 0 && (
                     <div className="mt-2 pt-2 border-t border-slate-50">
@@ -71,23 +71,23 @@ const ProjectLineGraph = () => {
     }, [growthData]);
 
     if (loading && growthData.length === 0) {
-        return <div className="w-full h-[400px] bg-white animate-pulse flex items-center justify-center font-bold text-sm text-slate-400">Loading growth data...</div>;
+        return <div className="w-full h-[400px] bg-card animate-pulse flex items-center justify-center font-bold text-sm text-muted-foreground/70">Loading growth data...</div>;
     }
 
     return (
-        <div className="w-full bg-white transition-all group">
+        <div className="w-full bg-card transition-all group">
             <div className="px-4 pt-4 pb-6 flex justify-between items-end">
                 <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-slate-900">Project Growth</h3>
-                    <p className="text-xs text-slate-500 font-medium italic">Monthly project initialization trends</p>
+                    <h3 className="text-lg font-bold text-foreground">Project Growth</h3>
+                    <p className="text-xs text-muted-foreground font-medium italic">Monthly project initialization trends</p>
                 </div>
                 <div className="flex gap-10">
                     <div className="text-right">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Total</p>
-                        <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-wider mb-0.5">Total</p>
+                        <p className="text-2xl font-bold text-foreground">{stats.total}</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Growth</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-wider mb-0.5">Growth</p>
                         <p className={`text-2xl font-bold ${Number(stats.pct) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                             {Number(stats.pct) >= 0 ? '↑' : '↓'}{Math.abs(stats.pct)}%
                         </p>
@@ -141,13 +141,13 @@ const ProjectLineGraph = () => {
             
             <div className="mt-8 flex items-center justify-between px-4 border-t border-slate-50 pt-6">
                 <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-lg shadow-blue-500/20"></div>
-                    <span className="text-xs font-bold text-slate-700">Project Distribution Overview</span>
+                    <div className="w-2.5 h-2.5 bg-primary rounded-full shadow-sm"></div>
+                    <span className="text-xs font-bold text-foreground">Project Distribution Overview</span>
                 </div>
                 <div className="flex items-center gap-6">
                     <div className="text-right">
-                        <span className="text-[10px] font-bold text-slate-400 block uppercase">Peak Performance</span>
-                        <span className="text-xs font-black text-slate-900">{stats?.peak?.projects || 0} Projects ({stats?.peak?.month})</span>
+                        <span className="text-[10px] font-bold text-muted-foreground/70 block uppercase">Peak Performance</span>
+                        <span className="text-xs font-semibold text-foreground">{stats?.peak?.projects || 0} Projects ({stats?.peak?.month})</span>
                     </div>
                 </div>
             </div>
@@ -155,4 +155,4 @@ const ProjectLineGraph = () => {
     );
 };
 
-export default ProjectLineGraph;
+export default ProjectLineGraph;

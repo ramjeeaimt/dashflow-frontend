@@ -91,10 +91,10 @@ const PredictiveInsights = () => {
                 <div className="w-full bg-muted/50 rounded-full h-1.5">
                   <div 
                     className={`h-1.5 rounded-full transition-all duration-300 ${
-                      insight?.color === 'success' ? 'bg-success' :
-                      insight?.color === 'warning' ? 'bg-warning' :
-                      insight?.color === 'error' ? 'bg-error' : 'bg-primary'
-                    }`}
+ insight?.color === 'success' ? 'bg-success' :
+ insight?.color === 'warning' ? 'bg-warning' :
+ insight?.color === 'error' ? 'bg-error' : 'bg-primary'
+ }`}
                     style={{ width: `${insight?.confidence}%` }}
                   ></div>
                 </div>

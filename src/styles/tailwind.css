@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
 @tailwind base;
 @tailwind components;
@@ -6,75 +6,60 @@
 
 @layer base {
   :root {
-    /* Core Colors */
-    --color-background: #f8fafc;
-    /* slate-50 */
-    --color-foreground: #0f172a;
-    /* slate-900 */
-    --color-border: rgba(148, 163, 184, 0.2);
-    /* slate-400 with opacity */
+    /*
+     * ── Dashflow design system ──────────────────────────────────────────
+     * Warm paper surfaces, ink text, ONE deep-green accent, dark charcoal
+     * sidebar. Display type: Space Grotesk. Body: Inter.
+     * Hierarchy comes from type, spacing and hairlines — never floods.
+     */
+
+    --radius: 0.5rem;
+
+    /* Core */
+    --color-background: #f7f6f2;   /* warm paper */
+    --color-foreground: #1d1c19;   /* warm ink */
+    --color-border: #e7e4dd;       /* warm hairline */
     --color-input: #ffffff;
-    /* white */
-    --color-ring: #1e40af;
-    /* blue-800 */
+    --color-ring: #17694e;
 
-    /* Card Colors */
+    /* Surfaces */
     --color-card: #ffffff;
-    /* white */
-    --color-card-foreground: #0f172a;
-    /* slate-900 */
-
-    /* Popover Colors */
+    --color-card-foreground: #1d1c19;
     --color-popover: #ffffff;
-    /* white */
-    --color-popover-foreground: #0f172a;
-    /* slate-900 */
+    --color-popover-foreground: #1d1c19;
 
-    /* Muted Colors */
-    --color-muted: #f1f5f9;
-    /* slate-100 */
-    --color-muted-foreground: #475569;
-    /* slate-600 */
+    /* Muted */
+    --color-muted: #efede7;
+    --color-muted-foreground: #716e64;
 
-    /* Primary Colors */
-    --color-primary: #1e40af;
-    /* blue-800 */
+    /* Primary — deep green, the only brand hue */
+    --color-primary: #17694e;
     --color-primary-foreground: #ffffff;
-    /* white */
 
-    /* Secondary Colors */
-    --color-secondary: #64748b;
-    /* slate-500 */
+    /* Secondary */
+    --color-secondary: #514f48;
     --color-secondary-foreground: #ffffff;
-    /* white */
 
-    /* Accent Colors */
-    --color-accent: #ea580c;
-    /* orange-600 */
-    --color-accent-foreground: #ffffff;
-    /* white */
+    /* Accent = neutral interaction wash (hover/selected), not a hue */
+    --color-accent: #efede7;
+    --color-accent-foreground: #1d1c19;
 
-    /* Success Colors */
-    --color-success: #059669;
-    /* emerald-600 */
+    /* Semantic — desaturated, for text/badges only */
+    --color-success: #15803d;
     --color-success-foreground: #ffffff;
-    /* white */
-
-    /* Warning Colors */
-    --color-warning: #d97706;
-    /* amber-600 */
+    --color-warning: #a16207;
     --color-warning-foreground: #ffffff;
-    /* white */
-
-    /* Error/Destructive Colors */
-    --color-error: #dc2626;
-    /* red-600 */
+    --color-error: #b3261e;
     --color-error-foreground: #ffffff;
-    /* white */
-    --color-destructive: #dc2626;
-    /* red-600 */
+    --color-destructive: #b3261e;
     --color-destructive-foreground: #ffffff;
-    /* white */
+
+    /* Sidebar — dark charcoal rail */
+    --color-sidebar: #191a17;
+    --color-sidebar-foreground: #f4f3ee;
+    --color-sidebar-muted: #9d9b91;
+    --color-sidebar-border: rgba(255, 255, 255, 0.08);
+    --color-sidebar-active: rgba(255, 255, 255, 0.09);
   }
 
   * {
@@ -83,21 +68,35 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1,
   h2,
   h3,
-  h4,
+  h4 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
   h5,
   h6 {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
+  /* Numeric/display data — tabular Space Grotesk */
   .font-data {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: -0.02em;
+  }
+
+  .font-display {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
   }
 }
 
@@ -106,24 +105,22 @@
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Interactions change color, never position */
   .micro-interaction {
-    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
   }
 
-  .micro-interaction:hover {
-    transform: translateY(-1px);
-  }
-
+  /* Flat elevation scale: hairline borders carry structure; shadows are whispers */
   .card-shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(29, 28, 25, 0.04);
   }
 
   .modal-shadow {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(29, 28, 25, 0.1);
   }
 
   .dropdown-shadow {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(29, 28, 25, 0.07);
   }
 
   .skeleton-pulse {

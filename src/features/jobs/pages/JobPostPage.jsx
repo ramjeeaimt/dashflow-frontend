@@ -51,12 +51,12 @@ export default function JobPostPage() {
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    activeTab === t.id
-                      ? 'bg-white text-blue-600 shadow-sm border border-gray-100 ring-1 ring-black/5'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
-                  }`}
+ activeTab === t.id
+ ? 'bg-card text-primary shadow-sm border border-gray-100 ring-1 ring-black/5'
+ : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
+ }`}
                 >
-                  <Icon name={t.icon} size={16} className={activeTab === t.id ? 'text-blue-600' : 'text-gray-400'} />
+                  <Icon name={t.icon} size={16} className={activeTab === t.id ? 'text-primary' : 'text-gray-400'} />
                   {t.label}
                 </button>
               ))}

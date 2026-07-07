@@ -24,11 +24,11 @@ export default function ActionDropdown({ project, onDelete, onEdit, onView, onSt
       {/* --- Trigger Button --- */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all duration-200 border rounded-lg shadow-sm active:scale-95 ${
-          isOpen 
-          ? "bg-slate-900 text-white border-slate-900" 
-          : "bg-white text-slate-700 border-slate-200 hover:border-slate-400"
-        }`}
+        className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all duration-200 border rounded-lg shadow-sm ${
+ isOpen 
+ ? "bg-sidebar text-white border-slate-900" 
+ : "bg-card text-foreground border-border hover:border-slate-400"
+ }`}
       >
         Actions
         <FaChevronDown className={`text-[10px] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
@@ -36,16 +36,16 @@ export default function ActionDropdown({ project, onDelete, onEdit, onView, onSt
 
       {/* --- Dropdown Menu --- */}
       {isOpen && (
-        <div className="absolute right-0 -mt-5 w-60 bg-white border border-slate-200  z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-150 origin-top-right">
+        <div className="absolute right-0 -mt-5 w-60 bg-card border border-border z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-150 origin-top-right">
           
           {/* Header */}
-          <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-slate-900 text-white flex items-center justify-center text-[10px] font-black uppercase">
+          <div className="px-4 py-3 bg-muted/60 border-b border-border flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-sidebar text-white flex items-center justify-center text-[10px] font-semibold uppercase">
                {project.projectName.slice(0, 2)}
             </div>
             <div className="min-w-0">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Project</p>
-              <p className="text-xs font-bold text-slate-800 truncate">{project.projectName}</p>
+              <p className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-wide leading-none mb-1">Project</p>
+              <p className="text-xs font-bold text-foreground truncate">{project.projectName}</p>
             </div>
           </div>
 
@@ -57,10 +57,10 @@ export default function ActionDropdown({ project, onDelete, onEdit, onView, onSt
                 setIsOpen(false);
               }}
               className={`flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg text-[11px] font-bold transition-all ${
-                isCompleted
-                ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-              }`}
+ isCompleted
+ ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+ : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+ }`}
             >
               {isCompleted ? <MdHourglassEmpty size={14} /> : <MdCheckCircle size={14} />}
               {isCompleted ? "Resume Work" : "Mark Done"}
@@ -74,33 +74,33 @@ export default function ActionDropdown({ project, onDelete, onEdit, onView, onSt
                 href={project.githubLink || project.links?.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg text-xs font-medium transition-all"
+                className="flex items-center gap-3 px-3 py-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-lg text-xs font-medium transition-all"
               >
-                <FaGithub className="text-slate-400" size={14}/>
+                <FaGithub className="text-muted-foreground/70" size={14}/>
                 GitHub Repository
               </a>
             )}
 
             <a
               href={`mailto:${project.clientEmail}`}
-              className="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg text-xs font-medium transition-all"
+              className="flex items-center gap-3 px-3 py-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground rounded-lg text-xs font-medium transition-all"
             >
-              <MdEmail className="text-slate-400" size={14}/>
+              <MdEmail className="text-muted-foreground/70" size={14}/>
               Email Client
             </a>
           </div>
 
           {/* Grid Actions */}
-          <div className="p-2 bg-slate-50 border-t border-slate-100 grid grid-cols-2 gap-2">
+          <div className="p-2 bg-muted/60 border-t border-border grid grid-cols-2 gap-2">
             <button
               onClick={() => { onView(project.id); setIsOpen(false); }}
-              className="flex items-center justify-center gap-2 p-2 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-400 rounded-lg text-[10px] font-bold uppercase transition-all"
+              className="flex items-center justify-center gap-2 p-2 bg-card border border-border text-muted-foreground hover:text-foreground hover:border-slate-400 rounded-lg text-[10px] font-bold uppercase transition-all"
             >
               <FaEye size={12} /> View
             </button>
             <button
               onClick={() => { onEdit(project.id); setIsOpen(false); }}
-              className="flex items-center justify-center gap-2 p-2 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-400 rounded-lg text-[10px] font-bold uppercase transition-all"
+              className="flex items-center justify-center gap-2 p-2 bg-card border border-border text-muted-foreground hover:text-foreground hover:border-slate-400 rounded-lg text-[10px] font-bold uppercase transition-all"
             >
               <FaEdit size={12} /> Edit
             </button>
@@ -110,7 +110,7 @@ export default function ActionDropdown({ project, onDelete, onEdit, onView, onSt
           <div className="p-1">
             <button
               onClick={() => { onDelete(project.id); setIsOpen(false); }}
-              className="flex items-center justify-center gap-2 w-full px-3 py-2 text-rose-500 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
+              className="flex items-center justify-center gap-2 w-full px-3 py-2 text-rose-500 hover:bg-rose-50 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-all"
             >
               <FaTrash size={10} /> Delete Project
             </button>

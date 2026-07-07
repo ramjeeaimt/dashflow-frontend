@@ -204,7 +204,7 @@ const TimeTrackingPage = () => {
           </div>
 
           {/* Filters */}
-          <div className="bg-card border border-border rounded-2xl p-6 mb-8 card-shadow">
+          <div className="bg-card border border-border rounded-lg p-6 mb-8 card-shadow">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <Select
@@ -249,7 +249,7 @@ const TimeTrackingPage = () => {
           </div>
 
           {/* Tab Navigation */}
-          <div className="bg-card border border-border rounded-2xl mb-8 card-shadow">
+          <div className="bg-card border border-border rounded-lg mb-8 card-shadow">
             <div className="border-b border-border">
               <nav className="flex space-x-1 p-2">
                 {tabOptions?.map((tab) => (
@@ -257,9 +257,9 @@ const TimeTrackingPage = () => {
                     key={tab?.id}
                     onClick={() => setActiveTab(tab?.id)}
                     className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-150 ${activeTab === tab?.id
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      }`}
+ ? 'bg-primary text-primary-foreground shadow-sm'
+ : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+ }`}
                   >
                     <Icon name={tab?.icon} size={16} />
                     <span>{tab?.label}</span>
@@ -274,7 +274,7 @@ const TimeTrackingPage = () => {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-            <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+            <div className="bg-card border border-border rounded-lg p-6 card-shadow">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                   <Icon name="Clock" size={20} className="text-primary" />
@@ -286,7 +286,7 @@ const TimeTrackingPage = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+            <div className="bg-card border border-border rounded-lg p-6 card-shadow">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
                   <Icon name="TrendingUp" size={20} className="text-success" />
@@ -298,7 +298,7 @@ const TimeTrackingPage = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+            <div className="bg-card border border-border rounded-lg p-6 card-shadow">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
                   <Icon name="CheckSquare" size={20} className="text-accent" />
@@ -310,7 +310,7 @@ const TimeTrackingPage = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+            <div className="bg-card border border-border rounded-lg p-6 card-shadow">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
                   <Icon name="Coffee" size={20} className="text-warning" />

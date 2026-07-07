@@ -91,8 +91,8 @@ const ClientDetailsPage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <Loader2 className="animate-spin text-blue-600 mx-auto mb-4" size={32} />
-          <p className="text-sm text-slate-500 font-medium">Loading details...</p>
+          <Loader2 className="animate-spin text-primary mx-auto mb-4" size={32} />
+          <p className="text-sm text-muted-foreground font-medium">Loading details...</p>
         </div>
       </div>
     );
@@ -101,15 +101,15 @@ const ClientDetailsPage = () => {
   if (!client) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center max-w-md w-full">
-          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Building2 className="text-slate-400" size={32} />
+        <div className="bg-card p-8 rounded-lg border border-border shadow-sm text-center max-w-md w-full">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <Building2 className="text-muted-foreground/70" size={32} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Entity Not Found</h2>
-          <p className="text-slate-500 mb-6 text-sm">We couldn't find the client or project details you're looking for. It may have been moved or deleted.</p>
+          <h2 className="text-xl font-bold text-foreground mb-2">Entity Not Found</h2>
+          <p className="text-muted-foreground mb-6 text-sm">We couldn't find the client or project details you're looking for. It may have been moved or deleted.</p>
           <button
             onClick={() => navigate('/client-management')}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-primary text-white py-2.5 rounded-xl font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
           >
             <ArrowLeft size={18} />
             Back to Dashboard
@@ -169,28 +169,28 @@ const ClientDetailsPage = () => {
         <main className="flex-1 pt-24 overflow-y-auto px-4 sm:px-6 md:px-8 py-8">
           <button
             onClick={() => navigate('/client-management')}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors mb-6 group"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 group"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium">Back to Network</span>
           </button>
 
-          <div className="bg-white border border-gray-200 p-6 mb-8">
+          <div className="bg-card border border-gray-200 p-6 mb-8">
             <div className="flex items-center gap-6">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center font-bold text-xl shadow-sm overflow-hidden bg-gray-100 border border-gray-200">
                 {client.logo ? (
                   <img src={client.logo} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-600">
+                  <div className="w-full h-full flex items-center justify-center bg-border text-muted-foreground">
                     {client.name?.charAt(0).toUpperCase()}
                   </div>
                 )}
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{client.name}</h1>
-                <div className="flex items-center gap-3 mt-1 text-slate-500">
+                <div className="flex items-center gap-3 mt-1 text-muted-foreground">
                   <span className="text-sm">{client.email}</span>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-muted-foreground/70">•</span>
                   <span className="text-sm">{client.company}</span>
                 </div>
               </div>
@@ -200,22 +200,22 @@ const ClientDetailsPage = () => {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left Column */}
             <div className="lg:w-1/3 space-y-4">
-              <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm">
-                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Contact Details</h4>
+              <div className="bg-card p-5 rounded-lg border border-border/60 shadow-sm">
+                <h4 className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-4">Contact Details</h4>
                 <div className="space-y-4">
                   {client.phone && (
                     <div className="flex items-center gap-3 text-sm">
-                      <Phone size={16} className="text-slate-400" />
-                      <span className="text-slate-600">{client.phone}</span>
+                      <Phone size={16} className="text-muted-foreground/70" />
+                      <span className="text-muted-foreground">{client.phone}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-3 text-sm">
-                    <Building2 size={16} className="text-slate-400" />
-                    <span className="text-slate-600">{client.company}</span>
+                    <Building2 size={16} className="text-muted-foreground/70" />
+                    <span className="text-muted-foreground">{client.company}</span>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
-                    <MapPin size={16} className="text-slate-400 mt-0.5" />
-                    <span className="text-slate-600 leading-tight">
+                    <MapPin size={16} className="text-muted-foreground/70 mt-0.5" />
+                    <span className="text-muted-foreground leading-tight">
                       {client.address || 'Address not set'}<br />
                       {client.city}, {client.state} {client.pincode}
                     </span>
@@ -224,10 +224,10 @@ const ClientDetailsPage = () => {
               </div>
 
               {/* Documents Card */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm">
+              <div className="bg-card p-5 rounded-lg border border-border/60 shadow-sm">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Documents</h4>
-                  <label className="cursor-pointer p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                  <h4 className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Documents</h4>
+                  <label className="cursor-pointer p-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/90 hover:text-white transition-all shadow-sm">
                     <Plus size={14} />
                     <input
                       type="file"
@@ -249,29 +249,29 @@ const ClientDetailsPage = () => {
                 </div>
                 <div className="space-y-2">
                   {client.documents && client.documents.length > 0 ? client.documents.map((doc, idx) => (
-                    <a key={idx} href={doc} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-blue-50 transition-all text-xs text-blue-600 font-semibold group">
+                    <a key={idx} href={doc} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-muted/60 border border-border rounded-xl hover:bg-primary/10 transition-all text-xs text-primary font-semibold group">
                       <FileText size={16} />
                       <span className="truncate flex-1">Supporting Document {idx + 1}</span>
-                      <ExternalLink size={14} className="text-slate-300 group-hover:text-blue-400" />
+                      <ExternalLink size={14} className="text-muted-foreground/70 group-hover:text-blue-400" />
                     </a>
                   )) : (
-                    <p className="text-xs text-slate-400 italic text-center py-4">No documents attached.</p>
+                    <p className="text-xs text-muted-foreground/70 italic text-center py-4">No documents attached.</p>
                   )}
                 </div>
               </div>
 
               {/* Invoice Message Card */}
-              <div className="bg-blue-50 border border-blue-100 p-5 rounded-2xl">
+              <div className="bg-primary/10 border border-border p-5 rounded-lg">
                 <div className="flex justify-between items-center mb-3">
-                  <h5 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                  <h5 className="text-[10px] font-bold text-primary uppercase tracking-wide flex items-center gap-2">
                     <MessageSquare size={14} /> Invoice Message
                   </h5>
                   {!editingInvoiceMessage ? (
-                    <button onClick={() => { setEditingInvoiceMessage(true); setTempInvoiceMessage(client.invoiceMessage || ''); }} className="text-[10px] font-bold text-blue-600 hover:underline">EDIT</button>
+                    <button onClick={() => { setEditingInvoiceMessage(true); setTempInvoiceMessage(client.invoiceMessage || ''); }} className="text-[10px] font-bold text-primary hover:underline">EDIT</button>
                   ) : (
                     <div className="flex gap-2">
                       <button onClick={handleUpdateInvoiceMessage} className="text-[10px] font-bold text-emerald-600">SAVE</button>
-                      <button onClick={() => setEditingInvoiceMessage(false)} className="text-[10px] font-bold text-slate-400">ESC</button>
+                      <button onClick={() => setEditingInvoiceMessage(false)} className="text-[10px] font-bold text-muted-foreground/70">ESC</button>
                     </div>
                   )}
                 </div>
@@ -279,10 +279,10 @@ const ClientDetailsPage = () => {
                   <textarea
                     value={tempInvoiceMessage}
                     onChange={(e) => setTempInvoiceMessage(e.target.value)}
-                    className="w-full text-xs p-2 bg-white border border-blue-200 rounded-lg h-24 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-xs p-2 bg-card border border-border rounded-lg h-24 outline-none focus:ring-2 focus:ring-ring"
                   />
                 ) : (
-                  <p className="text-xs text-blue-700 italic leading-relaxed">
+                  <p className="text-xs text-primary italic leading-relaxed">
                     "{client.invoiceMessage || 'No default message set.'}"
                   </p>
                 )}
@@ -291,46 +291,46 @@ const ClientDetailsPage = () => {
 
             {/* Right Column - Projects */}
             <div className="lg:w-2/3">
-              <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-                  <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Project Inventory</h5>
-                  <button className="text-[10px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+              <div className="bg-card rounded-lg border border-border/60 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 bg-muted/50 border-b border-border flex justify-between items-center">
+                  <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Project Inventory</h5>
+                  <button className="text-[10px] font-bold text-primary hover:text-blue-800 flex items-center gap-1">
                     <FileText size={12} /> BATCH INVOICE
                   </button>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                       {client.clientProjects?.length > 0 ? client.clientProjects.map(proj => (
-                        <tr key={proj.id} className="group hover:bg-slate-50/50 transition-colors">
+                        <tr key={proj.id} className="group hover:bg-muted/50 transition-colors">
                           <td className="py-4 px-6">
-                            <p className="text-sm font-bold text-slate-900 leading-tight">{proj.projectName}</p>
-                            <p className="text-[11px] text-slate-400 mt-1">{proj.description}</p>
+                            <p className="text-sm font-bold text-foreground leading-tight">{proj.projectName}</p>
+                            <p className="text-[11px] text-muted-foreground/70 mt-1">{proj.description}</p>
                           </td>
                           <td className="py-4 px-2">
-                            <span className="px-2 py-1 bg-purple-50 text-purple-600 rounded text-[9px] font-bold uppercase">{proj.phase}</span>
+                            <span className="px-2 py-1 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase">{proj.phase}</span>
                           </td>
                           <td className="py-4 px-2 text-right">
-                            <p className="text-sm font-bold text-slate-900">₹{proj.budget?.toLocaleString()}</p>
+                            <p className="text-sm font-bold text-foreground">₹{proj.budget?.toLocaleString()}</p>
                           </td>
                           <td className="py-4 px-6 text-right">
                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => { setViewProjectId(proj.id); setIsViewModalOpen(true); }}
-                                className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
+                                className="p-1.5 text-muted-foreground/70 hover:text-primary transition-colors"
                               >
                                 <Eye size={16} />
                               </button>
                               <button
                                 onClick={() => { setEditProjectId(proj.id); setIsEditModalOpen(true); }}
-                                className="p-1.5 text-slate-400 hover:text-purple-600 transition-colors"
+                                className="p-1.5 text-muted-foreground/70 hover:text-primary transition-colors"
                               >
                                 <Edit2 size={16} />
                               </button>
                               <button
                                 onClick={() => handleDeleteProject(proj.id)}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                                className="p-1.5 text-muted-foreground/70 hover:text-rose-600 transition-colors"
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -338,23 +338,23 @@ const ClientDetailsPage = () => {
                           </td>
                         </tr>
                       )) : (
-                        <tr><td className="py-12 text-center text-sm text-slate-400 italic">No active projects found.</td></tr>
+                        <tr><td className="py-12 text-center text-sm text-muted-foreground/70 italic">No active projects found.</td></tr>
                       )}
                     </tbody>
                   </table>
                 </div>
 
-                <div className="p-6 bg-slate-50/50 border-t border-slate-100">
+                <div className="p-6 bg-muted/50 border-t border-border">
                   <div
                     onClick={() => setIsProjectFormOpen(true)}
-                    className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/10 transition-all cursor-pointer group"
+                    className="bg-card border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-blue-400 hover:bg-primary/10 transition-all cursor-pointer group"
                   >
-                    <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                    <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4 transition-transform shadow-sm">
                       <Plus size={28} />
                     </div>
-                    <h6 className="text-base font-bold text-slate-900 mb-1">Add New Project</h6>
-                    <p className="text-xs text-slate-500 mb-6">Initiate a new workflow for {client.name}</p>
-                    <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md">
+                    <h6 className="text-base font-bold text-foreground mb-1">Add New Project</h6>
+                    <p className="text-xs text-muted-foreground mb-6">Initiate a new workflow for {client.name}</p>
+                    <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md">
                       <PlusCircle size={16} /> Create Project
                     </div>
                   </div>

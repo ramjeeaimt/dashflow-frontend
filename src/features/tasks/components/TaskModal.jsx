@@ -87,18 +87,18 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, employees = [] }) => 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans italic selection:bg-blue-100">
-      <div className="bg-white border border-slate-200 rounded-none w-full max-w-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 bg-sidebar/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans italic selection:bg-primary/10">
+      <div className="bg-card border border-border rounded-none w-full max-w-3xl shadow-sm overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Command Header */}
-        <div className="bg-blue-900 p-6 border-b border-slate-800 flex items-center justify-between">
+        <div className="bg-primary p-6 border-b border-slate-800 flex items-center justify-between">
           <div className="space-y-1">
-            <div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+            <div className="flex items-center space-x-2 text-[10px] font-semibold uppercase tracking-[0.4em] text-muted-foreground/70">
               <span className="w-6 h-px bg-slate-600"></span>
               <span>SEQUENCE_INITIALIZATION::V1</span>
             </div>
-            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
-              {task ? 'Edit Sequence' : 'Initialize Task'}
+            <h2 className="text-3xl font-semibold text-white uppercase tracking-tighter">
+              {task ? 'Edit task' : 'New task'}
             </h2>
           </div>
           <button 
@@ -114,37 +114,37 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, employees = [] }) => 
           {errors?.submit && (
             <div className="p-4 bg-red-50 border border-red-600 flex items-center space-x-3">
               <Icon name="AlertTriangle" size={18} className="text-red-600" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-red-600">{errors?.submit}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-red-600">{errors?.submit}</p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="md:col-span-2 space-y-2">
-              <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                 <span className="w-2 h-2 bg-slate-900"></span> Primary_Identifier
+              <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 flex items-center gap-2">
+                 <span className="w-2 h-2 bg-sidebar"></span> Primary_Identifier
               </label>
               <input
                 type="text"
                 placeholder="INPUT_CORE_TASK_IDENTIFIER..."
                 value={formData?.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className={`w-full px-5 py-4 bg-slate-50 border ${errors.title ? 'border-red-600' : 'border-slate-200'} focus:border-blue-500 focus:bg-white outline-none text-sm font-bold uppercase transition-all rounded-none`}
+                className={`w-full px-5 py-4 bg-muted/60 border ${errors.title ? 'border-red-600' : 'border-border'} focus:border-primary focus:bg-card outline-none text-sm font-bold uppercase transition-all rounded-none`}
               />
-              {errors.title && <p className="text-[9px] font-black text-red-600 uppercase tracking-widest">{errors.title}</p>}
+              {errors.title && <p className="text-[9px] font-semibold text-red-600 uppercase tracking-wide">{errors.title}</p>}
             </div>
 
             <div className="md:col-span-2 space-y-2">
-               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                 <span className="w-2 h-2 bg-slate-900"></span> Operational_Definition
+               <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 flex items-center gap-2">
+                 <span className="w-2 h-2 bg-sidebar"></span> Operational_Definition
               </label>
               <textarea
                 placeholder="PROVIDE_TECHNICAL_METADATA_DESCRIPTION..."
                 rows="3"
                 value={formData?.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className={`w-full px-5 py-4 bg-slate-50 border ${errors.description ? 'border-red-600' : 'border-slate-200'} focus:border-blue-500 focus:bg-white outline-none text-sm font-bold transition-all rounded-none resize-none`}
+                className={`w-full px-5 py-4 bg-muted/60 border ${errors.description ? 'border-red-600' : 'border-border'} focus:border-primary focus:bg-card outline-none text-sm font-bold transition-all rounded-none resize-none`}
               />
-               {errors.description && <p className="text-[9px] font-black text-red-600 uppercase tracking-widest">{errors.description}</p>}
+               {errors.description && <p className="text-[9px] font-semibold text-red-600 uppercase tracking-wide">{errors.description}</p>}
             </div>
 
             <IndustrialSelect 
@@ -167,51 +167,51 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, employees = [] }) => 
             />
 
             <div className="space-y-2">
-               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Target_Timeline</label>
+               <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">Target_Timeline</label>
                <input 
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-                className={`w-full px-5 py-4 bg-slate-50 border ${errors.dueDate ? 'border-red-600' : 'border-slate-200'} focus:border-blue-500 outline-none text-xs font-bold font-mono tracking-tighter`}
+                className={`w-full px-5 py-4 bg-muted/60 border ${errors.dueDate ? 'border-red-600' : 'border-border'} focus:border-primary outline-none text-xs font-bold font-mono tracking-tighter`}
                />
-               {errors.dueDate && <p className="text-[9px] font-black text-red-600 uppercase tracking-widest">{errors.dueDate}</p>}
+               {errors.dueDate && <p className="text-[9px] font-semibold text-red-600 uppercase tracking-wide">{errors.dueDate}</p>}
             </div>
 
             <div className="space-y-2">
-               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">Computational_Load_(H)</label>
+               <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">Computational_Load_(H)</label>
                <input 
                 type="number"
                 placeholder="0.00"
                 value={formData.estimatedHours}
                 onChange={(e) => setFormData({...formData, estimatedHours: e.target.value})}
-                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:border-blue-500 outline-none text-xs font-bold font-mono tracking-tighter"
+                className="w-full px-5 py-4 bg-muted/60 border border-border focus:border-primary outline-none text-xs font-bold font-mono tracking-tighter"
                />
             </div>
           </div>
 
-          <div className="space-y-4 pt-10 border-t border-slate-100">
-             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+          <div className="space-y-4 pt-10 border-t border-border">
+             <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 flex items-center gap-2">
                  <Icon name="Upload" size={14} /> Attach_Manifest
              </label>
-             <div className="border-2 border-dashed border-slate-200 p-8 flex flex-col items-center justify-center bg-slate-50/50 group hover:border-slate-900 transition-colors cursor-pointer">
-                <Icon name="Plus" size={32} className="text-slate-300 group-hover:text-slate-900 transition-colors mb-2" />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] group-hover:text-slate-900">IDENTIFICATION_UPLOAD_PENDING</span>
+             <div className="border-2 border-dashed border-border p-8 flex flex-col items-center justify-center bg-muted/50 group hover:border-slate-900 transition-colors cursor-pointer">
+                <Icon name="Plus" size={32} className="text-muted-foreground/70 group-hover:text-foreground transition-colors mb-2" />
+                <span className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-[0.2em] group-hover:text-foreground">IDENTIFICATION_UPLOAD_PENDING</span>
              </div>
           </div>
 
           {/* Modal Actions */}
-          <div className="flex items-center justify-end space-x-6 pt-12 border-t border-slate-100">
+          <div className="flex items-center justify-end space-x-6 pt-12 border-t border-border">
             <button
                type="button"
                onClick={onClose}
-               className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-900 transition-colors"
+               className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground/70 hover:text-foreground transition-colors"
             >
               Abuse_Sequence
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-10 py-5 bg-slate-900 text-white text-[11px] font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-all flex items-center gap-3 disabled:opacity-50"
+              className="px-10 py-5 bg-sidebar text-white text-[11px] font-semibold uppercase tracking-[0.3em] hover:bg-sidebar transition-all flex items-center gap-3 disabled:opacity-50"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin"></div>
@@ -229,18 +229,18 @@ const TaskModal = ({ isOpen, onClose, onSave, task = null, employees = [] }) => 
 
 const IndustrialSelect = ({ label, value, options, onChange, error }) => (
   <div className="space-y-2">
-    <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">{label}</label>
+    <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">{label}</label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`w-full px-5 py-4 bg-slate-50 border ${error ? 'border-red-600' : 'border-slate-200'} focus:border-blue-500 outline-none text-xs font-bold uppercase cursor-pointer appearance-none rounded-none`}
+      className={`w-full px-5 py-4 bg-muted/60 border ${error ? 'border-red-600' : 'border-border'} focus:border-primary outline-none text-xs font-bold uppercase cursor-pointer appearance-none rounded-none`}
       style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }}
     >
       <option value="">SELECT_OPTION</option>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
-    {error && <p className="text-[9px] font-black text-red-600 uppercase tracking-widest">{error}</p>}
+    {error && <p className="text-[9px] font-semibold text-red-600 uppercase tracking-wide">{error}</p>}
   </div>
 );
 
-export default TaskModal;
+export default TaskModal;

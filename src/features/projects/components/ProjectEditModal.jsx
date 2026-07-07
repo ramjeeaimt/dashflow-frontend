@@ -108,16 +108,16 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
     if (!projectId) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-950 w-full max-w-3xl max-h-[90vh]  overflow-hidden border border-white/20 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-sidebar/60 backdrop-blur-sm">
+            <div className="bg-card dark:bg-sidebar w-full max-w-3xl max-h-[90vh] overflow-hidden border border-white/20 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
                 {/* Header */}
-                <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <div className="px-8 py-6 border-b border-border dark:border-slate-800 flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Modify Project</h2>
-                        <p className="text-slate-500 text-sm">Update parameters and team assignments</p>
+                        <h2 className="text-2xl font-semibold text-foreground dark:text-white tracking-tight">Modify Project</h2>
+                        <p className="text-muted-foreground text-sm">Update parameters and team assignments</p>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-                        <X size={24} className="text-slate-400" />
+                    <button onClick={onClose} className="p-2 hover:bg-muted dark:hover:bg-sidebar rounded-xl transition-colors">
+                        <X size={24} className="text-muted-foreground/70" />
                     </button>
                 </div>
 
@@ -125,7 +125,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                 <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-64">
-                            <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+                            <Loader2 className="w-10 h-10 text-primary animate-spin" />
                         </div>
                     ) : (
                         <form id="project-edit-form" onSubmit={handleSubmit} className="space-y-8">
@@ -137,7 +137,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                 <FormInput label="Contact Info" name="contactInfo" value={project.contactInfo} onChange={handleChange} />
                             </div>
 
-                            <hr className="border-slate-100 dark:border-slate-800" />
+                            <hr className="border-border dark:border-slate-800" />
 
                             {/* Timeline & Progress Section */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -160,7 +160,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                 />
                             </div>
 
-                            <hr className="border-slate-100 dark:border-slate-800" />
+                            <hr className="border-border dark:border-slate-800" />
 
                             {/* Financials & Links Section */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -171,12 +171,12 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                             </div>
 
                             {/* Team Assignment Section */}
-                            <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 relative">
+                            <div className="bg-muted/60 dark:bg-sidebar/50 p-6 rounded-lg border border-border dark:border-slate-800 relative">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest flex items-center gap-2">
+                                    <h3 className="text-sm font-semibold text-foreground dark:text-slate-200 uppercase tracking-wide flex items-center gap-2">
                                         <UserPlus size={16} /> Team Assignment
                                     </h3>
-                                    <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-black px-2 py-1 rounded-lg">
+                                    <span className="bg-primary/10 dark:bg-primary/30 text-primary dark:text-indigo-400 text-[10px] font-semibold px-2 py-1 rounded-lg">
                                         {selectedEmployees.length} INDIVIDUALS
                                     </span>
                                 </div>
@@ -185,20 +185,20 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                     <button
                                         type="button"
                                         onClick={() => setShowEmployeeDropdown(!showEmployeeDropdown)}
-                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl flex justify-between items-center text-sm font-bold shadow-sm"
+                                        className="w-full bg-card dark:bg-sidebar border border-border dark:border-slate-700 p-4 rounded-lg flex justify-between items-center text-sm font-bold shadow-sm"
                                     >
                                         <div className="flex -space-x-2 overflow-hidden">
                                             {selectedEmployees.length > 0 ? (
                                                 selectedEmployees.slice(0, 5).map(id => {
                                                     const emp = employees.find(e => e.id === id);
                                                     return (
-                                                        <div key={id} className="w-8 h-8 rounded-full bg-indigo-500 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] text-white font-black">
+                                                        <div key={id} className="w-8 h-8 rounded-full bg-primary border-2 border-white dark:border-slate-800 flex items-center justify-center text-[10px] text-white font-semibold">
                                                             {(emp?.user?.firstName?.[0] || emp?.user?.name?.[0] || 'E').toUpperCase()}
                                                         </div>
                                                     );
                                                 })
                                             ) : (
-                                                <span className="text-slate-400 font-medium ml-2">Assign employees...</span>
+                                                <span className="text-muted-foreground/70 font-medium ml-2">Assign employees...</span>
                                             )}
                                         </div>
                                         <div className={`transition-transform duration-200 ${showEmployeeDropdown ? 'rotate-180' : ''}`}>
@@ -207,9 +207,9 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                     </button>
 
                                     {showEmployeeDropdown && (
-                                        <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-20 max-h-60 overflow-y-auto">
+                                        <div className="absolute bottom-full left-0 right-0 mb-2 bg-card dark:bg-sidebar border border-border dark:border-slate-700 rounded-lg shadow-sm z-20 max-h-60 overflow-y-auto">
                                             {employees.map(emp => (
-                                                <label key={emp.id} className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-100 dark:border-slate-700 last:border-b-0">
+                                                <label key={emp.id} className="flex items-center gap-3 p-3 hover:bg-muted/60 dark:hover:bg-slate-700/50 cursor-pointer border-b border-border dark:border-slate-700 last:border-b-0">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedEmployees.includes(emp.id)}
@@ -217,8 +217,8 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                                                         className="w-4 h-4 rounded-lg accent-indigo-600"
                                                     />
                                                     <div>
-                                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{emp.user?.name || `${emp.user?.firstName || ''} ${emp.user?.lastName || ''}`.trim() || 'Unknown'}</p>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase">{emp.department?.name || (typeof emp.department === 'string' ? emp.department : "Consultant")}</p>
+                                                        <p className="text-sm font-bold text-foreground dark:text-slate-100">{emp.user?.name || `${emp.user?.firstName || ''} ${emp.user?.lastName || ''}`.trim() || 'Unknown'}</p>
+                                                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase">{emp.department?.name || (typeof emp.department === 'string' ? emp.department : "Consultant")}</p>
                                                     </div>
                                                 </label>
                                             ))}
@@ -229,12 +229,12 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                             
                             {/* Notes */}
                             <div className="flex flex-col">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Additional Notes</label>
+                                <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2 ml-1">Additional Notes</label>
                                 <textarea
                                     name="notes"
                                     value={project.notes}
                                     onChange={handleChange}
-                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none min-h-[100px]"
+                                    className="w-full bg-muted/60 dark:bg-sidebar border border-border dark:border-slate-800 p-4 rounded-lg text-sm focus:ring-2 focus:ring-ring outline-none min-h-[100px]"
                                     placeholder="Add any internal remarks or project constraints..."
                                 />
                             </div>
@@ -243,10 +243,10 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="px-8 py-5 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-4 bg-slate-50/50 dark:bg-slate-900/50">
+                <div className="px-8 py-5 border-t border-border dark:border-slate-800 flex justify-end gap-4 bg-muted/50 dark:bg-sidebar/50">
                     <button 
                         onClick={onClose}
-                        className="px-6 py-2.5 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors"
+                        className="px-6 py-2.5 text-sm font-bold text-muted-foreground dark:text-muted-foreground/70 hover:text-foreground dark:hover:text-white transition-colors"
                     >
                         Discard
                     </button>
@@ -254,7 +254,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                         form="project-edit-form"
                         type="submit"
                         disabled={submitting}
-                        className="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                        className="px-8 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-lg shadow-sm dark:shadow-none transition-all disabled:opacity-50 flex items-center gap-2"
                     >
                         {submitting ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                         Commit Changes
@@ -268,7 +268,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
 // Internal Form Components
 const FormInput = ({ label, name, type = "text", value, onChange, placeholder, required = false }) => (
     <div className="flex flex-col">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{label}</label>
+        <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2 ml-1">{label}</label>
         <input
             name={name}
             type={type}
@@ -276,19 +276,19 @@ const FormInput = ({ label, name, type = "text", value, onChange, placeholder, r
             onChange={onChange}
             placeholder={placeholder}
             required={required}
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm transition-all"
+            className="w-full bg-card dark:bg-sidebar border border-border dark:border-slate-700 p-3.5 rounded-lg text-sm font-bold text-foreground dark:text-white focus:ring-2 focus:ring-ring outline-none shadow-sm transition-all"
         />
     </div>
 );
 
 const FormSelect = ({ label, name, value, onChange, options }) => (
     <div className="flex flex-col">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{label}</label>
+        <label className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2 ml-1">{label}</label>
         <select
             name={name}
             value={value}
             onChange={onChange}
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm transition-all cursor-pointer"
+            className="w-full bg-card dark:bg-sidebar border border-border dark:border-slate-700 p-3.5 rounded-lg text-sm font-bold text-foreground dark:text-white focus:ring-2 focus:ring-ring outline-none shadow-sm transition-all cursor-pointer"
         >
             {options.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>

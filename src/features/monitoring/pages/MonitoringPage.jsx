@@ -163,10 +163,10 @@ const MonitoringDashboard = () => {
                   <div className="bg-card border border-border rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-2xl font-bold text-blue-600">87%</p>
+                        <p className="text-2xl font-bold text-primary">87%</p>
                         <p className="text-sm text-muted-foreground">Avg Productivity</p>
                       </div>
-                      <Icon name="TrendingUp" size={24} className="text-blue-600" />
+                      <Icon name="TrendingUp" size={24} className="text-primary" />
                     </div>
                   </div>
                   <div className="bg-card border border-border rounded-lg p-4">

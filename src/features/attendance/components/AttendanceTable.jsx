@@ -234,9 +234,9 @@ const AttendanceTable = ({
       present: { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Present', icon: 'CheckCircle', iconColor: 'text-emerald-500' },
       absent: { color: 'bg-red-50 text-red-700 border-red-200', label: 'Absent', icon: 'XCircle', iconColor: 'text-red-500' },
       late: { color: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Late', icon: 'Clock', iconColor: 'text-amber-500' },
-      early_checkin: { color: 'bg-sky-50 text-sky-700 border-sky-200', label: 'Early In', icon: 'Clock', iconColor: 'text-sky-500' },
+      early_checkin: { color: 'bg-primary/10 text-primary border-border', label: 'Early In', icon: 'Clock', iconColor: 'text-sky-500' },
       early_departure: { color: 'bg-orange-50 text-orange-700 border-orange-200', label: 'Early Out', icon: 'LogOut', iconColor: 'text-orange-500' },
-      wfh: { color: 'bg-indigo-50 text-indigo-700 border-indigo-200', label: 'WFH', icon: 'Home', iconColor: 'text-indigo-500' },
+      wfh: { color: 'bg-primary/10 text-primary border-border', label: 'WFH', icon: 'Home', iconColor: 'text-primary' },
       not_checked_in: { color: 'bg-gray-50 text-gray-600 border-gray-200', label: 'Not Checked In', icon: 'MinusCircle', iconColor: 'text-gray-400' }
     };
 
@@ -282,7 +282,7 @@ const AttendanceTable = ({
 
   const SortableHeader = ({ field, children }) => (
     <th
-      className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-widest cursor-pointer hover:bg-slate-50 hover:text-slate-900 transition-all duration-150 group"
+      className="px-6 py-4 text-left text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wide cursor-pointer hover:bg-muted/60 hover:text-foreground transition-all duration-150 group"
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center gap-2">
@@ -290,8 +290,8 @@ const AttendanceTable = ({
         <Icon
           name={sortField === field && sortDirection === 'desc' ? 'ChevronDown' : 'ChevronUp'}
           size={12}
-          className={`transition-opacity duration-150 ${sortField === field ? 'text-blue-600 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'
-            }`}
+          className={`transition-opacity duration-150 ${sortField === field ? 'text-primary opacity-100' : 'text-muted-foreground/70 opacity-0 group-hover:opacity-100'
+ }`}
         />
       </div>
     </th>
@@ -311,11 +311,11 @@ const AttendanceTable = ({
 
   if (loading) {
     return (
-      <div className="bg-white border border-slate-100 rounded-2xl shadow-sm">
+      <div className="bg-card border border-border rounded-lg shadow-sm">
         <div className="flex items-center justify-center py-24">
           <div className="flex flex-col items-center gap-4">
-            <div className="h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-xs font-bold text-slate-400">Loading Attendance Records...</span>
+            <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-xs font-bold text-muted-foreground/70">Loading Attendance Records...</span>
           </div>
         </div>
       </div>
@@ -323,17 +323,17 @@ const AttendanceTable = ({
   }
 
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+    <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-100">
-          <thead className="bg-slate-50/50">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted/50">
             <tr>
               <th className="px-6 py-4 text-left w-12">
                 <input
                   type="checkbox"
                   checked={selectedEmployees?.length === attendanceData?.length && attendanceData?.length > 0}
                   onChange={handleSelectAll}
-                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer"
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-ring/20 transition-all cursor-pointer"
                 />
               </th>
               {visibleColumns.employeeName && <SortableHeader field="employeeName">Employee</SortableHeader>}
@@ -347,23 +347,23 @@ const AttendanceTable = ({
               {visibleColumns.location && <SortableHeader field="location">Location</SortableHeader>}
               {visibleColumns.productivity && <SortableHeader field="productivity">Productivity</SortableHeader>}
 
-              <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-widest relative">
+              <th className="px-6 py-4 text-left text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wide relative">
                 <div className="flex items-center gap-2">
                   <span>Actions</span>
                   <button
                     onClick={handleOpenColumnSettings}
-                    className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-600"
+                    className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground/70 hover:text-muted-foreground"
                   >
                     <Icon name="MoreVertical" size={14} />
                   </button>
                 </div>
 
                 {isColumnSettingsOpen && (
-                  <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-slate-200 shadow-xl rounded-xl p-4 w-56 text-left">
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">Display Columns</h4>
+                  <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border shadow-sm rounded-xl p-4 w-56 text-left">
+                    <h4 className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-3 px-1">Display Columns</h4>
                     <div className="space-y-1.5">
                       {COLUMN_OPTIONS.map(col => (
-                        <div key={col.key} className="hover:bg-slate-50 px-1.5 py-1 rounded-lg transition-colors">
+                        <div key={col.key} className="hover:bg-muted/60 px-1.5 py-1 rounded-lg transition-colors">
                           <Checkbox
                             checked={draftVisibleColumns[col.key]}
                             onChange={() => handleColumnToggle(col.key)}
@@ -374,18 +374,18 @@ const AttendanceTable = ({
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4 flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-4 flex items-center justify-end gap-2 border-t border-border pt-3">
                       <button
                         type="button"
                         onClick={handleCancelColumnSettings}
-                        className="px-3 py-1.5 text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
+                        className="px-3 py-1.5 text-[11px] font-semibold text-muted-foreground border border-border rounded-md hover:bg-muted/60 transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         type="button"
                         onClick={handleSaveColumnSettings}
-                        className="px-3 py-1.5 text-[11px] font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-3 py-1.5 text-[11px] font-semibold text-white bg-primary rounded-md hover:bg-primary/90 transition-colors"
                       >
                         Save
                       </button>
@@ -397,11 +397,11 @@ const AttendanceTable = ({
 
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-slate-50">
+          <tbody className="bg-card divide-y divide-slate-50">
             {sortedData?.map((employee, index) => (
               <tr
                 key={employee?.id || employee?.employeeId || `attendance-row-${index}`}
-                className="hover:bg-blue-50/30 transition-colors duration-150 cursor-pointer group"
+                className="hover:bg-primary/30 transition-colors duration-150 cursor-pointer group"
                 onClick={() => handleEmployeeClick(employee)}
               >
                 <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e?.stopPropagation()}>
@@ -409,7 +409,7 @@ const AttendanceTable = ({
                     type="checkbox"
                     checked={selectedEmployees?.includes(employee?.id || employee?.employeeId)}
                     onChange={() => handleSelectEmployee(employee?.id || employee?.employeeId)}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer"
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-ring/20 transition-all cursor-pointer"
                   />
                 </td>
                 {visibleColumns.employeeName && (
@@ -417,24 +417,24 @@ const AttendanceTable = ({
                     <div className="flex items-center gap-3">
                       <EmployeeAvatar employee={employee} size="md" />
                       <div>
-                        <div className="text-sm font-bold text-slate-900 tracking-tight">{employee?.employeeName || '—'}</div>
+                        <div className="text-sm font-bold text-foreground tracking-tight">{employee?.employeeName || '—'}</div>
                       </div>
                     </div>
                   </td>
                 )}
                 {visibleColumns.department && (
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">{employee?.department || 'Not Assigned'}</span>
+                    <span className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-lg">{employee?.department || 'Not Assigned'}</span>
                   </td>
                 )}
                 {visibleColumns.checkInTime && (
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col">
-                      <div className="text-sm text-slate-900 font-bold">
+                      <div className="text-sm text-foreground font-bold">
                         {formatTime(employee?.checkInTime)}
                       </div>
                       {employee?.checkInTime && employee?.checkInTime !== '--' && (
-                        <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                        <div className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">
                           {getRelativeTime(employee.checkInTime, employee.date)}
                         </div>
                       )}
@@ -443,18 +443,18 @@ const AttendanceTable = ({
                 )}
                 {visibleColumns.checkOutTime && (
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900 font-bold">
+                    <div className="text-sm text-foreground font-bold">
                       {formatTime(employee?.checkOutTime)}
                     </div>
                   </td>
                 )}
                 {visibleColumns.workDuration && (
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-slate-900">
+                    <div className="text-sm font-bold text-foreground">
                       {employee?.workDuration || '—'}
                     </div>
                     {employee?.overtime && employee?.overtime !== '0m' && employee?.overtime !== '--' && (
-                      <div className="text-[10px] font-bold text-blue-600 flex items-center gap-1 mt-0.5">
+                      <div className="text-[10px] font-bold text-primary flex items-center gap-1 mt-0.5">
                         <Icon name="Plus" size={10} />
                         {employee?.overtime} OT
                       </div>
@@ -465,18 +465,18 @@ const AttendanceTable = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col items-start gap-1">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-[10px] font-bold uppercase tracking-wider border ${employee?.status === 'present' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' :
-                        employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
-                          employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
-                            employee?.status === 'wfh' ? 'border-indigo-100 bg-indigo-50 text-indigo-700' :
-                              employee?.status === 'on_leave' ? 'border-purple-100 bg-purple-50 text-purple-700' :
-                                'border-slate-100 bg-slate-50 text-slate-600'
-                        }`}>
+ employee?.status === 'late' ? 'border-amber-100 bg-amber-50 text-amber-700' :
+ employee?.status === 'absent' ? 'border-rose-100 bg-rose-50 text-rose-700' :
+ employee?.status === 'wfh' ? 'border-border bg-primary/10 text-primary' :
+ employee?.status === 'on_leave' ? 'border-border bg-primary/10 text-primary' :
+ 'border-border bg-muted/60 text-muted-foreground'
+ }`}>
                         <div className={`w-1.5 h-1.5 rounded-none ${employee?.status === 'present' ? 'bg-emerald-500' :
-                          employee?.status === 'late' ? 'bg-amber-500' :
-                            employee?.status === 'absent' ? 'bg-rose-500' :
-                              employee?.status === 'wfh' ? 'bg-indigo-500' : 
-                                employee?.status === 'on_leave' ? 'bg-purple-500' : 'bg-slate-400'
-                          }`}></div>
+ employee?.status === 'late' ? 'bg-amber-500' :
+ employee?.status === 'absent' ? 'bg-rose-500' :
+ employee?.status === 'wfh' ? 'bg-primary' : 
+ employee?.status === 'on_leave' ? 'bg-primary' : 'bg-slate-400'
+ }`}></div>
                         {employee?.status?.replace('_', ' ')}
                       </span>
                     </div>
@@ -486,10 +486,10 @@ const AttendanceTable = ({
                 {visibleColumns.label && (
                   <td className="px-6 py-4 whitespace-nowrap">
                     {employee?.label ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-tight">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-border uppercase tracking-tight">
                         {employee.label}
                       </span>
-                    ) : <span className="text-xs font-bold text-slate-300">—</span>}
+                    ) : <span className="text-xs font-bold text-muted-foreground/70">—</span>}
                   </td>
                 )}
                 {visibleColumns.notes && (
@@ -499,22 +499,22 @@ const AttendanceTable = ({
                         {employee.notes.split('|').map((note, i) => {
                           const isEditLog = note.includes('[Edited on');
                           return (
-                            <div key={i} className={`text-[10px] truncate ${isEditLog ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}>
+                            <div key={i} className={`text-[10px] truncate ${isEditLog ? 'text-primary font-bold' : 'text-muted-foreground font-medium'}`}>
                               {note.trim()}
                             </div>
                           );
                         })}
                       </div>
-                    ) : <span className="text-xs font-bold text-slate-300">—</span>}
+                    ) : <span className="text-xs font-bold text-muted-foreground/70">—</span>}
                   </td>
                 )}
                 {visibleColumns.location && (
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-1.5 text-slate-600">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Icon
                         name={employee?.location === 'Office' ? 'Building' : employee?.location === 'WFH' ? 'Home' : 'MapPin'}
                         size={14}
-                        className="text-slate-400"
+                        className="text-muted-foreground/70"
                       />
                       <span className="text-xs font-semibold">{employee?.location || '—'}</span>
                     </div>
@@ -524,12 +524,12 @@ const AttendanceTable = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {employee?.productivity > 0 ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${employee.productivity >= 80 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${employee?.productivity}%` }}></div>
+                        <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${employee.productivity >= 80 ? 'bg-emerald-500' : 'bg-primary'}`} style={{ width: `${employee?.productivity}%` }}></div>
                         </div>
-                        <span className="text-xs font-bold text-slate-700">{employee?.productivity}%</span>
+                        <span className="text-xs font-bold text-foreground">{employee?.productivity}%</span>
                       </div>
-                    ) : <span className="text-xs font-bold text-slate-300">—</span>}
+                    ) : <span className="text-xs font-bold text-muted-foreground/70">—</span>}
                   </td>
                 )}
 
@@ -543,7 +543,7 @@ const AttendanceTable = ({
                           onCheckIn(employee.employeeId || employee.id);
                         }}
                         disabled={employee.isOnLeave}
-                        className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-none transition-all shadow-sm ${employee.isOnLeave ? 'bg-slate-300 text-white cursor-not-allowed opacity-70' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                        className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-none transition-all shadow-sm ${employee.isOnLeave ? 'bg-slate-300 text-white cursor-not-allowed opacity-70' : 'bg-primary text-white hover:bg-primary/90'}`}
                         title={employee.isOnLeave ? 'Employee is on approved leave today' : 'Check In'}
                       >
                         {employee.isOnLeave ? 'On Leave' : 'Check In'}
@@ -554,12 +554,12 @@ const AttendanceTable = ({
                           e.stopPropagation();
                           onCheckOut(employee.id || employee.employeeId);
                         }}
-                        className="px-4 py-1.5 text-[10px] font-bold bg-white border border-slate-200 text-slate-700 uppercase tracking-wider rounded-none hover:bg-slate-50 transition-all shadow-sm"
+                        className="px-4 py-1.5 text-[10px] font-bold bg-card border border-border text-foreground uppercase tracking-wider rounded-none hover:bg-muted/60 transition-all shadow-sm"
                       >
                         Check Out
                       </button>
                     ) : (
-                      <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-none uppercase tracking-wider">Done</span>
+                      <span className="text-[10px] font-bold text-muted-foreground/70 bg-muted/60 border border-border px-3 py-1 rounded-none uppercase tracking-wider">Done</span>
                     )}
 
                     {employee.hasRecord && (
@@ -586,7 +586,7 @@ const AttendanceTable = ({
 
                     <button
                       onClick={() => onViewHistory(employee)}
-                      className="p-2 bg-slate-50 border border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all rounded-none"
+                      className="p-2 bg-muted/60 border border-border text-muted-foreground/70 hover:text-primary hover:bg-primary/10 hover:border-border transition-all rounded-none"
                       title="View Details"
                     >
                       <Icon name="Eye" size={16} />
@@ -602,12 +602,12 @@ const AttendanceTable = ({
         </table>
 
         {attendanceData?.length === 0 && (
-          <div className="text-center py-24 bg-slate-50/10">
-            <div className="w-16 h-16 mx-auto mb-6 bg-white border border-slate-100 rounded-2xl flex items-center justify-center shadow-sm text-slate-200">
+          <div className="text-center py-24 bg-muted/10">
+            <div className="w-16 h-16 mx-auto mb-6 bg-card border border-border rounded-lg flex items-center justify-center shadow-sm text-slate-200">
               <Icon name="Users" size={32} />
             </div>
-            <h3 className="text-base font-bold text-slate-900 tracking-tight">No attendance records</h3>
-            <p className="text-xs font-semibold text-slate-400 mt-1">Try adjusting your filters to find what you're looking for.</p>
+            <h3 className="text-base font-bold text-foreground tracking-tight">No attendance records</h3>
+            <p className="text-xs font-semibold text-muted-foreground/70 mt-1">Try adjusting your filters to find what you're looking for.</p>
           </div>
         )}
       </div>

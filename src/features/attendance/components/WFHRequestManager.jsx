@@ -62,24 +62,24 @@ const WorkFromHomeRequestManager = () => {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div className="flex bg-slate-100 p-1 rounded-2xl w-fit border border-slate-200 shadow-inner">
+                <div className="flex bg-muted p-1 rounded-lg w-fit border border-border shadow-inner">
                     <button 
                         onClick={() => setActiveTab('pending')}
-                        className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                            activeTab === 'pending' 
-                            ? 'bg-white text-indigo-600 shadow-md' 
-                            : 'text-slate-500 hover:text-slate-800'
-                        }`}
+                        className={`px-6 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wide transition-all ${
+ activeTab === 'pending' 
+ ? 'bg-card text-primary shadow-md' 
+ : 'text-muted-foreground hover:text-foreground'
+ }`}
                     >
                         Pending Requests
                     </button>
                     <button 
                         onClick={() => setActiveTab('history')}
-                        className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                            activeTab === 'history' 
-                            ? 'bg-white text-indigo-600 shadow-md' 
-                            : 'text-slate-500 hover:text-slate-800'
-                        }`}
+                        className={`px-6 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wide transition-all ${
+ activeTab === 'history' 
+ ? 'bg-card text-primary shadow-md' 
+ : 'text-muted-foreground hover:text-foreground'
+ }`}
                     >
                         All History
                     </button>
@@ -88,42 +88,42 @@ const WorkFromHomeRequestManager = () => {
 
             {activeTab === 'pending' ? (
                 loading ? (
-                    <div className="p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+                    <div className="p-8 text-center text-muted-foreground/70 font-bold uppercase tracking-wide text-xs animate-pulse">
                         Scanning for new requests...
                     </div>
                 ) : requests.length === 0 ? (
-                    <div className="p-12 text-center bg-slate-50/50 border border-dashed border-slate-200 rounded-3xl">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 mx-auto mb-4 border border-slate-100 shadow-sm">
+                    <div className="p-12 text-center bg-muted/50 border border-dashed border-border rounded-lg">
+                        <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center text-muted-foreground/70 mx-auto mb-4 border border-border shadow-sm">
                             <Icon name="Wind" size={24} />
                         </div>
-                        <p className="text-sm font-bold text-slate-400">No pending Work From Home requests</p>
+                        <p className="text-sm font-bold text-muted-foreground/70">No pending Work From Home requests</p>
                     </div>
                 ) : (
-                    <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
-                        <div className="px-8 py-5 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                <Icon name="Home" size={16} className="text-indigo-500" /> Pending Work From Home Approvals
+                    <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+                        <div className="px-8 py-5 border-b border-slate-50 bg-muted/50 flex justify-between items-center">
+                            <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                                <Icon name="Home" size={16} className="text-primary" /> Pending Work From Home Approvals
                             </h3>
-                            <span className="bg-indigo-600 text-white text-[9px] font-black px-2.5 py-1 rounded-lg">
+                            <span className="bg-primary text-white text-[9px] font-semibold px-2.5 py-1 rounded-lg">
                                 {requests.length} NEW
                             </span>
                         </div>
                         
                         <div className="divide-y divide-slate-50">
                             {requests.map(req => (
-                                <div key={req.id} className="p-6 hover:bg-slate-50/30 transition-all flex items-center justify-between group">
+                                <div key={req.id} className="p-6 hover:bg-muted/30 transition-all flex items-center justify-between group">
                                     <div className="flex items-center space-x-5">
-                                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-black shadow-sm group-hover:scale-110 transition-transform">
+                                        <div className="w-12 h-12 rounded-lg bg-primary/10 border border-border flex items-center justify-center text-primary font-semibold shadow-sm transition-transform">
                                             {req.employee?.user?.firstName?.[0] || 'E'}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-bold text-slate-900 leading-none">
+                                            <p className="text-sm font-bold text-foreground leading-none">
                                                 {req.employee?.user?.firstName} {req.employee?.user?.lastName}
                                             </p>
-                                            <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-tighter flex items-center gap-1.5">
+                                            <p className="text-[10px] font-bold text-muted-foreground/70 mt-2 uppercase tracking-tighter flex items-center gap-1.5">
                                                 <Icon name="Calendar" size={10} /> {req.startDate} → {req.endDate}
                                             </p>
-                                            <p className="text-xs text-slate-500 mt-3 font-medium bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 inline-block italic">
+                                            <p className="text-xs text-muted-foreground mt-3 font-medium bg-muted/60 px-3 py-2 rounded-xl border border-border inline-block italic">
                                                 "{req.reason}"
                                             </p>
                                         </div>
@@ -132,12 +132,12 @@ const WorkFromHomeRequestManager = () => {
                                     <div className="flex items-center space-x-2">
                                         <button 
                                             onClick={() => handleDelete(req.id)}
-                                            className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                                            className="p-3 text-muted-foreground/70 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
                                             title="Delete permanently"
                                         >
                                             <Icon name="Trash2" size={18} />
                                         </button>
-                                        <div className="h-6 w-[1px] bg-slate-100 mx-1" />
+                                        <div className="h-6 w-[1px] bg-muted mx-1" />
                                         <button 
                                             onClick={() => handleAction(req.id, 'REJECTED')}
                                             className="p-3 bg-rose-50 text-rose-500 hover:bg-rose-100 rounded-xl transition-all"
@@ -147,7 +147,7 @@ const WorkFromHomeRequestManager = () => {
                                         </button>
                                         <button 
                                             onClick={() => handleAction(req.id, 'APPROVED')}
-                                            className={`px-6 py-2.5 bg-indigo-600 text-white text-[11px] font-black rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 ${actionLoadingId === req.id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                            className={`px-6 py-2.5 bg-primary text-white text-[11px] font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-sm flex items-center gap-2 ${actionLoadingId === req.id ? 'opacity-60 cursor-not-allowed' : ''}`}
                                             disabled={actionLoadingId === req.id}
                                         >
                                             {actionLoadingId === req.id ? (

@@ -50,26 +50,26 @@ const CompanySwitcher = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={toggleDropdown}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-200"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/60 border border-transparent hover:border-border transition-all duration-200"
             >
-                <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold text-xs shadow-sm">
                     {currentCompany.name?.[0]?.toUpperCase()}
                 </div>
                 <div className="hidden md:block text-left">
-                    <p className="text-xs font-bold text-slate-900 leading-none">{currentCompany.name}</p>
-                    <p className="text-[10px] text-slate-500 font-medium mt-1">Active Workspace</p>
+                    <p className="text-xs font-bold text-foreground leading-none">{currentCompany.name}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium mt-1">Active Workspace</p>
                 </div>
                 <Icon
                     name="ChevronDown"
                     size={14}
-                    className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    className={`text-muted-foreground/70 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                 />
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                    <div className="p-3 border-b border-slate-100 bg-slate-50/50">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Switch Workspace</p>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-card border border-border rounded-xl shadow-sm z-50 overflow-hidden">
+                    <div className="p-3 border-b border-border bg-muted/50">
+                        <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider">Switch Workspace</p>
                     </div>
 
                     <div className="max-h-60 overflow-y-auto">
@@ -77,35 +77,35 @@ const CompanySwitcher = () => {
                             <button
                                 key={comp.id}
                                 onClick={() => handleSwitch(comp.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left ${comp.id === currentCompany.id ? 'bg-blue-50/30' : ''}`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/60 transition-colors text-left ${comp.id === currentCompany.id ? 'bg-primary/30' : ''}`}
                             >
-                                <div className={`w-8 h-8 rounded flex items-center justify-center font-bold text-xs ${comp.id === currentCompany.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                                <div className={`w-8 h-8 rounded flex items-center justify-center font-bold text-xs ${comp.id === currentCompany.id ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}>
                                     {comp.name?.[0]?.toUpperCase()}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className={`text-xs font-bold truncate ${comp.id === currentCompany.id ? 'text-blue-600' : 'text-slate-700'}`}>
+                                    <p className={`text-xs font-bold truncate ${comp.id === currentCompany.id ? 'text-primary' : 'text-foreground'}`}>
                                         {comp.name}
                                     </p>
                                     {comp.id === currentCompany.id && (
-                                        <p className="text-[10px] text-blue-500 font-medium italic">Current</p>
+                                        <p className="text-[10px] text-primary font-medium italic">Current</p>
                                     )}
                                 </div>
                                 {comp.id === currentCompany.id && (
-                                    <Icon name="Check" size={14} className="text-blue-600" />
+                                    <Icon name="Check" size={14} className="text-primary" />
                                 )}
                             </button>
                         ))}
                     </div>
 
-                    <div className="p-2 border-t border-slate-100 flex flex-col gap-1">
+                    <div className="p-2 border-t border-border flex flex-col gap-1">
                         <button
                             onClick={() => {
                                 setIsOpen(false);
                                 navigate('/my-companies');
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all duration-200"
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-primary transition-all duration-200"
                         >
-                            <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500">
+                            <div className="w-8 h-8 rounded bg-muted flex items-center justify-center text-muted-foreground/70 group-hover:bg-primary/10 group-hover:text-primary">
                                 <Icon name="Layers" size={16} />
                             </div>
                             <span className="text-xs font-bold">View All Workspaces</span>
@@ -113,9 +113,9 @@ const CompanySwitcher = () => {
 
                         <button
                             onClick={handleAddCompany}
-                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all duration-200"
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-primary transition-all duration-200"
                         >
-                            <div className="w-8 h-8 rounded border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-blue-200 group-hover:text-blue-500">
+                            <div className="w-8 h-8 rounded border-2 border-dashed border-border flex items-center justify-center text-muted-foreground/70 group-hover:border-border group-hover:text-primary">
                                 <Icon name="Plus" size={16} />
                             </div>
                             <span className="text-xs font-bold">Add Company</span>

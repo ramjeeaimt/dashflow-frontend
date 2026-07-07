@@ -704,21 +704,21 @@ const ClientAdmin = () => {
           {/* Stats Cards with Enhanced Design */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Network Entities Card */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 p-3 shadow-none transition-all duration-300">
+            <div className="bg-primary/10 border border-border p-3 shadow-none transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-semibold text-blue-600 mb-1 uppercase tracking-wide">Network Entities</p>
+                  <p className="text-[10px] font-semibold text-primary mb-1 uppercase tracking-wide">Network Entities</p>
                   <p className="text-xl font-bold text-blue-900">{totalEntities}</p>
-                  <p className="text-[10px] text-blue-600 mt-0.5">Clients & Projects</p>
+                  <p className="text-[10px] text-primary mt-0.5">Clients & Projects</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-500 flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 bg-primary flex items-center justify-center shadow-md">
                   <Users size={18} className="text-white" />
                 </div>
               </div>
             </div>
 
             {/* Estimated Revenue Card */}
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-3 shadow-none transition-all duration-300">
+            <div className="bg-emerald-50 border border-emerald-200 p-3 shadow-none transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-semibold text-emerald-600 mb-1 uppercase tracking-wide">Revenue (MTD)</p>
@@ -732,14 +732,14 @@ const ClientAdmin = () => {
             </div>
 
             {/* Active Workflows Card */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 p-3 shadow-none transition-all duration-300">
+            <div className="bg-primary/10 border border-border p-3 shadow-none transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-semibold text-purple-600 mb-1 uppercase tracking-wide">Active Workflows</p>
+                  <p className="text-[10px] font-semibold text-primary mb-1 uppercase tracking-wide">Active Workflows</p>
                   <p className="text-xl font-bold text-purple-900">{activeWorkflows}</p>
-                  <p className="text-[10px] text-purple-600 mt-0.5">Running Projects</p>
+                  <p className="text-[10px] text-primary mt-0.5">Running Projects</p>
                 </div>
-                <div className="w-10 h-10 bg-purple-500 flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 bg-primary flex items-center justify-center shadow-md">
                   <TrendingUp size={18} className="text-white" />
                 </div>
               </div>
@@ -758,14 +758,14 @@ const ClientAdmin = () => {
                 <input
                   type="text"
                   placeholder="Search clients, projects, emails..."
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-card border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent shadow-sm transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <button
                 onClick={() => { setStep(1); setIsClientModalOpen(true); }}
-                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full sm:w-auto bg-primary hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-sm transition-all duration-200"
               >
                 <Plus size={18} /> Add Client / Project
               </button>
@@ -774,7 +774,7 @@ const ClientAdmin = () => {
 
           {/* List Section with Enhanced Cards */}
           {combinedData.length === 0 ? (
-            <div className="bg-white  border border-gray-200 p-12 text-center">
+            <div className="bg-card border border-gray-200 p-12 text-center">
               <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <Users size={32} className="text-gray-400" />
               </div>
@@ -782,7 +782,7 @@ const ClientAdmin = () => {
               <p className="text-gray-500 mb-6">Get started by adding your first client or project</p>
               <button
                 onClick={() => { setStep(1); setIsClientModalOpen(true); }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
                 <Plus size={16} /> Add First Entity
               </button>
@@ -792,7 +792,7 @@ const ClientAdmin = () => {
               {combinedData.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white border-b border-gray-100 transition-all duration-300 cursor-pointer hover:bg-slate-50"
+                  className="bg-card border-b border-gray-100 transition-all duration-300 cursor-pointer hover:bg-muted/60"
                 >
                   <div className="p-3 flex items-center justify-between" onClick={() => navigate(`/client-details/${item.id}`)}>
                     <div className="flex items-center gap-3 flex-1">
@@ -800,7 +800,7 @@ const ClientAdmin = () => {
                         {item.logo ? (
                           <img src={item.logo} alt="Logo" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-600">
+                          <div className="w-full h-full flex items-center justify-center bg-border text-muted-foreground">
                             {item.name?.charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -808,11 +808,11 @@ const ClientAdmin = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
                           <h3 className="font-semibold text-gray-900 text-sm">{item.name}</h3>
-                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200`}>
+                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border border-border`}>
                             {item.clientId ? 'Client' : 'Project'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
                           <span className="flex items-center gap-1">{item.email}</span>
                           <span className="text-slate-200">•</span>
                           <span>{item.company}</span>
@@ -820,11 +820,11 @@ const ClientAdmin = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 mr-4 border-r border-slate-200 pr-4">
+                        <div className="flex items-center gap-2 mr-4 border-r border-border pr-4">
                           <a 
                             href={`tel:${item.phone}`} 
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 text-slate-400 hover:text-emerald-600 transition-colors"
+                            className="p-1 text-muted-foreground/70 hover:text-emerald-600 transition-colors"
                             title="Call Client"
                           >
                             <Phone size={14} />
@@ -834,7 +834,7 @@ const ClientAdmin = () => {
                             target="_blank" 
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 text-slate-400 hover:text-green-600 transition-colors"
+                            className="p-1 text-muted-foreground/70 hover:text-green-600 transition-colors"
                             title="WhatsApp Client"
                           >
                             <MessageSquare size={14} />
@@ -842,7 +842,7 @@ const ClientAdmin = () => {
                           <a 
                             href={`mailto:${item.email}`} 
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                            className="p-1 text-muted-foreground/70 hover:text-primary transition-colors"
                             title="Gmail Client"
                           >
                             <Mail size={14} />
@@ -853,17 +853,17 @@ const ClientAdmin = () => {
                               setSelectedClientForProject(item);
                               setIsProjectFormOpen(true);
                             }}
-                            className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                            className="p-1 text-muted-foreground/70 hover:text-primary transition-colors"
                             title="Add Project"
                           >
                             <PlusCircle size={14} />
                           </button>
                         </div>
                       <div className="hidden md:block text-right min-w-[60px]">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Projects</p>
-                        <p className="text-base font-bold text-slate-900 leading-none">{item.clientProjects?.length || 0}</p>
+                        <p className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-wide leading-none mb-1">Projects</p>
+                        <p className="text-base font-bold text-foreground leading-none">{item.clientProjects?.length || 0}</p>
                       </div>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-gray-400 group-hover:text-blue-600`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-gray-400 group-hover:text-primary`}>
                         <ChevronRight size={16} />
                       </div>
                     </div>
@@ -891,7 +891,7 @@ const ClientAdmin = () => {
       {/* EDIT PROJECT MODAL */}
       {isEditing && editData.id && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white w-full max-w-3xl rounded-lg shadow-xl overflow-hidden">
+          <div className="bg-card w-full max-w-3xl rounded-lg shadow-sm overflow-hidden">
             <div className="px-5 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Edit Project</h3>
@@ -906,7 +906,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Select Project</label>
                 <select
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   onChange={(e) => handleProjectSelect(e.target.value)}
                   value={editData.id || ""}
                 >
@@ -925,7 +925,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Project Name</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editData.projectName || ''}
                   onChange={(e) => handleEditChange('projectName', e.target.value)}
                 />
@@ -934,7 +934,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                 <textarea
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   rows="3"
                   value={editData.description || ''}
                   onChange={(e) => handleEditChange('description', e.target.value)}
@@ -946,7 +946,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
                   <input
                     type="date"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.assigningDate ? editData.assigningDate.split('T')[0] : ''}
                     onChange={(e) => handleEditChange('assigningDate', e.target.value)}
                   />
@@ -955,7 +955,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Deadline</label>
                   <input
                     type="date"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.deadline ? editData.deadline.split('T')[0] : ''}
                     onChange={(e) => handleEditChange('deadline', e.target.value)}
                   />
@@ -966,7 +966,7 @@ const ClientAdmin = () => {
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Phase</label>
                   <select
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.phase || 'Planning'}
                     onChange={(e) => handleEditChange('phase', e.target.value)}
                   >
@@ -980,7 +980,7 @@ const ClientAdmin = () => {
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
                   <select
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.status || 'active'}
                     onChange={(e) => handleEditChange('status', e.target.value)}
                   >
@@ -997,7 +997,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Budget (₹)</label>
                   <input
                     type="number"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.budget || 0}
                     onChange={(e) => handleEditChange('budget', parseInt(e.target.value) || 0)}
                   />
@@ -1006,7 +1006,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Total Payment (₹)</label>
                   <input
                     type="number"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.totalPayment || 0}
                     onChange={(e) => handleEditChange('totalPayment', parseInt(e.target.value) || 0)}
                   />
@@ -1018,7 +1018,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Payment Received (₹)</label>
                   <input
                     type="number"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.paymentReceived || 0}
                     onChange={(e) => handleEditChange('paymentReceived', parseInt(e.target.value) || 0)}
                   />
@@ -1027,7 +1027,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Contact Info</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editData.contactInfo || ''}
                     onChange={(e) => handleEditChange('contactInfo', e.target.value)}
                   />
@@ -1038,7 +1038,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">GitHub Link</label>
                 <input
                   type="url"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editData.githubLink || ''}
                   onChange={(e) => handleEditChange('githubLink', e.target.value)}
                   placeholder="https://github.com/..."
@@ -1049,7 +1049,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Deployment Link</label>
                 <input
                   type="url"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editData.deploymentLink || ''}
                   onChange={(e) => handleEditChange('deploymentLink', e.target.value)}
                   placeholder="https://..."
@@ -1059,7 +1059,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Additional Notes</label>
                 <textarea
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   rows="2"
                   value={editData.notes || ''}
                   onChange={(e) => handleEditChange('notes', e.target.value)}
@@ -1078,7 +1078,7 @@ const ClientAdmin = () => {
               <button
                 onClick={handleUpdateProject}
                 disabled={isSubmitting}
-                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -1091,7 +1091,7 @@ const ClientAdmin = () => {
       {/* EDIT CLIENT MODAL */}
       {isEditingClient && editClientData.id && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
+          <div className="bg-card w-full max-w-2xl rounded-lg shadow-sm overflow-hidden">
             <div className="px-5 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Edit Client</h3>
@@ -1106,7 +1106,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Select Client</label>
                 <select
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   onChange={(e) => handleClientEditSelect(e.target.value)}
                   value={editClientData.id || ""}
                 >
@@ -1122,7 +1122,7 @@ const ClientAdmin = () => {
               <div className="border-t border-gray-100 my-2"></div>
 
               <div className="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Company Logo</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Company Logo</p>
                 <ImageUpload
                   initialImage={editClientData.logo}
                   initials={editClientData.name?.charAt(0)}
@@ -1135,7 +1135,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Full Name *</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editClientData.name || ''}
                   onChange={(e) => handleClientEditChange('name', e.target.value)}
                 />
@@ -1145,7 +1145,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
                 <input
                   type="email"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editClientData.email || ''}
                   onChange={(e) => handleClientEditChange('email', e.target.value)}
                 />
@@ -1155,7 +1155,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
                 <input
                   type="tel"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editClientData.phone || ''}
                   onChange={(e) => handleClientEditChange('phone', e.target.value)}
                 />
@@ -1165,7 +1165,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Company</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editClientData.company || ''}
                   onChange={(e) => handleClientEditChange('company', e.target.value)}
                 />
@@ -1174,7 +1174,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
                 <textarea
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   rows="2"
                   value={editClientData.address || ''}
                   onChange={(e) => handleClientEditChange('address', e.target.value)}
@@ -1186,7 +1186,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">City</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editClientData.city || ''}
                     onChange={(e) => handleClientEditChange('city', e.target.value)}
                   />
@@ -1195,7 +1195,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">State</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editClientData.state || ''}
                     onChange={(e) => handleClientEditChange('state', e.target.value)}
                   />
@@ -1207,7 +1207,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Pincode</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editClientData.pincode || ''}
                     onChange={(e) => handleClientEditChange('pincode', e.target.value)}
                   />
@@ -1216,7 +1216,7 @@ const ClientAdmin = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">Country</label>
                   <input
                     type="text"
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editClientData.country || 'India'}
                     onChange={(e) => handleClientEditChange('country', e.target.value)}
                   />
@@ -1227,7 +1227,7 @@ const ClientAdmin = () => {
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
                   <select
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editClientData.status || 'Lead'}
                     onChange={(e) => handleClientEditChange('status', e.target.value)}
                   >
@@ -1239,7 +1239,7 @@ const ClientAdmin = () => {
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
                   <select
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                     value={editClientData.priority || 'Medium'}
                     onChange={(e) => handleClientEditChange('priority', e.target.value)}
                   >
@@ -1254,7 +1254,7 @@ const ClientAdmin = () => {
                 <label className="block text-xs font-medium text-gray-700 mb-1">Budget</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editClientData.budget || ''}
                   onChange={(e) => handleClientEditChange('budget', e.target.value)}
                 />
@@ -1263,7 +1263,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Currency</label>
                 <select
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editClientData.currency || 'INR'}
                   onChange={(e) => handleClientEditChange('currency', e.target.value)}
                 >
@@ -1276,7 +1276,7 @@ const ClientAdmin = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
                 <textarea
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   rows="2"
                   value={editClientData.notes || ''}
                   onChange={(e) => handleClientEditChange('notes', e.target.value)}
@@ -1295,7 +1295,7 @@ const ClientAdmin = () => {
               <button
                 onClick={handleUpdateClient}
                 disabled={isSubmitting}
-                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -1308,7 +1308,7 @@ const ClientAdmin = () => {
       {/* REGISTER CLIENT MODAL */}
       {isClientModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
+          <div className="bg-card w-full max-w-2xl rounded-lg shadow-sm overflow-hidden">
             <div className="px-5 py-4 bg-gray-50 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
@@ -1324,8 +1324,8 @@ const ClientAdmin = () => {
                 {[1, 2, 3, 4].map((s) => (
                   <React.Fragment key={s}>
                     <div className="flex flex-col items-center">
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
-                        }`}>
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${step >= s ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+ }`}>
                         {step > s ? <CheckCircle2 size={14} /> : s}
                       </div>
                       <span className="text-xs text-gray-500 mt-1">
@@ -1333,7 +1333,7 @@ const ClientAdmin = () => {
                       </span>
                     </div>
                     {s < 4 && (
-                      <div className={`flex-1 h-0.5 mx-2 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                      <div className={`flex-1 h-0.5 mx-2 ${step > s ? 'bg-primary' : 'bg-gray-200'}`} />
                     )}
                   </React.Fragment>
                 ))}
@@ -1348,7 +1348,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Select Existing Client</label>
                       <select
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         onChange={(e) => handleClientSelect(e.target.value)}
                         value=""
                       >
@@ -1368,7 +1368,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Full Name *</label>
                       <input
                         type="text"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         required
                         value={newClient.name}
                         onChange={e => setNewClient({ ...newClient, name: e.target.value })}
@@ -1378,7 +1378,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Email *</label>
                       <input
                         type="email"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         required
                         value={newClient.email}
                         onChange={e => setNewClient({ ...newClient, email: e.target.value })}
@@ -1388,7 +1388,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
                       <input
                         type="tel"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.phone}
                         onChange={e => setNewClient({ ...newClient, phone: e.target.value })}
                       />
@@ -1396,7 +1396,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Lead Source</label>
                       <select
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.source}
                         onChange={e => setNewClient({ ...newClient, source: e.target.value })}
                       >
@@ -1416,7 +1416,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Company</label>
                       <input
                         type="text"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.company}
                         onChange={e => setNewClient({ ...newClient, company: e.target.value })}
                       />
@@ -1425,7 +1425,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Budget</label>
                       <input
                         type="text"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.budget}
                         onChange={e => setNewClient({ ...newClient, budget: e.target.value })}
                       />
@@ -1433,7 +1433,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Currency</label>
                       <select
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.currency}
                         onChange={e => setNewClient({ ...newClient, currency: e.target.value })}
                       >
@@ -1445,7 +1445,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
                       <select
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.priority}
                         onChange={e => setNewClient({ ...newClient, priority: e.target.value })}
                       >
@@ -1457,7 +1457,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
                       <select
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newClient.status}
                         onChange={e => setNewClient({ ...newClient, status: e.target.value })}
                       >
@@ -1469,7 +1469,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
                       <textarea
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         rows="2"
                         value={newClient.notes}
                         onChange={e => setNewClient({ ...newClient, notes: e.target.value })}
@@ -1485,7 +1485,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
                       <textarea
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         rows="2"
                         value={newClient.address}
                         onChange={e => setNewClient({ ...newClient, address: e.target.value })}
@@ -1496,7 +1496,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">City</label>
                         <input
                           type="text"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newClient.city}
                           onChange={e => setNewClient({ ...newClient, city: e.target.value })}
                         />
@@ -1505,7 +1505,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">State</label>
                         <input
                           type="text"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newClient.state}
                           onChange={e => setNewClient({ ...newClient, state: e.target.value })}
                         />
@@ -1516,7 +1516,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Pincode</label>
                         <input
                           type="text"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newClient.pincode}
                           onChange={e => setNewClient({ ...newClient, pincode: e.target.value })}
                         />
@@ -1525,7 +1525,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Country</label>
                         <input
                           type="text"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newClient.country}
                           onChange={e => setNewClient({ ...newClient, country: e.target.value })}
                         />
@@ -1537,16 +1537,16 @@ const ClientAdmin = () => {
                 {/* STEP 4: PROJECT DETAILS */}
                 {step === 4 && (
                   <div className="space-y-3">
-                    <div className="bg-blue-50 p-3 rounded-lg mb-2">
-                      <p className="text-xs text-blue-700 font-medium">Project Information (Optional)</p>
-                      <p className="text-xs text-blue-600 mt-1">Add project details for this client</p>
+                    <div className="bg-primary/10 p-3 rounded-lg mb-2">
+                      <p className="text-xs text-primary font-medium">Project Information (Optional)</p>
+                      <p className="text-xs text-primary mt-1">Add project details for this client</p>
                     </div>
 
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Project Name</label>
                       <input
                         type="text"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newProject.projectName}
                         onChange={e => handleProjectChange('projectName', e.target.value)}
                         placeholder="Enter project name"
@@ -1556,7 +1556,7 @@ const ClientAdmin = () => {
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                       <textarea
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         rows="2"
                         value={newProject.description}
                         onChange={e => handleProjectChange('description', e.target.value)}
@@ -1569,7 +1569,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
                         <input
                           type="date"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.assigningDate}
                           onChange={e => handleProjectChange('assigningDate', e.target.value)}
                         />
@@ -1578,7 +1578,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Deadline</label>
                         <input
                           type="date"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.deadline}
                           onChange={e => handleProjectChange('deadline', e.target.value)}
                         />
@@ -1590,7 +1590,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Budget (₹)</label>
                         <input
                           type="number"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.budget}
                           onChange={e => handleProjectChange('budget', parseInt(e.target.value) || 0)}
                           placeholder="0"
@@ -1600,7 +1600,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Total Payment (₹)</label>
                         <input
                           type="number"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.totalPayment}
                           onChange={e => handleProjectChange('totalPayment', parseInt(e.target.value) || 0)}
                           placeholder="0"
@@ -1613,7 +1613,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Payment Received (₹)</label>
                         <input
                           type="number"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.paymentReceived}
                           onChange={e => handleProjectChange('paymentReceived', parseInt(e.target.value) || 0)}
                           placeholder="0"
@@ -1622,7 +1622,7 @@ const ClientAdmin = () => {
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">Phase</label>
                         <select
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.phase}
                           onChange={e => handleProjectChange('phase', e.target.value)}
                         >
@@ -1639,7 +1639,7 @@ const ClientAdmin = () => {
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
                         <select
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.status}
                           onChange={e => handleProjectChange('status', e.target.value)}
                         >
@@ -1653,7 +1653,7 @@ const ClientAdmin = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Contact Info</label>
                         <input
                           type="text"
-                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                           value={newProject.contactInfo}
                           onChange={e => handleProjectChange('contactInfo', e.target.value)}
                           placeholder="Contact number"
@@ -1665,7 +1665,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">GitHub Link</label>
                       <input
                         type="url"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newProject.githubLink}
                         onChange={e => handleProjectChange('githubLink', e.target.value)}
                         placeholder="https://github.com/..."
@@ -1676,7 +1676,7 @@ const ClientAdmin = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">Deployment Link</label>
                       <input
                         type="url"
-                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                         value={newProject.deploymentLink}
                         onChange={e => handleProjectChange('deploymentLink', e.target.value)}
                         placeholder="https://..."
@@ -1693,7 +1693,7 @@ const ClientAdmin = () => {
                   </button>
                 )}
                 {step < 4 ? (
-                  <button type="button" onClick={handleNextStep} className="ml-auto px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  <button type="button" onClick={handleNextStep} className="ml-auto px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90">
                     Next <ArrowRight size={14} className="inline ml-1" />
                   </button>
                 ) : (
@@ -1711,7 +1711,7 @@ const ClientAdmin = () => {
                       type="button"
                       onClick={handleCreateProject}
                       disabled={isSubmitting}
-                      className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2"
+                      className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2"
                     >
                       {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Briefcase size={14} />}
                       {isSubmitting ? 'Creating...' : 'Create Project Only'}
@@ -1719,7 +1719,7 @@ const ClientAdmin = () => {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                      className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2"
                     >
                       {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
                       {isSubmitting ? 'Saving...' : 'Save Client Only'}
@@ -1735,12 +1735,12 @@ const ClientAdmin = () => {
       {/* INVOICE MODAL */}
       {isInvoiceModalOpen && selectedEntity && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-          <div className="bg-white w-full max-w-4xl rounded-lg shadow-xl flex flex-col max-h-[90vh]">
+          <div className="bg-card w-full max-w-4xl rounded-lg shadow-sm flex flex-col max-h-[90vh]">
             <div className="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Create Invoice</h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  To: <span className="text-blue-600 font-medium">
+                  To: <span className="text-primary font-medium">
                     {selectedEntity.type === 'Project' ? selectedEntity.clientName || selectedEntity.name : selectedEntity.name}
                   </span>
                   {selectedEntity.type === 'Project' && (
@@ -1759,7 +1759,7 @@ const ClientAdmin = () => {
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">GST Number</label>
                     <input
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                       placeholder="27XXXXXXXXXXXXZ1"
                       value={gstNumber}
                       onChange={e => setGstNumber(e.target.value)}
@@ -1769,7 +1769,7 @@ const ClientAdmin = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="text-sm font-medium text-gray-700">Invoice Items</h4>
-                      <button onClick={addInvoiceItem} className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                      <button onClick={addInvoiceItem} className="text-xs text-primary hover:text-primary flex items-center gap-1">
                         <PlusCircle size={14} /> Add Item
                       </button>
                     </div>
@@ -1797,7 +1797,7 @@ const ClientAdmin = () => {
                                   <option value="Consultancy">Consultancy</option>
                                   <option value="Development">Development</option>
                                   <option value="Maintenance">Maintenance</option>
-                                  <option value="CUSTOM_ENTRY" className="text-blue-600">+ Custom Service</option>
+                                  <option value="CUSTOM_ENTRY" className="text-primary">+ Custom Service</option>
                                 </select>
                               )}
                               <input
@@ -1860,19 +1860,19 @@ const ClientAdmin = () => {
                     <div className="flex gap-1.5">
                       <button
                         onClick={() => setInvoiceCurrency({ code: 'INR', symbol: '₹' })}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'INR' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'INR' ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                       >
                         INR
                       </button>
                       <button
                         onClick={() => setInvoiceCurrency({ code: 'USD', symbol: '$' })}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'USD' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'USD' ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                       >
                         USD
                       </button>
                       <button
                         onClick={() => setInvoiceCurrency({ code: 'EUR', symbol: '€' })}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'EUR' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${invoiceCurrency.code === 'EUR' ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                       >
                         EUR
                       </button>
@@ -1882,7 +1882,7 @@ const ClientAdmin = () => {
                   <button
                     onClick={handleSendInvoice}
                     disabled={isSubmitting}
-                    className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full mt-4 bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                     {isSubmitting ? 'Sending...' : 'Send Invoice'}

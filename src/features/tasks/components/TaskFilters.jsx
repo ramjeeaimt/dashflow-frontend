@@ -65,17 +65,17 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
   const hasActiveFilters = Object.values(filters)?.some(value => value !== '');
 
   return (
-    <div className="bg-white border border-slate-200 rounded-none mb-12">
-      <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+    <div className="bg-card border border-border rounded-none mb-12">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/60">
         <div className="flex items-center space-x-4">
-          <div className="p-2 bg-slate-900 text-white">
+          <div className="p-2 bg-sidebar text-white">
             <Icon name="Filter" size={16} />
           </div>
           <div className="space-y-0.5">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 leading-none">
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.3em] text-foreground leading-none">
               Diagnostic_Control
             </h3>
-            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+            <div className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-wide">
               Telemetry: {filteredTasks} / {totalTasks} Records Manifested
             </div>
           </div>
@@ -83,7 +83,7 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
         {hasActiveFilters && (
           <button
             onClick={clearAllFilters}
-            className="px-3 py-1.5 border-2 border-slate-900 text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2"
+            className="px-3 py-1.5 border-2 border-slate-900 text-[10px] font-semibold uppercase tracking-wide hover:bg-sidebar hover:text-white transition-all flex items-center gap-2"
           >
             <Icon name="X" size={12} strokeWidth={3} />
             Purge Filters
@@ -93,9 +93,9 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
 
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <div className="xl:col-span-1">
-          <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Vector_Search</label>
+          <label className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70 mb-2">Vector_Search</label>
           <div className="relative group">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70 group-focus-within:text-foreground transition-colors">
               <Icon name="Search" size={14} />
             </div>
             <input
@@ -103,7 +103,7 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
               placeholder="IDENTIFY_TASKS..."
               value={filters?.search}
               onChange={(e) => handleFilterChange('search', e?.target?.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-200 focus:border-slate-900 focus:bg-white outline-none text-xs font-bold transition-all rounded-none placeholder:text-slate-300"
+              className="w-full pl-10 pr-4 py-3 bg-muted/60 border-2 border-border focus:border-slate-900 focus:bg-card outline-none text-xs font-bold transition-all rounded-none placeholder:text-muted-foreground/70"
             />
           </div>
         </div>
@@ -138,14 +138,14 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
       </div>
 
       {hasActiveFilters && (
-        <div className="px-6 py-4 border-t border-slate-100 flex flex-wrap gap-2 items-center">
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-2">Active_Sequences:</span>
+        <div className="px-6 py-4 border-t border-border flex flex-wrap gap-2 items-center">
+            <span className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wide mr-2">Active_Sequences:</span>
             {Object.entries(filters)?.map(([key, value]) => {
               if (!value) return null;
               return (
                 <div
                   key={key}
-                  className="flex items-center gap-2 px-3 py-1 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest"
+                  className="flex items-center gap-2 px-3 py-1 bg-sidebar text-white text-[10px] font-semibold uppercase tracking-wide"
                 >
                   <span>{key}::{value}</span>
                   <button
@@ -165,11 +165,11 @@ const TaskFilters = ({ onFiltersChange, totalTasks, filteredTasks }) => {
 
 const FilterDropdown = ({ label, value, options, onChange }) => (
   <div className="space-y-2">
-    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</label>
+    <label className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">{label}</label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 focus:border-slate-900 focus:bg-white outline-none text-xs font-bold transition-all rounded-none appearance-none cursor-pointer"
+      className="w-full px-4 py-3 bg-muted/60 border-2 border-border focus:border-slate-900 focus:bg-card outline-none text-xs font-bold transition-all rounded-none appearance-none cursor-pointer"
       style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
     >
       {options.map(opt => (
@@ -179,4 +179,4 @@ const FilterDropdown = ({ label, value, options, onChange }) => (
   </div>
 );
 
-export default TaskFilters;
+export default TaskFilters;

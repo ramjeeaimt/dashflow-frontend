@@ -53,7 +53,7 @@ const FeaturesPage = () => {
             longDescription: "Fully automated payroll processing with TDS, PF, ESI, and PT calculations. Generate salary slips, bank files, and tax reports with one click.",
             color: "bg-emerald-500",
             gradient: "from-emerald-500 to-teal-500",
-            shadow: "shadow-emerald-200",
+            shadow: "",
             bullets: [
                 "Automated TDS/ESI/PF calculations",
                 "Bank file generation (HDFC, ICICI, SBI)",
@@ -71,9 +71,9 @@ const FeaturesPage = () => {
             icon: <Calendar size={24} />,
             description: "Comprehensive leave tracking with multiple leave types, accruals, and approval workflows integrated with payroll.",
             longDescription: "Manage all types of leave (CL, SL, PL, LWP) with automatic accrual based on company policy. Geo-fenced attendance marking.",
-            color: "bg-blue-600",
+            color: "bg-primary",
             gradient: "from-blue-600 to-indigo-600",
-            shadow: "shadow-blue-200",
+            shadow: "",
             bullets: [
                 "Multiple leave types & policies",
                 "Geo-fenced attendance marking",
@@ -90,9 +90,9 @@ const FeaturesPage = () => {
             icon: <Users size={24} />,
             description: "Empower employees with self-service access to payslips, leave applications, and personal information updates.",
             longDescription: "Employees can view payslips, apply for leave, request overtime, and update personal details without HR intervention.",
-            color: "bg-purple-600",
+            color: "bg-primary",
             gradient: "from-purple-600 to-pink-600",
-            shadow: "shadow-purple-200",
+            shadow: "",
             bullets: [
                 "View digital payslips anytime",
                 "Apply for leave & track status",
@@ -111,9 +111,9 @@ const FeaturesPage = () => {
             icon: <Briefcase size={24} />,
             description: "From 'add-project' to final delivery. Manage tasks, clients, and internal teams through a unified pipeline.",
             longDescription: "Complete project lifecycle management with milestones, dependencies, and resource allocation. Multiple view options including Kanban, Gantt, and Calendar.",
-            color: "bg-indigo-600",
+            color: "bg-primary",
             gradient: "from-indigo-600 to-blue-600",
-            shadow: "shadow-indigo-200",
+            shadow: "",
             bullets: [
                 "Kanban, Gantt & Calendar views",
                 "Task dependencies & milestones",
@@ -132,7 +132,7 @@ const FeaturesPage = () => {
             longDescription: "Full agile support with sprints, epics, user stories, and story points. Direct integration with popular version control systems.",
             color: "bg-orange-600",
             gradient: "from-orange-600 to-red-600",
-            shadow: "shadow-orange-200",
+            shadow: "",
             bullets: [
                 "Sprint planning & velocity tracking",
                 "Backlog grooming tools",
@@ -149,9 +149,9 @@ const FeaturesPage = () => {
             icon: <Users size={24} />,
             description: "Optimize team utilization with real-time workload views and capacity planning tools.",
             longDescription: "See who's overworked and who has bandwidth. Allocate resources efficiently across projects and track utilization rates.",
-            color: "bg-cyan-600",
+            color: "bg-primary",
             gradient: "from-cyan-600 to-blue-600",
-            shadow: "shadow-cyan-200",
+            shadow: "",
             bullets: [
                 "Workload balancing",
                 "Capacity planning",
@@ -170,9 +170,9 @@ const FeaturesPage = () => {
             icon: <Clock size={24} />,
             description: "Capture every billable second. Real-time visibility into productivity without micro-managing.",
             longDescription: "Track time against projects and tasks with start/stop timers, manual entry, and timesheet approvals. Billable vs non-billable tracking.",
-            color: "bg-blue-600",
+            color: "bg-primary",
             gradient: "from-blue-600 to-sky-600",
-            shadow: "shadow-blue-200",
+            shadow: "",
             bullets: [
                 "Start/stop timers",
                 "Timesheet approvals",
@@ -192,7 +192,7 @@ const FeaturesPage = () => {
             longDescription: "Mobile app with offline support, desktop timer widget, and browser extension. All data syncs seamlessly across devices.",
             color: "bg-green-600",
             gradient: "from-green-600 to-emerald-600",
-            shadow: "shadow-green-200",
+            shadow: "",
             bullets: [
                 "iOS & Android apps",
                 "Desktop timer widget",
@@ -211,7 +211,7 @@ const FeaturesPage = () => {
             longDescription: "Set project budgets, track actual vs planned hours, and calculate profitability with cost rates and billing rates.",
             color: "bg-yellow-600",
             gradient: "from-yellow-600 to-orange-600",
-            shadow: "shadow-yellow-200",
+            shadow: "",
             bullets: [
                 "Budget vs actual tracking",
                 "Profit margin calculations",
@@ -230,9 +230,9 @@ const FeaturesPage = () => {
             icon: <BarChart2 size={24} />,
             description: "Customizable dashboards with real-time metrics on projects, finances, and team performance.",
             longDescription: "Drag-and-drop dashboard builder with 50+ widgets. Create role-specific views for executives, managers, and team leads.",
-            color: "bg-purple-600",
+            color: "bg-primary",
             gradient: "from-purple-600 to-indigo-600",
-            shadow: "shadow-purple-200",
+            shadow: "",
             bullets: [
                 "50+ customizable widgets",
                 "Real-time data refresh",
@@ -250,9 +250,9 @@ const FeaturesPage = () => {
             icon: <Zap size={24} />,
             description: "Predictive analytics that forecast project delays, budget overruns, and resource bottlenecks.",
             longDescription: "Machine learning models analyze historical data to predict outcomes and suggest corrective actions before issues arise.",
-            color: "bg-pink-600",
+            color: "bg-primary",
             gradient: "from-pink-600 to-rose-600",
-            shadow: "shadow-pink-200",
+            shadow: "",
             bullets: [
                 "Delay prediction",
                 "Budget forecasting",
@@ -269,9 +269,9 @@ const FeaturesPage = () => {
             icon: <FileText size={24} />,
             description: "Build custom reports with any combination of data. Schedule automated email reports.",
             longDescription: "Report builder with drag-and-drop interface. Choose from multiple visualization types and schedule recurring reports.",
-            color: "bg-indigo-600",
+            color: "bg-primary",
             gradient: "from-indigo-600 to-purple-600",
-            shadow: "shadow-indigo-200",
+            shadow: "",
             bullets: [
                 "Drag-and-drop builder",
                 "Multiple chart types",
@@ -292,7 +292,7 @@ const FeaturesPage = () => {
             longDescription: "Create unlimited custom roles with permissions for each module. Inherit or override permissions at project level.",
             color: "bg-red-600",
             gradient: "from-red-600 to-rose-600",
-            shadow: "shadow-red-200",
+            shadow: "",
             bullets: [
                 "Unlimited custom roles",
                 "Module-level permissions",
@@ -311,7 +311,7 @@ const FeaturesPage = () => {
             longDescription: "Bank-grade encryption for all data. Field-level encryption for sensitive information like salaries and personal data.",
             color: "bg-gray-800",
             gradient: "from-gray-800 to-gray-900",
-            shadow: "shadow-gray-200",
+            shadow: "",
             bullets: [
                 "AES-256 encryption at rest",
                 "TLS 1.3 in transit",
@@ -328,9 +328,9 @@ const FeaturesPage = () => {
             icon: <Fingerprint size={24} />,
             description: "Multiple 2FA options including authenticator apps, SMS, and biometric authentication.",
             longDescription: "Protect accounts with 2FA. Support for Google Authenticator, Microsoft Authenticator, SMS codes, and biometrics on mobile.",
-            color: "bg-blue-800",
+            color: "bg-primary",
             gradient: "from-blue-800 to-indigo-800",
-            shadow: "shadow-blue-200",
+            shadow: "",
             bullets: [
                 "Authenticator apps",
                 "SMS verification",
@@ -349,9 +349,9 @@ const FeaturesPage = () => {
             icon: <Globe size={24} />,
             description: "Give clients secure access to project progress, invoices, and reports.",
             longDescription: "Branded client portal where clients can view project status, approve deliverables, and download invoices.",
-            color: "bg-teal-600",
+            color: "bg-primary",
             gradient: "from-teal-600 to-cyan-600",
-            shadow: "shadow-teal-200",
+            shadow: "",
             bullets: [
                 "Branded portal",
                 "File sharing",
@@ -368,9 +368,9 @@ const FeaturesPage = () => {
             icon: <MessageSquare size={24} />,
             description: "Built-in chat, video calls, and announcements. Keep everyone connected.",
             longDescription: "Real-time messaging with threads, file sharing, and emoji reactions. Integrated video calls and team announcements.",
-            color: "bg-violet-600",
+            color: "bg-primary",
             gradient: "from-violet-600 to-purple-600",
-            shadow: "shadow-violet-200",
+            shadow: "",
             bullets: [
                 "Real-time chat",
                 "Video calls (up to 50 participants)",
@@ -389,7 +389,7 @@ const FeaturesPage = () => {
             longDescription: "Full API access for custom integrations. Pre-built connectors for Slack, GitHub, Google Workspace, and 100+ other tools.",
             color: "bg-amber-600",
             gradient: "from-amber-600 to-orange-600",
-            shadow: "shadow-amber-200",
+            shadow: "",
             bullets: [
                 "RESTful API",
                 "Webhook support",
@@ -407,30 +407,30 @@ const FeaturesPage = () => {
         : allFeatures.filter(f => f.category === activeTab);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-sans selection:bg-blue-100 selection:text-blue-900">
+        <div className="min-h-screen bg-gray-50 font-sans selection:bg-primary/10 selection:text-blue-900">
             {/* Sticky Navigation */}
             <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center gap-4">
                             <Link to="/" className="flex items-center gap-2">
-                                <span className="text-2xl font-extrabold tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                                <span className="text-2xl font-semibold tracking-tighter bg-primary bg-clip-text text-transparent">
                                     DIFMO
                                 </span>
                                 {/* <span className="text-2xl font-light text-gray-400">/</span> */}
-                                <span className="text-2xl font-extrabold text-gray-700">CRM</span>
+                                <span className="text-2xl font-semibold text-gray-700">CRM</span>
                             </Link>
                             <div className="hidden md:flex items-center space-x-1 ml-4">
                                 <button 
                                     onClick={() => navigate('/features')} 
-                                    className="px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg border-b-2 border-blue-600"
+                                    className="px-3 py-2 text-sm font-medium text-primary bg-primary/10 rounded-lg border-b-2 border-primary"
                                 >
                                     Features
                                 </button>
-                                <Link to="/pricing" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Pricing</Link>
-                                {/* <Link to="/security" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Security</Link> */}
-                                <Link to="/privacy-policy" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Privacy</Link>
-                                {/* <Link to="/customers" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Customers</Link> */}
+                                <Link to="/pricing" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition">Pricing</Link>
+                                {/* <Link to="/security" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition">Security</Link> */}
+                                <Link to="/privacy-policy" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition">Privacy</Link>
+                                {/* <Link to="/customers" className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition">Customers</Link> */}
                             </div>
                         </div>
 
@@ -462,7 +462,7 @@ const FeaturesPage = () => {
                                     </Link>
                                     <Link 
                                         to="/company-registration" 
-                                        className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all text-sm font-semibold flex items-center gap-2"
+                                        className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-primary/90 shadow-sm hover:shadow-sm transition-all text-sm font-semibold flex items-center gap-2"
                                     >
                                         Start Free Trial <Rocket className="w-4 h-4" />
                                     </Link>
@@ -483,11 +483,11 @@ const FeaturesPage = () => {
                     {mobileMenuOpen && (
                         <div className="md:hidden py-4 border-t border-gray-100">
                             <div className="flex flex-col space-y-2">
-                                <button onClick={() => navigate('/features')} className="px-3 py-2 text-left text-blue-600 bg-blue-50 rounded-lg">Features</button>
-                                <Link to="/pricing" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Pricing</Link>
-                                <Link to="/security" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Security</Link>
-                                <Link to="/privacy-policy" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Privacy</Link>
-                                <Link to="/customers" className="px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Customers</Link>
+                                <button onClick={() => navigate('/features')} className="px-3 py-2 text-left text-primary bg-primary/10 rounded-lg">Features</button>
+                                <Link to="/pricing" className="px-3 py-2 text-gray-700 hover:bg-primary/10 rounded-lg">Pricing</Link>
+                                <Link to="/security" className="px-3 py-2 text-gray-700 hover:bg-primary/10 rounded-lg">Security</Link>
+                                <Link to="/privacy-policy" className="px-3 py-2 text-gray-700 hover:bg-primary/10 rounded-lg">Privacy</Link>
+                                <Link to="/customers" className="px-3 py-2 text-gray-700 hover:bg-primary/10 rounded-lg">Customers</Link>
                             </div>
                         </div>
                     )}
@@ -496,7 +496,7 @@ const FeaturesPage = () => {
 
             {/* Personalized Welcome for Auth Users */}
             {isAuthenticated && (
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4">
+                <div className="bg-primary text-white py-4">
                     <div className="max-w-7xl mx-auto px-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -517,7 +517,7 @@ const FeaturesPage = () => {
             )}
 
             {/* Hero Section */}
-            <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white overflow-hidden">
+            <div className="relative bg-primary text-white overflow-hidden">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
                 <div className="max-w-7xl mx-auto px-4 py-24 relative">
                     <div className="text-center max-w-4xl mx-auto">
@@ -525,20 +525,20 @@ const FeaturesPage = () => {
                             <Zap className="w-4 h-4" />
                             {/* <span>New: AI-powered insights now available</span> */}
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight">
+                        <h1 className="text-5xl md:text-6xl font-semibold mb-6 tracking-tight">
                             Everything Your Team Needs
-                            <span className="block text-2xl md:text-3xl font-light mt-4 text-blue-200">
+                            <span className="block text-2xl md:text-3xl font-light mt-4 text-primary-foreground/70">
                                 In One Powerful Platform
                             </span>
                         </h1>
-                        <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+                        <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
                             18+ integrated modules. 100+ features. Zero compromises.
                             Built for Indian businesses, trusted by 2,000+ companies.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link 
                                 to="/company-registration" 
-                                className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition shadow-2xl flex items-center justify-center gap-2 group"
+                                className="bg-card text-primary px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition shadow-sm flex items-center justify-center gap-2 group"
                             >
                                 Start 14-day Free Trial <Rocket className="w-4 h-4 group-hover:translate-x-1 transition" />
                             </Link>
@@ -551,7 +551,7 @@ const FeaturesPage = () => {
                         </div>
                         
                         {/* Trust badges */}
-                        <div className="flex flex-wrap justify-center gap-8 mt-12 text-sm text-blue-200">
+                        <div className="flex flex-wrap justify-center gap-8 mt-12 text-sm text-primary-foreground/70">
                             <div className="flex items-center gap-2">
                                 <Shield className="w-4 h-4" />
                                 <span>ISO 27001 Certified</span>
@@ -581,7 +581,7 @@ const FeaturesPage = () => {
             </div>
 
             {/* Feature Categories Filter */}
-            <div className="sticky top-16 z-40 bg-white border-b border-gray-200 shadow-sm">
+            <div className="sticky top-16 z-40 bg-card border-b border-gray-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex overflow-x-auto hide-scrollbar gap-2 py-4">
                         {featureCategories.map((category) => (
@@ -589,10 +589,10 @@ const FeaturesPage = () => {
                                 key={category.id}
                                 onClick={() => setActiveTab(category.id)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
-                                    activeTab === category.id
-                                        ? 'bg-blue-600 text-white shadow-lg'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                }`}
+ activeTab === category.id
+ ? 'bg-primary text-white shadow-sm'
+ : 'text-gray-600 hover:bg-gray-100'
+ }`}
                             >
                                 {category.icon}
                                 {category.name}
@@ -606,7 +606,7 @@ const FeaturesPage = () => {
             <div className="max-w-7xl mx-auto px-4 py-16">
                 {/* Section Header */}
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl font-black text-gray-900 mb-4">
+                    <h2 className="text-4xl font-semibold text-gray-900 mb-4">
                         {activeTab === 'all' ? 'All Features' : featureCategories.find(c => c.id === activeTab)?.name}
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
@@ -621,21 +621,21 @@ const FeaturesPage = () => {
                         <div 
                             key={feature.id} 
                             className={`flex flex-col lg:flex-row gap-12 items-center ${
-                                index % 2 === 1 ? 'lg:flex-row-reverse' : ''
-                            }`}
+ index % 2 === 1 ? 'lg:flex-row-reverse' : ''
+ }`}
                         >
                             {/* Content Side */}
                             <div className="flex-1 space-y-6">
                                 {/* Popular Badge */}
                                 {feature.popular && (
-                                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white px-4 py-2 rounded-full text-sm font-bold">
+                                    <div className="inline-flex items-center gap-2 bg-amber-400 text-white px-4 py-2 rounded-full text-sm font-bold">
                                         <Award className="w-4 h-4" />
                                         Most Popular
                                     </div>
                                 )}
 
                                 {/* Icon and Title */}
-                                <div className={`bg-gradient-to-r ${feature.gradient} w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-xl`}>
+                                <div className="bg-muted border border-border w-12 h-12 rounded-lg flex items-center justify-center text-foreground">
                                     {feature.icon}
                                 </div>
                                 
@@ -658,13 +658,13 @@ const FeaturesPage = () => {
                                 </div>
 
                                 {/* Stats Card */}
-                                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-6 mt-6">
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mt-6">
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-sm text-gray-500 mb-1">{feature.stats.label}</p>
                                             <p className="text-3xl font-bold text-gray-900">{feature.stats.value}</p>
                                         </div>
-                                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+                                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                                             {feature.stats.icon}
                                         </div>
                                     </div>
@@ -674,7 +674,7 @@ const FeaturesPage = () => {
                                 <div className="flex flex-wrap gap-4 pt-4">
                                     <Link 
                                         to="/company-registration" 
-                                        className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition flex items-center gap-2"
+                                        className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition flex items-center gap-2"
                                     >
                                         Try it free <ChevronRight className="w-4 h-4" />
                                     </Link>
@@ -686,7 +686,7 @@ const FeaturesPage = () => {
 
                             {/* Image Side */}
                             <div className="flex-1 w-full group">
-                                <div className="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500">
+                                <div className="relative bg-card rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-3xl transition-all duration-500">
                                     {/* Browser Chrome */}
                                     <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 border-b border-gray-200">
                                         <div className="flex gap-1.5">
@@ -695,7 +695,7 @@ const FeaturesPage = () => {
                                             <div className="w-3 h-3 rounded-full bg-green-400"></div>
                                         </div>
                                         <div className="flex-1 flex justify-center">
-                                            <div className="bg-white px-4 py-1 rounded-full text-xs text-gray-500 border border-gray-200">
+                                            <div className="bg-card px-4 py-1 rounded-full text-xs text-gray-500 border border-gray-200">
                                                 {feature.title}
                                             </div>
                                         </div>
@@ -705,7 +705,7 @@ const FeaturesPage = () => {
                                     <img 
                                         src={feature.image} 
                                         alt={feature.title}
-                                        className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
+                                        className="w-full h-64 md:h-80 object-cover transition-transform duration-700"
                                     />
                                     
                                     {/* Overlay with feature name */}
@@ -733,7 +733,7 @@ const FeaturesPage = () => {
             {/* Demo Video Modal */}
             {showDemoVideo && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl max-w-4xl w-full overflow-hidden">
+                    <div className="bg-card rounded-lg max-w-4xl w-full overflow-hidden">
                         <div className="flex justify-between items-center p-4 border-b">
                             <h3 className="font-bold text-lg">Product Demo</h3>
                             <button 
@@ -761,8 +761,8 @@ const FeaturesPage = () => {
             <div className="bg-gray-50 py-24 border-y border-gray-200">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
-                        <span className="text-blue-600 font-bold text-sm uppercase tracking-wider">Simple Process</span>
-                        <h2 className="text-4xl font-black text-gray-900 mt-2">Get Started in 3 Steps</h2>
+                        <span className="text-primary font-bold text-sm uppercase tracking-wider">Simple Process</span>
+                        <h2 className="text-4xl font-semibold text-gray-900 mt-2">Get Started in 3 Steps</h2>
                         <p className="text-gray-500 mt-4 text-lg max-w-2xl mx-auto">
                             From signup to full implementation in less than 5 minutes
                         </p>
@@ -770,29 +770,29 @@ const FeaturesPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                         {/* Progress Line */}
-                        <div className="hidden md:block absolute top-20 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200"></div>
+                        <div className="hidden md:block absolute top-20 left-1/4 right-1/4 h-0.5 bg-blue-200"></div>
 
                         {/* Step 1 */}
                         <div className="relative text-center group">
-                            <div className="w-32 h-32 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-xl mb-8">
+                            <div className="w-32 h-32 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm mb-8">
                                 <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-black text-white">01</span>
+                                    <span className="text-3xl font-semibold text-white">01</span>
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">Create Account</h3>
                             <p className="text-gray-500 text-sm leading-relaxed px-4">
                                 Sign up with your company details. Get your dedicated instance on our secure cloud.
                             </p>
-                            <div className="mt-4 inline-flex items-center gap-1 text-xs text-blue-600 font-medium">
+                            <div className="mt-4 inline-flex items-center gap-1 text-xs text-primary font-medium">
                                 <Clock className="w-3 h-3" /> Takes 2 minutes
                             </div>
                         </div>
 
                         {/* Step 2 */}
                         <div className="relative text-center group">
-                            <div className="w-32 h-32 mx-auto bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-3xl rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-xl mb-8">
+                            <div className="w-32 h-32 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm mb-8">
                                 <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-black text-white">02</span>
+                                    <span className="text-3xl font-semibold text-white">02</span>
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">Import Your Team</h3>
@@ -803,15 +803,15 @@ const FeaturesPage = () => {
                                 <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/32?img=1" alt="Team" />
                                 <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/32?img=2" alt="Team" />
                                 <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/32?img=3" alt="Team" />
-                                <span className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 text-xs flex items-center justify-center border-2 border-white">+12</span>
+                                <span className="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center border-2 border-white">+12</span>
                             </div>
                         </div>
 
                         {/* Step 3 */}
                         <div className="relative text-center group">
-                            <div className="w-32 h-32 mx-auto bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-xl mb-8">
+                            <div className="w-32 h-32 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm mb-8">
                                 <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-black text-white">03</span>
+                                    <span className="text-3xl font-semibold text-white">03</span>
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">Go Live</h3>
@@ -828,9 +828,9 @@ const FeaturesPage = () => {
             </div>
 
             {/* Integration Partners */}
-            <div className="bg-white py-20">
+            <div className="bg-card py-20">
                 <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Seamlessly integrates with</h3>
+                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-8">Seamlessly integrates with</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60 hover:opacity-100 transition">
                         <div className="text-2xl font-bold text-gray-700">Slack</div>
                         <div className="text-2xl font-bold text-gray-700">GitHub</div>
@@ -845,18 +845,18 @@ const FeaturesPage = () => {
             </div>
 
             {/* CTA Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-20">
+            <div className="bg-primary py-20">
                 <div className="max-w-7xl mx-auto px-4 text-center text-white">
-                    <h2 className="text-4xl md:text-5xl font-black mb-6">
+                    <h2 className="text-4xl md:text-5xl font-semibold mb-6">
                         Ready to Transform Your Business?
                     </h2>
-                    <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+                    <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
                         Join 2,000+ Indian companies already using DIFMO CRM to streamline operations and boost productivity.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link 
                             to="/company-registration" 
-                            className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition shadow-2xl flex items-center justify-center gap-2 group text-lg"
+                            className="bg-card text-primary px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition shadow-sm flex items-center justify-center gap-2 group text-lg"
                         >
                             Start 14-day Free Trial <Rocket className="w-5 h-5 group-hover:translate-x-1 transition" />
                         </Link>
@@ -867,7 +867,7 @@ const FeaturesPage = () => {
                             Contact Sales
                         </Link>
                     </div>
-                    <p className="text-sm text-blue-200 mt-6">
+                    <p className="text-sm text-primary-foreground/70 mt-6">
                         No credit card required • Full access • Cancel anytime
                     </p>
                 </div>
@@ -878,7 +878,7 @@ const FeaturesPage = () => {
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
                         <div className="col-span-2">
-                            <span className="text-2xl font-black text-white">DIFMO</span>
+                            <span className="text-2xl font-semibold text-white">DIFMO</span>
                             <span className="text-gray-500 ml-1">CRM</span>
                             <p className="mt-4 text-gray-500 text-sm leading-relaxed max-w-xs">
                                 The complete business management platform for modern Indian companies.
@@ -950,7 +950,7 @@ const FeaturesPage = () => {
 
             {/* Floating Help Button */}
             <div className="fixed bottom-6 right-6 z-50">
-                <button className="bg-blue-600 text-white p-4 rounded-full shadow-xl hover:bg-blue-700 transition group relative">
+                <button className="bg-primary text-white p-4 rounded-full shadow-sm hover:bg-primary/90 transition group relative">
                     <MessageSquare className="w-6 h-6" />
                     <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
                         Questions? Chat with us

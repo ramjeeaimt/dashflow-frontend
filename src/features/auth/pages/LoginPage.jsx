@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { LoginForm, useAuthStore } from 'features/auth';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import { isAdminUser } from '../../../config/roles';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Login = () => {
         targetPath = '/employee-dashboard';
       } else {
         // Fallback case for existing tokens or other roles
-        const isAdmin = user?.roles?.some(r => ['Super Admin', 'Admin', 'ADMIN'].includes(r.name)) || ['admin@difmo.com', 'pritam@difmo.com'].includes(user?.email);
+        const isAdmin = isAdminUser(user);
         const isEmployee = user?.roles?.some(r => r.name === 'Employee');
         const isIntern = user?.roles?.some(r => r.name === 'Interns');
 
@@ -41,58 +42,67 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Left Side - Branding/Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-blue-900 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-purple-900 opacity-90"></div>
-        <img
-          src="/login_background_abstract.png"
-          alt="Background"
-          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
-        />
-        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
-          <h1 className="text-5xl font-bold mb-6">Welcome Back</h1>
-          <p className="text-xl text-blue-100 max-w-md">
-            Manage your company, track productivity, and grow your business with our all-in-one CRM solution.
+    <div className="min-h-screen flex bg-background">
+      {/* Brand panel — dark charcoal, desktop only */}
+      <div className="hidden lg:flex lg:w-[44%] bg-sidebar flex-col justify-between p-12">
+        <Link to="/" className="font-display text-xl font-semibold tracking-tight text-sidebar-foreground">
+          Dashflow
+        </Link>
+
+        <div>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-sidebar-foreground leading-tight max-w-md">
+            Run your company from one quiet place.
+          </h1>
+          <p className="mt-4 text-sm text-sidebar-muted max-w-sm leading-relaxed">
+            People, attendance, payroll, projects and clients — measured,
+            organised and out of your way.
           </p>
         </div>
+
+        <p className="text-xs text-sidebar-muted">
+          © {new Date().getFullYear()} Dashflow
+        </p>
       </div>
 
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Sign in to your account</h2>
-            <p className="mt-2 text-gray-600">
-              Or <Link to="/company-registration" className="font-medium text-blue-600 hover:text-blue-500">register your company</Link>
+      {/* Form panel */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <Link to="/" className="lg:hidden font-display text-lg font-semibold text-foreground tracking-tight">
+              Dashflow
+            </Link>
+            <h2 className="mt-6 lg:mt-0 font-display text-2xl font-semibold text-foreground tracking-tight">
+              Sign in
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              New here?{' '}
+              <Link to="/company-registration" className="text-primary underline underline-offset-4 hover:no-underline">
+                Register your company
+              </Link>
             </p>
           </div>
 
           {location.state?.message && (
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-              <div className="flex">
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
-                    {location.state.message}
-                  </p>
-                </div>
-              </div>
+            <div className="border border-border bg-muted rounded-md p-3 mb-6">
+              <p className="text-sm text-muted-foreground">{location.state.message}</p>
             </div>
           )}
 
-          <LoginForm
-            onSubmit={handleLogin}
-            isLoading={isLoading}
-            error={error}
-            clearError={clearError}
-            onForgotPasswordClick={() => setIsForgotPasswordOpen(true)}
-          />
+          <div className="bg-card border border-border rounded-lg p-6 sm:p-8 card-shadow">
+            <LoginForm
+              onSubmit={handleLogin}
+              isLoading={isLoading}
+              error={error}
+              clearError={clearError}
+              onForgotPasswordClick={() => setIsForgotPasswordOpen(true)}
+            />
+          </div>
         </div>
       </div>
 
-      <ForgotPasswordModal 
-        isOpen={isForgotPasswordOpen} 
-        onClose={() => setIsForgotPasswordOpen(false)} 
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
       />
     </div>
   );

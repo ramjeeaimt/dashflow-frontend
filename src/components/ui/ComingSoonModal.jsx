@@ -14,7 +14,7 @@ const ComingSoonModal = ({ isOpen, onClose }) => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="relative w-full max-w-md bg-card border border-border rounded-xl shadow-lg overflow-hidden"
+                        className="relative w-full max-w-md bg-card border border-border rounded-xl shadow-sm overflow-hidden"
                     >
                         {/* Close Button */}
                         <button
@@ -28,7 +28,7 @@ const ComingSoonModal = ({ isOpen, onClose }) => {
                             {/* Logo/Icon Container */}
                             <div className="relative">
                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
-                                <div className="relative w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
+                                <div className="relative w-20 h-20 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20">
                                     <Icon name="Rocket" size={40} className="text-primary" />
                                 </div>
                             </div>
@@ -53,7 +53,7 @@ const ComingSoonModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Decorative bottom bar */}
-                        <div className="h-1.5 w-full bg-gradient-to-r from-primary/20 via-primary to-primary/20" />
+                        <div className="h-1.5 w-full bg-primary" />
                     </motion.div>
                 </div>
             )}

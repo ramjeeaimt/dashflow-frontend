@@ -109,7 +109,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="relative w-full max-w-lg bg-card border border-border rounded-lg shadow-sm overflow-hidden animate-in fade-in zoom-in duration-200">
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <div>
                         <h2 className="text-xl font-bold">{isEditing ? 'Edit Expense' : 'Add New Expense'}</h2>
@@ -221,7 +221,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
                                     type="button"
                                     onClick={() => setFormData(p => ({ ...p, type: 'debit' }))}
                                     className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${formData.type === 'debit' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
-                                        }`}
+ }`}
                                 >
                                     DEBIT (Out)
                                 </button>
@@ -229,7 +229,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
                                     type="button"
                                     onClick={() => setFormData(p => ({ ...p, type: 'credit' }))}
                                     className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${formData.type === 'credit' ? 'bg-card text-green-500 shadow-sm' : 'text-muted-foreground'
-                                        }`}
+ }`}
                                 >
                                     CREDIT (In)
                                 </button>
@@ -263,7 +263,7 @@ const ExpenseModal = ({ isOpen, onClose, onSuccess, expenseToEdit = null }) => {
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 rounded-xl shadow-lg shadow-primary/20"
+                            className="flex-1 rounded-xl shadow-sm shadow-primary/20"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">

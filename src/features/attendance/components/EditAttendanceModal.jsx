@@ -31,8 +31,8 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4">
-      <div className="bg-white w-full max-w-lg rounded-none shadow-2xl border border-slate-100 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-sidebar/60 backdrop-blur-md p-4">
+      <div className="bg-card w-full max-w-lg rounded-none shadow-sm border border-border flex flex-col animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-50">
@@ -41,11 +41,11 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
                 <Icon name="Edit" size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">Edit Attendance</h2>
-                <p className="text-[11px] font-semibold text-slate-400">Modifying record for {attendance.employeeName}</p>
+                <h2 className="text-lg font-bold text-foreground tracking-tight leading-tight">Edit Attendance</h2>
+                <p className="text-[11px] font-semibold text-muted-foreground/70">Modifying record for {attendance.employeeName}</p>
               </div>
            </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-none transition-all">
+          <button onClick={onClose} className="p-2 text-muted-foreground/70 hover:text-foreground hover:bg-muted/60 rounded-none transition-all">
             <X size={20} />
           </button>
         </div>
@@ -53,32 +53,32 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Check In Time</label>
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide ml-1">Check In Time</label>
               <input
                 type="time"
                 step="60"
                 {...register('checkInTime', { required: status !== 'absent' ? 'Check-in time is required' : false })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-semibold rounded-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all disabled:opacity-50"
+                className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-semibold rounded-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all disabled:opacity-50"
                 disabled={status === 'absent'}
               />
               {errors.checkInTime && <span className="text-xs text-rose-500 font-bold ml-1">{errors.checkInTime.message}</span>}
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Check Out Time</label>
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide ml-1">Check Out Time</label>
               <input
                 type="time"
                 step="60"
                 {...register('checkOutTime')}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-semibold rounded-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all"
+                className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-semibold rounded-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Attendance Status</label>
+            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide ml-1">Attendance Status</label>
             <select
               {...register('status')}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm font-semibold rounded-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all cursor-pointer"
+              className="w-full px-4 py-2.5 bg-muted/60 border border-border text-sm font-semibold rounded-none focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none transition-all cursor-pointer"
             >
               <option value="present">Present</option>
               <option value="absent">Absent</option>
@@ -90,10 +90,10 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
 
           {attendance.notes && (
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Previous Notes History</label>
-              <div className="bg-slate-50 border border-slate-100 p-3 rounded-none max-h-32 overflow-y-auto space-y-2">
+              <label className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wide ml-1">Previous Notes History</label>
+              <div className="bg-muted/60 border border-border p-3 rounded-none max-h-32 overflow-y-auto space-y-2">
                 {attendance.notes.split('|').map((note, i) => (
-                  <div key={i} className={`text-[11px] ${note.includes('[Edited on') ? 'text-blue-600 font-medium' : 'text-slate-500'}`}>
+                  <div key={i} className={`text-[11px] ${note.includes('[Edited on') ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                     {note.trim()}
                   </div>
                 ))}
@@ -102,14 +102,14 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
           )}
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-rose-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <label className="text-[11px] font-bold text-rose-500 uppercase tracking-wide ml-1 flex items-center gap-2">
                Reason for Change *
             </label>
             <textarea
               {...register('notes', { required: 'You must provide a reason for editing this record' })}
               rows="3"
               placeholder="Explain why you are changing these times..."
-              className={`w-full px-4 py-3 bg-slate-50 border ${errors.notes ? 'border-rose-300 focus:ring-rose-100' : 'border-slate-200 focus:ring-blue-100'} text-sm font-medium rounded-none outline-none transition-all resize-none`}
+              className={`w-full px-4 py-3 bg-muted/60 border ${errors.notes ? 'border-rose-300 focus:ring-rose-100' : 'border-border focus:ring-ring/20'} text-sm font-medium rounded-none outline-none transition-all resize-none`}
             ></textarea>
             {errors.notes && <span className="text-[10px] text-rose-500 font-bold ml-1">{errors.notes.message}</span>}
           </div>
@@ -118,13 +118,13 @@ const EditAttendanceModal = ({ isOpen, onClose, onSave, attendance }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 text-sm font-bold text-slate-500 bg-white border border-slate-200 rounded-none hover:bg-slate-50 transition-all active:scale-95"
+              className="px-6 py-2.5 text-sm font-bold text-muted-foreground bg-card border border-border rounded-none hover:bg-muted/60 transition-all "
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-8 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-none hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-100"
+              className="px-8 py-2.5 text-sm font-bold text-white bg-primary rounded-none hover:bg-primary/90 transition-all shadow-sm "
             >
               Update Attendance
             </button>

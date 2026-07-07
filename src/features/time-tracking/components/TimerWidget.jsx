@@ -122,7 +122,7 @@ const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange }) => {
 
   return (
     <>
-      <div className="bg-card border border-border rounded-2xl p-8 card-shadow">
+      <div className="bg-card border border-border rounded-lg p-8 card-shadow">
         <div className="text-center">
           {/* Timer Display */}
           <div className="mb-8">
@@ -204,7 +204,7 @@ const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange }) => {
       {/* Idle Detection Modal */}
       {showIdleModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-2xl p-6 max-w-md mx-4 modal-shadow">
+          <div className="bg-card border border-border rounded-lg p-6 max-w-md mx-4 modal-shadow">
             <div className="text-center">
               <div className="w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Icon name="Clock" size={24} className="text-warning" />

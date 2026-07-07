@@ -52,13 +52,13 @@ const EmployeeActions = ({
   }, [employees]);
 
   return (
-    <div className="bg-white border-b border-slate-200 p-0 mb-0">
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-between border-b border-slate-200">
+    <div className="bg-card border-b border-border p-0 mb-0">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-between border-b border-border">
         {/* Primary Actions */}
-        <div className="flex flex-col sm:flex-row p-6 items-center gap-4 lg:border-r border-slate-200">
+        <div className="flex flex-col sm:flex-row p-6 items-center gap-4 lg:border-r border-border">
           <button
             onClick={onAddEmployee}
-            className="flex items-center justify-center space-x-2 px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl text-sm hover:bg-blue-700 transition-all shadow-sm active:translate-y-0.5"
+            className="flex items-center justify-center space-x-2 px-6 py-2.5 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary/90 transition-all shadow-sm .5"
           >
             <Icon name="Plus" size={16} />
             <span>Add Employee</span>
@@ -72,7 +72,7 @@ const EmployeeActions = ({
                 onChange={handleFileImport}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-              <div className="flex items-center space-x-2 px-4 py-2.5 border border-slate-200 bg-white text-slate-700 font-semibold rounded-xl text-xs hover:bg-slate-50 transition-colors shadow-sm">
+              <div className="flex items-center space-x-2 px-4 py-2.5 border border-border bg-card text-foreground font-semibold rounded-xl text-xs hover:bg-muted/60 transition-colors shadow-sm">
                 <Icon name="Upload" size={14} />
                 <span>Import CSV</span>
               </div>
@@ -80,7 +80,7 @@ const EmployeeActions = ({
 
             <button
               onClick={onExportEmployees}
-              className="flex items-center space-x-2 px-4 py-2.5 border border-slate-200 bg-white text-slate-700 font-semibold rounded-xl text-xs hover:bg-slate-50 transition-colors shadow-sm"
+              className="flex items-center space-x-2 px-4 py-2.5 border border-border bg-card text-foreground font-semibold rounded-xl text-xs hover:bg-muted/60 transition-colors shadow-sm"
             >
               <Icon name="Download" size={14} />
               <span>Export</span>
@@ -89,10 +89,10 @@ const EmployeeActions = ({
         </div>
 
         {/* Bulk Actions */}
-        <div className="flex-1 flex items-center justify-between p-6 bg-slate-50/30">
+        <div className="flex-1 flex items-center justify-between p-6 bg-muted/30">
           <div className="flex items-center gap-6">
             {selectedEmployees?.length > 0 && (
-              <div className="flex items-center space-x-2 text-xs font-semibold text-blue-700 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+              <div className="flex items-center space-x-2 text-xs font-semibold text-primary bg-primary/10 px-4 py-2 rounded-xl border border-border">
                 <Icon name="CheckSquare" size={14} />
                 <span>{selectedEmployees?.length} selected</span>
               </div>
@@ -104,18 +104,18 @@ const EmployeeActions = ({
                   <select
                     value={bulkAction}
                     onChange={(e) => setBulkAction(e.target.value)}
-                    className="appearance-none pl-4 pr-10 py-2 border border-slate-200 bg-white text-slate-700 font-medium rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                    className="appearance-none pl-4 pr-10 py-2 border border-border bg-card text-foreground font-medium rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all"
                   >
                     {bulkActionOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                   </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground/70">
                     <Icon name="ChevronDown" size={14} />
                   </div>
                 </div>
                 <button
                   onClick={handleBulkAction}
                   disabled={!bulkAction}
-                  className="px-5 py-2 bg-slate-900 text-white font-semibold rounded-xl text-xs hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                  className="px-5 py-2 bg-sidebar text-white font-semibold rounded-xl text-xs hover:bg-sidebar disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                 >
                   Apply
                 </button>
@@ -124,26 +124,26 @@ const EmployeeActions = ({
           </div>
 
           {!selectedEmployees?.length && (
-            <span className="text-xs font-medium text-slate-400 italic">Select employees for bulk actions</span>
+            <span className="text-xs font-medium text-muted-foreground/70 italic">Select employees for bulk actions</span>
           )}
         </div>
       </div>
 
       {/* Modern Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-slate-100 bg-white">
+      <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-border bg-card">
         {[
-          { label: 'Total Employees', count: employeeCounts.total, color: 'text-slate-900', bg: 'bg-slate-50' },
+          { label: 'Total Employees', count: employeeCounts.total, color: 'text-foreground', bg: 'bg-muted/60' },
           { label: 'Active', count: employeeCounts.active, color: 'text-emerald-600', bg: 'bg-emerald-50/30' },
           { label: 'Pending', count: employeeCounts.pending, color: 'text-amber-600', bg: 'bg-amber-50/30' },
-          { label: 'Inactive', count: employeeCounts.inactive, color: 'text-slate-500', bg: 'bg-slate-50' },
+          { label: 'Inactive', count: employeeCounts.inactive, color: 'text-muted-foreground', bg: 'bg-muted/60' },
           { label: 'Terminated', count: employeeCounts.terminated, color: 'text-rose-600', bg: 'bg-rose-50/30' },
         ].map((stat, i) => (
-          <div key={i} className="p-5 hover:bg-slate-50/50 transition-colors group">
+          <div key={i} className="p-5 hover:bg-muted/50 transition-colors group">
             <div className="flex items-center justify-between mb-1">
               <p className={`text-2xl font-bold tracking-tight ${stat.color}`}>{stat.count}</p>
               <div className={`w-2 h-2 rounded-full ${stat.color.replace('text-', 'bg-')}`}></div>
             </div>
-            <p className="text-xs font-semibold text-slate-500 tracking-tight">{stat.label}</p>
+            <p className="text-xs font-semibold text-muted-foreground tracking-tight">{stat.label}</p>
           </div>
         ))}
       </div>

@@ -727,14 +727,14 @@ const PayrollPage = () => {
                                                         {row.isGenerated ? (
                                                             <>
                                                                 <span className="border-b border-dashed border-red-300">-₹{row.deductions}</span>
-                                                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col bg-slate-800 text-white text-xs rounded shadow-xl p-3 z-50 min-w-[200px]">
-                                                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px] mb-2 border-b border-slate-600 pb-1">Deduction Breakdown</div>
+                                                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col bg-sidebar text-white text-xs rounded shadow-sm p-3 z-50 min-w-[200px]">
+                                                                    <div className="text-muted-foreground/70 font-bold uppercase tracking-wider text-[10px] mb-2 border-b border-slate-600 pb-1">Deduction Breakdown</div>
                                                                     <div className="flex justify-between mb-1">
-                                                                        <span className="text-slate-300">Leaves & Absences:</span>
+                                                                        <span className="text-muted-foreground/70">Leaves & Absences:</span>
                                                                         <span className="font-semibold text-red-300">₹{row.leaveDeduction || 0}</span>
                                                                     </div>
                                                                     <div className="flex justify-between">
-                                                                        <span className="text-slate-300">Half-Days:</span>
+                                                                        <span className="text-muted-foreground/70">Half-Days:</span>
                                                                         <span className="font-semibold text-red-300">₹{row.halfDeduction || 0}</span>
                                                                     </div>
                                                                     <div className="border-t border-slate-600 mt-2 pt-1 flex justify-between font-bold">
@@ -750,8 +750,8 @@ const PayrollPage = () => {
                                                     </td>
                                                     <td className="px-3 sm:px-6 py-4">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${row.status === 'sent' ? 'bg-green-100 text-green-800' :
-                                                            row.status === 'not-generated' ? 'bg-slate-100 text-slate-500' : 'bg-yellow-100 text-yellow-800'
-                                                            }`}>
+ row.status === 'not-generated' ? 'bg-muted text-muted-foreground' : 'bg-yellow-100 text-yellow-800'
+ }`}>
                                                             {row.status.replace('-', ' ')}
                                                         </span>
                                                     </td>
@@ -800,7 +800,7 @@ const PayrollPage = () => {
                                                                             }
                                                                         }}
                                                                         disabled={creatingManualIds[row.employeeId]}
-                                                                        className="flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold rounded-lg transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                        className="flex items-center gap-1 px-3 py-1 bg-muted text-foreground hover:bg-border text-[10px] font-bold rounded-lg transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                                                                     >
                                                                         {creatingManualIds[row.employeeId] ? (
                                                                             <>
@@ -819,7 +819,7 @@ const PayrollPage = () => {
                                                                             <button
                                                                                 onClick={() => setRegenerateConfirmModal({ isOpen: true, row })}
                                                                                 disabled={regeneratingIds[row.id]}
-                                                                                className="flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-lg hover:bg-slate-200 transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                                className="flex items-center gap-1 px-3 py-1 bg-muted text-foreground text-[10px] font-bold rounded-lg hover:bg-border transition-all uppercase tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                                                                             >
                                                                                 {regeneratingIds[row.id] ? (
                                                                                     <>
@@ -859,7 +859,7 @@ const PayrollPage = () => {
                                                                             setReviewModalMode('view');
                                                                             setIsReviewModalOpen(true);
                                                                         }}
-                                                                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                        className="p-2 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                                                                         title="View"
                                                                     >
                                                                         <Icon name="Eye" size={18} />
@@ -871,7 +871,7 @@ const PayrollPage = () => {
                                                                                 setReviewModalMode('edit');
                                                                                 setIsReviewModalOpen(true);
                                                                             }}
-                                                                            className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                                            className="p-2 text-muted-foreground/70 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
                                                                             title="Edit Customizations"
                                                                         >
                                                                             <Icon name="Pencil" size={18} />
@@ -895,7 +895,7 @@ const PayrollPage = () => {
             {/* NEW: Manual Payroll Modal*/}
             {isManualModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-card rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="bg-card rounded-xl shadow-sm max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b border-border flex justify-between items-center">
                             <h2 className="text-xl font-bold text-foreground">
                                 {isEditing ? 'Edit Payroll Entry' : 'Manual Payroll Entry'}
@@ -932,7 +932,7 @@ const PayrollPage = () => {
                                         name="month"
                                         value={manualFormData.month}
                                         disabled
-                                        className="w-full bg-slate-100 text-slate-500 border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
+                                        className="w-full bg-muted text-muted-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
                                     >
                                         {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                                     </select>
@@ -943,7 +943,7 @@ const PayrollPage = () => {
                                         name="year"
                                         value={manualFormData.year}
                                         disabled
-                                        className="w-full bg-slate-100 text-slate-500 border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
+                                        className="w-full bg-muted text-muted-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
                                     >
                                         {[2023, 2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
@@ -1075,7 +1075,7 @@ const PayrollPage = () => {
             {/* Bulk Confirm Modal */}
             {isBulkConfirmModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-card rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                    <div className="bg-card rounded-lg shadow-sm w-full max-w-md overflow-hidden">
                         <div className="p-6">
                             <h3 className="text-xl font-bold text-foreground mb-2">Confirm Bulk Generation</h3>
                             <p className="text-sm text-muted-foreground mb-6">
@@ -1108,7 +1108,7 @@ const PayrollPage = () => {
             {/* Regenerate Confirm Modal */}
             {regenerateConfirmModal.isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-card rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                    <div className="bg-card rounded-lg shadow-sm w-full max-w-md overflow-hidden">
                         <div className="p-6">
                             <h3 className="text-xl font-bold text-foreground mb-2">Confirm Regeneration</h3>
                             <p className="text-sm text-muted-foreground mb-6">

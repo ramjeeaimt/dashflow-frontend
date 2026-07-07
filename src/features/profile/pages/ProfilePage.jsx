@@ -150,7 +150,7 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-background">
       <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
@@ -162,8 +162,8 @@ const Profile = () => {
       <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16 pb-8`}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900">User Settings</h1>
-            <p className="text-slate-500 mt-1">Manage your identity and workplace configuration.</p>
+            <h1 className="text-2xl font-bold text-foreground">User Settings</h1>
+            <p className="text-muted-foreground mt-1">Manage your identity and workplace configuration.</p>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
@@ -175,11 +175,11 @@ const Profile = () => {
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${activeSection === section.id
-                      ? 'bg-white text-blue-600 shadow-sm border border-slate-200'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                      }`}
+ ? 'bg-card text-primary shadow-sm border border-border'
+ : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+ }`}
                   >
-                    <Icon name={section.icon} size={18} className={activeSection === section.id ? 'text-blue-600' : 'text-slate-400'} />
+                    <Icon name={section.icon} size={18} className={activeSection === section.id ? 'text-primary' : 'text-muted-foreground/70'} />
                     <span>{section.label}</span>
                   </button>
                 ))}
@@ -187,23 +187,23 @@ const Profile = () => {
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="border-b border-slate-100 px-8 py-6 flex justify-between items-center">
+            <div className="flex-1 bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="border-b border-border px-8 py-6 flex justify-between items-center">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <h2 className="text-lg font-semibold text-foreground">
                     {sections.find(s => s.id === activeSection)?.label}
                   </h2>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {sections.find(s => s.id === activeSection)?.description}
                   </p>
                 </div>
                 {activeSection === 'profile' && !isEditingUser && (
-                  <button onClick={() => setIsEditingUser(true)} className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                  <button onClick={() => setIsEditingUser(true)} className="text-sm font-semibold text-primary hover:text-primary">
                     Edit Profile
                   </button>
                 )}
                 {activeSection === 'organization' && !isEditingCompany && user?.roles?.some(r => ['Admin', 'ADMIN', 'Super Admin'].includes(r.name)) && (
-                  <button onClick={() => setIsEditingCompany(true)} className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                  <button onClick={() => setIsEditingCompany(true)} className="text-sm font-semibold text-primary hover:text-primary">
                     Edit Company
                   </button>
                 )}
@@ -213,35 +213,35 @@ const Profile = () => {
                 {activeSection === 'profile' && (
                   <div className="space-y-8">
                     {/* Hero Section */}
-                    <div className="flex items-center gap-6 pb-8 border-b border-slate-100">
+                    <div className="flex items-center gap-6 pb-8 border-b border-border">
                       <ImageUpload
                         initialImage={user?.avatar}
                         initials={initials}
-                        size="w-24 h-24 shadow-md ring-4 ring-white"
+                        size="w-24 h-24 shadow-md "
                         onUploadSuccess={(url) => setFormData((prev) => ({ ...prev, avatar: url }))}
                       />
                       <div>
-                        <h3 className="text-xl font-bold text-slate-900">{formData.firstName} {formData.lastName}</h3>
-                        <p className="text-slate-500">{formData.email}</p>
+                        <h3 className="text-xl font-bold text-foreground">{formData.firstName} {formData.lastName}</h3>
+                        <p className="text-muted-foreground">{formData.email}</p>
                         <div className={`mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                          user?.roles?.some(r => ['Admin', 'ADMIN', 'Super Admin'].includes(r.name))
-                            ? 'bg-blue-50 text-blue-700 border-blue-100'
-                            : 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                        }`}>
+ user?.roles?.some(r => ['Admin', 'ADMIN', 'Super Admin'].includes(r.name))
+ ? 'bg-primary/10 text-primary border-border'
+ : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+ }`}>
                           {user?.roles?.find(r => ['Admin', 'ADMIN', 'Super Admin'].includes(r.name)) ? 'Company Administrator' : 'Employee'}
                         </div>
                       </div>
                     </div>
 
                     {isEditingUser ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-6 rounded-xl border border-slate-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-muted/50 p-6 rounded-xl border border-border">
                         <Input label="First Name" name="firstName" value={formData.firstName || ""} onChange={handleChange} />
                         <Input label="Last Name" name="lastName" value={formData.lastName || ""} onChange={handleChange} />
                         <Input label="Email Address" name="email" value={formData.email || ""} onChange={handleChange} />
                         <Input label="Phone Number" name="phone" value={formData.phone || ""} onChange={handleChange} />
                         <div className="md:col-span-2 flex justify-end gap-3 mt-4">
-                          <button onClick={() => setIsEditingUser(false)} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Cancel</button>
-                          <button onClick={updateUser} className="px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-blue-700">Save Profile</button>
+                          <button onClick={() => setIsEditingUser(false)} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</button>
+                          <button onClick={updateUser} className="px-6 py-2 bg-primary text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-primary/90">Save Profile</button>
                         </div>
                       </div>
                     ) : (
@@ -258,14 +258,14 @@ const Profile = () => {
                 {activeSection === 'organization' && (
                   <div className="space-y-6">
                     {isEditingCompany ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-6 rounded-xl border border-slate-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-muted/50 p-6 rounded-xl border border-border">
                         <Input label="Company Name" name="company.name" value={company.name || ""} onChange={handleChange} />
                         <Input label="Website" name="company.website" value={company.website || ""} onChange={handleChange} />
                         <Input label="Industry" name="company.industry" value={company.industry || ""} onChange={handleChange} />
                         <Input label="Team Size" name="company.size" value={company.size || ""} onChange={handleChange} />
                         <div className="md:col-span-2 flex justify-end gap-3 mt-4">
-                          <button onClick={() => setIsEditingCompany(false)} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Cancel</button>
-                          <button onClick={updateCompany} className="px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-blue-700">Update Organization</button>
+                          <button onClick={() => setIsEditingCompany(false)} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</button>
+                          <button onClick={updateCompany} className="px-6 py-2 bg-primary text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-primary/90">Update Organization</button>
                         </div>
                       </div>
                     ) : (
@@ -282,13 +282,13 @@ const Profile = () => {
                 {activeSection === 'account' && (
                   <div className="max-w-xl">
                     <div className="mb-8">
-                      <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                        <Icon name="Shield" size={20} className="text-blue-600" /> Security & Credentials
+                      <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                        <Icon name="Shield" size={20} className="text-primary" /> Security & Credentials
                       </h3>
-                      <p className="text-slate-500 text-sm mt-1">Update your password to keep your account secure.</p>
+                      <p className="text-muted-foreground text-sm mt-1">Update your password to keep your account secure.</p>
                     </div>
 
-                    <form onSubmit={handlePasswordChange} className="space-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-200">
+                    <form onSubmit={handlePasswordChange} className="space-y-4 bg-muted/50 p-6 rounded-xl border border-border">
                       {passwordStatus.error && (
                         <div className="p-3 text-sm text-red-700 bg-red-50 rounded-lg border border-red-100">
                           {passwordStatus.error}
@@ -323,7 +323,7 @@ const Profile = () => {
                         <button 
                           type="submit" 
                           disabled={passwordStatus.loading}
-                          className="px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-70 flex items-center gap-2"
+                          className="px-6 py-2 bg-primary text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-primary/90 disabled:opacity-70 flex items-center gap-2"
                         >
                           {passwordStatus.loading && <Icon name="Loader2" size={16} className="animate-spin" />}
                           Update Password
@@ -344,23 +344,23 @@ const Profile = () => {
 const DetailRow = ({ label, value, icon }) => (
   <div className="py-4 flex flex-col sm:flex-row sm:items-center">
     <div className="w-full sm:w-1/3 flex items-center gap-3 mb-1 sm:mb-0">
-      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+      <div className="w-8 h-8 rounded-lg bg-muted/60 flex items-center justify-center text-muted-foreground/70">
         <Icon name={icon} size={16} />
       </div>
-      <span className="text-sm font-medium text-slate-500">{label}</span>
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
     </div>
     <div className="w-full sm:w-2/3 pl-11 sm:pl-0">
-      <p className="text-sm font-semibold text-slate-900">{value || 'Not set'}</p>
+      <p className="text-sm font-semibold text-foreground">{value || 'Not set'}</p>
     </div>
   </div>
 );
 
 const Input = ({ label, ...props }) => (
   <div>
-    <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>
+    <label className="block text-sm font-medium text-foreground mb-1.5">{label}</label>
     <input
       {...props}
-      className="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+      className="w-full border border-border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-ring focus:border-primary transition-all outline-none"
     />
   </div>
 );

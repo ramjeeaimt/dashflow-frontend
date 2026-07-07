@@ -17,23 +17,24 @@ import {
 import useAuthStore from '../../../store/useAuthStore';
 import Icon from '../../../components/AppIcon';
 import api from '../../../api/client';
+import { isAdminUser } from '../../../config/roles';
 
 const colorMap = {
-  slate: { bg: 'bg-slate-50', border: 'border-slate-100', text: 'text-slate-900', icon: 'text-slate-400', label: 'text-slate-400' },
+  slate: { bg: 'bg-muted/60', border: 'border-border', text: 'text-foreground', icon: 'text-muted-foreground/70', label: 'text-muted-foreground/70' },
   emerald: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700', icon: 'text-emerald-600', label: 'text-emerald-600/70' },
   rose: { bg: 'bg-rose-50', border: 'border-rose-100', text: 'text-rose-700', icon: 'text-rose-600', label: 'text-rose-600/70' },
   amber: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700', icon: 'text-amber-600', label: 'text-amber-600/70' },
-  sky: { bg: 'bg-sky-50', border: 'border-sky-100', text: 'text-sky-700', icon: 'text-sky-600', label: 'text-sky-600/70' },
+  sky: { bg: 'bg-primary/10', border: 'border-border', text: 'text-primary', icon: 'text-primary', label: 'text-primary/70' },
 };
 
 const StatCard = ({ label, value, icon, color }) => {
   const c = colorMap[color] || colorMap.slate;
   return (
     <div className={`${c.bg} border ${c.border} p-5 hover:shadow-md transition-all group`}>
-      <p className={`text-[11px] font-bold uppercase tracking-widest ${c.label} mb-3 ml-1`}>{label}</p>
+      <p className={`text-[11px] font-bold uppercase tracking-wide ${c.label} mb-3 ml-1`}>{label}</p>
       <div className="flex items-center justify-between">
         <span className={`text-3xl font-bold ${c.text} tracking-tight leading-none`}>{value ?? 0}</span>
-        <div className={`w-10 h-10 bg-white rounded-xl flex items-center justify-center ${c.icon} group-hover:scale-110 transition-all border ${c.border}`}>
+        <div className={`w-10 h-10 bg-card rounded-xl flex items-center justify-center ${c.icon} transition-all border ${c.border}`}>
           <Icon name={icon} size={20} />
         </div>
       </div>
@@ -67,8 +68,7 @@ const AttendanceManagement = () => {
   const [historyEmployee, setHistoryEmployee] = useState(null);
 
 
-  const isAdmin = user?.roles?.some(role => ['super admin', 'admin', 'Super Admin', 'Admin', 'ADMIN', 'manager', 'Manager'].includes(role.name)) || 
-                  ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email?.toLowerCase());
+  const isAdmin = isAdminUser(user);
 
   useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
@@ -232,7 +232,7 @@ const AttendanceManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
@@ -244,19 +244,19 @@ const AttendanceManagement = () => {
         <div className="p-4 sm:p-8 max-w-[1600px] mx-auto space-y-10">
 
           {/* Header Section */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-100">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border">
             <div>
               <BreadcrumbNavigation items={breadcrumbItems} />
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mt-3">Attendance Management</h1>
-              <p className="text-sm font-medium text-slate-500 mt-1">Track daily presence, check-ins, and productivity metrics.</p>
+              <h1 className="text-3xl font-bold text-foreground tracking-tight mt-3">Attendance Management</h1>
+              <p className="text-sm font-medium text-muted-foreground mt-1">Track daily presence, check-ins, and productivity metrics.</p>
             </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
                 className={`flex items-center space-x-2 px-4 py-2 text-xs font-bold rounded-xl transition-all border ${showAnalytics
-                  ? 'bg-blue-50 border-blue-100 text-blue-600 shadow-sm'
-                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
+ ? 'bg-primary/10 border-border text-primary shadow-sm'
+ : 'bg-card border-border text-muted-foreground hover:bg-muted/60'
+ }`}
               >
                 <Icon name="BarChart2" size={16} />
                 <span>{showAnalytics ? 'Hide Analytics' : 'Show Analytics'}</span>

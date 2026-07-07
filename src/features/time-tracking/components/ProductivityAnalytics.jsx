@@ -106,7 +106,7 @@ const ProductivityAnalytics = () => {
       </div>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
               <Icon name="TrendingUp" size={20} className="text-success" />
@@ -118,7 +118,7 @@ const ProductivityAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
               <Icon name="Clock" size={20} className="text-primary" />
@@ -130,7 +130,7 @@ const ProductivityAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
               <Icon name="CheckSquare" size={20} className="text-accent" />
@@ -142,7 +142,7 @@ const ProductivityAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
               <Icon name="Target" size={20} className="text-warning" />
@@ -157,7 +157,7 @@ const ProductivityAnalytics = () => {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weekly Trend Chart */}
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-foreground">Weekly Trend</h3>
             <Button variant="outline" size="sm" iconName="Download">
@@ -197,7 +197,7 @@ const ProductivityAnalytics = () => {
         </div>
 
         {/* Application Usage */}
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-foreground">Application Usage</h3>
             <Button variant="outline" size="sm" iconName="MoreHorizontal" />
@@ -251,7 +251,7 @@ const ProductivityAnalytics = () => {
         </div>
 
         {/* Focus Time Analysis */}
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow lg:col-span-2">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-foreground">Focus Time Analysis</h3>
             <div className="flex items-center space-x-2">
@@ -307,7 +307,7 @@ const ProductivityAnalytics = () => {
         </div>
       </div>
       {/* Insights */}
-      <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+      <div className="bg-card border border-border rounded-lg p-6 card-shadow">
         <h3 className="text-lg font-semibold text-foreground mb-4">Productivity Insights</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-success/5 border border-success/20 rounded-lg p-4">

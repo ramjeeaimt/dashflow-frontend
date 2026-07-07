@@ -93,14 +93,14 @@ const CompanyDetails = () => {
         <div className="max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-10">
                 <div>
-                    <h3 className="text-lg font-semibold text-slate-900">Organization Identity</h3>
-                    <p className="text-sm text-slate-500">Essential information about your company.</p>
+                    <h3 className="text-lg font-semibold text-foreground">Organization Identity</h3>
+                    <p className="text-sm text-muted-foreground">Essential information about your company.</p>
                 </div>
                 {!isEditing && (
                     <Button
                         onClick={() => setIsEditing(true)}
                         variant="outline"
-                        className="border-slate-200 text-slate-700 hover:bg-slate-50"
+                        className="border-border text-foreground hover:bg-muted/60"
                     >
                         <Icon name="Edit" size={16} className="mr-2" />
                         Edit Details
@@ -110,7 +110,7 @@ const CompanyDetails = () => {
 
             {isEditing ? (
                 <form onSubmit={handleSubmit} className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-slate-50/50 p-8 rounded-xl border border-slate-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-muted/50 p-8 rounded-xl border border-border">
                         <Input
                             label="Company Name"
                             value={formData.name}
@@ -141,7 +141,7 @@ const CompanyDetails = () => {
                             value={formData.email}
                             onChange={(e) => handleChange('email', e.target.value)}
                             disabled
-                            className="bg-slate-100"
+                            className="bg-muted"
                         />
                         <Input
                             label="Support Phone"
@@ -167,7 +167,7 @@ const CompanyDetails = () => {
                             value={formData.country}
                             onChange={(e) => handleChange('country', e.target.value)}
                         />
-                        <div className="md:col-span-2 grid grid-cols-2 gap-4 border-t border-slate-200 pt-6">
+                        <div className="md:col-span-2 grid grid-cols-2 gap-4 border-t border-border pt-6">
                             <Input
                                 label="Business Opening Time"
                                 type="time"
@@ -183,19 +183,19 @@ const CompanyDetails = () => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                    <div className="flex items-center justify-end gap-3 pt-6 border-t border-border">
                         <Button
                             variant="ghost"
                             onClick={() => setIsEditing(false)}
                             type="button"
-                            className="text-slate-500 hover:text-slate-700"
+                            className="text-muted-foreground hover:text-foreground"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             loading={saving}
-                            className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-8"
+                            className="bg-primary hover:bg-primary/90 text-white shadow-sm px-8"
                         >
                             <Icon name="Save" size={16} className="mr-2" />
                             Save Changes
@@ -203,7 +203,7 @@ const CompanyDetails = () => {
                     </div>
                 </form>
             ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                     <DetailRow label="Legal Name" value={formData.name} icon="Building" />
                     <DetailRow
                         label="Website"
@@ -234,10 +234,10 @@ const CompanyDetails = () => {
 const DetailRow = ({ label, value, icon, isLink }) => (
     <div className="py-6 flex flex-col sm:flex-row sm:items-center group">
         <div className="w-full sm:w-1/3 flex items-center gap-3 mb-1 sm:mb-0">
-            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-muted/60 flex items-center justify-center text-muted-foreground/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                 <Icon name={icon} size={16} />
             </div>
-            <span className="text-sm font-medium text-slate-500">{label}</span>
+            <span className="text-sm font-medium text-muted-foreground">{label}</span>
         </div>
         <div className="w-full sm:w-2/3 pl-11 sm:pl-0">
             {isLink && value ? (
@@ -245,13 +245,13 @@ const DetailRow = ({ label, value, icon, isLink }) => (
                     href={value.startsWith('http') ? value : `https://${value}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
+                    className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
                 >
                     {value}
                     <Icon name="ExternalLink" size={12} />
                 </a>
             ) : (
-                <p className="text-sm font-semibold text-slate-900">{value || 'Not provided'}</p>
+                <p className="text-sm font-semibold text-foreground">{value || 'Not provided'}</p>
             )}
         </div>
     </div>

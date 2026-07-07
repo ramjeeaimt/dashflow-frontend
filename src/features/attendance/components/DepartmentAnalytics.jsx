@@ -6,7 +6,7 @@ const DepartmentAnalytics = ({ data, selectedDepartment }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload?.length) {
       return (
-        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+        <div className="bg-card border border-border rounded-lg p-3 shadow-sm">
           <p className="text-foreground font-medium mb-2">{label}</p>
           {payload?.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry?.color }}>
@@ -45,9 +45,9 @@ const DepartmentAnalytics = ({ data, selectedDepartment }) => {
           <div 
             key={index}
             className={`p-4 rounded-lg border transition-all duration-200 ${
-              selectedDepartment === dept?.name?.toLowerCase() 
-                ? 'border-primary bg-primary/5' :'border-border bg-muted/20 hover:bg-muted/40'
-            }`}
+ selectedDepartment === dept?.name?.toLowerCase() 
+ ? 'border-primary bg-primary/5' :'border-border bg-muted/20 hover:bg-muted/40'
+ }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">

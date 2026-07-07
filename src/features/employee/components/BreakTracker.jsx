@@ -38,7 +38,7 @@ const BreakTracker = ({ attendanceStatus, onBreakToggle }) => {
       id: 'meeting', 
       label: 'Meeting Break', 
       icon: 'Users', 
-      color: 'text-blue-500',
+      color: 'text-primary',
       defaultDuration: 30,
       maxDuration: 60
     },

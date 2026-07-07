@@ -43,9 +43,9 @@ const SAMPLE_MSGS = [
 ];
 
 const LABEL_COLORS = {
-  'Recruitment': 'bg-blue-100 text-blue-700',
+  'Recruitment': 'bg-primary/10 text-primary',
   'Query': 'bg-amber-100 text-amber-700',
-  'Business': 'bg-purple-100 text-purple-700',
+  'Business': 'bg-primary/10 text-primary',
   'Urgent': 'bg-red-100 text-red-700',
 };
 
@@ -100,10 +100,10 @@ export default function MessagesTab() {
   };
 
   return (
-    <div className="w-full flex h-[calc(100vh-200px)] border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+    <div className="w-full flex h-[calc(100vh-200px)] border border-gray-200 rounded-xl overflow-hidden bg-card shadow-sm">
       {/* Inbox List Sidebar */}
       <div className="w-full md:w-80 lg:w-96 border-r border-gray-200 bg-gray-50 flex flex-col">
-        <div className="p-4 border-b border-gray-200 bg-white">
+        <div className="p-4 border-b border-gray-200 bg-card">
           <h1 className="text-lg font-semibold text-gray-800 mb-3">Messages</h1>
           <div className="relative">
             <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -112,7 +112,7 @@ export default function MessagesTab() {
               placeholder="Search messages..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-card border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring transition-all"
             />
           </div>
         </div>
@@ -125,10 +125,10 @@ export default function MessagesTab() {
               <button 
                 key={msgId} 
                 onClick={() => { setOpenId(msgId); markAsRead(msgId); }}
-                className={`w-full text-left p-4 border-b border-gray-100 hover:bg-gray-100 transition-all flex items-start gap-3 relative ${openId === msgId ? 'bg-blue-50 hover:bg-blue-50 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'}`}
+                className={`w-full text-left p-4 border-b border-gray-100 hover:bg-gray-100 transition-all flex items-start gap-3 relative ${openId === msgId ? 'bg-primary/10 hover:bg-primary/10 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'}`}
               >
-                {!m.read && <div className="absolute right-4 top-4 w-2 h-2 bg-blue-500 rounded-full" />}
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">
+                {!m.read && <div className="absolute right-4 top-4 w-2 h-2 bg-primary rounded-full" />}
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs flex-shrink-0">
                   {m.avatar || m.from?.[0]?.toUpperCase() || 'M'}
                 </div>
                 <div className="flex-1 min-w-0 pr-4">
@@ -156,13 +156,13 @@ export default function MessagesTab() {
       </div>
 
       {/* Message Detail View */}
-      <div className="flex-1 bg-white flex flex-col overflow-hidden relative">
+      <div className="flex-1 bg-card flex flex-col overflow-hidden relative">
         {currentMsg ? (
           <>
             {/* Detail Header */}
-            <div className="p-5 border-b border-gray-100 bg-white flex items-center justify-between">
+            <div className="p-5 border-b border-gray-100 bg-card flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg shadow-sm">
                   {currentMsg.avatar || currentMsg.from?.[0]?.toUpperCase() || 'M'}
                 </div>
                 <div>
@@ -175,7 +175,7 @@ export default function MessagesTab() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all border border-transparent hover:border-blue-100">
+                <button className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all border border-transparent hover:border-border">
                   <Icon name="Reply" size={18} />
                 </button>
                 <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all border border-transparent hover:border-red-100">
@@ -197,7 +197,7 @@ export default function MessagesTab() {
                   <h1 className="text-xl font-bold text-gray-900 leading-tight">{currentMsg.subject}</h1>
                 </div>
                 
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm whitespace-pre-wrap leading-relaxed text-gray-700 text-sm">
+                <div className="bg-card border border-gray-200 rounded-xl p-6 shadow-sm whitespace-pre-wrap leading-relaxed text-gray-700 text-sm">
                   {currentMsg.body}
                 </div>
 
@@ -206,9 +206,9 @@ export default function MessagesTab() {
                   <div className="relative group">
                     <textarea 
                       placeholder="Type your reply here..."
-                      className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all min-h-[120px] resize-none shadow-sm pb-14"
+                      className="w-full p-4 bg-card border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-ring transition-all min-h-[120px] resize-none shadow-sm pb-14"
                     />
-                    <button className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all shadow-sm font-medium flex items-center gap-2">
+                    <button className="absolute bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-all shadow-sm font-medium flex items-center gap-2">
                       <Icon name="Send" size={14} /> Send
                     </button>
                   </div>

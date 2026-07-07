@@ -42,7 +42,7 @@ const ImageUpload = ({ initialImage, onUploadSuccess, initials = "??", size = "w
       )}
 
       {!loading && (
-        <label className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full cursor-pointer shadow-lg hover:bg-blue-700 transition-colors border-2 border-white">
+        <label className="absolute bottom-0 right-0 p-2 bg-primary rounded-full cursor-pointer shadow-sm hover:bg-primary/90 transition-colors border-2 border-white">
           <Camera className="w-4 h-4 text-white" />
           <input
             type="file"

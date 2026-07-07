@@ -9,6 +9,7 @@ import notificationService from '../../../services/notification.service';
 import employeeService from '../../../services/employee.service';
 import clientService from '../../../services/client.service';
 import { Checkbox } from '../../../components/ui/Checkbox';
+import { isAdminUser } from '../../../config/roles';
 
 const getPreviewHtml = (title, message) => {
   const year = new Date().getFullYear();
@@ -177,7 +178,7 @@ const NotificationsPage = () => {
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [templateForm, setTemplateForm] = useState({ name: '', title: '', message: '' });
 
-  const isAdmin = user?.roles?.some((role) => ['Admin', 'Super Admin', 'Manager'].includes(role.name)) || user?.email === 'admin@difmo.com';
+  const isAdmin = isAdminUser(user);
   const companyId = user?.company?.id;
 
   const recipientDataset = composeForm.audience === 'clients' ? clients : employees;
@@ -410,7 +411,7 @@ const NotificationsPage = () => {
       : 'Employees and internal users';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted/60">
       <Header onToggleSidebar={toggleMobileSidebar} />
       <Sidebar
         isCollapsed={sidebarCollapsed}
@@ -423,13 +424,13 @@ const NotificationsPage = () => {
         <div className="mx-auto max-w-7xl p-4 sm:p-6">
           <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/70">
                 Communication Center
               </p>
-              <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+              <h1 className="mt-1 text-2xl font-semibold text-foreground">
                 {isAdmin ? 'Notifications & Campaigns' : 'My Notifications'}
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {isAdmin
                   ? 'Send email campaigns to employees, clients, or everyone and track delivery history.'
                   : 'Stay on top of alerts, payroll updates, and workflow activity.'}
@@ -439,14 +440,14 @@ const NotificationsPage = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleMarkAllAsRead}
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60"
               >
                 <CheckCheck size={16} />
                 Mark all read
               </button>
               <button
                 onClick={handleClearAll}
-                className="inline-flex items-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-rose-200 bg-card px-4 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50"
               >
                 <Trash2 size={16} />
                 Clear inbox
@@ -465,39 +466,39 @@ const NotificationsPage = () => {
               </div>
 
               <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
-                <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
                   <div className="mb-5 flex items-center justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Compose Campaign</h2>
-                      <p className="mt-1 text-sm text-slate-500">Use a standard broadcast flow to target the right audience.</p>
+                      <h2 className="text-lg font-semibold text-foreground">Compose Campaign</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">Use a standard broadcast flow to target the right audience.</p>
                     </div>
                     <button
                       onClick={() => setShowTemplates(!showTemplates)}
-                      className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
                     >
                       <Briefcase size={14} /> {showTemplates ? 'CLOSE TEMPLATES' : 'MY TEMPLATES'}
                     </button>
                   </div>
 
                   {showTemplates && (
-                    <div className="mb-6 space-y-2 max-h-60 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
+                    <div className="mb-6 space-y-2 max-h-60 overflow-y-auto p-2 bg-muted/60 rounded-xl border border-border">
                       <div className="flex items-center justify-between px-1 mb-2">
-                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Saved Templates</h3>
-                        <button onClick={() => navigate('/notifications/templates/design')} className="text-[10px] font-bold text-blue-600 hover:underline">+ CREATE NEW</button>
+                        <h3 className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Saved Templates</h3>
+                        <button onClick={() => navigate('/notifications/templates/design')} className="text-[10px] font-bold text-primary hover:underline">+ CREATE NEW</button>
                       </div>
                       {templates.length === 0 ? (
-                        <p className="text-xs text-slate-400 italic p-2 text-center">No templates saved yet.</p>
+                        <p className="text-xs text-muted-foreground/70 italic p-2 text-center">No templates saved yet.</p>
                       ) : templates.map(tpl => (
-                        <div key={tpl.id} className="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-100 shadow-sm hover:border-blue-300 group">
+                        <div key={tpl.id} className="flex items-center justify-between p-2 bg-card rounded-lg border border-border shadow-sm hover:border-blue-300 group">
                           <div className="cursor-pointer flex-1" onClick={() => handleLoadTemplate(tpl)}>
-                            <p className="text-xs font-bold text-slate-800">{tpl.name || tpl.title}</p>
-                            <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{tpl.title}</p>
+                            <p className="text-xs font-bold text-foreground">{tpl.name || tpl.title}</p>
+                            <p className="text-[10px] text-muted-foreground truncate max-w-[200px]">{tpl.title}</p>
                           </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)} className="p-1.5 text-slate-400 hover:text-blue-600">
+                            <button onClick={() => navigate(`/notifications/templates/design/${tpl.id}`)} className="p-1.5 text-muted-foreground/70 hover:text-primary">
                               <Pencil size={14} />
                             </button>
-                            <button onClick={() => handleDeleteTemplate(tpl.id)} className="p-1.5 text-slate-400 hover:text-rose-500">
+                            <button onClick={() => handleDeleteTemplate(tpl.id)} className="p-1.5 text-muted-foreground/70 hover:text-rose-500">
                               <Trash2 size={14} />
                             </button>
                           </div>
@@ -512,7 +513,7 @@ const NotificationsPage = () => {
                         value={composeForm.title}
                         onChange={(event) => handleComposeChange('title', event.target.value)}
                         placeholder="Monthly update, policy reminder..."
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500"
+                        className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
                       />
                     </Field>
 
@@ -522,13 +523,13 @@ const NotificationsPage = () => {
                         onChange={(event) => handleComposeChange('message', event.target.value)}
                         rows={6}
                         placeholder="Write the message content."
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500"
+                        className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
                       />
                     </Field>
 
                     {/* Toggle Option for Custom Designed Template */}
                     {(composeForm.channel === 'email' || composeForm.channel === 'both') && (
-                      <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl transition-all shadow-sm">
+                      <div className="flex items-start gap-3 p-3.5 bg-muted/60 border border-border/80 rounded-xl transition-all shadow-sm">
                         <Checkbox
                           id="useCustomLayout"
                           checked={useCustomLayout}
@@ -544,7 +545,7 @@ const NotificationsPage = () => {
                         <select
                           value={composeForm.audience}
                           onChange={(event) => handleComposeChange('audience', event.target.value)}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500"
+                          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
                         >
                           <option value="employees">Employees</option>
                           <option value="clients">Clients</option>
@@ -556,7 +557,7 @@ const NotificationsPage = () => {
                         <select
                           value={composeForm.channel}
                           onChange={(event) => handleComposeChange('channel', event.target.value)}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500"
+                          className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
                         >
                           <option value="email">Email only</option>
                           <option value="both">Email + in-app</option>
@@ -567,7 +568,7 @@ const NotificationsPage = () => {
 
                     {composeForm.audience !== 'all' && (
                       <Field label="Targeting">
-                        <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+                        <div className="flex rounded-lg border border-border bg-muted/60 p-1">
                           {[
                             { key: 'all', label: `All ${composeForm.audience}` },
                             { key: 'selected', label: 'Selected only' }
@@ -577,28 +578,28 @@ const NotificationsPage = () => {
                               type="button"
                               onClick={() => handleComposeChange('selectionMode', option.key)}
                               className={`flex-1 rounded-md px-3 py-2 text-sm transition-colors ${composeForm.selectionMode === option.key
-                                ? 'bg-white font-semibold text-slate-900 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-900'
-                                }`}
+ ? 'bg-card font-semibold text-foreground shadow-sm'
+ : 'text-muted-foreground hover:text-foreground'
+ }`}
                             >
                               {option.label}
                             </button>
                           ))}
                         </div>
-                        <p className="mt-2 text-xs text-slate-500">{audienceSummary}</p>
+                        <p className="mt-2 text-xs text-muted-foreground">{audienceSummary}</p>
                       </Field>
                     )}
 
                     {composeForm.audience !== 'all' && composeForm.selectionMode === 'selected' && (
-                      <div className="rounded-xl border border-slate-200">
-                        <div className="border-b border-slate-200 p-3">
+                      <div className="rounded-xl border border-border">
+                        <div className="border-b border-border p-3">
                           <div className="relative">
-                            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+                            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" size={15} />
                             <input
                               value={recipientSearch}
                               onChange={(event) => setRecipientSearch(event.target.value)}
                               placeholder={`Search ${composeForm.audience}`}
-                              className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500"
+                              className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm text-foreground outline-none transition-colors focus:border-primary"
                             />
                           </div>
                         </div>
@@ -611,7 +612,7 @@ const NotificationsPage = () => {
                             const email = composeForm.audience === 'clients' ? recipient.email : recipient.user?.email;
 
                             return (
-                              <div key={recipientId} className="rounded-lg border border-transparent px-2 py-2 hover:border-slate-200 hover:bg-slate-50">
+                              <div key={recipientId} className="rounded-lg border border-transparent px-2 py-2 hover:border-border hover:bg-muted/60">
                                 <Checkbox
                                   checked={selectedRecipientIds.includes(recipientId)}
                                   onChange={() => handleRecipientToggle(recipientId)}
@@ -624,7 +625,7 @@ const NotificationsPage = () => {
                           })}
 
                           {filteredRecipients.length === 0 && (
-                            <div className="rounded-lg border border-dashed border-slate-200 px-3 py-6 text-center text-sm text-slate-400">
+                            <div className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground/70">
                               No matching recipients found.
                             </div>
                           )}
@@ -634,9 +635,9 @@ const NotificationsPage = () => {
 
                     {feedback && (
                       <div className={`rounded-lg border px-3 py-2 text-sm ${feedback.type === 'success'
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                        : 'border-rose-200 bg-rose-50 text-rose-700'
-                        }`}>
+ ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+ : 'border-rose-200 bg-rose-50 text-rose-700'
+ }`}>
                         {feedback.message}
                       </div>
                     )}
@@ -646,7 +647,7 @@ const NotificationsPage = () => {
                         type="button"
                         onClick={handleSendNotification}
                         disabled={isSending}
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <Send size={16} />
                         {isSending ? 'Sending campaign...' : 'Send notification'}
@@ -654,7 +655,7 @@ const NotificationsPage = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/notifications/templates/design')}
-                        className="px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors"
+                        className="px-4 py-3 bg-card border border-border text-muted-foreground rounded-lg text-sm font-semibold hover:bg-muted/60 transition-colors"
                         title="Design new template"
                       >
                         <Briefcase size={16} />
@@ -663,49 +664,49 @@ const NotificationsPage = () => {
                   </div>
                 </section>
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
                   <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Campaign History</h2>
-                      <p className="mt-1 text-sm text-slate-500">Recent outbound communication history.</p>
+                      <h2 className="text-lg font-semibold text-foreground">Campaign History</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">Recent outbound communication history.</p>
                     </div>
                     <div className="relative w-full md:w-72">
-                      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+                      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" size={15} />
                       <input
                         value={historySearch}
                         onChange={(event) => setHistorySearch(event.target.value)}
                         placeholder="Search history"
-                        className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition-colors focus:border-blue-500"
+                        className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm text-foreground outline-none transition-colors focus:border-primary"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     {isLoadingData && (
-                      <div className="rounded-xl border border-dashed border-slate-200 px-4 py-10 text-center text-sm text-slate-400">
+                      <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground/70">
                         Loading history...
                       </div>
                     )}
 
                     {!isLoadingData && filteredHistory.length === 0 && (
-                      <div className="rounded-xl border border-dashed border-slate-200 px-4 py-10 text-center text-sm text-slate-400">
+                      <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground/70">
                         No campaigns found.
                       </div>
                     )}
 
                     {!isLoadingData && filteredHistory.map((item) => (
-                      <div key={item.id} className="rounded-xl border border-slate-200 p-4">
+                      <div key={item.id} className="rounded-xl border border-border p-4">
                         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
+                              <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
                               <Badge>{item.type}</Badge>
                               <Badge variant={item.status === 'failed' ? 'danger' : 'neutral'}>{item.status}</Badge>
                             </div>
-                            <p className="mt-2 text-sm text-slate-600">{item.message}</p>
+                            <p className="mt-2 text-sm text-muted-foreground">{item.message}</p>
                           </div>
                           <div className="text-left md:text-right">
-                            <p className="text-xs font-medium text-slate-500">{formatHistoryTime(item.createdAt)}</p>
+                            <p className="text-xs font-medium text-muted-foreground">{formatHistoryTime(item.createdAt)}</p>
                           </div>
                         </div>
                       </div>
@@ -717,34 +718,34 @@ const NotificationsPage = () => {
           )}
 
           {!isAdmin && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Inbox</h2>
-                  <p className="mt-1 text-sm text-slate-500">Recent workspace notifications.</p>
+                  <h2 className="text-lg font-semibold text-foreground">Inbox</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Recent workspace notifications.</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 {inboxItems.length === 0 && (
-                  <div className="rounded-xl border border-dashed border-slate-200 px-4 py-10 text-center text-sm text-slate-400">
+                  <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground/70">
                     No notifications.
                   </div>
                 )}
 
                 {inboxItems.map((item) => (
-                  <div key={item.id} className="rounded-xl border border-slate-200 p-4">
+                  <div key={item.id} className="rounded-xl border border-border p-4">
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 rounded-lg bg-blue-50 p-2 text-blue-600">
+                      <div className="mt-0.5 rounded-lg bg-primary/10 p-2 text-primary">
                         <Bell size={16} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
+                          <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
                           {!item.read && <Badge variant="info">Unread</Badge>}
                         </div>
-                        <p className="mt-1 text-sm text-slate-600">{item.message}</p>
-                        <p className="mt-2 text-xs text-slate-400">
+                        <p className="mt-1 text-sm text-muted-foreground">{item.message}</p>
+                        <p className="mt-2 text-xs text-muted-foreground/70">
                           {formatHistoryTime(item.timestamp || item.createdAt)}
                         </p>
                       </div>
@@ -762,7 +763,7 @@ const NotificationsPage = () => {
 
 const Field = ({ label, children }) => (
   <div>
-    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground/70">
       {label}
     </label>
     {children}
@@ -770,19 +771,19 @@ const Field = ({ label, children }) => (
 );
 
 const StatCard = ({ icon, label, value }) => (
-  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div className="flex items-center justify-between text-slate-500">
+  <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+    <div className="flex items-center justify-between text-muted-foreground">
       <span className="text-xs font-semibold uppercase tracking-[0.08em]">{label}</span>
       {icon}
     </div>
-    <p className="mt-3 text-2xl font-semibold text-slate-900">{value}</p>
+    <p className="mt-3 text-2xl font-semibold text-foreground">{value}</p>
   </div>
 );
 
 const Badge = ({ children, variant = 'info' }) => {
   const styles = {
-    info: 'bg-blue-50 text-blue-700',
-    neutral: 'bg-slate-100 text-slate-600',
+    info: 'bg-primary/10 text-primary',
+    neutral: 'bg-muted text-muted-foreground',
     danger: 'bg-rose-50 text-rose-700',
   };
 

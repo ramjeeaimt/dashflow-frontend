@@ -20,7 +20,7 @@ const renderActiveShape = (props) => {
             <text x={cx} y={cy} dy={-15} textAnchor="middle" fill="#64748b" className="text-[11px] font-bold">
                 {payload.name}
             </text>
-            <text x={cx} y={cy} dy={15} textAnchor="middle" fill="#1e293b" className="text-2xl font-black">
+            <text x={cx} y={cy} dy={15} textAnchor="middle" fill="#1e293b" className="text-2xl font-semibold">
                 {`${(percent * 100).toFixed(0)}%`}
             </text>
             <Sector
@@ -41,11 +41,11 @@ const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
         return (
-            <div className="bg-white border border-slate-100 p-3 rounded-xl shadow-xl">
-                <p className="text-xs font-bold text-slate-400 mb-1">{data.name}</p>
+            <div className="bg-card border border-border p-3 rounded-xl shadow-sm">
+                <p className="text-xs font-bold text-muted-foreground/70 mb-1">{data.name}</p>
                 <div className="flex items-baseline gap-2">
-                    <span className="text-xl font-bold text-slate-800">{data.value}</span>
-                    <span className="text-xs text-slate-500 font-medium">Projects</span>
+                    <span className="text-xl font-bold text-foreground">{data.value}</span>
+                    <span className="text-xs text-muted-foreground font-medium">Projects</span>
                 </div>
             </div>
         );
@@ -75,20 +75,20 @@ const Piegraph = () => {
     };
 
     if (loading && statusData.length === 0) {
-        return <div className="w-full h-[450px] bg-white animate-pulse flex items-center justify-center font-bold text-sm text-slate-400">Loading distribution...</div>;
+        return <div className="w-full h-[450px] bg-card animate-pulse flex items-center justify-center font-bold text-sm text-muted-foreground/70">Loading distribution...</div>;
     }
 
     return (
-        <div className="w-full bg-white transition-all group">
+        <div className="w-full bg-card transition-all group">
             {/* Header */}
             <div className="px-4 pt-4 pb-6 flex justify-between items-end">
                 <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-slate-900">Status Distribution</h3>
-                    <p className="text-xs text-slate-500 font-medium italic">Project layout by phase and activity</p>
+                    <h3 className="text-lg font-bold text-foreground">Status Distribution</h3>
+                    <p className="text-xs text-muted-foreground font-medium italic">Project layout by phase and activity</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Total Records</p>
-                    <p className="text-2xl font-bold text-slate-900">{total}</p>
+                    <p className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-wider mb-0.5">Total Records</p>
+                    <p className="text-2xl font-bold text-foreground">{total}</p>
                 </div>
             </div>
 
@@ -128,16 +128,16 @@ const Piegraph = () => {
                                 key={item.name}
                                 onClick={() => toggleLegend(item.name)}
                                 className={`flex items-center justify-between p-4 rounded-xl transition-all duration-200 ${
-                                    isHidden ? "bg-slate-50 opacity-40" : "bg-slate-50 hover:bg-slate-100"
-                                }`}
+ isHidden ? "bg-muted/60 opacity-40" : "bg-muted/60 hover:bg-muted"
+ }`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: isHidden ? "#cbd5e1" : item.color }} />
-                                    <span className={`text-xs font-bold ${isHidden ? "text-slate-400" : "text-slate-700"}`}>
+                                    <span className={`text-xs font-bold ${isHidden ? "text-muted-foreground/70" : "text-foreground"}`}>
                                         {item.name}
                                     </span>
                                 </div>
-                                <span className={`text-xs font-black ${isHidden ? "text-slate-400" : "text-slate-900"}`}>
+                                <span className={`text-xs font-semibold ${isHidden ? "text-muted-foreground/70" : "text-foreground"}`}>
                                     {item.value} 
                                 </span>
                             </button>
@@ -151,7 +151,7 @@ const Piegraph = () => {
                 {statusData.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-                        <span className="text-[11px] font-bold text-slate-500">{item.name}</span>
+                        <span className="text-[11px] font-bold text-muted-foreground">{item.name}</span>
                     </div>
                 ))}
             </div>
@@ -159,4 +159,4 @@ const Piegraph = () => {
     );
 };
 
-export default Piegraph;
+export default Piegraph;

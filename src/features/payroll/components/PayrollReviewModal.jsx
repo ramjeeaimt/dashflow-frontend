@@ -225,8 +225,8 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
 
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-            <div className="bg-card rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-                <div className="p-6 border-b border-border flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-t-xl">
+            <div className="bg-card rounded-xl shadow-sm w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div className="p-6 border-b border-border flex justify-between items-center bg-muted/60 dark:bg-sidebar rounded-t-xl">
                     <div>
                         <h2 className="text-xl font-bold text-foreground">
                             {mode === 'send' ? 'Review & Finalize Payslip' : mode === 'edit' ? 'Edit Custom Payslip' : 'View Payslip'}
@@ -240,7 +240,7 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                     </button>
                 </div>
 
-                <div className="flex border-b border-border bg-white px-6">
+                <div className="flex border-b border-border bg-card px-6">
                     <button
                         className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'payslip' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                         onClick={() => setActiveTab('payslip')}
@@ -256,7 +256,7 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 bg-gray-100">
-                    <div className={`bg-white shadow-sm p-4 rounded-lg mx-auto overflow-hidden ${activeTab === 'payslip' ? 'block' : 'hidden'} ${mode === 'view' ? 'pointer-events-none' : ''}`} style={{ minHeight: '600px' }}>
+                    <div className={`bg-card shadow-sm p-4 rounded-lg mx-auto overflow-hidden ${activeTab === 'payslip' ? 'block' : 'hidden'} ${mode === 'view' ? 'pointer-events-none' : ''}`} style={{ minHeight: '600px' }}>
                         {/* We render the HTML and let users click into any inputs or contenteditable fields it contains */}
                         <div
                             ref={payslipRef}
@@ -264,7 +264,7 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                             className="payslip-preview-container"
                         />
                     </div>
-                    <div className={`bg-white shadow-sm p-4 rounded-lg mx-auto overflow-hidden ${activeTab === 'email' ? 'block' : 'hidden'} ${mode === 'view' ? 'pointer-events-none' : ''}`} style={{ minHeight: '600px', maxWidth: '800px' }}>
+                    <div className={`bg-card shadow-sm p-4 rounded-lg mx-auto overflow-hidden ${activeTab === 'email' ? 'block' : 'hidden'} ${mode === 'view' ? 'pointer-events-none' : ''}`} style={{ minHeight: '600px', maxWidth: '800px' }}>
                         <div
                             ref={emailBodyRef}
                             dangerouslySetInnerHTML={{ __html: evaluatedEmailBodyHtml }}
@@ -273,7 +273,7 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                     </div>
                 </div>
 
-                <div className="p-6 border-t border-border flex justify-between items-center bg-slate-50 dark:bg-slate-900 rounded-b-xl">
+                <div className="p-6 border-t border-border flex justify-between items-center bg-muted/60 dark:bg-sidebar rounded-b-xl">
                     <div className="text-sm text-muted-foreground">
                         Status: <span className={`font-semibold uppercase ${payroll.status === 'sent' ? 'text-green-600' : 'text-yellow-600'}`}>{payroll.status}</span>
                     </div>
@@ -281,7 +281,7 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                         <Button variant="outline" onClick={onClose}>{mode === 'view' ? 'Close' : 'Cancel'}</Button>
 
                         {mode === 'edit' && (
-                            <Button onClick={handleSaveCustom} disabled={isSaving} className="bg-blue-600 text-white hover:bg-blue-700">
+                            <Button onClick={handleSaveCustom} disabled={isSaving} className="bg-primary text-white hover:bg-primary/90">
                                 {isSaving ? (
                                     <><Icon name="Loader2" className="animate-spin mr-2" size={16} /> Saving...</>
                                 ) : (

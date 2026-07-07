@@ -3,7 +3,7 @@ import axios from 'axios';
 const apiClient = axios.create({
 
     baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5002/api',
-    // baseURL: 'https://dashflow-backend.vercel.app/api',
+    timeout: 30000, // fail fast instead of hanging the UI on a dead backend
     headers: {
         'Content-Type': 'application/json',
     },

@@ -63,10 +63,10 @@ const LocationVerification = ({ location, onRefreshLocation, workMode }) => {
     if (workMode !== 'office') {
       return {
         status: 'not_required',
-        color: 'bg-blue-50 border-blue-200',
-        textColor: 'text-blue-700',
+        color: 'bg-primary/10 border-border',
+        textColor: 'text-primary',
         icon: 'Info',
-        iconColor: 'text-blue-500',
+        iconColor: 'text-primary',
         message: 'Location verification not required for this work mode'
       };
     }
@@ -205,9 +205,9 @@ const LocationVerification = ({ location, onRefreshLocation, workMode }) => {
 
                 return (
                   <div key={office?.id} className={`p-3 rounded-lg border ${
-                    distance && distance <= office?.radius 
-                      ? 'bg-success/5 border-success/20' :'bg-muted/30 border-border'
-                  }`}>
+ distance && distance <= office?.radius 
+ ? 'bg-success/5 border-success/20' :'bg-muted/30 border-border'
+ }`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-sm font-medium text-foreground">{office?.name}</div>
@@ -216,8 +216,8 @@ const LocationVerification = ({ location, onRefreshLocation, workMode }) => {
                       {distance && (
                         <div className="text-right">
                           <div className={`text-sm font-medium ${
-                            distance <= office?.radius ? 'text-success' : 'text-muted-foreground'
-                          }`}>
+ distance <= office?.radius ? 'text-success' : 'text-muted-foreground'
+ }`}>
                             {Math.round(distance)}m
                           </div>
                           <div className="text-xs text-muted-foreground">
@@ -283,14 +283,14 @@ const LocationVerification = ({ location, onRefreshLocation, workMode }) => {
 
         {/* Location Permissions Help */}
         {!location?.verified && workMode === 'office' && (
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="p-3 bg-primary/10 border border-border rounded-lg">
             <div className="flex items-start space-x-2">
-              <Icon name="Info" size={16} className="text-blue-500 mt-0.5" />
+              <Icon name="Info" size={16} className="text-primary mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-blue-700 mb-1">
+                <p className="text-sm font-medium text-primary mb-1">
                   Enable Location Access
                 </p>
-                <p className="text-xs text-blue-600">
+                <p className="text-xs text-primary">
                   To verify your office location, please allow location access in your browser settings or use manual override.
                 </p>
               </div>

@@ -59,12 +59,12 @@ const EmployeeProfileAdmin = () => {
       <Header />
       <Sidebar />
       <main className="pt-16 pb-12 px-6">
-        <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden mt-8">
-          <div className="px-8 py-5 border-b border-slate-50 bg-slate-50/20 flex items-center gap-4">
-            <h3 className="text-sm font-bold text-slate-800 mr-auto">Employee Records (Admin)</h3>
+        <div className="bg-card rounded-lg border border-border/60 shadow-sm overflow-hidden mt-8">
+          <div className="px-8 py-5 border-b border-slate-50 bg-muted/20 flex items-center gap-4">
+            <h3 className="text-sm font-bold text-foreground mr-auto">Employee Records (Admin)</h3>
             <button
               onClick={() => setProfileTab('attendance')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${profileTab === 'attendance' ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${profileTab === 'attendance' ? 'bg-sidebar text-white shadow-sm' : 'bg-muted text-muted-foreground hover:bg-border'}`}
             >
               <span className="flex items-center gap-1.5"><Icon name="Clock" size={13} /> Attendance</span>
             </button>            {employee && (
@@ -79,7 +79,7 @@ const EmployeeProfileAdmin = () => {
                         console.error('Failed to terminate employee', e);
                       }
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-red-600 text-white shadow-lg mr-2"
+                    className="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-red-600 text-white shadow-sm mr-2"
                   >
                     Terminate
                   </button>
@@ -94,7 +94,7 @@ const EmployeeProfileAdmin = () => {
                         console.error('Failed to activate employee', e);
                       }
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-green-600 text-white shadow-lg"
+                    className="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-green-600 text-white shadow-sm"
                   >
                     Activate
                   </button>
@@ -103,7 +103,7 @@ const EmployeeProfileAdmin = () => {
             )}
             <button
               onClick={() => setProfileTab('payslips')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${profileTab === 'payslips' ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${profileTab === 'payslips' ? 'bg-sidebar text-white shadow-sm' : 'bg-muted text-muted-foreground hover:bg-border'}`}
             >
               <span className="flex items-center gap-1.5"><Icon name="FileText" size={13} /> Payslips</span>
             </button>
@@ -113,26 +113,26 @@ const EmployeeProfileAdmin = () => {
           {profileTab === 'attendance' && (
             <div className="p-8">
               {latestAttendance && (
-                <div className="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                  <p className="text-sm font-medium text-slate-700">Latest Check‑in: {new Date(latestAttendance.checkInTime).toLocaleString()}</p>
-                  <p className="text-sm text-slate-600">Status: {latestAttendance.late ? 'Late' : 'On Time'}</p>
+                <div className="mb-6 p-4 bg-muted/60 rounded-xl border border-border">
+                  <p className="text-sm font-medium text-foreground">Latest Check‑in: {new Date(latestAttendance.checkInTime).toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground">Status: {latestAttendance.late ? 'Late' : 'On Time'}</p>
                 </div>
               )}
               {attendanceRecords.length === 0 ? (
                 <div className="text-center py-12">
                   <Icon name="Calendar" size={40} className="text-slate-200 mx-auto mb-4" />
-                  <p className="text-sm font-bold text-slate-400">No attendance records found</p>
+                  <p className="text-sm font-bold text-muted-foreground/70">No attendance records found</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-100">
-                        <th className="text-left text-[10px] font-bold text-slate-400 uppercase pb-3 pr-4">Date</th>
-                        <th className="text-left text-[10px] font-bold text-slate-400 uppercase pb-3 pr-4">Check‑in</th>
-                        <th className="text-left text-[10px] font-bold text-slate-400 uppercase pb-3 pr-4">Check‑out</th>
-                        <th className="text-left text-[10px] font-bold text-slate-400 uppercase pb-3 pr-4">Hours</th>
-                        <th className="text-left text-[10px] font-bold text-slate-400 uppercase pb-3">Status</th>
+                      <tr className="border-b border-border">
+                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Date</th>
+                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Check‑in</th>
+                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Check‑out</th>
+                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Hours</th>
+                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -141,17 +141,17 @@ const EmployeeProfileAdmin = () => {
                         const checkOut = record.checkOutTime ? new Date(record.checkOutTime) : null;
                         const hours = checkIn && checkOut ? ((checkOut - checkIn) / 3600000).toFixed(1) : '--';
                         return (
-                          <tr key={record.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-all">
-                            <td className="py-3 pr-4 text-sm font-medium text-slate-800">
+                          <tr key={record.id} className="border-b border-slate-50 hover:bg-muted/30 transition-all">
+                            <td className="py-3 pr-4 text-sm font-medium text-foreground">
                               {checkIn ? checkIn.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--'}
                             </td>
-                            <td className="py-3 pr-4 text-sm text-slate-600">
+                            <td className="py-3 pr-4 text-sm text-muted-foreground">
                               {checkIn ? checkIn.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '--'}
                             </td>
-                            <td className="py-3 pr-4 text-sm text-slate-600">
+                            <td className="py-3 pr-4 text-sm text-muted-foreground">
                               {checkOut ? checkOut.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '--'}
                             </td>
-                            <td className="py-3 pr-4 text-sm text-slate-600">{hours} hrs</td>
+                            <td className="py-3 pr-4 text-sm text-muted-foreground">{hours} hrs</td>
                             <td className="py-3">
                               <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase ${record.late ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
                                 {record.late ? 'Late' : 'On Time'}
@@ -163,7 +163,7 @@ const EmployeeProfileAdmin = () => {
                     </tbody>
                   </table>
                   {attendanceRecords.length > 30 && (
-                    <p className="text-[10px] text-slate-400 mt-4 text-center">Showing latest 30 records of {attendanceRecords.length} total</p>
+                    <p className="text-[10px] text-muted-foreground/70 mt-4 text-center">Showing latest 30 records of {attendanceRecords.length} total</p>
                   )}
                 </div>
               )}
@@ -176,25 +176,25 @@ const EmployeeProfileAdmin = () => {
               {payslipRecords.length === 0 ? (
                 <div className="text-center py-12">
                   <Icon name="FileText" size={40} className="text-slate-200 mx-auto mb-4" />
-                  <p className="text-sm font-bold text-slate-400">No payslips available</p>
+                  <p className="text-sm font-bold text-muted-foreground/70">No payslips available</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {payslipRecords.map(slip => (
-                    <div key={slip.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+                    <div key={slip.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted/60 transition-all border border-transparent hover:border-border">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                          <Icon name="FileText" size={16} className="text-indigo-500" />
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                          <Icon name="FileText" size={16} className="text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-800">
+                          <p className="text-sm font-bold text-foreground">
                             {new Date(0, (slip.month || 1) - 1).toLocaleString('default', { month: 'long' })} {slip.year}
                           </p>
-                          <p className="text-[10px] text-slate-400 font-medium mt-0.5">Net Salary: ₹{slip.netSalary?.toLocaleString('en-IN') || '0'}</p>
+                          <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">Net Salary: ₹{slip.netSalary?.toLocaleString('en-IN') || '0'}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${slip.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : slip.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
+                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${slip.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : slip.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-muted/60 text-muted-foreground border-border'}`}>
                           {slip.status || 'pending'}
                         </span>
                       </div>

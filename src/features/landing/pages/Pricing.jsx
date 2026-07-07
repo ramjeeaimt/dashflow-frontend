@@ -50,13 +50,13 @@ const Pricing = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center gap-8">
-                            <Link to="/" className="text-2xl font-extrabold tracking-tighter text-blue-600">
+                            <Link to="/" className="text-2xl font-semibold tracking-tighter text-primary">
                                 DIFMO<span className="text-gray-900">CRM</span>
                             </Link>
                             <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
-                                <Link to="/features" className="hover:text-blue-600 transition">Features</Link>
-                                <Link to="/pricing" className="text-blue-600 font-bold border-b-2 border-blue-600">Pricing</Link>
-                                <Link to="/privacy-policy" className="hover:text-blue-600 transition">Privacy</Link>
+                                <Link to="/features" className="hover:text-primary transition">Features</Link>
+                                <Link to="/pricing" className="text-primary font-bold border-b-2 border-primary">Pricing</Link>
+                                <Link to="/privacy-policy" className="hover:text-primary transition">Privacy</Link>
                             </div>
                         </div>
 
@@ -72,7 +72,7 @@ const Pricing = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <Link to="/login" className="bg-blue-600 text-white px-5 py-2.5 rounded-full hover:bg-blue-700 transition text-sm font-semibold">
+                                <Link to="/login" className="bg-primary text-white px-5 py-2.5 rounded-full hover:bg-primary/90 transition text-sm font-semibold">
                                     Get Started
                                 </Link>
                             )}
@@ -83,8 +83,8 @@ const Pricing = () => {
 
             {/* Header Section */}
             <div className="py-20 text-center px-4">
-                <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight mb-4">
-                    Transparent <span className="text-blue-600">Pricing</span>
+                <h1 className="text-4xl md:text-6xl font-semibold text-gray-900 tracking-tight mb-4">
+                    Transparent <span className="text-primary">Pricing</span>
                 </h1>
                 <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-10">
                     Choose the plan that fits your business needs. Scale your CRM as you grow.
@@ -95,9 +95,9 @@ const Pricing = () => {
                     <span className={`text-sm ${!isAnnual ? 'text-gray-900 font-bold' : 'text-gray-500'}`}>Monthly</span>
                     <button 
                         onClick={() => setIsAnnual(!isAnnual)}
-                        className="w-14 h-8 bg-blue-600 rounded-full relative transition-colors duration-300"
+                        className="w-14 h-8 bg-primary rounded-full relative transition-colors duration-300"
                     >
-                        <div className={`absolute top-1 bg-white w-6 h-6 rounded-full transition-all duration-300 ${isAnnual ? 'left-7' : 'left-1'}`} />
+                        <div className={`absolute top-1 bg-card w-6 h-6 rounded-full transition-all duration-300 ${isAnnual ? 'left-7' : 'left-1'}`} />
                     </button>
                     <span className={`text-sm ${isAnnual ? 'text-gray-900 font-bold' : 'text-gray-500'}`}>
                         Annual <span className="text-green-500 font-bold text-xs ml-1">(Save 20%)</span>
@@ -109,10 +109,10 @@ const Pricing = () => {
                     {plans.map((plan, idx) => (
                         <div 
                             key={idx}
-                            className={`relative bg-white p-8 rounded-3xl border ${plan.highlight ? 'border-blue-600 shadow-2xl shadow-blue-100 ring-4 ring-blue-50' : 'border-gray-200 shadow-xl shadow-gray-100'} transition-transform hover:-translate-y-2`}
+                            className={`relative bg-card p-8 rounded-lg border ${plan.highlight ? 'border-primary shadow-sm ring-4 ring-blue-50' : 'border-gray-200 shadow-sm '} transition-transform `}
                         >
                             {plan.highlight && (
-                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest">
+                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide">
                                     Most Popular
                                 </span>
                             )}
@@ -121,7 +121,7 @@ const Pricing = () => {
                             <p className="text-gray-500 text-sm mb-6">{plan.description}</p>
                             
                             <div className="mb-8">
-                                <span className="text-4xl font-black text-gray-900">₹{plan.price}</span>
+                                <span className="text-4xl font-semibold text-gray-900">₹{plan.price}</span>
                                 {plan.price !== "Custom" && <span className="text-gray-500">/mo</span>}
                             </div>
 
@@ -136,7 +136,7 @@ const Pricing = () => {
 
                             <button 
                                 onClick={() => navigate('/company-registration')}
-                                className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition ${plan.highlight ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-black'}`}
+                                className={`w-full py-4 rounded-lg font-bold flex items-center justify-center gap-2 transition ${plan.highlight ? 'bg-primary text-white hover:bg-primary/90' : 'bg-gray-900 text-white hover:bg-black'}`}
                             >
                                 {plan.buttonText} <ArrowRight size={18} />
                             </button>

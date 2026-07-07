@@ -134,7 +134,7 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-card w-full max-w-6xl rounded-lg shadow-lg border border-border animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            <div className="bg-card w-full max-w-6xl rounded-lg shadow-sm border border-border animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <div>
                         <h2 className="text-xl font-semibold text-foreground">
@@ -170,13 +170,13 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                             <span className="text-xs font-semibold text-rose-600 uppercase tracking-tighter mr-2">Absent</span>
                             <span className="text-sm font-bold text-rose-700">{stats.absent}</span>
                         </div>
-                        <div className="flex items-center px-3 py-1.5 bg-sky-50 border border-sky-100 rounded-md shadow-sm">
-                            <span className="text-xs font-semibold text-sky-600 uppercase tracking-tighter mr-2">Leaves</span>
-                            <span className="text-sm font-bold text-sky-700">{stats.leaves}</span>
+                        <div className="flex items-center px-3 py-1.5 bg-primary/10 border border-border rounded-md shadow-sm">
+                            <span className="text-xs font-semibold text-primary uppercase tracking-tighter mr-2">Leaves</span>
+                            <span className="text-sm font-bold text-primary">{stats.leaves}</span>
                         </div>
-                        <div className="flex items-center px-3 py-1.5 bg-purple-50 border border-purple-100 rounded-md shadow-sm">
-                            <span className="text-xs font-semibold text-purple-600 uppercase tracking-tighter mr-2">Overtime</span>
-                            <span className="text-sm font-bold text-purple-700">{stats.overtime ? `${stats.overtime}h` : '0h'}</span>
+                        <div className="flex items-center px-3 py-1.5 bg-primary/10 border border-border rounded-md shadow-sm">
+                            <span className="text-xs font-semibold text-primary uppercase tracking-tighter mr-2">Overtime</span>
+                            <span className="text-sm font-bold text-primary">{stats.overtime ? `${stats.overtime}h` : '0h'}</span>
                         </div>
                     </div>
                 </div>
@@ -194,17 +194,17 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                             <p className="text-sm text-muted-foreground">No attendance records found for the selected month.</p>
                         </div>
                     ) : (
-                        <div className="border border-border rounded-lg overflow-hidden shadow-sm bg-background">
+                        <div className="border border-border rounded-lg overflow-x-auto shadow-sm bg-background">
                             <table className="min-w-full divide-y divide-border">
                                 <thead className="bg-muted text-left">
                                     <tr>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Date</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Check In</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Check Out</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center">Work Hours</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Status</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Label</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Notes</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Date</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Check In</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Check Out</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide text-center">Work Hours</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Label</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Notes</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
@@ -226,17 +226,17 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-none text-[10px] font-bold uppercase tracking-wider border shadow-sm
-                                                    ${record.status === 'present' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                                        record.status === 'late' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                                            record.status === 'early_departure' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                                                record.status === 'absent' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                                                                    'bg-slate-50 text-slate-700 border-slate-200'}`}>
+ ${record.status === 'present' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+ record.status === 'late' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+ record.status === 'early_departure' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+ record.status === 'absent' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+ 'bg-muted/60 text-foreground border-border'}`}>
                                                     {record.status?.replace('_', ' ')}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {record.label ? (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-border">
                                                         {record.label}
                                                     </span>
                                                 ) : '--'}
@@ -247,7 +247,7 @@ const AttendanceHistoryModal = ({ isOpen, onClose, employee }) => {
                                                         {record.notes.split('|').map((note, i) => {
                                                             const isEditLog = note.includes('[Edited on');
                                                             return (
-                                                                <div key={i} className={`pb-1 ${i !== 0 ? 'border-t border-slate-100 pt-1' : ''} ${isEditLog ? 'text-blue-600 font-medium' : 'text-slate-600'}`}>
+                                                                <div key={i} className={`pb-1 ${i !== 0 ? 'border-t border-border pt-1' : ''} ${isEditLog ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                                                                     {note.trim()}
                                                                 </div>
                                                             );

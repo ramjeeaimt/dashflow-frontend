@@ -63,6 +63,13 @@ module.exports = {
           DEFAULT: "var(--color-error)", /* red-600 */
           foreground: "var(--color-error-foreground)", /* white */
         },
+        sidebar: {
+          DEFAULT: "var(--color-sidebar)",
+          foreground: "var(--color-sidebar-foreground)",
+          muted: "var(--color-sidebar-muted)",
+          border: "var(--color-sidebar-border)",
+          active: "var(--color-sidebar-active)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -71,6 +78,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        display: ['Space Grotesk', 'Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {

@@ -34,18 +34,18 @@ const TaskAnalytics = ({ tasks = [] }) => {
       {/* Industrial Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white border border-slate-200 p-6 transition-all cursor-default hover:bg-slate-50 group">
+          <div key={stat.label} className="bg-card border border-border p-6 transition-all cursor-default hover:bg-muted/60 group">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-slate-900 text-white rounded-none">
+              <div className="p-3 bg-sidebar text-white rounded-none">
                 <Icon name={stat.icon} size={18} />
               </div>
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</div>
+              <div className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-[0.2em]">{stat.label}</div>
             </div>
-            <div className="text-4xl font-black text-slate-900 tracking-tighter italic">
+            <div className="text-4xl font-semibold text-foreground tracking-tighter italic">
               {stat.value}
             </div>
-            <div className="mt-4 h-1 bg-slate-100 overflow-hidden">
-               <div className="h-full bg-slate-900 w-1/3 group-hover:w-full transition-all duration-1000"></div>
+            <div className="mt-4 h-1 bg-muted overflow-hidden">
+               <div className="h-full bg-sidebar w-1/3 group-hover:w-full transition-all duration-1000"></div>
             </div>
           </div>
         ))}
@@ -53,10 +53,10 @@ const TaskAnalytics = ({ tasks = [] }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Status Distribution */}
-        <div className="bg-white border border-slate-200 p-8">
-          <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-slate-100">
-             <div className="w-2 h-6 bg-slate-900"></div>
-             <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">OPERATIONAL_STATUS_MATRIX</h3>
+        <div className="bg-card border border-border p-8">
+          <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-border">
+             <div className="w-2 h-6 bg-sidebar"></div>
+             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-foreground">OPERATIONAL_STATUS_MATRIX</h3>
           </div>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -78,7 +78,7 @@ const TaskAnalytics = ({ tasks = [] }) => {
                   verticalAlign="middle" 
                   align="right" 
                   layout="vertical"
-                  formatter={(value) => <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest pl-2">{value}</span>}
+                  formatter={(value) => <span className="text-[10px] font-semibold text-foreground uppercase tracking-wide pl-2">{value}</span>}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -86,10 +86,10 @@ const TaskAnalytics = ({ tasks = [] }) => {
         </div>
 
         {/* Priority Analysis */}
-        <div className="bg-white border border-slate-200 p-8">
-          <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-slate-100">
+        <div className="bg-card border border-border p-8">
+          <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-border">
              <div className="w-2 h-6 bg-red-600"></div>
-             <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">CRITICALITY_VECTOR_ANALYSIS</h3>
+             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-foreground">CRITICALITY_VECTOR_ANALYSIS</h3>
           </div>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -120,10 +120,10 @@ const TaskAnalytics = ({ tasks = [] }) => {
       </div>
 
       {/* Industrial Quick Insights */}
-      <div className="bg-white border border-slate-200 p-8">
-         <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-slate-100">
-             <Icon name="Zap" size={20} className="text-slate-900" />
-             <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">SYSTEM_DIAGNOSTICS_OVERVIEW</h3>
+      <div className="bg-card border border-border p-8">
+         <div className="flex items-center space-x-3 mb-8 pb-4 border-b border-border">
+             <Icon name="Zap" size={20} className="text-foreground" />
+             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-foreground">SYSTEM_DIAGNOSTICS_OVERVIEW</h3>
          </div>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <InsightModule 
@@ -138,7 +138,7 @@ const TaskAnalytics = ({ tasks = [] }) => {
               value="ENGINEERING" 
               subtitle="87% Efficiency calculated" 
               icon="Terminal"
-              color="text-blue-600"
+              color="text-primary"
             />
             <InsightModule 
               label="RISK_VECTOR_DETECTED" 
@@ -156,9 +156,9 @@ const TaskAnalytics = ({ tasks = [] }) => {
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 p-3 shadow-xl">
-        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">DATA_POINT</p>
-        <p className="text-xs font-black text-white uppercase tracking-tighter">
+      <div className="bg-sidebar p-3 shadow-sm">
+        <p className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wide mb-1">DATA_POINT</p>
+        <p className="text-xs font-semibold text-white uppercase tracking-tighter">
           {`${payload[0].name} : ${payload[0].value} RECORDS`}
         </p>
       </div>
@@ -168,13 +168,13 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 const InsightModule = ({ label, value, subtitle, icon, color }) => (
-  <div className="p-6 bg-slate-50 border border-slate-200 hover:border-slate-400 transition-colors">
+  <div className="p-6 bg-muted/60 border border-border hover:border-slate-400 transition-colors">
     <div className="flex items-center space-x-3 mb-4">
       <Icon name={icon} size={16} className={color} />
-      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
+      <span className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wide">{label}</span>
     </div>
-    <div className="text-2xl font-black text-slate-900 tracking-tighter mb-1 uppercase italic">{value}</div>
-    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{subtitle}</div>
+    <div className="text-2xl font-semibold text-foreground tracking-tighter mb-1 uppercase italic">{value}</div>
+    <div className="text-[9px] font-bold text-muted-foreground/70 uppercase tracking-wide">{subtitle}</div>
   </div>
 );
 

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import authService from '../services/auth.service';
+import { ROLES, isSystemAdmin, canUser } from '../config/roles';
 
 const sanitizeUser = (user) => {
     if (!user) return null;
@@ -10,9 +11,8 @@ const sanitizeUser = (user) => {
         description: role.description
     })) : [];
 
-
-    if (['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user.email) && !roles.some(r => r.name?.toUpperCase() === 'ADMIN')) {
-        roles.push({ id: 'super-admin', name: 'Admin', description: 'System Administrator' });
+    if (isSystemAdmin(user) && !roles.some(r => r.name?.toUpperCase() === 'ADMIN')) {
+        roles.push({ id: 'super-admin', name: ROLES.ADMIN, description: 'System Administrator' });
     }
 
     return {
@@ -79,7 +79,6 @@ const useAuthStore = create((set, get) => ({
         );
 
         try {
-            console.log(`[AuthFlow] Initiating login for: ${email}`);
 
             // Race the login request against the 10-second timeout
             const response = await Promise.race([
@@ -87,7 +86,6 @@ const useAuthStore = create((set, get) => ({
                 timeoutPromise
             ]);
 
-            console.log('[AuthFlow] Login response received:', response);
 
             // unwrap backend response
             const payload = response.data || response;
@@ -109,7 +107,6 @@ const useAuthStore = create((set, get) => ({
                 isLoading: false
             });
 
-            console.log('[AuthFlow] Login SUCCESS');
 
         } catch (error) {
             console.error('[AuthFlow] Login error:', error);
@@ -201,9 +198,7 @@ const useAuthStore = create((set, get) => ({
     fetchProfile: async () => {
         set({ isLoading: true, error: null });
         try {
-            console.log('[Auth] Fetching user profile...');
             const userData = await authService.getProfile();
-            console.log('[Auth] Profile fetched successfully:', userData);
             const sanitizedUser = sanitizeUser(userData);
 
             // Save sanitized user data to localStorage
@@ -230,21 +225,8 @@ const useAuthStore = create((set, get) => ({
 
     clearError: () => set({ error: null }),
 
-    // Helper to check for a specific permission
-    can: (action, resource) => {
-        const { user } = get();
-        if (!user || !user.permissions) return false;
-
-        // Check for super admin bypass logic if applicable
-        const isSuperAdmin = user.roles?.some(r => r.name?.toUpperCase() === 'SUPER ADMIN' || r.name?.toUpperCase() === 'ADMIN') ||
-            ['admin@difmo.com', 'info@difmo.com', 'hello@system.com', 'pritam@difmo.com'].includes(user.email);
-        if (isSuperAdmin) return true;
-
-        return user.permissions.some(p =>
-            p.action === action && (p.resource === resource || p.resource === 'all') ||
-            p.action === 'manage' && (p.resource === resource || p.resource === 'all')
-        );
-    }
+    // Helper to check for a specific permission — policy lives in src/config/roles.js
+    can: (action, resource) => canUser(get().user, action, resource)
 }));
 
 export default useAuthStore;

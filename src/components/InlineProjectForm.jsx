@@ -223,11 +223,11 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-lg shadow-xl overflow-hidden">
-        <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex justify-between items-center">
+      <div className="bg-card w-full max-w-3xl rounded-lg shadow-sm overflow-hidden">
+        <div className="px-5 py-4 bg-primary text-white flex justify-between items-center">
           <div>
             <h3 className="text-lg font-bold">Add New Project</h3>
-            <p className="text-xs text-blue-100 mt-0.5">
+            <p className="text-xs text-primary-foreground/80 mt-0.5">
               Client: <span className="font-semibold">{client?.name || 'N/A'}</span> ({client?.email || 'N/A'})
             </p>
           </div>
@@ -244,7 +244,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               type="text"
               name="projectName"
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
               value={formData.projectName}
               onChange={handleChange}
               placeholder="Enter project name"
@@ -257,7 +257,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
             <textarea
               name="description"
               rows="3"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
               value={formData.description}
               onChange={handleChange}
               placeholder="Project description..."
@@ -273,7 +273,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <input
                 type="date"
                 name="assigningDate"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                 value={formData.assigningDate}
                 onChange={handleChange}
               />
@@ -286,7 +286,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <input
                 type="date"
                 name="deadline"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                 value={formData.deadline}
                 onChange={handleChange}
               />
@@ -300,7 +300,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <label className="block text-xs font-semibold text-gray-700 mb-1">Phase</label>
               <select
                 name="phase"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                 value={formData.phase}
                 onChange={handleChange}
               >
@@ -315,7 +315,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <label className="block text-xs font-semibold text-gray-700 mb-1">Status</label>
               <select
                 name="status"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                 value={formData.status}
                 onChange={handleChange}
               >
@@ -328,7 +328,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
           </div>
 
           {/* Assigned Employees Section */}
-          <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+          <div className="bg-primary/10 p-3 rounded-lg border border-border">
             <div className="flex justify-between items-center mb-3">
               <h4 className="text-xs font-semibold text-purple-800 flex items-center gap-1">
                 <Users size={12} /> Assigned Team Members ({formData.assignedEmployees.length})
@@ -336,7 +336,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <button
                 type="button"
                 onClick={() => setShowEmployeeDropdown(!showEmployeeDropdown)}
-                className="text-purple-600 hover:text-purple-700 text-xs flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-purple-100 transition-colors"
+                className="text-primary hover:text-primary text-xs flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 <UserPlus size={12} /> Add Member
               </button>
@@ -344,7 +344,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
 
             {/* Employee Selection Dropdown */}
             {showEmployeeDropdown && (
-              <div className="mb-3 bg-white rounded-lg border border-purple-200 shadow-lg overflow-hidden">
+              <div className="mb-3 bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                 <div className="p-2 border-b border-gray-100 bg-gray-50">
                   <div className="relative">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -353,7 +353,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                       placeholder="Search employees..."
                       value={employeeSearchTerm}
                       onChange={(e) => setEmployeeSearchTerm(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-card"
                       autoFocus
                     />
                   </div>
@@ -361,7 +361,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                 <div className="max-h-56 overflow-y-auto">
                   {isLoadingEmployees ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 size={20} className="animate-spin text-purple-600" />
+                      <Loader2 size={20} className="animate-spin text-primary" />
                     </div>
                   ) : filteredEmployees.length === 0 ? (
                     <div className="text-center py-8">
@@ -378,7 +378,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                           onClick={() => !isAlreadyAssigned && handleAddEmployee(employee)}
                           disabled={isAlreadyAssigned}
                           className={`w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-0 ${isAlreadyAssigned ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
-                            }`}
+ }`}
                         >
                           <div
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0"
@@ -407,7 +407,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
             {formData.assignedEmployees.length > 0 && (
               <div className="space-y-2 mt-2">
                 {formData.assignedEmployees.map((employee) => (
-                  <div key={employee.id} className="flex items-center justify-between p-2 bg-white rounded-lg border border-purple-100 shadow-sm">
+                  <div key={employee.id} className="flex items-center justify-between p-2 bg-card rounded-lg border border-border shadow-sm">
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0"
@@ -439,7 +439,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                 <button
                   type="button"
                   onClick={() => setShowEmployeeDropdown(true)}
-                  className="mt-2 text-purple-600 hover:text-purple-700 text-xs flex items-center gap-1 mx-auto"
+                  className="mt-2 text-primary hover:text-primary text-xs flex items-center gap-1 mx-auto"
                 >
                   <Plus size={12} /> Add team members
                 </button>
@@ -458,7 +458,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                 <input
                   type="number"
                   name="budget"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={formData.budget}
                   onChange={handleChange}
                   placeholder="0"
@@ -469,7 +469,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                 <input
                   type="number"
                   name="totalPayment"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={formData.totalPayment}
                   onChange={handleChange}
                   placeholder="0"
@@ -480,7 +480,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                 <input
                   type="number"
                   name="paymentReceived"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={formData.paymentReceived}
                   onChange={handleChange}
                   placeholder="0"
@@ -491,7 +491,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
                 <input
                   type="text"
                   name="contactInfo"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                   value={formData.contactInfo}
                   onChange={handleChange}
                   placeholder="Phone number"
@@ -509,7 +509,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <input
                 type="url"
                 name="githubLink"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                 value={formData.githubLink}
                 onChange={handleChange}
                 placeholder="GitHub URL"
@@ -517,7 +517,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
               <input
                 type="url"
                 name="deploymentLink"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
                 value={formData.deploymentLink}
                 onChange={handleChange}
                 placeholder="Deployment URL"
@@ -537,7 +537,7 @@ const InlineProjectForm = ({ client, onClose, onSubmit, isSubmitting }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
               {isSubmitting ? 'Creating...' : 'Create Project'}

@@ -18,14 +18,14 @@ const DataLoader = ({
     <div className={`flex flex-col items-center justify-center w-full ${sizeClasses[size] || sizeClasses.large} animate-in fade-in duration-500 ${className}`}>
       <div className="relative mb-6">
         {/* Decorative background glow */}
-        <div className="absolute inset-0 bg-blue-100 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+        <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl opacity-50 animate-pulse"></div>
         
         {/* Main spinning icon */}
-        <div className="relative bg-white p-4 rounded-2xl border border-blue-50 shadow-sm">
+        <div className="relative bg-card p-4 rounded-lg border border-blue-50 shadow-sm">
           <Icon 
             name={icon} 
             size={size === 'small' ? 24 : 40} 
-            className="text-blue-600 animate-spin" 
+            className="text-primary animate-spin" 
             strokeWidth={1.5}
           />
         </div>
@@ -45,7 +45,7 @@ const DataLoader = ({
       
       {/* Progress line indicator */}
       <div className="w-32 h-1 bg-gray-100 rounded-full mt-6 overflow-hidden relative">
-        <div className="absolute top-0 left-0 h-full bg-blue-500 rounded-full w-1/3 animate-progress-slide"></div>
+        <div className="absolute top-0 left-0 h-full bg-primary rounded-full w-1/3 animate-progress-slide"></div>
       </div>
 
       <style jsx>{`

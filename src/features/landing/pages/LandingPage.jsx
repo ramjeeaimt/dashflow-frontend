@@ -135,14 +135,14 @@ const LandingPage = () => {
     const currentRoleContent = user?.role ? roleBasedContent[user.role] : null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white font-sans selection:bg-blue-100 selection:text-blue-900">
+        <div className="min-h-screen bg-gray-50 font-sans selection:bg-primary/10 selection:text-blue-900">
             {/* Live Notification Banner */}
             {showNotification && (
-                <div className="bg-blue-600 text-white py-2.5 px-4 text-center text-[10px] sm:text-sm relative">
+                <div className="bg-primary text-white py-2.5 px-4 text-center text-[10px] sm:text-sm relative">
                     <p className="inline-flex flex-wrap justify-center items-center gap-2">
                         <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-300 fill-current" />
                         <span className="font-medium">Live:</span> DIFMO CRM handles 10,000+ users with 99.9% uptime.
-                        <button className="underline font-bold hover:text-blue-200">View Demo →</button>
+                        <button className="underline font-bold hover:text-primary-foreground/70">View Demo →</button>
                     </p>
                     <button
                         onClick={() => setShowNotification(false)}
@@ -168,18 +168,18 @@ const LandingPage = () => {
 
                         {/* Desktop Navigation */}
                         <div className="hidden lg:flex items-center space-x-1">
-                            <Link to="/features" className="px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Features</Link>
-                            <Link to="/pricing" className="px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Pricing</Link>
-                            <button onClick={() => navigate('/privacy-policy')} className="px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">Privacy</button>
+                            <Link to="/features" className="px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition">Features</Link>
+                            <Link to="/pricing" className="px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition">Pricing</Link>
+                            <button onClick={() => navigate('/privacy-policy')} className="px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition">Privacy</button>
                         </div>
 
                         {/* Right Section */}
                         <div className="flex items-center gap-2 sm:gap-4">
                             {isAuthenticated ? (
                                 <div className="flex items-center gap-2">
-                                    <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
-                                        <User className="h-4 w-4 text-slate-600" />
-                                        <span className="text-xs font-bold text-slate-700">{getFullName()}</span>
+                                    <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 bg-muted hover:bg-border rounded-lg transition">
+                                        <User className="h-4 w-4 text-muted-foreground" />
+                                        <span className="text-xs font-bold text-foreground">{getFullName()}</span>
                                     </Link>
                                     <button onClick={handleLogout} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition">
                                         <LogOut className="h-4 w-4" />
@@ -187,12 +187,12 @@ const LandingPage = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <Link to="/login" className="text-slate-600 hover:text-slate-900 font-bold text-xs sm:text-sm px-3 py-2 hover:bg-slate-100 rounded-lg transition">
+                                    <Link to="/login" className="text-muted-foreground hover:text-foreground font-bold text-xs sm:text-sm px-3 py-2 hover:bg-muted rounded-lg transition">
                                         Log in
                                     </Link>
                                     <Link
                                         to="/company-registration"
-                                        className="hidden sm:flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow-md transition-all text-xs sm:text-sm font-bold"
+                                        className="hidden sm:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 shadow-md transition-all text-xs sm:text-sm font-bold"
                                     >
                                         Free Trial <ArrowRight className="w-4 h-4" />
                                     </Link>
@@ -201,7 +201,7 @@ const LandingPage = () => {
 
                             {/* Mobile Menu Button */}
                             <button
-                                className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+                                className="lg:hidden p-2 rounded-lg hover:bg-muted text-muted-foreground"
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             >
                                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -211,13 +211,13 @@ const LandingPage = () => {
 
                     {/* Mobile Menu */}
                     {mobileMenuOpen && (
-                        <div className="lg:hidden py-4 border-t border-slate-100 animate-in slide-in-from-top duration-200">
+                        <div className="lg:hidden py-4 border-t border-border animate-in slide-in-from-top duration-200">
                             <div className="flex flex-col space-y-1">
-                                <Link to="/features" className="px-4 py-3 text-slate-700 hover:bg-blue-50 rounded-lg font-semibold">Features</Link>
-                                <Link to="/pricing" className="px-4 py-3 text-slate-700 hover:bg-blue-50 rounded-lg font-semibold">Pricing</Link>
-                                <Link to="/privacy-policy" className="px-4 py-3 text-slate-700 hover:bg-blue-50 rounded-lg font-semibold">Privacy Policy</Link>
+                                <Link to="/features" className="px-4 py-3 text-foreground hover:bg-primary/10 rounded-lg font-semibold">Features</Link>
+                                <Link to="/pricing" className="px-4 py-3 text-foreground hover:bg-primary/10 rounded-lg font-semibold">Pricing</Link>
+                                <Link to="/privacy-policy" className="px-4 py-3 text-foreground hover:bg-primary/10 rounded-lg font-semibold">Privacy Policy</Link>
                                 {!isAuthenticated && (
-                                    <Link to="/company-registration" className="mx-4 mt-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-bold text-center">
+                                    <Link to="/company-registration" className="mx-4 mt-2 px-4 py-3 bg-primary text-white rounded-lg font-bold text-center">
                                         Start Free Trial
                                     </Link>
                                 )}
@@ -229,7 +229,7 @@ const LandingPage = () => {
 
             {/* Personalized Welcome Section for Authenticated Users */}
             {isAuthenticated && currentRoleContent && (
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-8">
+                <div className="bg-primary text-white py-8">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                             <div>
@@ -239,13 +239,13 @@ const LandingPage = () => {
                                         {userRole?.label}
                                     </span>
                                 </h1>
-                                <p className="text-blue-100">
+                                <p className="text-primary-foreground/80">
                                     {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                                 </p>
                             </div>
                             <Link
                                 to="/dashboard"
-                                className="mt-4 md:mt-0 bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition flex items-center gap-2 w-fit"
+                                className="mt-4 md:mt-0 bg-card text-primary px-6 py-2 rounded-lg font-semibold hover:bg-primary/10 transition flex items-center gap-2 w-fit"
                             >
                                 Go to Dashboard <ArrowRight className="w-4 h-4" />
                             </Link>
@@ -256,7 +256,7 @@ const LandingPage = () => {
                             {currentRoleContent.metrics.map((metric, idx) => (
                                 <div key={idx} className="bg-white/10 backdrop-blur-lg rounded-lg p-4 border border-white/20">
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="text-blue-100 text-sm">{metric.label}</span>
+                                        <span className="text-primary-foreground/80 text-sm">{metric.label}</span>
                                         <span className="text-white/80">{metric.icon}</span>
                                     </div>
                                     <div className="flex items-end justify-between">
@@ -291,30 +291,30 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
                         <div className="text-center lg:text-left lg:col-span-6">
-                            <h1 className="text-4xl sm:text-6xl lg:text-7xl tracking-tight font-black text-slate-900 leading-[1.1]">
+                            <h1 className="text-4xl sm:text-6xl lg:text-7xl tracking-tight font-semibold text-foreground leading-[1.1]">
                                 {isAuthenticated ? (
                                     <>Grow business <br />
-                                        <span className="text-blue-600 underline decoration-blue-100 underline-offset-8">With Us</span></>
+                                        <span className="text-primary underline decoration-blue-100 underline-offset-8">With Us</span></>
                                 ) : (
                                     <>Manage business <br />
-                                        <span className="text-blue-600 underline decoration-blue-100 underline-offset-8">All in One Place</span></>
+                                        <span className="text-primary underline decoration-blue-100 underline-offset-8">All in One Place</span></>
                                 )}
                             </h1>
 
-                            <p className="mt-6 text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                            <p className="mt-6 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0">
                                 {isAuthenticated
                                     ? "Your team, projects, and payroll are waiting. Pick up right where you left off."
                                     : "Unified projects, automated payroll, and deep analytics—all in one place. Built for modern Indian teams."}
                             </p>
 
                             {/* Trust Indicators */}
-                            <div className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-slate-500">
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full">
+                            <div className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-muted-foreground">
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/60 rounded-full">
                                     <CheckCircle className="w-4 h-4 text-emerald-500" />
                                     <span>ISO 27001</span>
                                 </div>
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full">
-                                    <Shield className="w-4 h-4 text-blue-500" />
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/60 rounded-full">
+                                    <Shield className="w-4 h-4 text-primary" />
                                     <span>100% Secure</span>
                                 </div>
                             </div>
@@ -324,7 +324,7 @@ const LandingPage = () => {
                                 {isAuthenticated ? (
                                     <Link
                                         to="/dashboard"
-                                        className="flex items-center justify-center px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 group"
+                                        className="flex items-center justify-center px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition shadow-sm group"
                                     >
                                         Go to Dashboard <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
                                     </Link>
@@ -332,7 +332,7 @@ const LandingPage = () => {
                                     <>
                                         <Link
                                             to="/company-registration"
-                                            className="flex items-center justify-center px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 group"
+                                            className="flex items-center justify-center px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition shadow-sm group"
                                         >
                                             Start 14-day Trial <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
                                         </Link>
@@ -381,7 +381,7 @@ const LandingPage = () => {
                         <div className="mt-16 lg:mt-0 lg:col-span-6 relative">
                             <div className="relative mx-auto w-full">
                                 {/* Main Image */}
-                                <div className="relative rounded-2xl shadow-2xl overflow-hidden border-8 border-white">
+                                <div className="relative rounded-lg shadow-sm overflow-hidden border-8 border-white">
                                     <img
                                         className="w-full object-cover"
                                         src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80"
@@ -389,19 +389,19 @@ const LandingPage = () => {
                                     />
 
                                     {/* Floating Stats */}
-                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur rounded-lg px-4 py-2 shadow-lg">
+                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur rounded-lg px-4 py-2 shadow-sm">
                                         <div className="text-sm font-medium text-gray-600">Active Sessions</div>
                                         <div className="text-lg font-bold text-green-600">1,847 online</div>
                                     </div>
 
-                                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-lg px-4 py-2 shadow-lg">
+                                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-lg px-4 py-2 shadow-sm">
                                         <div className="text-sm font-medium text-gray-600">Response Time</div>
-                                        <div className="text-lg font-bold text-blue-600">89ms</div>
+                                        <div className="text-lg font-bold text-primary">89ms</div>
                                     </div>
                                 </div>
 
                                 {/* Badge */}
-                                {/* <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full shadow-xl">
+                                {/* <div className="absolute -bottom-4 -right-4 bg-primary text-white px-6 py-3 rounded-full shadow-sm">
                                     <span className="font-bold">✨ New: AI Analytics</span>
                                 </div> */}
                             </div>
@@ -414,19 +414,19 @@ const LandingPage = () => {
             <section id="demo-video" className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-black text-gray-900">See DIFMO CRM in Action</h2>
+                        <h2 className="text-4xl font-semibold text-gray-900">See DIFMO CRM in Action</h2>
                         <p className="text-gray-600 mt-4">Watch how teams are transforming their workflow</p>
                     </div>
 
-                    <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video max-w-4xl mx-auto">
+                    <div className="relative rounded-lg overflow-hidden shadow-sm aspect-video max-w-4xl mx-auto">
                         <img
                             src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80"
                             alt="Video Thumbnail"
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <button className="w-20 h-20 bg-white rounded-full flex items-center justify-center hover:scale-110 transition shadow-2xl">
-                                <Play className="w-8 h-8 text-blue-600 ml-1" />
+                            <button className="w-20 h-20 bg-card rounded-full flex items-center justify-center transition shadow-sm">
+                                <Play className="w-8 h-8 text-primary ml-1" />
                             </button>
                         </div>
 
@@ -437,17 +437,17 @@ const LandingPage = () => {
                     </div>
 
                     <div className="flex justify-center gap-8 mt-8 text-sm text-gray-500">
-                        <span>⚡ 5-min setup</span>
-                        <span>🔒 Enterprise security</span>
-                        <span>📱 Mobile app included</span>
+                        <span>5-minute setup</span>
+                        <span>Enterprise-grade security</span>
+                        <span>Mobile app included</span>
                     </div>
                 </div>
             </section>
 
             {/* Trust Bar with Real Companies */}
-            <section className="py-16 border-y border-gray-200 bg-white">
+            <section className="py-16 border-y border-gray-200 bg-card">
                 <div className="max-w-7xl mx-auto px-4 text-center">
-                    <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-8">Trusted by India's fastest growing companies</p>
+                    <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-8">Trusted by India's fastest growing companies</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-70 hover:opacity-100 transition">
                         <div className="flex flex-col items-center">
                             <span className="text-2xl font-bold text-gray-800">BharatPe</span>
@@ -476,38 +476,38 @@ const LandingPage = () => {
             </section>
 
             {/* How It Works Section - Interactive */}
-            <div className="bg-white py-20">
+            <div className="bg-card py-20">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-black text-gray-900 tracking-tight">Get Started in 3 Simple Steps</h2>
+                        <h2 className="text-4xl font-semibold text-gray-900 tracking-tight">Get Started in 3 Simple Steps</h2>
                         <p className="text-gray-500 mt-4 text-lg">Join 2,000+ Indian businesses already using DIFMO CRM</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                         {/* Progress Line */}
-                        <div className="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200"></div>
+                        <div className="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-blue-200"></div>
 
                         {/* Step 1 */}
                         <div className="relative text-center group cursor-pointer">
-                            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-xl group-hover:shadow-2xl mb-8">
+                            <div className="w-24 h-24 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm group-hover:shadow-sm mb-8">
                                 <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-black text-white">01</span>
+                                    <span className="text-3xl font-semibold text-white">01</span>
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">Register Your Company</h3>
                             <p className="text-gray-500 text-sm leading-relaxed px-4">
                                 Create your company profile in under 2 minutes. Get your dedicated instance on our secure cloud.
                             </p>
-                            <div className="mt-4 text-xs text-blue-600 font-medium">
+                            <div className="mt-4 text-xs text-primary font-medium">
                                 Avg. time: 2 mins ⏱️
                             </div>
                         </div>
 
                         {/* Step 2 */}
                         <div className="relative text-center group cursor-pointer">
-                            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-xl group-hover:shadow-2xl mb-8">
+                            <div className="w-24 h-24 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm group-hover:shadow-sm mb-8">
                                 <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-black text-white">02</span>
+                                    <span className="text-3xl font-semibold text-white">02</span>
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">Invite Your Team</h3>
@@ -518,15 +518,15 @@ const LandingPage = () => {
                                 <img className="w-6 h-6 rounded-full border-2 border-white" src="https://i.pravatar.cc/24?img=1" alt="Team" />
                                 <img className="w-6 h-6 rounded-full border-2 border-white" src="https://i.pravatar.cc/24?img=2" alt="Team" />
                                 <img className="w-6 h-6 rounded-full border-2 border-white" src="https://i.pravatar.cc/24?img=3" alt="Team" />
-                                <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs flex items-center justify-center border-2 border-white">+9</span>
+                                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center border-2 border-white">+9</span>
                             </div>
                         </div>
 
                         {/* Step 3 */}
                         <div className="relative text-center group cursor-pointer">
-                            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-xl group-hover:shadow-2xl mb-8">
+                            <div className="w-24 h-24 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm group-hover:shadow-sm mb-8">
                                 <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-black text-white">03</span>
+                                    <span className="text-3xl font-semibold text-white">03</span>
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">Go Live & Scale</h3>
@@ -554,11 +554,11 @@ const LandingPage = () => {
             </div>
 
             {/* Main Features with Icons */}
-            <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
+            <section className="py-24 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
-                        <span className="text-blue-600 font-bold text-sm uppercase tracking-wider">Everything you need</span>
-                        <h2 className="text-4xl font-black text-gray-900 mt-2">One Platform, Infinite Possibilities</h2>
+                        <span className="text-primary font-bold text-sm uppercase tracking-wider">Everything you need</span>
+                        <h2 className="text-4xl font-semibold text-gray-900 mt-2">One Platform, Infinite Possibilities</h2>
                         <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
                             Built for Indian businesses, with features that actually matter. No bloated modules, just pure productivity.
                         </p>
@@ -566,11 +566,11 @@ const LandingPage = () => {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Project Management */}
-                        <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300">
-                            <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
+                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/90 group-hover:text-white transition-all duration-300">
                                 <Briefcase className="w-7 h-7" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-blue-600 transition">Project Management</h3>
+                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition">Project Management</h3>
                             <p className="text-gray-500 leading-relaxed mb-4">
                                 Kanban boards, Gantt charts, and timeline views. Assign tasks, track progress, and hit deadlines.
                             </p>
@@ -582,11 +582,11 @@ const LandingPage = () => {
                         </div>
 
                         {/* HRM & Payroll */}
-                        <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300">
-                            <div className="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
+                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/90 group-hover:text-white transition-all duration-300">
                                 <Users className="w-7 h-7" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition">HRM & Payroll</h3>
+                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition">HRM & Payroll</h3>
                             <p className="text-gray-500 leading-relaxed mb-4">
                                 Automated attendance, leave management, and payroll processing with TDS, PF, and ESI calculations.
                             </p>
@@ -598,11 +598,11 @@ const LandingPage = () => {
                         </div>
 
                         {/* Analytics */}
-                        <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300">
-                            <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
+                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/90 group-hover:text-white transition-all duration-300">
                                 <PieChart className="w-7 h-7" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-purple-600 transition">Deep Analytics</h3>
+                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition">Deep Analytics</h3>
                             <p className="text-gray-500 leading-relaxed mb-4">
                                 Real-time dashboards, custom reports, and predictive insights powered by AI. Make data-driven decisions.
                             </p>
@@ -614,8 +614,8 @@ const LandingPage = () => {
                         </div>
 
                         {/* Security */}
-                        <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300">
-                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-300">
+                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
+                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600 group-hover:text-white transition-all duration-300">
                                 <Shield className="w-7 h-7" />
                             </div>
                             <h3 className="text-xl font-bold mb-3 group-hover:text-red-600 transition">Enterprise Security</h3>
@@ -630,8 +630,8 @@ const LandingPage = () => {
                         </div>
 
                         {/* Communication */}
-                        <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300">
-                            <div className="w-14 h-14 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
+                            <div className="w-14 h-14 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
                                 <MessageSquare className="w-7 h-7" />
                             </div>
                             <h3 className="text-xl font-bold mb-3 group-hover:text-green-600 transition">Team Communication</h3>
@@ -646,8 +646,8 @@ const LandingPage = () => {
                         </div>
 
                         {/* API Access */}
-                        <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-100/50 transition-all duration-300">
-                            <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
+                            <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
                                 <Zap className="w-7 h-7" />
                             </div>
                             <h3 className="text-xl font-bold mb-3 group-hover:text-orange-600 transition">API & Integrations</h3>
@@ -663,30 +663,30 @@ const LandingPage = () => {
                     </div>
 
                     {/* Feature Highlight */}
-                    {/* <div className="mt-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 md:p-12 text-white">
+                    {/* <div className="mt-16 bg-primary rounded-lg p-8 md:p-12 text-white">
                         <div className="grid md:grid-cols-2 gap-8 items-center">
                             <div>
                                 <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-4">
                                     🚀 Just Launched
                                 </span>
                                 <h3 className="text-3xl font-bold mb-4">AI-Powered Insights</h3>
-                                <p className="text-blue-100 mb-6">
+                                <p className="text-primary-foreground/80 mb-6">
                                     Our new AI engine analyzes your business data to predict churn, suggest upsells, and identify bottlenecks before they become problems.
                                 </p>
                                 <ul className="space-y-3">
                                     {['Predictive analytics', 'Automated reports', 'Smart recommendations'].map((item, i) => (
                                         <li key={i} className="flex items-center gap-2">
-                                            <CheckCircle className="w-5 h-5 text-blue-200" />
+                                            <CheckCircle className="w-5 h-5 text-primary-foreground/70" />
                                             <span>{item}</span>
                                         </li>
                                     ))}
                                 </ul>
-                                <button className="mt-8 bg-white text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition">
+                                <button className="mt-8 bg-card text-primary px-6 py-3 rounded-xl font-bold hover:bg-primary/10 transition">
                                     Learn more about AI features
                                 </button>
                             </div>
                             <div className="relative">
-                                <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
+                                <div className="bg-white/10 backdrop-blur rounded-lg p-6 border border-white/20">
                                     <div className="flex items-center justify-between mb-4">
                                         <span className="font-semibold">Revenue Forecast</span>
                                         <span className="text-green-300">+23% vs last month</span>
@@ -712,10 +712,10 @@ const LandingPage = () => {
             </section>
 
             {/* Testimonials */}
-            <section className="py-24 bg-white">
+            <section className="py-24 bg-card">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-black text-gray-900">Loved by Teams Across India</h2>
+                        <h2 className="text-4xl font-semibold text-gray-900">Loved by Teams Across India</h2>
                         <p className="text-gray-500 mt-4">See what our customers have to say about DIFMO CRM</p>
                     </div>
 
@@ -743,7 +743,7 @@ const LandingPage = () => {
                                 image: 'https://i.pravatar.cc/100?img=3'
                             }
                         ].map((testimonial, idx) => (
-                            <div key={idx} className="bg-gray-50 p-8 rounded-2xl border border-gray-200 hover:border-blue-200 transition group">
+                            <div key={idx} className="bg-gray-50 p-8 rounded-lg border border-gray-200 hover:border-border transition group">
                                 <div className="flex items-center gap-4 mb-6">
                                     <img
                                         src={testimonial.image}
@@ -768,19 +768,19 @@ const LandingPage = () => {
                     {/* Stats */}
                     <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         <div>
-                            <div className="text-4xl font-black text-blue-600">2,000+</div>
+                            <div className="text-4xl font-semibold text-primary">2,000+</div>
                             <div className="text-sm text-gray-500">Active Companies</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-black text-blue-600">50K+</div>
+                            <div className="text-4xl font-semibold text-primary">50K+</div>
                             <div className="text-sm text-gray-500">Users</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-black text-blue-600">99.9%</div>
+                            <div className="text-4xl font-semibold text-primary">99.9%</div>
                             <div className="text-sm text-gray-500">Uptime SLA</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-black text-blue-600">24/7</div>
+                            <div className="text-4xl font-semibold text-primary">24/7</div>
                             <div className="text-sm text-gray-500">Support</div>
                         </div>
                     </div>
@@ -790,14 +790,14 @@ const LandingPage = () => {
             {/* Pricing Teaser */}
             <section className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-black text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+                    <h2 className="text-4xl font-semibold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
                     <p className="text-gray-500 mb-12 max-w-2xl mx-auto">Start free, scale as you grow. No hidden fees, no surprises.</p>
 
                     <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                         {/* Free Plan */}
-                        <div className="bg-white p-8 rounded-2xl border border-gray-200 hover:shadow-xl transition">
+                        <div className="bg-card p-8 rounded-lg border border-gray-200 hover:shadow-sm transition">
                             <h3 className="text-xl font-bold mb-2">Starter</h3>
-                            <div className="text-3xl font-black mb-4">₹0<span className="text-sm font-normal text-gray-500">/mo</span></div>
+                            <div className="text-3xl font-semibold mb-4">₹0<span className="text-sm font-normal text-gray-500">/mo</span></div>
                             <p className="text-gray-500 text-sm mb-6">Perfect for small teams</p>
                             <ul className="text-left space-y-3 mb-8">
                                 <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Up to 5 users</li>
@@ -810,28 +810,28 @@ const LandingPage = () => {
                         </div>
 
                         {/* Pro Plan - Highlighted */}
-                        <div className="bg-blue-600 text-white p-8 rounded-2xl shadow-2xl scale-105 relative overflow-hidden">
+                        <div className="bg-primary text-white p-8 rounded-lg shadow-sm scale-105 relative overflow-hidden">
                             <div className="absolute top-0 right-0 bg-yellow-400 text-gray-900 px-3 py-1 text-xs font-bold rounded-bl-lg">
                                 POPULAR
                             </div>
                             <h3 className="text-xl font-bold mb-2">Professional</h3>
-                            <div className="text-3xl font-black mb-4">₹999<span className="text-sm font-normal text-blue-200">/mo</span></div>
-                            <p className="text-blue-100 text-sm mb-6">For growing businesses</p>
+                            <div className="text-3xl font-semibold mb-4">₹999<span className="text-sm font-normal text-primary-foreground/70">/mo</span></div>
+                            <p className="text-primary-foreground/80 text-sm mb-6">For growing businesses</p>
                             <ul className="text-left space-y-3 mb-8">
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-blue-200" /> Up to 25 users</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-blue-200" /> Advanced analytics</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-blue-200" /> Automated payroll</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-blue-200" /> Priority support</li>
+                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Up to 25 users</li>
+                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Advanced analytics</li>
+                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Automated payroll</li>
+                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Priority support</li>
                             </ul>
-                            <Link to="/company-registration" className="block w-full bg-white text-blue-600 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
+                            <Link to="/company-registration" className="block w-full bg-card text-primary py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
                                 Start Free Trial
                             </Link>
                         </div>
 
                         {/* Enterprise */}
-                        <div className="bg-white p-8 rounded-2xl border border-gray-200 hover:shadow-xl transition">
+                        <div className="bg-card p-8 rounded-lg border border-gray-200 hover:shadow-sm transition">
                             <h3 className="text-xl font-bold mb-2">Enterprise</h3>
-                            <div className="text-3xl font-black mb-4">Custom</div>
+                            <div className="text-3xl font-semibold mb-4">Custom</div>
                             <p className="text-gray-500 text-sm mb-6">For large organizations</p>
                             <ul className="text-left space-y-3 mb-8">
                                 <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Unlimited users</li>
@@ -847,11 +847,11 @@ const LandingPage = () => {
             </section>
 
             {/* Newsletter */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-card">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-12 text-white text-center">
+                    <div className="bg-primary rounded-lg p-12 text-white text-center">
                         <h2 className="text-3xl font-bold mb-4">Stay Ahead of the Curve</h2>
-                        <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+                        <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
                             Get product updates, CRM tips, and industry insights delivered to your inbox.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
@@ -860,11 +860,11 @@ const LandingPage = () => {
                                 placeholder="Enter your email"
                                 className="flex-1 px-6 py-3 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white"
                             />
-                            <button className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition whitespace-nowrap">
+                            <button className="bg-card text-primary px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition whitespace-nowrap">
                                 Subscribe
                             </button>
                         </div>
-                        <p className="text-xs text-blue-200 mt-4">
+                        <p className="text-xs text-primary-foreground/70 mt-4">
                             We respect your privacy. Unsubscribe at any time.
                         </p>
                     </div>
@@ -877,7 +877,7 @@ const LandingPage = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
                         {/* Company Info */}
                         <div className="col-span-2">
-                            <span className="text-2xl font-black text-white">DIFMO</span>
+                            <span className="text-2xl font-semibold text-white">DIFMO</span>
                             <span className="text-gray-500 ml-1">CRM</span>
                             <p className="mt-4 text-gray-500 text-sm leading-relaxed">
                                 Revolutionizing business management for the next generation of Indian entrepreneurs.
@@ -958,16 +958,16 @@ const LandingPage = () => {
             {/* Floating Help Button & Chat Window */}
             <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
                 {isChatOpen && (
-                    <div className="mb-4 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+                    <div className="mb-4 w-72 sm:w-80 bg-card rounded-lg shadow-sm border border-border overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
                         {/* Chat Header */}
-                        <div className="bg-blue-600 p-4 text-white flex items-center justify-between">
+                        <div className="bg-primary p-4 text-white flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                                     <MessageSquare className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold">DIFMO Support</p>
-                                    <p className="text-[10px] text-blue-100 uppercase tracking-widest font-medium">Online now</p>
+                                    <p className="text-[10px] text-primary-foreground/80 uppercase tracking-wide font-medium">Online now</p>
                                 </div>
                             </div>
                             <button onClick={() => setIsChatOpen(false)} className="hover:bg-white/10 p-1 rounded-lg transition">
@@ -976,14 +976,14 @@ const LandingPage = () => {
                         </div>
 
                         {/* Chat Messages */}
-                        <div className="h-64 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                        <div className="h-64 overflow-y-auto p-4 space-y-4 bg-muted/60">
                             {messages.map((msg, idx) => (
                                 <div key={idx} className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}>
                                     <div className={`max-w-[85%] px-4 py-2 text-sm ${
-                                        msg.isBot 
-                                        ? 'bg-white text-slate-800 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm' 
-                                        : 'bg-blue-600 text-white rounded-2xl rounded-tr-none shadow-md'
-                                    }`}>
+ msg.isBot 
+ ? 'bg-card text-foreground rounded-lg rounded-tl-none border border-border shadow-sm' 
+ : 'bg-primary text-white rounded-lg rounded-tr-none shadow-md'
+ }`}>
                                         {msg.text}
                                     </div>
                                 </div>
@@ -991,16 +991,16 @@ const LandingPage = () => {
                         </div>
 
                         {/* Chat Input */}
-                        <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-100">
+                        <form onSubmit={handleSendMessage} className="p-3 bg-card border-t border-border">
                             <div className="relative">
                                 <input
                                     type="text"
                                     value={chatMessage}
                                     onChange={(e) => setChatMessage(e.target.value)}
                                     placeholder="Type your message..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-600 transition-all pr-10"
+                                    className="w-full bg-muted/60 border border-border rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary transition-all pr-10"
                                 />
-                                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-700">
+                                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary">
                                     <ArrowRight className="w-5 h-5" />
                                 </button>
                             </div>
@@ -1010,11 +1010,11 @@ const LandingPage = () => {
                 
                 <button 
                     onClick={() => setIsChatOpen(!isChatOpen)}
-                    className={`${isChatOpen ? 'bg-slate-800' : 'bg-blue-600'} text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all group relative`}
+                    className={`${isChatOpen ? 'bg-sidebar' : 'bg-primary'} text-white p-4 rounded-full shadow-sm transition-all group relative`}
                 >
                     {isChatOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
                     {!isChatOpen && (
-                        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none shadow-xl">
+                        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none shadow-sm">
                             Need help? Chat with us
                         </span>
                     )}
@@ -1022,12 +1022,12 @@ const LandingPage = () => {
             </div>
 
             {/* Cookie Consent (Simplified) */}
-            {/* <div className="fixed bottom-6 left-6 bg-white rounded-lg shadow-2xl p-4 max-w-sm border border-gray-200 z-50 hidden md:block">
+            {/* <div className="fixed bottom-6 left-6 bg-card rounded-lg shadow-sm p-4 max-w-sm border border-gray-200 z-50 hidden md:block">
                 <p className="text-sm text-gray-600 mb-3">
                     We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.
                 </p>
                 <div className="flex gap-2">
-                    <button className="flex-1 bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700 transition">
+                    <button className="flex-1 bg-primary text-white text-sm py-2 rounded-lg hover:bg-primary/90 transition">
                         Accept
                     </button>
                     <button className="flex-1 bg-gray-100 text-gray-700 text-sm py-2 rounded-lg hover:bg-gray-200 transition">

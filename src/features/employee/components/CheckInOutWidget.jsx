@@ -43,7 +43,7 @@ const CheckInOutWidget = ({
       label: 'Work From Home',
       icon: 'Home',
       description: 'Remote work from home',
-      color: 'text-blue-500'
+      color: 'text-primary'
     },
     {
       value: 'client_site',
@@ -104,8 +104,8 @@ const CheckInOutWidget = ({
       {/* Status Display */}
       <div className="text-center mb-8">
         <div className={`inline-flex items-center space-x-2 px-6 py-3 rounded-full text-lg font-medium ${attendanceStatus?.isCheckedIn
-          ? 'bg-success/10 text-success border border-success/20' : 'bg-muted text-muted-foreground border border-border'
-          }`}>
+ ? 'bg-success/10 text-success border border-success/20' : 'bg-muted text-muted-foreground border border-border'
+ }`}>
           <Icon
             name={attendanceStatus?.isCheckedIn ? 'UserCheck' : 'UserX'}
             size={20}
@@ -137,8 +137,8 @@ const CheckInOutWidget = ({
                 key={mode?.value}
                 onClick={() => setWorkMode(mode?.value)}
                 className={`p-4 rounded-lg border text-left transition-all duration-150 ${workMode === mode?.value
-                  ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border bg-card hover:bg-muted/50'
-                  }`}
+ ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border bg-card hover:bg-muted/50'
+ }`}
               >
                 <div className="flex items-center space-x-3">
                   <Icon name={mode?.icon} size={20} className={mode?.color} />
@@ -164,8 +164,8 @@ const CheckInOutWidget = ({
             <span className="text-sm font-medium text-foreground">Location</span>
           </div>
           <span className={`text-xs px-2 py-1 rounded-full ${location?.verified
-            ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
-            }`}>
+ ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+ }`}>
             {location?.verified ? 'Verified' : 'Unverified'}
           </span>
         </div>
@@ -192,9 +192,9 @@ const CheckInOutWidget = ({
           onClick={handleAction}
           disabled={!location?.verified && workMode === 'office' && !canCheckInWithoutLocation}
           className={`w-full py-4 text-lg font-medium ${attendanceStatus?.isCheckedIn
-            ? 'bg-error hover:bg-error/90 text-error-foreground'
-            : 'bg-success hover:bg-success/90 text-success-foreground'
-            }`}
+ ? 'bg-error hover:bg-error/90 text-error-foreground'
+ : 'bg-success hover:bg-success/90 text-success-foreground'
+ }`}
         >
           <Icon
             name={attendanceStatus?.isCheckedIn ? 'LogOut' : 'LogIn'}
@@ -243,8 +243,8 @@ const CheckInOutWidget = ({
       {attendanceStatus?.isCheckedIn && (
         <div className="mt-6 pt-6 border-t border-border">
           <div className={`flex items-center justify-between p-4 rounded-lg ${attendanceStatus?.isOnBreak
-            ? 'bg-warning/10 border border-warning/20' : 'bg-muted/50'
-            }`}>
+ ? 'bg-warning/10 border border-warning/20' : 'bg-muted/50'
+ }`}>
             <div className="flex items-center space-x-2">
               <Icon
                 name="Coffee"

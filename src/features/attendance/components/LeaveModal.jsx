@@ -41,7 +41,7 @@ const LeaveModal = ({ isOpen, onClose, employeeId, onSave }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-card w-full max-w-md p-6 rounded-lg shadow-lg border border-border">
+            <div className="bg-card w-full max-w-md p-6 rounded-lg shadow-sm border border-border">
                 <h2 className="text-xl font-semibold mb-4">Request Leave</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Select

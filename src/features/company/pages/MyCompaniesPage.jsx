@@ -46,7 +46,7 @@ const MyCompaniesPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
+        <div className="min-h-screen bg-background">
             <Header onToggleSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)} />
             <Sidebar 
                 isCollapsed={sidebarCollapsed} 
@@ -59,12 +59,12 @@ const MyCompaniesPage = () => {
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">My Workspaces</h1>
-                            <p className="text-slate-500 mt-1">Manage and switch between your registered companies.</p>
+                            <h1 className="text-2xl font-bold text-foreground">My Workspaces</h1>
+                            <p className="text-muted-foreground mt-1">Manage and switch between your registered companies.</p>
                         </div>
                         <button 
                             onClick={() => navigate('/company-registration')}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-blue-700 transition-all"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-primary/90 transition-all"
                         >
                             <Icon name="Plus" size={18} />
                             Add New Company
@@ -74,7 +74,7 @@ const MyCompaniesPage = () => {
                     {loading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="h-64 bg-white rounded-xl border border-slate-200 animate-pulse" />
+                                <div key={i} className="h-64 bg-card rounded-xl border border-border animate-pulse" />
                             ))}
                         </div>
                     ) : (
@@ -83,60 +83,60 @@ const MyCompaniesPage = () => {
                                 companies.map((company) => (
                                     <div 
                                         key={company.id} 
-                                        className={`group bg-white rounded-xl border transition-all duration-300 overflow-hidden ${
-                                            company.id === user?.company?.id 
-                                            ? 'border-blue-200 ring-2 ring-blue-500/5 shadow-md' 
-                                            : 'border-slate-200 hover:border-blue-300 hover:shadow-lg shadow-sm'
-                                        }`}
+                                        className={`group bg-card rounded-xl border transition-all duration-300 overflow-hidden ${
+ company.id === user?.company?.id 
+ ? 'border-border ring-2 ring-ring shadow-md' 
+ : 'border-border hover:border-blue-300 hover:shadow-sm shadow-sm'
+ }`}
                                     >
                                         {/* Card Header */}
                                         <div className="p-6 pb-4 flex items-start justify-between">
                                             <div className="flex items-center gap-4">
                                                 <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold ${
-                                                    company.id === user?.company?.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'
-                                                }`}>
+ company.id === user?.company?.id ? 'bg-primary text-white' : 'bg-muted text-muted-foreground/70'
+ }`}>
                                                     {company.name?.[0]?.toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{company.name}</h3>
-                                                    <p className="text-xs text-slate-500">{company.industry || 'General Business'}</p>
+                                                    <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">{company.name}</h3>
+                                                    <p className="text-xs text-muted-foreground">{company.industry || 'General Business'}</p>
                                                 </div>
                                             </div>
                                             {company.id === user?.company?.id && (
-                                                <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full uppercase tracking-wider border border-blue-100">
+                                                <span className="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-wider border border-border">
                                                     Active
                                                 </span>
                                             )}
                                         </div>
 
                                         {/* Quick Stats */}
-                                        <div className="px-6 py-4 grid grid-cols-2 gap-4 border-t border-slate-50 bg-slate-50/50">
+                                        <div className="px-6 py-4 grid grid-cols-2 gap-4 border-t border-slate-50 bg-muted/50">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400">
+                                                <div className="w-8 h-8 rounded-lg bg-card border border-border flex items-center justify-center text-muted-foreground/70">
                                                     <Icon name="Users" size={14} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Employees</p>
-                                                    <p className="text-sm font-bold text-slate-700">{company.totalEmployees || 0}</p>
+                                                    <p className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-tight">Employees</p>
+                                                    <p className="text-sm font-bold text-foreground">{company.totalEmployees || 0}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400">
+                                                <div className="w-8 h-8 rounded-lg bg-card border border-border flex items-center justify-center text-muted-foreground/70">
                                                     <Icon name="Layers" size={14} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Depts</p>
-                                                    <p className="text-sm font-bold text-slate-700">{company.totalDepartments || 0}</p>
+                                                    <p className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-tight">Depts</p>
+                                                    <p className="text-sm font-bold text-foreground">{company.totalDepartments || 0}</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Action Footer */}
-                                        <div className="p-4 bg-white border-t border-slate-100">
+                                        <div className="p-4 bg-card border-t border-border">
                                             {company.id === user?.company?.id ? (
                                                 <button 
                                                     onClick={() => navigate('/dashboard')}
-                                                    className="w-full py-2 bg-slate-50 text-slate-400 text-xs font-bold rounded-lg cursor-not-allowed text-center"
+                                                    className="w-full py-2 bg-muted/60 text-muted-foreground/70 text-xs font-bold rounded-lg cursor-not-allowed text-center"
                                                     disabled
                                                 >
                                                     Already Active
@@ -144,7 +144,7 @@ const MyCompaniesPage = () => {
                                             ) : (
                                                 <button 
                                                     onClick={() => handleSwitch(company.id)}
-                                                    className="w-full py-2 bg-white text-blue-600 border border-blue-200 text-xs font-bold rounded-lg hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm text-center"
+                                                    className="w-full py-2 bg-card text-primary border border-border text-xs font-bold rounded-lg hover:bg-primary/90 hover:text-white hover:border-primary transition-all shadow-sm text-center"
                                                 >
                                                     Switch to Workspace
                                                 </button>
@@ -153,17 +153,17 @@ const MyCompaniesPage = () => {
                                     </div>
                                 ))
                             ) : (
-                                <div className="col-span-full py-20 bg-white rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center">
-                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+                                <div className="col-span-full py-20 bg-card rounded-lg border border-dashed border-border flex flex-col items-center justify-center text-center">
+                                    <div className="w-16 h-16 bg-muted/60 rounded-full flex items-center justify-center text-muted-foreground/70 mb-4">
                                         <Icon name="Layers" size={32} />
                                     </div>
-                                    <h3 className="text-lg font-bold text-slate-900">No Workspaces Found</h3>
-                                    <p className="text-slate-500 max-w-xs mt-1">
+                                    <h3 className="text-lg font-bold text-foreground">No Workspaces Found</h3>
+                                    <p className="text-muted-foreground max-w-xs mt-1">
                                         We couldn't find any companies associated with your account.
                                     </p>
                                     <button 
                                         onClick={() => navigate('/company-registration')}
-                                        className="mt-6 px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all"
+                                        className="mt-6 px-6 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-all"
                                     >
                                         Register Your First Company
                                     </button>

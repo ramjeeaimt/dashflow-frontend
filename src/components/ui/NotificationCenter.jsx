@@ -153,7 +153,7 @@ const NotificationCenter = () => {
       </button>
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="fixed inset-x-4 sm:inset-x-auto top-16 sm:absolute sm:right-0 sm:mt-2 w-auto sm:w-80 bg-popover border border-border rounded-lg shadow-xl z-50 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-x-4 sm:inset-x-auto top-16 sm:absolute sm:right-0 sm:mt-2 w-auto sm:w-80 bg-popover border border-border rounded-lg shadow-sm z-50 animate-in fade-in zoom-in duration-200">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h3 className="text-sm font-semibold text-popover-foreground">
@@ -200,8 +200,8 @@ const NotificationCenter = () => {
                     key={notification?.id}
                     onClick={() => handleNotificationClick(notification)}
                     className={`w-full flex items-start space-x-3 p-4 text-left hover:bg-muted transition-colors duration-150 ${
-                      !notification?.read ? 'bg-muted/50' : ''
-                    }`}
+ !notification?.read ? 'bg-muted/50' : ''
+ }`}
                   >
                     <div className={`mt-1 ${getNotificationColor(notification)}`}>
                       <Icon name={getNotificationIcon(notification)} size={16} />
@@ -210,8 +210,8 @@ const NotificationCenter = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
                         <p className={`text-sm font-medium ${
-                          !notification?.read ? 'text-popover-foreground' : 'text-muted-foreground'
-                        }`}>
+ !notification?.read ? 'text-popover-foreground' : 'text-muted-foreground'
+ }`}>
                           {notification?.title}
                         </p>
                         {!notification?.read && (

@@ -24,7 +24,7 @@ const ExpenseViewModal = ({ isOpen, onClose, expense }) => {
             case 'rejected':
                 return { cls: 'bg-rose-50 text-rose-700 border border-rose-100', label: 'Rejected', Icon: AlertCircle };
             default:
-                return { cls: 'bg-slate-50 text-slate-600 border border-slate-100', label: status || 'N/A', Icon: CheckCircle2 };
+                return { cls: 'bg-muted/60 text-muted-foreground border border-border', label: status || 'N/A', Icon: CheckCircle2 };
         }
     };
 
@@ -50,19 +50,19 @@ const ExpenseViewModal = ({ isOpen, onClose, expense }) => {
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden z-10">
+            <div className="relative w-full max-w-xl bg-card rounded-lg shadow-sm overflow-hidden z-10">
                 {/* Header */}
-                <div className={`flex items-center justify-between px-6 py-5 border-b border-slate-100 ${isCredit ? 'bg-emerald-50/60' : isPayroll ? 'bg-amber-50/60' : 'bg-rose-50/40'}`}>
+                <div className={`flex items-center justify-between px-6 py-5 border-b border-border ${isCredit ? 'bg-emerald-50/60' : isPayroll ? 'bg-amber-50/60' : 'bg-rose-50/40'}`}>
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-xl ${isCredit ? 'bg-emerald-100 text-emerald-700' : isPayroll ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
                             {isPayroll ? <Wallet size={20} /> : isCredit ? <IndianRupee size={20} /> : <CreditCard size={20} />}
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">{isPayroll ? 'Payroll Details' : 'Transaction Details'}</h2>
-                            <p className="text-xs text-slate-500 mt-0.5">{isCredit ? 'Incoming Credit' : isPayroll ? 'Payroll Disbursement' : 'Outgoing Debit'}</p>
+                            <h2 className="text-lg font-bold text-foreground">{isPayroll ? 'Payroll Details' : 'Transaction Details'}</h2>
+                            <p className="text-xs text-muted-foreground mt-0.5">{isCredit ? 'Incoming Credit' : isPayroll ? 'Payroll Disbursement' : 'Outgoing Debit'}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-700">
+                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground/70 hover:text-foreground">
                         <X size={20} />
                     </button>
                 </div>
@@ -71,26 +71,26 @@ const ExpenseViewModal = ({ isOpen, onClose, expense }) => {
                 <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
                     {/* Amount - hero */}
                     <div className={`rounded-xl p-5 text-center ${isCredit ? 'bg-emerald-50 border border-emerald-100' : isPayroll ? 'bg-amber-50 border border-amber-100' : 'bg-rose-50 border border-rose-100'}`}>
-                        <p className="text-[10px] font-bold uppercase tracking-widest mb-1 text-slate-500">Amount</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide mb-1 text-muted-foreground">Amount</p>
                         <p className={`text-4xl font-bold tracking-tight ${isCredit ? 'text-emerald-600' : isPayroll ? 'text-amber-600' : 'text-rose-600'}`}>
                             {isCredit ? '+' : '−'}{formatAmt(amount)}
                         </p>
-                        <p className="text-xs text-slate-400 mt-1">Currency: {currency}</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">Currency: {currency}</p>
                     </div>
 
                     {/* Title & Type grid */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
+                        <div className="bg-muted/60 rounded-xl p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 flex items-center gap-1">
                                 <FileText size={11} /> Title
                             </p>
-                            <p className="text-sm font-bold text-slate-900">{title}</p>
+                            <p className="text-sm font-bold text-foreground">{title}</p>
                         </div>
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
+                        <div className="bg-muted/60 rounded-xl p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 flex items-center gap-1">
                                 <Tag size={11} /> Category
                             </p>
-                            <span className="inline-block text-xs font-bold text-slate-700 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
+                            <span className="inline-block text-xs font-bold text-foreground bg-card border border-border px-2.5 py-1 rounded-full">
                                 {category}
                             </span>
                         </div>
@@ -98,17 +98,17 @@ const ExpenseViewModal = ({ isOpen, onClose, expense }) => {
 
                     {/* Date & Status */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
+                        <div className="bg-muted/60 rounded-xl p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 flex items-center gap-1">
                                 <Calendar size={11} /> Date
                             </p>
-                            <p className="text-sm font-bold text-slate-900">
+                            <p className="text-sm font-bold text-foreground">
                                 {dateValue ? format(dateValue, 'MMM dd, yyyy') : '—'}
                             </p>
-                            {dateValue && <p className="text-[10px] text-slate-400 mt-0.5">{format(dateValue, 'EEEE')}</p>}
+                            {dateValue && <p className="text-[10px] text-muted-foreground/70 mt-0.5">{format(dateValue, 'EEEE')}</p>}
                         </div>
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Status</p>
+                        <div className="bg-muted/60 rounded-xl p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5">Status</p>
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${statusInfo.cls}`}>
                                 <StatusIcon size={13} /> {statusInfo.label}
                             </span>
@@ -117,36 +117,36 @@ const ExpenseViewModal = ({ isOpen, onClose, expense }) => {
 
                     {/* Description */}
                     {description && (
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Description / Notes</p>
-                            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{description}</p>
+                        <div className="bg-muted/60 rounded-xl p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-2">Description / Notes</p>
+                            <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{description}</p>
                         </div>
                     )}
 
                     {/* Employee Info */}
                     {employee?.user && (
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1">
+                        <div className="bg-muted/60 rounded-xl p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-3 flex items-center gap-1">
                                 <User size={11} /> {isPayroll ? 'Employee' : 'Posted By'}
                             </p>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
                                     {(employee.user.firstName?.[0] || '') + (employee.user.lastName?.[0] || '')}
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-slate-900 text-sm">{employee.user.firstName} {employee.user.lastName}</p>
-                                    <p className="text-xs text-slate-400">{employee.user.email}</p>
+                                    <p className="font-semibold text-foreground text-sm">{employee.user.firstName} {employee.user.lastName}</p>
+                                    <p className="text-xs text-muted-foreground/70">{employee.user.email}</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {/* Metadata */}
-                    <div className="bg-slate-50/60 rounded-xl p-4 text-xs text-slate-400 space-y-1.5 border border-slate-100">
+                    <div className="bg-muted/60 rounded-xl p-4 text-xs text-muted-foreground/70 space-y-1.5 border border-border">
                         {rawExpense.id && (
                             <div className="flex justify-between">
                                 <span className="font-semibold">ID</span>
-                                <span className="font-mono text-slate-500">{rawExpense.id}</span>
+                                <span className="font-mono text-muted-foreground">{rawExpense.id}</span>
                             </div>
                         )}
                         {createdAt && (
@@ -176,10 +176,10 @@ const ExpenseViewModal = ({ isOpen, onClose, expense }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                <div className="px-6 py-4 border-t border-border bg-muted/50">
                     <button
                         onClick={onClose}
-                        className="w-full px-4 py-2.5 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors text-sm"
+                        className="w-full px-4 py-2.5 bg-sidebar text-white font-semibold rounded-xl hover:bg-sidebar transition-colors text-sm"
                     >
                         Close
                     </button>

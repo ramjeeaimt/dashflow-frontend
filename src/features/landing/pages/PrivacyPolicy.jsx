@@ -6,20 +6,20 @@ const PrivacyPolicy = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-white font-sans">
+        <div className="min-h-screen bg-card font-sans">
             {/* Header */}
-            <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+            <header className="bg-card border-b border-border sticky top-0 z-50">
                 <div className="max-w-4xl mx-auto px-8 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <button
                             onClick={() => navigate(-1)}
-                            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold transition-all"
+                            className="flex items-center gap-2 text-primary hover:text-primary font-bold transition-all"
                         >
                             <ArrowLeft size={18} />
                             <span>Go Back</span>
                         </button>
 
-                        <Link to="/" className="text-xl font-bold text-slate-900">
+                        <Link to="/" className="text-xl font-bold text-foreground">
                             DashFlow
                         </Link>
                     </div>
@@ -30,22 +30,22 @@ const PrivacyPolicy = () => {
             <main className="max-w-4xl mx-auto px-8 py-16">
                 <div>
                     {/* Title */}
-                        <h1 className="text-6xl font-black text-red-600 mb-2 uppercase tracking-tighter">
+                        <h1 className="text-6xl font-semibold text-red-600 mb-2 uppercase tracking-tighter">
                             Privacy Policy
                         </h1>
-                        <p className="text-base font-bold text-blue-600 uppercase tracking-widest">
+                        <p className="text-base font-bold text-primary uppercase tracking-wide">
                             Effective Date: April 14, 2026
                         </p>
 
                     {/* Body */}
-                    <div className="space-y-16 text-xl text-slate-700 leading-relaxed">
+                    <div className="space-y-16 text-xl text-foreground leading-relaxed">
 
-                        <section className="text-2xl font-bold text-slate-800">
+                        <section className="text-2xl font-bold text-foreground">
                             This Privacy Policy is prepared by <span className="text-red-600">DashFlow</span> ("We", "Us", or "Our").
                             We are committed to protecting and preserving the privacy of our visitors.
                         </section>
 
-                        <div className="divide-y divide-slate-100">
+                        <div className="divide-y divide-border">
                             <PolicySection
                                 id="1"
                                 title="About the App"
@@ -89,7 +89,7 @@ const PrivacyPolicy = () => {
                                 content={
                                     <div>
                                         <p>You can access, update, or delete your data anytime.</p>
-                                        <p className="mt-4 font-bold text-blue-600">
+                                        <p className="mt-4 font-bold text-primary">
                                             Contact support: <a href="mailto:difmotech@gmail.com" className="underline hover:text-red-600">difmotech@gmail.com</a>
                                         </p>
                                     </div>
@@ -104,23 +104,23 @@ const PrivacyPolicy = () => {
 
                             {/* App Access Section Simplified */}
                             <section className="py-12">
-                                <h2 className="text-3xl font-black text-red-600 mb-8 uppercase tracking-tight">
+                                <h2 className="text-3xl font-semibold text-red-600 mb-8 uppercase tracking-tight">
                                     08. App Access Instructions
                                 </h2>
 
                                 <div className="space-y-12 pl-0 sm:pl-4">
                                     <div className="grid sm:grid-cols-2 gap-12">
                                         <div>
-                                            <p className="text-blue-600 text-sm font-bold uppercase mb-4">Demo Credentials</p>
-                                            <div className="p-6 border border-slate-100 rounded-none space-y-2 font-mono text-lg">
-                                                <p><span className="text-slate-400">EMAIL:</span> test@dashflow.com</p>
-                                                <p><span className="text-slate-400">PASS:</span> 123456</p>
+                                            <p className="text-primary text-sm font-bold uppercase mb-4">Demo Credentials</p>
+                                            <div className="p-6 border border-border rounded-none space-y-2 font-mono text-lg">
+                                                <p><span className="text-muted-foreground/70">EMAIL:</span> test@dashflow.com</p>
+                                                <p><span className="text-muted-foreground/70">PASS:</span> 123456</p>
                                             </div>
                                         </div>
 
                                         <div>
-                                            <p className="text-blue-600 text-sm font-bold uppercase mb-4">How to Login</p>
-                                            <ol className="list-decimal pl-5 space-y-4 text-lg text-slate-600">
+                                            <p className="text-primary text-sm font-bold uppercase mb-4">How to Login</p>
+                                            <ol className="list-decimal pl-5 space-y-4 text-lg text-muted-foreground">
                                                 <li>Navigate to the login screen</li>
                                                 <li>Enter the provided credentials</li>
                                                 <li>Click the Login button to access the dashboard</li>
@@ -128,7 +128,7 @@ const PrivacyPolicy = () => {
                                         </div>
                                     </div>
 
-                                    <div className="p-4 text-sm text-slate-400 border-t border-slate-50 italic">
+                                    <div className="p-4 text-sm text-muted-foreground/70 border-t border-slate-50 italic">
                                         Authorized access allows for employee management, attendance tracking, and payroll processing.
                                     </div>
                                 </div>
@@ -137,14 +137,14 @@ const PrivacyPolicy = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-20 pt-8 border-t border-slate-100 flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <div className="mt-20 pt-8 border-t border-border flex justify-between text-xs font-bold text-muted-foreground/70 uppercase tracking-wide">
                         <span>Last Updated: April 2026</span>
                         <span>v1.0.0 Stable</span>
                     </div>
                 </div>
             </main>
 
-            <footer className="py-12 border-t border-slate-50 text-center text-slate-400 text-sm font-medium">
+            <footer className="py-12 border-t border-slate-50 text-center text-muted-foreground/70 text-sm font-medium">
                 © 2026 DashFlow. All rights reserved.
             </footer>
         </div>
@@ -153,11 +153,11 @@ const PrivacyPolicy = () => {
 
 const PolicySection = ({ id, title, content }) => (
     <section className="py-16 first:pt-0">
-        <h2 className="text-3xl font-black text-blue-600 mb-6 flex items-baseline gap-4 uppercase tracking-tight">
+        <h2 className="text-3xl font-semibold text-primary mb-6 flex items-baseline gap-4 uppercase tracking-tight">
             <span className="text-red-600 text-2xl font-mono">{id.padStart(2, '0')}.</span>
             {title}
         </h2>
-        <div className="text-xl text-slate-600 pl-0 sm:pl-12 font-medium">
+        <div className="text-xl text-muted-foreground pl-0 sm:pl-12 font-medium">
             {content}
         </div>
     </section>

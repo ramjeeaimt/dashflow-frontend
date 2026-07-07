@@ -73,9 +73,9 @@ const PolicyViolationAlerts = () => {
         label: 'Medium Priority'
       },
       low: { 
-        color: 'bg-blue-50 border-blue-200 text-blue-600', 
+        color: 'bg-primary/10 border-border text-primary', 
         icon: 'AlertCircle', 
-        iconColor: 'text-blue-500',
+        iconColor: 'text-primary',
         label: 'Low Priority'
       }
     };

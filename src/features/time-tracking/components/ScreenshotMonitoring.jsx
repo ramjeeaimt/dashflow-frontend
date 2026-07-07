@@ -127,7 +127,7 @@ const ScreenshotMonitoring = () => {
     <>
       <div className="space-y-6">
         {/* Header & Controls */}
-        <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+        <div className="bg-card border border-border rounded-lg p-6 card-shadow">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div>
               <h2 className="text-xl font-semibold text-foreground">Screenshot Monitoring</h2>
@@ -222,7 +222,7 @@ const ScreenshotMonitoring = () => {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+          <div className="bg-card border border-border rounded-lg p-6 card-shadow">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                 <Icon name="Camera" size={20} className="text-primary" />
@@ -234,7 +234,7 @@ const ScreenshotMonitoring = () => {
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+          <div className="bg-card border border-border rounded-lg p-6 card-shadow">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
                 <Icon name="Activity" size={20} className="text-success" />
@@ -246,7 +246,7 @@ const ScreenshotMonitoring = () => {
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 card-shadow">
+          <div className="bg-card border border-border rounded-lg p-6 card-shadow">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
                 <Icon name="Flag" size={20} className="text-warning" />
@@ -260,7 +260,7 @@ const ScreenshotMonitoring = () => {
         </div>
 
         {/* Screenshots Gallery */}
-        <div className="bg-card border border-border rounded-2xl card-shadow">
+        <div className="bg-card border border-border rounded-lg card-shadow">
           <div className="p-6 border-b border-border">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-foreground">Recent Screenshots</h3>
@@ -375,7 +375,7 @@ const ScreenshotMonitoring = () => {
       {/* Consent Modal */}
       {showConsentModal &&
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-2xl p-6 max-w-md mx-4 modal-shadow">
+          <div className="bg-card border border-border rounded-lg p-6 max-w-md mx-4 modal-shadow">
             <div className="text-center">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Icon name="Shield" size={24} className="text-primary" />

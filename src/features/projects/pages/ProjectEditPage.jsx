@@ -161,7 +161,7 @@ const ProjectEdit = () => {
                     <BreadcrumbNavigation items={breadcrumbItems} />
 
                     <div className="max-w-4xl mx-auto mt-6">
-                        <div className="bg-card rounded-2xl shadow-lg p-8 border border-border">
+                        <div className="bg-card rounded-lg shadow-sm p-8 border border-border">
                             <h1 className="text-3xl font-bold mb-6 text-center text-foreground">Edit Project</h1>
 
                             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -282,7 +282,7 @@ const ProjectEdit = () => {
                                         </button>
 
                                         {showEmployeeDropdown && (
-                                            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl z-10 max-h-64 overflow-y-auto">
+                                            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-sm z-10 max-h-64 overflow-y-auto">
                                                 {employees.length === 0 ? (
                                                     <div className="p-4 text-center text-muted-foreground text-sm">No employees found</div>
                                                 ) : (

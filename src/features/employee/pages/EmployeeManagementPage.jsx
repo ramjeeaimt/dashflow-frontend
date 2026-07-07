@@ -13,6 +13,7 @@ import { useAttendanceStore } from 'features/attendance';
 import useAuthStore from '../../../store/useAuthStore';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import toast from 'react-hot-toast';
+import { isSystemAdmin as isSystemAdminUser } from '../../../config/roles';
 
 const EmployeeManagement = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const EmployeeManagement = () => {
     { label: 'Employee Management', path: '/employee-management' }
   ];
 
-  const isSystemAdmin = ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email);
+  const isSystemAdmin = isSystemAdminUser(user);
 
   useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
@@ -267,16 +268,16 @@ const EmployeeManagement = () => {
         onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
 
-      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 bg-slate-50 min-h-screen`}>
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 bg-muted/60 min-h-screen`}>
         <div className="p-4 sm:p-8 max-w-[1600px] mx-auto">
           <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
               <BreadcrumbNavigation items={breadcrumbItems} />
               <div className="mt-4">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">
                   {isSystemAdmin ? 'Global Founder Directory' : 'Employee Management'}
                 </h1>
-                <p className="text-slate-500 max-w-2xl text-sm font-medium">
+                <p className="text-muted-foreground max-w-2xl text-sm font-medium">
                   {isSystemAdmin
                     ? 'Directory of all company administrators and founders across the DIFMO platform.'
                     : 'Efficiently manage your workforce, departments, and employee details in one place.'}
@@ -296,14 +297,14 @@ const EmployeeManagement = () => {
               </div>
               <button
                 onClick={() => fetchEmployees(user?.company?.id, filters)}
-                className="bg-white px-4 py-1.5 border border-red-200 text-xs font-bold rounded-lg hover:bg-red-50 transition-colors"
+                className="bg-card px-4 py-1.5 border border-red-200 text-xs font-bold rounded-lg hover:bg-red-50 transition-colors"
               >
                 Try Again
               </button>
             </div>
           )}
 
-          <div className="mt-4 overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-md">
+          <div className="mt-4 overflow-hidden bg-card rounded-lg border border-border shadow-sm transition-all duration-300 hover:shadow-md">
             <EmployeeActions
               employees={employees}
               selectedEmployees={selectedEmployees}
