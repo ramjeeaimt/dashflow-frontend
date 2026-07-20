@@ -1,4 +1,4 @@
-import apiClient from '../api/client';
+import apiClient, { LONG_TIMEOUT } from '../api/client';
 import { API_ENDPOINTS } from '../api/endpoints';
 
 const financeService = {
@@ -86,7 +86,7 @@ const financeService = {
         const payload = { month, year };
         if (companyId) payload.companyId = companyId;
         if (employeeId) payload.employeeId = employeeId;
-        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/bulk-generate`, payload);
+        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/bulk-generate`, payload, { timeout: LONG_TIMEOUT });
         return response.data;
     },
 
@@ -116,6 +116,16 @@ const financeService = {
         return response.data.data || response.data;
     },
 
+    // Fetch the authoritative payslip PDF — the same configured format emailed to
+    // the employee. Returns a Blob. Backend enforces owner/admin access.
+    getPayslipPdf: async (id) => {
+        const response = await apiClient.get(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}/slip`, {
+            responseType: 'blob',
+            timeout: LONG_TIMEOUT, // server renders the PDF on demand
+        });
+        return response.data;
+    },
+
     deletePayroll: async (id) => {
         const response = await apiClient.delete(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}`);
         return response.data;
@@ -129,7 +139,7 @@ const financeService = {
         return response.data;
     },
     sendPayrollEmail: async (id, payload) => {
-        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}/send-email`, payload);
+        const response = await apiClient.post(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}/send-email`, payload, { timeout: LONG_TIMEOUT });
         return response.data;
     },
 };

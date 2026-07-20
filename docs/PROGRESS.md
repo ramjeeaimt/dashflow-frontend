@@ -25,6 +25,39 @@
 
 ## Session log
 
+### 2026-07-08 — Responsiveness / overflow pass
+- **Global horizontal-overflow guard**: `html, body { overflow-x: hidden; max-width: 100% }`
+  in `styles/index.css` — kills stray page-level horizontal scroll on mobile app-wide.
+  Intentional scroll regions keep their own `overflow-x-auto`. Added `max-width:100%`
+  to img/video/canvas/svg.
+- **FinancialSummaryCard** (admin dashboard fiscal summary — the reported overflow):
+  padding `p-8 → p-5 sm:p-8`; stat grid `grid-cols-2 lg:grid-cols-4` with `min-w-0` on
+  cards (fixes the CSS-grid "children won't shrink below content" overflow) + `break-words`
+  and `text-lg sm:text-2xl` figures; budget legend/header rows now wrap and stack on mobile.
+- **Verified already-responsive** (left as-is): app shell (sidebar = mobile drawer, header
+  collapses switcher/profile text to icons on small screens, center search `hidden md:block`);
+  employee My Attendance, Employee Payroll (responsive stats + `overflow-x-auto` table +
+  new PDF viewer modal), Employee Dashboard (stacking grid). Admin payroll table has its
+  scroll wrapper so the global guard won't clip columns.
+- Build passes.
+
+### 2026-07-07 (feature batch + login polish)
+- **Employee dashboard**: added "Latest payslip" card (shows finalized sent/paid net pay
+  + status, links to full payroll); right column now stacks payslip + attendance history.
+- **Past-date attendance**: rewrote `TakeAttendanceModal` — added a date picker (max=today)
+  so admins can back-date records; also FIXED a latent crash (it referenced `<Icon>` and
+  `<EmployeeAvatar>` without importing them). Backdated entries auto-add an audit note.
+- **Employee monthly attendance**: confirmed `EmployeeAttandece` already scopes to own
+  `user.id` with month/year selectors — left intact.
+- **Employee-management**: status filter now defaults to `active` on load (clearable).
+- **Pagination**: new reusable `components/ui/Pagination.jsx` (page window + page-size
+  select); wired into the employees table (client-side over the filtered list, resets to
+  page 1 on filter/search change). Backend payroll endpoint now accepts page/limit.
+- **Login page**: rebuilt LoginForm on tokens (icon focus states, ring, animated submit)
+  and upgraded the brand panel — animated aurora blobs + grid, feature highlight cards,
+  framer-motion entrance. More interactive, on-brand (deep green / charcoal).
+- Verified: `npm run build` passes; backend security fixes retested against live DB.
+
 ### 2026-07-07 (structural redesign) — Layout/placement overhaul (Claude session)
 Decision: restructure IN PLACE, not a from-scratch folder — preserves all working
 functionality (hard requirement) while changing the skeleton.

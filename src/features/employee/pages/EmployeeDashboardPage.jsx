@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import attendanceService from '../../../services/attendance.service';
 import employeeService from '../../../services/employee.service';
 import overtimeService from '../../../services/overtime.service';
+import { usePayrollStore } from '../../../store/payrollStore';
 import useAuthStore from '../../../store/useAuthStore';
 import {
     Clock,
@@ -41,6 +43,23 @@ const EmployeeDashboard = () => {
 
     const { user, isAuthenticated } = useAuthStore();
     const [currentTime, setCurrentTime] = useState(new Date());
+    const navigate = useNavigate();
+
+    // Finalized payslips (backend scopes an employee to their own sent/paid records)
+    const { payrolls, fetchEmployeePayrolls } = usePayrollStore();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const latestPayslip = React.useMemo(() => {
+        const finalized = (payrolls || []).filter((p) => ['sent', 'paid'].includes(p.status));
+        return [...finalized].sort((a, b) =>
+            (b.year - a.year) || (b.month - a.month),
+        )[0] || null;
+    }, [payrolls]);
+
+    useEffect(() => {
+        if (isAuthenticated && user?.id) {
+            fetchEmployeePayrolls({ employeeId: user.id });
+        }
+    }, [isAuthenticated, user?.id, fetchEmployeePayrolls]);
 
 
 
@@ -431,9 +450,55 @@ const EmployeeDashboard = () => {
                             />
                         </div>
 
-                        {/* Attendance History Sidebar */}
-                        <div className="lg:col-span-1">
-                            <div className="bg-card rounded-xl shadow-sm border border-border h-full">
+                        {/* Right column: payslip + attendance history */}
+                        <div className="lg:col-span-1 space-y-6">
+                            {/* Latest payslip card */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                                <div className="p-5 border-b border-border flex items-center justify-between">
+                                    <h2 className="font-semibold flex items-center">
+                                        <Icon name="Receipt" size={18} className="mr-2 text-primary" />
+                                        Latest payslip
+                                    </h2>
+                                    <button
+                                        onClick={() => navigate('/employee/payroll')}
+                                        className="text-xs text-primary hover:underline bg-transparent border-none cursor-pointer"
+                                    >
+                                        View all
+                                    </button>
+                                </div>
+                                <div className="p-5">
+                                    {latestPayslip ? (
+                                        <div>
+                                            <div className="flex items-baseline justify-between mb-1">
+                                                <span className="text-sm text-muted-foreground">
+                                                    {monthNames[(latestPayslip.month || 1) - 1]} {latestPayslip.year}
+                                                </span>
+                                                <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${latestPayslip.status === 'paid' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'}`}>
+                                                    {latestPayslip.status === 'paid' ? 'Paid' : 'Issued'}
+                                                </span>
+                                            </div>
+                                            <p className="font-data text-2xl font-semibold text-foreground tracking-tight">
+                                                ₹{Number(latestPayslip.netSalary ?? latestPayslip.netPay ?? 0).toLocaleString('en-IN')}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">Net pay</p>
+                                            <button
+                                                onClick={() => navigate('/employee/payroll')}
+                                                className="mt-4 w-full py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                                            >
+                                                <Icon name="Download" size={15} />
+                                                View payslip
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="py-6 text-center text-sm text-muted-foreground">
+                                            No payslip issued yet. It appears here once your admin finalizes payroll.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Attendance History */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border">
                                 <div className="p-5 border-b border-border flex items-center justify-between">
                                     <h2 className="font-semibold flex items-center">
                                         <History className="w-5 h-5 mr-2 text-primary" />

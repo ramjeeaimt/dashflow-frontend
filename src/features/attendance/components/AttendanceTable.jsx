@@ -563,33 +563,36 @@ const AttendanceTable = ({
                     )}
 
                     {employee.hasRecord && (
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={(e) => handleEditClick(e, employee)}
-                          className="p-2 bg-amber-50 border border-amber-100 text-amber-500 hover:text-amber-700 hover:bg-amber-100 transition-all rounded-none"
+                          className="p-2 bg-card border border-border rounded-md text-muted-foreground hover:bg-warning hover:border-warning hover:text-white transition-colors"
                           title="Edit Record"
+                          aria-label="Edit record"
                         >
-                          <Icon name="Edit" size={14} />
+                          <Icon name="Pencil" size={15} />
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onRevoke(employee.employeeId || employee.id);
                           }}
-                          className="p-2 bg-red-50 border border-red-100 text-red-500 hover:text-red-700 hover:bg-red-100 transition-all rounded-none"
+                          className="p-2 bg-card border border-border rounded-md text-muted-foreground hover:bg-error hover:border-error hover:text-white transition-colors"
                           title="Revoke Attendance"
+                          aria-label="Revoke attendance"
                         >
-                          <Icon name="RotateCcw" size={14} />
+                          <Icon name="RotateCcw" size={15} />
                         </button>
                       </div>
                     )}
 
                     <button
                       onClick={() => onViewHistory(employee)}
-                      className="p-2 bg-muted/60 border border-border text-muted-foreground/70 hover:text-primary hover:bg-primary/10 hover:border-border transition-all rounded-none"
+                      className="p-2 bg-card border border-border rounded-md text-muted-foreground hover:bg-primary hover:border-primary hover:text-white transition-colors"
                       title="View Details"
+                      aria-label="View details"
                     >
-                      <Icon name="Eye" size={16} />
+                      <Icon name="Eye" size={15} />
                     </button>
                   </div>
                 </td>

@@ -8,7 +8,7 @@ import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import useAuthStore from '../../../store/useAuthStore';
 import financeService from '../../../services/finance.service';
 import { employeeService } from '../../../services/employee.service';
-import api from '../../../api/client';
+import api, { LONG_TIMEOUT } from '../../../api/client';
 import PayrollDetailsModal from '../components/PayrollDetailsModal';
 import PayrollReviewModal from '../components/PayrollReviewModal';
 const PayrollPage = () => {
@@ -418,10 +418,13 @@ const PayrollPage = () => {
 
     const handleFinalizeAndSend = async (payrollId, payslipHtml, emailBodyHtml) => {
         try {
+            // Rendering the PDF (Puppeteer) + SMTP delivery routinely exceeds the
+            // default 30s timeout. Use the long timeout so we never abort a job
+            // that is actually succeeding on the server.
             const response = await api.post(`/finance/payroll/${payrollId}/send`, {
                 payslipHtml,
                 emailBodyHtml
-            });
+            }, { timeout: LONG_TIMEOUT });
             console.log("Payroll Send Response:", response.data);
             if (response.data?.fallbackUsed) {
                 console.warn(`Fallback PDF used: ${response.data.fallbackReason}`);
@@ -430,7 +433,17 @@ const PayrollPage = () => {
             fetchPayroll();
         } catch (error) {
             console.error('Failed to finalize payroll:', error);
-            toast.error('Error sending payroll PDF.');
+            // A client-side abort does NOT mean the server failed — it may still
+            // be rendering/sending. Tell the admin not to re-send (duplicate email).
+            if (error.code === 'ECONNABORTED' || /timeout/i.test(error.message || '')) {
+                toast.error(
+                    'Still processing on the server — the payslip may still be delivered. Refresh in a minute before re-sending.',
+                    { position: 'top-right', duration: 7000 }
+                );
+            } else {
+                toast.error('Error sending payroll PDF.');
+            }
+            fetchPayroll(); // resync status either way
             throw error;
         }
     };

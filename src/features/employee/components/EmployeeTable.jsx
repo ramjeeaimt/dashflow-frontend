@@ -312,14 +312,20 @@ const EmployeeTable = ({
                   </td>
                 )}
                 <td className="px-6 py-4 bg-muted/30">
-                  <div className="flex items-center justify-center space-x-1 sm:opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <div className="flex items-center justify-center gap-1.5">
                     {[
-                      { icon: 'Eye', color: 'hover:bg-primary/90', onClick: () => onViewEmployee(employee) },
-                      { icon: 'Edit', color: 'hover:bg-sidebar', onClick: () => onEditEmployee(employee) },
-                      { icon: 'Trash2', color: 'hover:bg-rose-500', onClick: () => onDeleteEmployee(employee.id || employee._id) },
+                      { icon: 'Eye', label: 'View', color: 'hover:bg-primary hover:border-primary', onClick: () => onViewEmployee(employee) },
+                      { icon: 'Pencil', label: 'Edit', color: 'hover:bg-sidebar hover:border-sidebar', onClick: () => onEditEmployee(employee) },
+                      { icon: 'Trash2', label: 'Delete', color: 'hover:bg-error hover:border-error', onClick: () => onDeleteEmployee(employee.id || employee._id) },
                     ].map((btn, i) => (
-                      <button key={i} onClick={btn.onClick} className={`p-2 bg-card border border-border rounded-lg text-muted-foreground/70 hover:text-white hover:border-transparent transition-all shadow-sm ${btn.color}`}>
-                        <Icon name={btn.icon} size={14} />
+                      <button
+                        key={i}
+                        onClick={btn.onClick}
+                        title={btn.label}
+                        aria-label={btn.label}
+                        className={`p-2 bg-card border border-border rounded-md text-muted-foreground hover:text-white transition-colors ${btn.color}`}
+                      >
+                        <Icon name={btn.icon} size={15} />
                       </button>
                     ))}
                   </div>
@@ -349,10 +355,10 @@ const EmployeeTable = ({
                   <p className="text-xs text-muted-foreground/70 font-medium mt-0.5">{employee.email || '—'}</p>
                 </div>
               </div>
-              <div className="flex space-x-1">
-                <button onClick={() => onViewEmployee(employee)} className="p-2 border border-border bg-card rounded-lg text-muted-foreground/70 hover:bg-primary/90 hover:text-white transition-all shadow-sm"><Icon name="Eye" size={16} /></button>
-                <button onClick={() => onEditEmployee(employee)} className="p-2 border border-border bg-card rounded-lg text-muted-foreground/70 hover:bg-sidebar hover:text-white transition-all shadow-sm"><Icon name="Edit" size={16} /></button>
-                <button onClick={() => onDeleteEmployee(employee.id || employee._id)} className="p-2 border border-border bg-card rounded-lg text-muted-foreground/70 hover:bg-rose-500 hover:text-white transition-all shadow-sm"><Icon name="Trash2" size={16} /></button>
+              <div className="flex gap-1.5">
+                <button onClick={() => onViewEmployee(employee)} aria-label="View" className="p-2 border border-border bg-card rounded-md text-muted-foreground hover:bg-primary hover:border-primary hover:text-white transition-colors"><Icon name="Eye" size={16} /></button>
+                <button onClick={() => onEditEmployee(employee)} aria-label="Edit" className="p-2 border border-border bg-card rounded-md text-muted-foreground hover:bg-sidebar hover:border-sidebar hover:text-white transition-colors"><Icon name="Pencil" size={16} /></button>
+                <button onClick={() => onDeleteEmployee(employee.id || employee._id)} aria-label="Delete" className="p-2 border border-border bg-card rounded-md text-muted-foreground hover:bg-error hover:border-error hover:text-white transition-colors"><Icon name="Trash2" size={16} /></button>
               </div>
             </div>
 

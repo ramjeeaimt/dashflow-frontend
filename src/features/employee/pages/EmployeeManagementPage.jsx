@@ -12,6 +12,7 @@ import {
 import { useAttendanceStore } from 'features/attendance';
 import useAuthStore from '../../../store/useAuthStore';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
+import Pagination from '../../../components/ui/Pagination';
 import toast from 'react-hot-toast';
 import { isSystemAdmin as isSystemAdminUser } from '../../../config/roles';
 
@@ -25,7 +26,7 @@ const EmployeeManagement = () => {
     department: '',
     branch: '',
     employmentType: '',
-    status: ''
+    status: 'active' // default to Active on load; user can clear/change it
   });
   const [modalState, setModalState] = useState({
     isOpen: false,
@@ -88,6 +89,20 @@ const EmployeeManagement = () => {
     });
     return filtered;
   }, [employees, searchTerm, sortConfig, filters]);
+
+  // Pagination over the filtered list
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Any change to the result set should send the user back to page 1
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, filters, pageSize]);
+
+  const paginatedEmployees = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredAndSortedEmployees.slice(start, start + pageSize);
+  }, [filteredAndSortedEmployees, page, pageSize]);
 
   const handleSort = (key) => {
     setSortConfig((prev) => ({
@@ -324,7 +339,7 @@ const EmployeeManagement = () => {
             />
 
             <EmployeeTable
-              employees={filteredAndSortedEmployees}
+              employees={paginatedEmployees}
               setEmployees={setEmployees}
               selectedEmployees={selectedEmployees}
               onSelectEmployee={handleSelectEmployee}
@@ -336,6 +351,15 @@ const EmployeeManagement = () => {
               onSort={handleSort}
               loading={loading}
             />
+            {!loading && filteredAndSortedEmployees.length > 0 && (
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                totalItems={filteredAndSortedEmployees.length}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+              />
+            )}
           </div>
 
           <EmployeeModal

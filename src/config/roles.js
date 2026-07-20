@@ -35,6 +35,19 @@ export const SYSTEM_ADMIN_EMAILS = [
 /** Account(s) that operate across all companies. */
 export const GLOBAL_OWNER_EMAILS = ['hello@system.com'];
 
+/**
+ * Platform super admins — may manage EVERY company (the cross-company "System
+ * Admin" tools). This mirrors the backend gate in `company.controller.ts`:
+ * `Super Admin` role OR one of these emails. It deliberately EXCLUDES the
+ * broader legacy admin allowlist (e.g. pritam@difmo.com is a company admin, not
+ * a platform operator) so company admins get the full company sidebar.
+ */
+export const PLATFORM_SUPER_ADMIN_EMAILS = [
+  'admin@difmo.com',
+  'info@difmo.com',
+  'hello@system.com',
+];
+
 const norm = (value) => (value || '').trim().toUpperCase();
 
 const userRoleNames = (user) =>
@@ -52,6 +65,11 @@ export const hasNonEmployeeRole = (user) =>
 
 export const isGlobalOwner = (user) =>
   GLOBAL_OWNER_EMAILS.some((email) => norm(email) === norm(user?.email));
+
+/** Platform super admin — can manage all companies (matches backend gate). */
+export const isPlatformSuperAdmin = (user) =>
+  hasRole(user, ROLES.SUPER_ADMIN) ||
+  PLATFORM_SUPER_ADMIN_EMAILS.some((email) => norm(email) === norm(user?.email));
 
 /** Legacy allowlisted accounts — admin regardless of role rows. */
 export const isSystemAdmin = (user) =>

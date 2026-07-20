@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import useAuthStore from '../../store/useAuthStore';
 import BrandMark, { BrandGlyph } from '../BrandMark';
-import { ROLES, isGlobalOwner as isGlobalOwnerUser, isSystemAdmin as isSystemAdminUser, hasRole, hasNonEmployeeRole } from '../../config/roles';
+import { ROLES, isGlobalOwner as isGlobalOwnerUser, isSystemAdmin as isSystemAdminUser, isPlatformSuperAdmin, hasRole, hasNonEmployeeRole } from '../../config/roles';
 
 const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, onMobileClose }) => {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
 
   const isGlobalOwner = isGlobalOwnerUser(user);
   const isSystemAdmin = isSystemAdminUser(user);
+  const isPlatformAdmin = isPlatformSuperAdmin(user); // cross-company operators only
   const isCompanyAdmin = isSystemAdmin || hasRole(user, ROLES.ADMIN);
   const isAdmin = isCompanyAdmin ||
     hasRole(user, ROLES.SUPER_ADMIN, ROLES.MANAGER, ROLES.HR_MANAGER) ||
@@ -53,7 +54,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       ]
     };
 
-    if (isGlobalOwner) {
+    // Only cross-company platform operators (Super Admin role or the platform
+    // super-admin emails) get the platform-only "System Admin" view. Company
+    // admins fall through to the full company sidebar below.
+    if (isPlatformAdmin) {
       return [systemAdminSection];
     }
 
@@ -172,14 +176,13 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       }
     ];
 
-    if (isSystemAdmin) {
-      // System Admin only sees the Global tools
-      return [systemAdminSection];
-    }
-
-    // Company Admin/Standard Admin sees the Company tools
+    // Note: the platform-only view (System Admin section) is granted to the
+    // global owner ONLY, handled above via `isGlobalOwner`. Being in the legacy
+    // admin email allowlist (`isSystemAdmin`) means "company admin" — those users
+    // must see the full company sidebar, not the cross-company platform tools
+    // (which the backend restricts to the super owner anyway).
     return adminSections;
-  }, [user, isAdmin, isSystemAdmin, isGlobalOwner, can]);
+  }, [user, isAdmin, isSystemAdmin, isPlatformAdmin, isGlobalOwner, can]);
 
   const normalizedSections = useMemo(() => {
     return sections
@@ -200,23 +203,32 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       .filter((section) => section.items.length > 0);
   }, [sections]);
 
-  useEffect(() => {
-    const nextOpenGroups = {};
-    normalizedSections.forEach((section) => {
-      section.items.forEach((item) => {
-        if (item.children) {
-          nextOpenGroups[item.key] = item.children.some((child) => activePath.startsWith(child.path));
-        }
+  // Open the group containing the active route BEFORE the browser paints, so a
+  // freshly-mounted sidebar (each route renders its own) never flashes all-collapsed
+  // then snaps open — that snap was the "jerk" on navigation.
+  useLayoutEffect(() => {
+    setOpenGroups((prev) => {
+      const next = { ...prev };
+      normalizedSections.forEach((section) => {
+        section.items.forEach((item) => {
+          if (item.children && item.children.some((child) => activePath.startsWith(child.path))) {
+            next[item.key] = true; // ensure active group is open; keep user's other toggles
+          }
+        });
       });
+      return next;
     });
-    setOpenGroups((prev) => ({ ...nextOpenGroups, ...prev }));
   }, [activePath, normalizedSections]);
 
   const isPathActive = (path) => activePath === path || activePath.startsWith(`${path}/`);
   const isGroupActive = (item) => item.children?.some((child) => isPathActive(child.path));
 
   const handleLeafNavigation = (path) => {
-    navigate(path);
+    // Don't re-navigate to the page we're already on — that would remount the
+    // whole page (and this sidebar) for nothing, which reads as a jump.
+    if (path && !isPathActive(path)) {
+      navigate(path);
+    }
     onMobileClose?.();
   };
 

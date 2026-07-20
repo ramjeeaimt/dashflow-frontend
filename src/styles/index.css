@@ -1,3 +1,4 @@
+html,
 body {
   margin: 0;
   padding: 0;
@@ -5,6 +6,11 @@ body {
   font-size: 14px;
   line-height: 1.5;
   background-color: #f7f6f2;
+  /* Safety net: never let a stray wide element create a horizontal page
+     scrollbar on mobile. Intentional scroll regions use their own
+     overflow-x-auto containers, which are unaffected. */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 * {
@@ -12,6 +18,20 @@ body {
   line-height: inherit;
   font-family: inherit;
   margin: unset;
+}
+
+/* Media never forces the layout wider than its column. NB: bare `svg` is
+   intentionally excluded — constraining icon SVGs collapses lucide icons inside
+   flex containers. Chart SVGs stay responsive via their ResponsiveContainer. */
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+/* Icons keep their intrinsic size and never shrink in flex rows */
+svg.lucide {
+  flex-shrink: 0;
 }
 
 /* Industrial Precision Scrollbar */

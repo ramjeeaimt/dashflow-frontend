@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../../store/useAuthStore";
 import { usePayrollStore } from "store/payrollStore";
+import financeService from "../../../services/finance.service";
 import {
   Search, FileText, Download, Filter,
   ChevronRight, AlertCircle, Calendar,
@@ -10,10 +11,7 @@ import {
 } from "lucide-react";
 import Sidebar from "components/ui/Sidebar";
 import Header from "components/ui/Header";
-
-// PDF Libraries
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import PdfViewer from "components/ui/PdfViewer";
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const currentYear = new Date().getFullYear();
@@ -31,10 +29,12 @@ const EmployeePayrollPage = () => {
   const [selectedMonth, setSelectedMonth] = useState("All");
   const [selectedYear, setSelectedYear] = useState("");
 
-  // States for PDF Preview
+  // States for PDF Preview (real backend payslip PDF, same as emailed)
   const [selectedPayroll, setSelectedPayroll] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const pdfRef = useRef();
+  const [pdfBlob, setPdfBlob] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState(null);
 
  useEffect(() => {
   // 🔹 Check karein ki user profile load ho chuki hai
@@ -47,23 +47,42 @@ const EmployeePayrollPage = () => {
   }
 }, [user, fetchEmployeePayrolls]);
 
-  // ========== PDF DOWNLOAD LOGIC ==========
-  const downloadPDF = async () => {
-    const element = pdfRef.current;
-    if (!element) return;
-
+  // ========== PAYSLIP PREVIEW / DOWNLOAD (real configured PDF) ==========
+  // Open the preview: fetch the authoritative payslip PDF from the backend
+  // (the exact configured format emailed to the employee) and show it inline.
+  const openPayslip = async (payroll) => {
+    setSelectedPayroll(payroll);
+    setIsPreviewOpen(true);
+    setPdfError(null);
+    setPdfLoading(true);
+    setPdfBlob(null);
     try {
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Payslip_${monthNames[selectedPayroll.month - 1]}_${selectedPayroll.year}.pdf`);
-    } catch (error) {
-      console.error("PDF Export Error:", error);
+      const blob = await financeService.getPayslipPdf(payroll.id);
+      setPdfBlob(blob);
+    } catch (err) {
+      console.error("Failed to load payslip PDF:", err);
+      setPdfError("Could not load your payslip. Please try again or contact HR.");
+    } finally {
+      setPdfLoading(false);
     }
+  };
+
+  const closePayslip = () => {
+    setIsPreviewOpen(false);
+    setPdfBlob(null);
+    setSelectedPayroll(null);
+  };
+
+  const downloadPDF = () => {
+    if (!pdfBlob || !selectedPayroll) return;
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Payslip_${monthNames[selectedPayroll.month - 1]}_${selectedPayroll.year}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   };
 
   // ========== ADVANCED FILTERING LOGIC ==========
@@ -229,7 +248,7 @@ const EmployeePayrollPage = () => {
                     filteredPayrolls.map((p) => (
                       <tr
                         key={p.id}
-                        onClick={() => { setSelectedPayroll(p); setIsPreviewOpen(true); }}
+                        onClick={() => openPayslip(p)}
                         className="hover:bg-muted/60 transition-all cursor-pointer group"
                       >
                         <td className="px-6 py-4">
@@ -254,8 +273,11 @@ const EmployeePayrollPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button className="p-2 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg">
-                           <span className="px-2 py-1 bg-green-500 text-white rounded-full">View</span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openPayslip(p); }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                          >
+                            <FileText size={13} /> View
                           </button>
                         </td>
                       </tr>
@@ -274,30 +296,52 @@ const EmployeePayrollPage = () => {
           </div>
         </main>
 
-        {/* Preview Modal */}
+        {/* Preview Modal — renders the actual configured payslip PDF */}
         {isPreviewOpen && selectedPayroll && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sidebar/60 backdrop-blur-sm">
-            <div className="bg-card w-full max-w-md overflow-hidden animate-in zoom-in duration-200">
-              <div ref={pdfRef} className="p-8 bg-card">
-                <div className="text-center mb-6">
-                  <h2 className="text-xl font-semibold text-foreground uppercase tracking-tight">Salary Payslip</h2>
-                  <p className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-wide">{monthNames[selectedPayroll.month - 1]} {selectedPayroll.year}</p>
+            <div className="bg-card w-full max-w-3xl h-[88vh] rounded-lg overflow-hidden border border-border flex flex-col animate-in zoom-in-95 duration-200">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <div>
+                  <h2 className="font-display text-base font-semibold text-foreground tracking-tight">
+                    Payslip · {monthNames[selectedPayroll.month - 1]} {selectedPayroll.year}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">Net ₹{Number(selectedPayroll.netSalary).toLocaleString('en-IN')}</p>
                 </div>
-                <div className="space-y-4">
-                  <DetailRow label="Employee" value={user?.name} />
-                  <DetailRow label="Basic Salary" value={`₹${selectedPayroll.basicSalary}`} />
-                  <DetailRow label="Allowances" value={`₹${selectedPayroll.allowances}`} />
-                  <DetailRow label="Deductions" value={`- ₹${selectedPayroll.deductions}`} isRed />
-                  <div className="flex justify-between pt-4 border-t border-border">
-                    <span className="text-xs font-semibold text-primary uppercase tracking-wide">Net Amount</span>
-                    <span className="text-xl font-semibold text-foreground">₹{Number(selectedPayroll.netSalary).toLocaleString('en-IN')}</span>
-                  </div>
-                </div>
+                <button onClick={closePayslip} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                  <X size={18} />
+                </button>
               </div>
-              <div className="p-6 bg-muted/60 flex gap-3">
-                <button onClick={() => setIsPreviewOpen(false)} className="flex-1 px-6 py-3 bg-card border border-border rounded-xl text-xs font-semibold text-muted-foreground hover:bg-muted">Close</button>
-                <button onClick={downloadPDF} className="flex-1 px-6 py-3 bg-primary text-xs font-semibold text-white hover:bg-primary/90 shadow-sm flex items-center justify-center gap-2 transition-all">
-                  <Download size={14} /> Download
+
+              {/* PDF body — custom viewer (no native browser PDF chrome) */}
+              <div className="flex-1 overflow-hidden">
+                {pdfLoading ? (
+                  <div className="h-full flex flex-col items-center justify-center gap-3 text-muted-foreground bg-muted/40">
+                    <Loader2 size={28} className="animate-spin" />
+                    <p className="text-sm">Loading your payslip…</p>
+                  </div>
+                ) : pdfError ? (
+                  <div className="h-full flex flex-col items-center justify-center gap-2 text-center px-6 bg-muted/40">
+                    <AlertCircle size={28} className="text-error" />
+                    <p className="text-sm text-muted-foreground">{pdfError}</p>
+                    <button onClick={() => openPayslip(selectedPayroll)} className="mt-2 text-sm text-primary hover:underline">Retry</button>
+                  </div>
+                ) : pdfBlob ? (
+                  <PdfViewer blob={pdfBlob} className="h-full" />
+                ) : null}
+              </div>
+
+              {/* Footer */}
+              <div className="px-5 py-3 border-t border-border flex justify-end gap-3">
+                <button onClick={closePayslip} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Close
+                </button>
+                <button
+                  onClick={downloadPDF}
+                  disabled={!pdfBlob}
+                  className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Download size={15} /> Download PDF
                 </button>
               </div>
             </div>

@@ -1,227 +1,263 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Check, Clock } from 'lucide-react';
+import { X, Save, Check } from 'lucide-react';
+import Icon from '../../../components/AppIcon';
+
+const todayStr = () => new Date().toISOString().split('T')[0];
+
+// Small inline avatar (the shared one is defined privately in table components)
+const Avatar = ({ name }) => {
+  const initials = (name || '?')
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  return (
+    <div className="w-9 h-9 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
+      {initials}
+    </div>
+  );
+};
 
 const TakeAttendanceModal = ({ isOpen, onClose, onSave, employees, existingAttendance }) => {
-    const [attendanceMap, setAttendanceMap] = useState({});
-    const [loading, setLoading] = useState(false);
+  const [attendanceMap, setAttendanceMap] = useState({});
+  const [loading, setLoading] = useState(false);
+  // Admins may record attendance for a past day (e.g. a missed check-in).
+  const [selectedDate, setSelectedDate] = useState(todayStr());
 
-    useEffect(() => {
-        if (isOpen && employees.length > 0) {
-            const initialMap = {};
-            employees.forEach(emp => {
-                // Check if employee already has attendance for today
-                const existing = existingAttendance.find(
-                    record => record.employeeId === emp.id &&
-                        new Date(record.date).toDateString() === new Date().toDateString()
-                );
+  useEffect(() => {
+    if (isOpen && employees.length > 0) {
+      const initialMap = {};
+      employees.forEach((emp) => {
+        const existing = existingAttendance.find(
+          (record) =>
+            record.employeeId === emp.id &&
+            new Date(record.date).toISOString().split('T')[0] === selectedDate,
+        );
 
-                if (existing) {
-                    initialMap[emp.id] = {
-                        status: existing.status,
-                        checkInTime: existing.checkInTime,
-                        checkOutTime: existing.checkOutTime,
-                        isExisting: true
-                    };
-                } else {
-                    initialMap[emp.id] = {
-                        status: 'present', // Default to present
-                        checkInTime: '09:00',
-                        checkOutTime: '',
-                        label: '',
-                        isExisting: false
-                    };
-                }
-            });
-            setAttendanceMap(initialMap);
+        if (existing) {
+          initialMap[emp.id] = {
+            status: existing.status,
+            checkInTime: existing.checkInTime,
+            checkOutTime: existing.checkOutTime,
+            isExisting: true,
+          };
+        } else {
+          initialMap[emp.id] = {
+            status: 'present',
+            checkInTime: '09:00',
+            checkOutTime: '',
+            label: '',
+            isExisting: false,
+          };
         }
-    }, [isOpen, employees, existingAttendance]);
+      });
+      setAttendanceMap(initialMap);
+    }
+  }, [isOpen, employees, existingAttendance, selectedDate]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    const handleStatusChange = (employeeId, status) => {
-        setAttendanceMap(prev => ({
-            ...prev,
-            [employeeId]: { ...prev[employeeId], status }
-        }));
-    };
+  const isPast = selectedDate < todayStr();
 
-    const handleTimeChange = (employeeId, field, value) => {
-        setAttendanceMap(prev => ({
-            ...prev,
-            [employeeId]: { ...prev[employeeId], [field]: value }
-        }));
-    };
+  const handleStatusChange = (employeeId, status) => {
+    setAttendanceMap((prev) => ({
+      ...prev,
+      [employeeId]: { ...prev[employeeId], status },
+    }));
+  };
 
-    const handleSubmit = async () => {
-        setLoading(true);
-        const recordsToSave = Object.entries(attendanceMap)
-            .filter(([_, data]) => !data.isExisting) // Only save new records
-            .map(([employeeId, data]) => ({
-                employeeId,
-                status: data.status,
-                checkInTime: data.checkInTime,
-                checkOutTime: data.checkOutTime,
-                label: data.label,
-                date: new Date().toISOString().split('T')[0]
-            }));
+  const handleTimeChange = (employeeId, field, value) => {
+    setAttendanceMap((prev) => ({
+      ...prev,
+      [employeeId]: { ...prev[employeeId], [field]: value },
+    }));
+  };
 
-        if (recordsToSave.length === 0) {
-            alert('No new records to save.');
-            setLoading(false);
-            onClose();
-            return;
-        }
+  const handleSubmit = async () => {
+    setLoading(true);
+    const recordsToSave = Object.entries(attendanceMap)
+      .filter(([_, data]) => !data.isExisting)
+      .map(([employeeId, data]) => ({
+        employeeId,
+        status: data.status,
+        checkInTime: data.checkInTime,
+        checkOutTime: data.checkOutTime,
+        label: data.label,
+        date: selectedDate,
+        // A back-dated entry carries an audit note automatically
+        ...(isPast ? { notes: `Back-dated entry for ${selectedDate} added by admin` } : {}),
+      }));
 
-        await onSave(recordsToSave);
-        setLoading(false);
-    };
+    if (recordsToSave.length === 0) {
+      alert('No new records to save for this date.');
+      setLoading(false);
+      onClose();
+      return;
+    }
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-sidebar/60 backdrop-blur-md p-4">
-            <div className="bg-card w-full max-w-5xl max-h-[90vh] flex flex-col rounded-lg shadow-sm border border-border animate-in fade-in zoom-in-95 duration-200">
+    await onSave(recordsToSave);
+    setLoading(false);
+  };
 
-                {/* Header */}
-                <div className="flex items-center justify-between p-8 border-b border-slate-50">
-                    <div className="flex items-center space-x-5">
-                       <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-sm">
-                          <Icon name="Calendar" size={28} />
-                       </div>
-                       <div>
-                          <h2 className="text-2xl font-bold text-foreground tracking-tight">Daily Attendance</h2>
-                          <p className="text-sm font-semibold text-muted-foreground/70 mt-0.5">
-                              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                          </p>
-                       </div>
-                    </div>
-                    <button onClick={onClose} className="p-3 text-muted-foreground/70 hover:text-foreground hover:bg-muted/60 rounded-xl transition-all">
-                        <X size={24} />
-                    </button>
-                </div>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-sidebar/60 backdrop-blur-md p-4">
+      <div className="bg-card w-full max-w-5xl max-h-[90vh] flex flex-col rounded-lg modal-shadow border border-border animate-in fade-in zoom-in-95 duration-200">
 
-                {/* Content - Scrollable List */}
-                <div className="flex-1 overflow-y-auto p-8 bg-muted/20">
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-12 gap-6 text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wide mb-4 px-4">
-                            <div className="col-span-4 flex items-center space-x-2">
-                                <span>Employee</span>
-                            </div>
-                            <div className="col-span-3">Attendance Status</div>
-                            <div className="col-span-2">Time In</div>
-                            <div className="col-span-1">Time Out</div>
-                            <div className="col-span-2">Label</div>
-                        </div>
-
-                        <div className="space-y-3">
-                            {employees.map(emp => {
-                                const data = attendanceMap[emp.id] || {};
-                                const isExisting = data.isExisting;
-
-                                return (
-                                    <div key={emp.id} className={`grid grid-cols-12 gap-6 items-center p-5 rounded-lg border transition-all ${isExisting ? 'bg-muted/50 border-border opacity-60' : 'bg-card border-border hover:border-border hover:shadow-md'}`}>
-
-                                        {/* Employee Info */}
-                                        <div className="col-span-4 flex items-center space-x-4">
-                                            <EmployeeAvatar employee={{ employeeName: emp.name, ...emp }} size="md" />
-                                            <div>
-                                                <div className="text-sm font-bold text-foreground tracking-tight">{emp.name}</div>
-                                                <div className="text-[11px] font-medium text-muted-foreground/70">{emp.employeeCode || emp.id}</div>
-                                            </div>
-                                        </div>
-
-                                        {/* Status Selection */}
-                                        <div className="col-span-3">
-                                            {isExisting ? (
-                                                <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted text-muted-foreground rounded-lg w-fit">
-                                                    <Icon name="Check" size={12} className="text-primary" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider">{data.status}</span>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {['present', 'absent', 'late', 'leave'].map(status => (
-                                                        <button
-                                                            key={status}
-                                                            onClick={() => handleStatusChange(emp.id, status)}
-                                                            className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-lg transition-all border ${data.status === status
- ? 'bg-primary text-white border-primary shadow-md '
- : 'bg-card text-muted-foreground/70 border-border hover:border-border'
- }`}
-                                                        >
-                                                            {status}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Time In */}
-                                        <div className="col-span-2">
-                                            <input
-                                                type="time"
-                                                value={data.checkInTime || ''}
-                                                onChange={(e) => handleTimeChange(emp.id, 'checkInTime', e.target.value)}
-                                                disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
-                                                className="w-full px-4 py-2 text-xs font-bold bg-muted/60 border border-border rounded-xl text-foreground focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
-                                            />
-                                        </div>
-
-                                        {/* Time Out */}
-                                        <div className="col-span-1">
-                                            <input
-                                                type="time"
-                                                value={data.checkOutTime || ''}
-                                                onChange={(e) => handleTimeChange(emp.id, 'checkOutTime', e.target.value)}
-                                                disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
-                                                className="w-full px-4 py-2 text-xs font-bold bg-muted/60 border border-border rounded-xl text-foreground focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none disabled:opacity-30 transition-all cursor-pointer"
-                                            />
-                                        </div>
-
-                                        {/* Label */}
-                                        <div className="col-span-2">
-                                            <input
-                                                type="text"
-                                                value={data.label || ''}
-                                                onChange={(e) => handleTimeChange(emp.id, 'label', e.target.value)}
-                                                placeholder="Label..."
-                                                disabled={isExisting || data.status === 'absent' || data.status === 'leave'}
-                                                className="w-full px-4 py-2 text-[10px] font-bold bg-muted/60 border border-border rounded-xl text-foreground focus:ring-2 focus:ring-ring/20 focus:border-blue-400 outline-none disabled:opacity-30 transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="p-8 border-t border-slate-50 bg-card flex justify-end space-x-3 rounded-b-3xl">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-2.5 text-sm font-bold text-muted-foreground/70 hover:text-foreground transition-all "
-                    >
-                        Discard Changes
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={loading}
-                        className="px-8 py-2.5 bg-primary text-white text-sm font-bold rounded-xl shadow-sm hover:bg-primary/90 transition-all flex items-center disabled:opacity-50"
-                    >
-                        {loading ? (
-                            <div className="flex items-center">
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                                Saving...
-                            </div>
-                        ) : (
-                            <>
-                                <Icon name="Save" size={18} className="mr-2" />
-                                Save Records
-                            </>
-                        )}
-                    </button>
-                </div>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-border">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+              <Icon name="Calendar" size={22} />
             </div>
+            <div>
+              <h2 className="font-display text-xl font-semibold text-foreground tracking-tight">Record attendance</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
+                  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                })}
+                {isPast && <span className="ml-2 text-warning font-medium">· back-dated</span>}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              Date
+              <input
+                type="date"
+                value={selectedDate}
+                max={todayStr()}
+                onChange={(e) => setSelectedDate(e.target.value || todayStr())}
+                className="px-3 py-1.5 bg-muted/60 border border-border rounded-md text-sm text-foreground outline-none focus:border-ring transition-colors"
+              />
+            </label>
+            <button onClick={onClose} className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+              <X size={20} />
+            </button>
+          </div>
         </div>
-    );
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 bg-muted/20">
+          <div className="hidden sm:grid grid-cols-12 gap-4 text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-3 px-4">
+            <div className="col-span-4">Employee</div>
+            <div className="col-span-3">Status</div>
+            <div className="col-span-2">Time in</div>
+            <div className="col-span-1">Out</div>
+            <div className="col-span-2">Label</div>
+          </div>
+
+          <div className="space-y-2">
+            {employees.map((emp) => {
+              const data = attendanceMap[emp.id] || {};
+              const isExisting = data.isExisting;
+              const disabled = isExisting || data.status === 'absent' || data.status === 'leave';
+
+              return (
+                <div
+                  key={emp.id}
+                  className={`grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 sm:items-center p-4 rounded-lg border transition-colors ${
+                    isExisting ? 'bg-muted/50 border-border opacity-70' : 'bg-card border-border hover:border-muted-foreground/40'
+                  }`}
+                >
+                  <div className="col-span-4 flex items-center gap-3">
+                    <Avatar name={emp.name} />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-foreground truncate">{emp.name}</div>
+                      <div className="text-[11px] text-muted-foreground">{emp.employeeCode || emp.id}</div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-3">
+                    {isExisting ? (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-muted text-muted-foreground rounded-md w-fit">
+                        <Check size={12} className="text-primary" />
+                        <span className="text-[10px] font-medium uppercase tracking-wide">{data.status}</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {['present', 'absent', 'late', 'leave'].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => handleStatusChange(emp.id, status)}
+                            className={`px-2 py-1 text-[10px] font-medium uppercase tracking-wide rounded-md transition-colors border ${
+                              data.status === status
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-card text-muted-foreground border-border hover:border-muted-foreground/40'
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-span-2">
+                    <input
+                      type="time"
+                      value={data.checkInTime || ''}
+                      onChange={(e) => handleTimeChange(emp.id, 'checkInTime', e.target.value)}
+                      disabled={disabled}
+                      className="w-full px-3 py-1.5 text-xs bg-muted/60 border border-border rounded-md text-foreground outline-none focus:border-ring disabled:opacity-40 transition-colors"
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <input
+                      type="time"
+                      value={data.checkOutTime || ''}
+                      onChange={(e) => handleTimeChange(emp.id, 'checkOutTime', e.target.value)}
+                      disabled={disabled}
+                      className="w-full px-3 py-1.5 text-xs bg-muted/60 border border-border rounded-md text-foreground outline-none focus:border-ring disabled:opacity-40 transition-colors"
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <input
+                      type="text"
+                      value={data.label || ''}
+                      onChange={(e) => handleTimeChange(emp.id, 'label', e.target.value)}
+                      placeholder="Label…"
+                      disabled={disabled}
+                      className="w-full px-3 py-1.5 text-xs bg-muted/60 border border-border rounded-md text-foreground outline-none focus:border-ring disabled:opacity-40 transition-colors"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-5 border-t border-border bg-card flex justify-end gap-3 rounded-b-lg">
+          <button
+            onClick={onClose}
+            className="px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-6 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving…
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                Save records
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default TakeAttendanceModal;

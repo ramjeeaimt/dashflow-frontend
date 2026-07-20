@@ -16,6 +16,7 @@ const Profile = () => {
   const [activeSection, setActiveSection] = useState('profile');
   const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
   const [passwordStatus, setPasswordStatus] = useState({ loading: false, error: null, success: false });
+  const [loadError, setLoadError] = useState(null);
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -50,10 +51,15 @@ const Profile = () => {
 
         const res = await apiClient.get(API_ENDPOINTS.AUTH.PROFILE);
 
-        setUser(res.data.data);
-        setFormData(res.data.data);
+        // The axios interceptor already unwraps the { statusCode, message, data }
+        // envelope, so res.data IS the profile. Fall back to res.data.data in case
+        // an unwrapped response ever comes through.
+        const profile = res.data?.data ?? res.data;
+        setUser(profile);
+        setFormData(profile);
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load profile:', err);
+        setLoadError(err.response?.data?.message || 'Could not load your profile.');
       }
     };
 
@@ -138,7 +144,28 @@ const Profile = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  if (!user) return <div className="p-10">Loading profile...</div>;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        {loadError ? (
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-3">{loadError}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-muted-foreground">
+            <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
+            <p className="text-sm">Loading profile…</p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const initials = `${formData.firstName?.[0] || ""}${formData.lastName?.[0] || ""}`;
   const company = formData.company || {};

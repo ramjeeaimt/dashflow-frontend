@@ -1,4 +1,14 @@
 import axios from 'axios';
+
+/**
+ * Timeout for genuinely long server operations — Puppeteer PDF rendering,
+ * payslip email dispatch, bulk payroll generation. Pass as a per-request
+ * override: `api.post(url, body, { timeout: LONG_TIMEOUT })`.
+ * Without this, the default below aborts the client mid-render while the
+ * backend keeps working (the user sees an error, but the email still sends).
+ */
+export const LONG_TIMEOUT = 180000; // 3 minutes
+
 // Create an Axios instance with the base URL of the backend API
 const apiClient = axios.create({
 
