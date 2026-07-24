@@ -52,10 +52,18 @@ const Projects = () => {
   const { projects, loading, fetchProjects, deleteProject } = useProjectStore();
   const navigate = useNavigate();
 
-  const handleDelete = async (projectId) => {
-    if (!window.confirm("Are you sure you want to delete this project? This will permanently delete the project and all its tasks.")) return;
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({ isOpen: false, projectId: null });
+
+  const handleDelete = (projectId) => {
+    setDeleteConfirmModal({ isOpen: true, projectId });
+  };
+
+  const confirmDelete = async () => {
+    const { projectId } = deleteConfirmModal;
+    setDeleteConfirmModal({ isOpen: false, projectId: null });
+    if (!projectId) return;
     try {
-      await deleteProject(projectId, user.company.id);
+      await deleteProject(projectId, user?.company?.id || user?.companyId);
     } catch (err) {
       alert("Failed to delete project");
     }
@@ -295,6 +303,36 @@ const Projects = () => {
               if (user?.company?.id) fetchProjects(user.company.id, true);
             }}
           />
+        )}
+
+        {/* Custom Delete Confirmation Modal */}
+        {deleteConfirmModal.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="bg-card border border-border rounded-xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
+              <div className="p-6">
+                <h3 className="text-lg font-bold text-foreground mb-2">Delete Project</h3>
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                  Are you sure you want to delete this project? This will permanently delete the project record and all of its associated tasks, comments, activity logs, and time logs. This action cannot be undone.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirmModal({ isOpen: false, projectId: null })}
+                    className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-secondary hover:bg-secondary/80 rounded-lg transition-colors border border-border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmDelete}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  >
+                    Confirm Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>
