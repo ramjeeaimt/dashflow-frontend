@@ -1,224 +1,415 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Pencil,
+  Github,
+  ExternalLink,
+  Mail,
+  Phone,
+  Calendar,
+  CalendarClock,
+  Users,
+  Wallet,
+} from "lucide-react";
 import apiClient from "../../../api/client";
 import { API_ENDPOINTS } from "../../../api/endpoints";
 import Sidebar from "../../../components/ui/Sidebar";
 import Header from "../../../components/ui/Header";
 import BreadcrumbNavigation from "../../../components/ui/BreadcrumbNavigation";
+import {
+  decorateProject,
+  HEALTH_META,
+  PHASE_STYLES,
+  formatCurrency,
+  formatDate,
+  deadlineLabel,
+  initials,
+} from "../projectUtils";
 
 const ProjectDetails = () => {
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const [project, setProject] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-    const toggleMobileSidebar = () => {
-        setIsMobileSidebarOpen(!isMobileSidebarOpen);
-    };
-
-    const handleToggleSidebar = () => {
-        setSidebarCollapsed(!sidebarCollapsed);
-    };
+  useEffect(() => {
+    let cancelled = false;
 
     const fetchProject = async () => {
-        try {
-            const res = await apiClient.get(`${API_ENDPOINTS.PROJECTS.BASE}/${id}`);
-            const data = res.data.data || res.data;
-            let assignedPeople = data.assignedPeople;
-            if (typeof assignedPeople === 'string') {
-                assignedPeople = assignedPeople.replace(/[{}"]/g, "").split(",").map(p => p.trim());
-            }
-            setProject({ ...data, assignedPeople });
-        } catch (err) {
-            console.error("Error fetching project:", err);
-        } finally {
-            setLoading(false);
-        }
+      setLoading(true);
+      try {
+        const res = await apiClient.get(`${API_ENDPOINTS.PROJECTS.BASE}/${id}`);
+        const data = res.data?.data || res.data;
+        if (!cancelled) setProject(data ? decorateProject(data) : null);
+      } catch (err) {
+        console.error("Error fetching project:", err);
+        if (!cancelled) setProject(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
 
-    useEffect(() => {
-        fetchProject();
-    }, [id]);
+    fetchProject();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
-    const breadcrumbItems = [
-        { label: "Dashboard", path: "/dashboard" },
-        { label: "Projects", path: "/projects" },
-        { label: project?.projectName || "Details", path: "#" }
-    ];
+  const breadcrumbItems = [
+    { label: "Dashboard", path: "/dashboard" },
+    { label: "Projects", path: "/projects" },
+    { label: project?.projectName || "Details", path: "#" },
+  ];
 
-    return (
-        <div className="min-h-screen bg-background dark:bg-sidebar">
-            <Header onToggleSidebar={toggleMobileSidebar} />
-            <Sidebar 
-                isCollapsed={sidebarCollapsed} 
-                onToggleCollapse={handleToggleSidebar}
-                isMobileOpen={isMobileSidebarOpen}
-                onMobileClose={() => setIsMobileSidebarOpen(false)}
-            />
-            
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 px-4 sm:px-6 md:px-8`}>
-                <div className="max-w-7xl mx-auto">
-                    
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                            <div className="relative">
-                                <div className="w-12 h-12 border-4 border-border rounded-full"></div>
-                                <div className="absolute top-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                            <p className="mt-4 text-muted-foreground font-medium animate-pulse">Building View...</p>
-                        </div>
-                    ) : !project ? (
-                        <div className="p-10 text-center text-muted-foreground">Project not found</div>
-                    ) : (
-                        <>
-                            {/* TOP ACTION BAR */}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                                <div>
-                                    <BreadcrumbNavigation items={breadcrumbItems} />
-                                    <div className="flex items-center gap-3 mt-2">
-                                        <h1 className="text-3xl font-semibold text-foreground dark:text-white tracking-tight">
-                                            {project.projectName}
-                                        </h1>
-                                        <StatusBadge phase={project.phase} />
-                                    </div>
-                                </div>
-                                <div className="flex gap-3">
-                                    <button onClick={() => navigate("/projects")} className="px-4 py-2 text-sm font-medium text-muted-foreground bg-card border border-border rounded-xl hover:bg-muted/60 transition-all shadow-sm">
-                                        Back
-                                    </button>
-                                    <button onClick={() => navigate(`/edit-project/${id}`)} className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary/90 transition-all shadow-md dark:shadow-none">
-                                        Edit Project
-                                    </button>
-                                </div>
-                            </div>
+  const health = project ? HEALTH_META[project.health] : null;
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                {/* LEFT COLUMN */}
-                                <div className="lg:col-span-2 space-y-6">
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                        <StatCard label="Total Budget" value={`₹${project.totalPayment}`} color="blue" />
-                                        <StatCard label="Collected" value={`₹${project.paymentReceived}`} color="green" />
-                                        <StatCard label="Deadline" value={project.deadline} color="orange" />
-                                    </div>
+  return (
+    <div className="min-h-screen bg-background">
+      <Header onToggleSidebar={() => setIsMobileSidebarOpen((v) => !v)} />
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+        isMobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+      />
 
-                                    <div className="bg-card dark:bg-sidebar rounded-lg p-6 shadow-sm border border-border dark:border-slate-800">
-                                        <h3 className="text-lg font-bold mb-6 text-foreground dark:text-slate-100">Project Overview</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
-                                            <DetailItem label="Assigning Date" value={project.assigningDate} />
-                                            <DetailItem label="Current Phase" value={project.phase} />
-                                            <div className="md:col-span-2">
-                                                <p className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">Links</p>
-                                                <div className="space-y-3">
-                                                    <LinkItem label="GitHub Repository" url={project.githubLink} />
-                                                    <LinkItem label="Live Deployment" url={project.deploymentLink} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+      <main
+        className={`transition-all duration-300 ${
+          sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"
+        } pt-16 pb-12 px-4 sm:px-8`}
+      >
+        <div className="max-w-6xl mx-auto">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+              <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin mb-4" />
+              <p className="text-sm text-muted-foreground">Loading project…</p>
+            </div>
+          ) : !project ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+              <h2 className="text-base font-medium text-foreground mb-1">
+                Project not found
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                It may have been deleted or you don't have access to it.
+              </p>
+              <button
+                onClick={() => navigate("/projects")}
+                className="px-4 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Back to projects
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6 pt-6">
+              <BreadcrumbNavigation items={breadcrumbItems} />
 
-                                    <div className="bg-card dark:bg-sidebar rounded-lg p-6 shadow-sm border border-border dark:border-slate-800">
-                                        <h3 className="text-lg font-bold mb-4 text-foreground dark:text-slate-100">Team Members</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {project.assignedPeople?.map((person, i) => (
-                                                <div key={i} className="flex items-center gap-2 bg-muted/60 dark:bg-sidebar px-4 py-2 rounded-full border border-border dark:border-slate-700">
-                                                    <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">
-                                                        {person.charAt(0)}
-                                                    </div>
-                                                    <span className="text-sm font-medium text-foreground dark:text-muted-foreground/70">{person}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* RIGHT COLUMN */}
-                                <div className="lg:col-span-1 space-y-6">
-                                    <div className="bg-card rounded-lg p-6 text-black shadow-sm dark:shadow-none border border-border">
-                                        <h3 className="text-lg font-bold mb-4 opacity-90">Client Details</h3>
-                                        <div className="space-y-6">
-                                            <div>
-                                                <p className="text-muted-foreground/70 text-xs font-bold uppercase tracking-wide">Client Name:</p>
-                                                <p className="text-xl font-medium mt-1">{project.clientName}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-muted-foreground/70 text-xs font-bold uppercase tracking-wide">Contact Information:</p>
-                                                <p className="mt-1">{project.contactInfo}</p>
-                                                <p className="mt-1 opacity-80">{project.clientEmail}</p>
-                                            </div>
-                                            <div className="pt-4 border-t border-border">
-                                                <button className="w-full bg-primary/10 hover:bg-primary/10 text-primary py-2 rounded-lg transition text-sm font-medium">
-                                                    Email Client
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-card dark:bg-sidebar rounded-lg p-6 shadow-sm border border-border dark:border-slate-800">
-                                        <h3 className="text-sm font-bold text-muted-foreground/70 uppercase mb-4">Payment Progress</h3>
-                                        <div className="w-full bg-muted dark:bg-sidebar h-3 rounded-full overflow-hidden">
-                                            <div 
-                                                className="bg-green-500 h-full transition-all duration-1000" 
-                                                style={{ width: `${(project.paymentReceived / project.totalPayment) * 100}%` }}
-                                            ></div>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground mt-2 font-medium">
-                                            {Math.round((project.paymentReceived / project.totalPayment) * 100)}% of total budget collected
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                    )}
+              {/* Header */}
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <h1 className="text-2xl font-semibold text-foreground tracking-tight">
+                      {project.projectName || "Untitled project"}
+                    </h1>
+                    <span
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium ${
+                        PHASE_STYLES[project.phase] || PHASE_STYLES.default
+                      }`}
+                    >
+                      {project.phase || "Planning"}
+                    </span>
+                    <span
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium ${health.badge}`}
+                    >
+                      {health.label}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1.5">
+                    {project.clientName || "No client"} · Started{" "}
+                    {formatDate(project.assigningDate)}
+                  </p>
                 </div>
-            </main>
-        </div>
-    );
-};
 
-// Sub-components
-const StatCard = ({ label, value, color }) => {
-    const colors = {
-        blue: "bg-primary/10 text-primary border-border",
-        green: "bg-emerald-50 text-emerald-700 border-emerald-100",
-        orange: "bg-orange-50 text-orange-700 border-orange-100"
-    };
-    return (
-        <div className={`${colors[color]} p-4 rounded-lg border flex flex-col items-center justify-center text-center shadow-sm`}>
-            <p className="text-[10px] font-bold uppercase tracking-tighter opacity-70 mb-1">{label}</p>
-            <p className="text-lg font-bold tracking-tight">{value || "-"}</p>
-        </div>
-    );
-};
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => navigate("/projects")}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-medium text-muted-foreground bg-card border border-border rounded-lg hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <ArrowLeft size={15} />
+                    Back
+                  </button>
+                  <button
+                    onClick={() => navigate(`/edit-project/${id}`)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Pencil size={15} />
+                    Edit
+                  </button>
+                </div>
+              </div>
 
-const DetailItem = ({ label, value }) => (
-    <div>
-        <p className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-1">{label}</p>
-        <p className="text-foreground dark:text-slate-200 font-medium leading-relaxed">{value || "Not set"}</p>
+              {/* Key figures */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <Stat
+                  icon={<Wallet size={16} />}
+                  label="Contract value"
+                  value={formatCurrency(project.totalPayment)}
+                />
+                <Stat
+                  icon={<Wallet size={16} />}
+                  label="Outstanding"
+                  value={formatCurrency(project.outstandingPayment)}
+                  emphasis={project.outstandingPayment > 0 ? "text-error" : undefined}
+                />
+                <Stat
+                  icon={<CalendarClock size={16} />}
+                  label="Deadline"
+                  value={formatDate(project.deadline)}
+                  hint={deadlineLabel(project)}
+                  hintClass={health.text}
+                />
+                <Stat
+                  icon={<Users size={16} />}
+                  label="Team size"
+                  value={project.assignedEmployees.length}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                {/* Main column */}
+                <div className="lg:col-span-2 space-y-6">
+                  <Card title="Overview">
+                    {project.description ? (
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {project.description}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">
+                        No description added yet.
+                      </p>
+                    )}
+
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mt-6 pt-6 border-t border-border">
+                      <Field
+                        icon={<Calendar size={14} />}
+                        label="Start date"
+                        value={formatDate(project.assigningDate)}
+                      />
+                      <Field
+                        icon={<CalendarClock size={14} />}
+                        label="Deadline"
+                        value={formatDate(project.deadline)}
+                      />
+                      <Field label="Phase" value={project.phase || "Planning"} />
+                      <Field
+                        label="Status"
+                        value={project.derivedStatus || project.status || "active"}
+                      />
+                    </dl>
+                  </Card>
+
+                  <Card title="Team" count={project.assignedEmployees.length}>
+                    {project.assignedEmployees.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">
+                        Nobody assigned to this project yet.
+                      </p>
+                    ) : (
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {project.assignedEmployees.map((member) => (
+                          <li
+                            key={member.id}
+                            className="flex items-center gap-3 p-3 rounded-lg border border-border"
+                          >
+                            <div className="w-9 h-9 rounded-full bg-muted overflow-hidden flex items-center justify-center text-xs font-medium text-muted-foreground shrink-0">
+                              {member.avatar ? (
+                                <img
+                                  src={member.avatar}
+                                  alt={member.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                initials(member.name)
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {member.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {member.designation || member.email || "Team member"}
+                              </p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Card>
+
+                  <Card title="Links">
+                    <div className="space-y-2">
+                      <LinkRow
+                        icon={<Github size={15} />}
+                        label="Repository"
+                        url={project.githubLink}
+                      />
+                      <LinkRow
+                        icon={<ExternalLink size={15} />}
+                        label="Live deployment"
+                        url={project.deploymentLink}
+                      />
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Side column */}
+                <div className="space-y-6">
+                  <Card title="Payment">
+                    <div className="flex items-baseline justify-between mb-2">
+                      <span className="text-2xl font-semibold text-foreground tracking-tight">
+                        {formatCurrency(project.paymentReceived)}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        of {formatCurrency(project.totalPayment)}
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-success rounded-full transition-all duration-500"
+                        style={{ width: `${project.paymentProgress}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between mt-3 text-sm">
+                      <span className="text-muted-foreground">
+                        {project.paymentProgress}% collected
+                      </span>
+                      <span
+                        className={
+                          project.outstandingPayment > 0
+                            ? "text-error font-medium"
+                            : "text-success font-medium"
+                        }
+                      >
+                        {project.outstandingPayment > 0
+                          ? `${formatCurrency(project.outstandingPayment)} due`
+                          : "Fully paid"}
+                      </span>
+                    </div>
+                  </Card>
+
+                  <Card title="Client">
+                    <p className="text-base font-medium text-foreground">
+                      {project.clientName || "Not specified"}
+                    </p>
+                    <div className="mt-4 space-y-3">
+                      <ContactRow
+                        icon={<Mail size={14} />}
+                        value={project.clientEmail}
+                        href={
+                          project.clientEmail ? `mailto:${project.clientEmail}` : null
+                        }
+                      />
+                      <ContactRow
+                        icon={<Phone size={14} />}
+                        value={project.contactInfo}
+                        href={
+                          project.contactInfo ? `tel:${project.contactInfo}` : null
+                        }
+                      />
+                    </div>
+                    {project.clientEmail && (
+                      <a
+                        href={`mailto:${project.clientEmail}`}
+                        className="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted rounded-lg hover:bg-border transition-colors"
+                      >
+                        <Mail size={15} />
+                        Email client
+                      </a>
+                    )}
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
+  );
+};
+
+const Card = ({ title, count, children }) => (
+  <section className="bg-card rounded-xl border border-border">
+    <div className="px-5 py-3.5 border-b border-border flex items-center gap-2">
+      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      {count !== undefined && (
+        <span className="text-xs text-muted-foreground">({count})</span>
+      )}
+    </div>
+    <div className="p-5">{children}</div>
+  </section>
 );
 
-const LinkItem = ({ label, url }) => (
-    <div className="flex items-center justify-between p-3 bg-muted/60 dark:bg-sidebar/50 rounded-xl border border-border dark:border-slate-800">
-        <span className="text-sm font-medium text-muted-foreground dark:text-muted-foreground/70">{label}</span>
-        <a href={url} target="_blank" rel="noreferrer" className="text-primary dark:text-indigo-400 text-sm font-bold hover:underline truncate max-w-[200px]">
-            {url ? "View Link ↗" : "N/A"}
-        </a>
+const Stat = ({ icon, label, value, hint, hintClass, emphasis }) => (
+  <div className="bg-card p-5 rounded-xl border border-border">
+    <div className="flex items-center gap-2 text-muted-foreground mb-2.5">
+      {icon}
+      <span className="text-xs font-medium">{label}</span>
     </div>
+    <p
+      className={`text-xl font-semibold tracking-tight ${
+        emphasis || "text-foreground"
+      }`}
+    >
+      {value}
+    </p>
+    {hint && <p className={`text-xs mt-1 ${hintClass || "text-muted-foreground"}`}>{hint}</p>}
+  </div>
 );
 
-const StatusBadge = ({ phase }) => {
-    const styles = {
-        'Completed': "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-        'Development': "bg-primary/10 text-primary dark:bg-primary/30 dark:text-blue-400",
-        'default': "bg-muted text-muted-foreground"
-    };
-    return (
-        <span className={`px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wide ${styles[phase] || styles.default}`}>
-            {phase}
-        </span>
-    );
-};
+const Field = ({ icon, label, value }) => (
+  <div>
+    <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1">
+      {icon}
+      {label}
+    </dt>
+    <dd className="text-sm text-foreground capitalize">{value || "Not set"}</dd>
+  </div>
+);
+
+const LinkRow = ({ icon, label, url }) => (
+  <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+    <span className="flex items-center gap-2.5 text-sm text-foreground">
+      <span className="text-muted-foreground">{icon}</span>
+      {label}
+    </span>
+    {url ? (
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+      >
+        Open
+        <ExternalLink size={13} />
+      </a>
+    ) : (
+      <span className="text-sm text-muted-foreground">Not set</span>
+    )}
+  </div>
+);
+
+const ContactRow = ({ icon, value, href }) => (
+  <div className="flex items-center gap-2.5 text-sm min-w-0">
+    <span className="text-muted-foreground shrink-0">{icon}</span>
+    {value ? (
+      <a href={href} className="text-foreground hover:text-primary truncate transition-colors">
+        {value}
+      </a>
+    ) : (
+      <span className="text-muted-foreground">Not provided</span>
+    )}
+  </div>
+);
 
 export default ProjectDetails;

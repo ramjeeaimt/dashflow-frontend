@@ -5,7 +5,10 @@ export const useCompanyStore = create((set) => ({
   company: null,
   isUpdating: false,
 
-  fetchCompany: async (id) => {
+  fetchCompany: async (id, force = false) => {
+    if (!force && get().company?.id === id) {
+      return;
+    }
     try {
       const res = await apiClient.get(`/companies/${id}`);
       set({ company: res.data });

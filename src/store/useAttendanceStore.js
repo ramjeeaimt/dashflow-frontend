@@ -25,8 +25,11 @@ const useAttendanceStore = create((set, get) => ({
         get().applyFilters();
     },
 
-    fetchAttendanceData: async (companyId) => {
+    fetchAttendanceData: async (companyId, force = false) => {
         if (!companyId) return;
+        if (!force && get().attendanceData.length > 0) {
+            return;
+        }
         set({ loading: true, error: null });
         try {
             const [attendanceRecords, employeesList, analytics] = await Promise.all([
@@ -130,7 +133,7 @@ const useAttendanceStore = create((set, get) => ({
     checkIn: async (employeeId, companyId, label) => {
         try {
             await attendanceService.checkIn(employeeId, 'Office', 'Manual Check-in', null, null, label);
-            await get().fetchAttendanceData(companyId);
+            await get().fetchAttendanceData(companyId, true);
             return true;
         } catch (error) {
             throw error;
@@ -140,7 +143,7 @@ const useAttendanceStore = create((set, get) => ({
     checkOut: async (attendanceId, companyId, notes, label) => {
         try {
             await attendanceService.checkOut(attendanceId, notes || 'Manual Check-out', null, null, label);
-            await get().fetchAttendanceData(companyId);
+            await get().fetchAttendanceData(companyId, true);
             return true;
         } catch (error) {
             throw error;
@@ -154,7 +157,7 @@ const useAttendanceStore = create((set, get) => ({
                 checkInTime: data.checkInTime ? data.checkInTime + ':00' : null,
                 checkOutTime: data.checkOutTime ? data.checkOutTime + ':00' : null,
             });
-            await get().fetchAttendanceData(companyId);
+            await get().fetchAttendanceData(companyId, true);
             return true;
         } catch (error) {
             throw error;
@@ -164,7 +167,7 @@ const useAttendanceStore = create((set, get) => ({
     bulkCheckIn: async (employeeIds, companyId, notes, label) => {
         try {
             await attendanceService.bulkCheckIn(employeeIds, notes, label);
-            await get().fetchAttendanceData(companyId);
+            await get().fetchAttendanceData(companyId, true);
             return true;
         } catch (error) {
             throw error;
@@ -178,7 +181,7 @@ const useAttendanceStore = create((set, get) => ({
                 checkInTime: data.checkInTime ? data.checkInTime : null,
                 checkOutTime: (data.checkOutTime && data.checkOutTime !== '--') ? data.checkOutTime : null,
             });
-            await get().fetchAttendanceData(companyId);
+            await get().fetchAttendanceData(companyId, true);
             return true;
         } catch (error) {
             throw error;
@@ -188,7 +191,7 @@ const useAttendanceStore = create((set, get) => ({
     revokeAttendance: async (employeeId, companyId) => {
         try {
             await attendanceService.revoke(employeeId);
-            await get().fetchAttendanceData(companyId);
+            await get().fetchAttendanceData(companyId, true);
             return true;
         } catch (error) {
             throw error;

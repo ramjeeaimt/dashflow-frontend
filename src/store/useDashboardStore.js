@@ -21,8 +21,11 @@ const useDashboardStore = create((set, get) => ({
     loading: false,
     error: null,
 
-    fetchDashboardData: async (companyId, isAdmin = false, userId = null) => {
+    fetchDashboardData: async (companyId, isAdmin = false, userId = null, force = false) => {
         if (!companyId) return;
+        if (!force && get().metrics && get().metrics.totalEmployees > 0) {
+            return;
+        }
         set({ loading: true, error: null });
         try {
             const promises = [
@@ -54,7 +57,7 @@ const useDashboardStore = create((set, get) => ({
     },
 
     refreshDashboard: async (companyId, isAdmin = false, userId = null) => {
-        await get().fetchDashboardData(companyId, isAdmin, userId);
+        await get().fetchDashboardData(companyId, isAdmin, userId, true);
     }
 }));
 

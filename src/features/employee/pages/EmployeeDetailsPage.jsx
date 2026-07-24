@@ -9,6 +9,8 @@ import apiClient from '../../../api/client';
 import { API_ENDPOINTS } from '../../../api/endpoints';
 import useAuthStore from '../../../store/useAuthStore';
 import { attendanceService } from '../../../services/attendance.service';
+import AttendanceTimeline, { WorkModeSummary } from '../../attendance/components/AttendanceTimeline';
+import WorkModeBadge from '../../attendance/components/WorkModeBadge';
 
 const EmployeeDetailsPage = () => {
     const { id } = useParams();
@@ -20,9 +22,9 @@ const EmployeeDetailsPage = () => {
     const [roles, setRoles] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [activeMenu, setActiveMenu] = useState(null);
-    const [attendanceRecords, setAttendanceRecords] = useState([]);
     const [payslipRecords, setPayslipRecords] = useState([]);
     const [profileTab, setProfileTab] = useState('attendance');
+    const [workMode, setWorkMode] = useState(null);
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -42,19 +44,28 @@ const EmployeeDetailsPage = () => {
         fetchDetails();
     }, [id, currentUser]);
 
-    // Fetch attendance & payslip data for employee profile
+    // Payslips, plus the work-mode summary so WFH status can be surfaced in the
+    // profile header without waiting for the attendance tab to be opened.
     useEffect(() => {
         const fetchProfileData = async () => {
-            try {
-                const [attData, payRes] = await Promise.all([
-                    attendanceService.getAll({ employeeId: id }),
-                    financeService.getEmployeePayrolls(id),
-                ]);
-                setAttendanceRecords(Array.isArray(attData) ? attData : []);
-                const payArr = payRes || [];
-                setPayslipRecords(Array.isArray(payArr) ? payArr : []);
-            } catch (err) {
-                console.error('Failed to fetch attendance/payslip data:', err);
+            const [timelineResult, payResult] = await Promise.allSettled([
+                attendanceService.getTimeline(id),
+                financeService.getEmployeePayrolls(id),
+            ]);
+
+            if (timelineResult.status === 'fulfilled') {
+                setWorkMode({
+                    policy: timelineResult.value?.wfhPolicy || null,
+                    requests: timelineResult.value?.wfhRequests || [],
+                });
+            } else {
+                console.error('Failed to fetch work mode:', timelineResult.reason);
+            }
+
+            if (payResult.status === 'fulfilled') {
+                setPayslipRecords(Array.isArray(payResult.value) ? payResult.value : []);
+            } else {
+                console.error('Failed to fetch payslips:', payResult.reason);
             }
         };
         if (id) fetchProfileData();
@@ -158,7 +169,17 @@ const EmployeeDetailsPage = () => {
                                 </div>
                                 <h2 className="text-xl font-bold text-foreground">{employee.user?.firstName} {employee.user?.lastName}</h2>
                                 <p className="text-[10px] font-semibold text-primary uppercase tracking-[0.2em] mt-2 px-3 py-1 bg-primary/10 inline-block rounded-full">{employee.designation?.name || 'Staff'}</p>
+                                {workMode?.policy && (
+                                    <div className="mt-4 flex justify-center">
+                                        <WorkModeBadge policy={workMode.policy} showHint />
+                                    </div>
+                                )}
                             </div>
+
+                            {/* Work arrangement — permanent WFH vs granted days */}
+                            {workMode?.policy && (
+                                <WorkModeSummary policy={workMode.policy} requests={workMode.requests} />
+                            )}
 
                             {/* TIMELINE */}
                             <div className="bg-card rounded-lg p-8 border border-border/60 shadow-sm">
@@ -256,56 +277,7 @@ const EmployeeDetailsPage = () => {
                         {/* Attendance Tab */}
                         {profileTab === 'attendance' && (
                             <div className="p-8">
-                                {attendanceRecords.length === 0 ? (
-                                    <div className="text-center py-12">
-                                        <Icon name="Calendar" size={40} className="text-slate-200 mx-auto mb-4" />
-                                        <p className="text-sm font-bold text-muted-foreground/70">No attendance records found</p>
-                                        <p className="text-[10px] text-muted-foreground/70 mt-1">Attendance data will appear here once the employee checks in.</p>
-                                    </div>
-                                ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="border-b border-border">
-                                                    <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide pb-3 pr-4">Date</th>
-                                                    <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide pb-3 pr-4">Check-in</th>
-                                                    <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide pb-3 pr-4">Check-out</th>
-                                                    <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide pb-3 pr-4">Hours</th>
-                                                    <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide pb-3">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {attendanceRecords.slice(0, 30).map((record) => {
-                                                    const checkIn = record.checkInTimestamp ? new Date(record.checkInTimestamp) : null;
-                                                    const checkOut = record.checkOutTimestamp ? new Date(record.checkOutTimestamp) : null;
-                                                    const hours = checkIn && checkOut ? ((checkOut - checkIn) / 3600000).toFixed(1) : '--';
-                                                    return (
-                                                        <tr key={record.id} className="border-b border-slate-50 hover:bg-muted/30 transition-all">
-                                                            <td className="py-3 pr-4 text-sm font-medium text-foreground">
-                                                                {checkIn ? checkIn.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--'}
-                                                            </td>
-                                                            <td className="py-3 pr-4 text-sm text-muted-foreground">
-                                                                {checkIn ? checkIn.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '--'}
-                                                            </td>
-                                                            <td className="py-3 pr-4 text-sm text-muted-foreground">
-                                                                {checkOut ? checkOut.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '--'}
-                                                            </td>
-                                                            <td className="py-3 pr-4 text-sm text-muted-foreground">{hours} hrs</td>
-                                                            <td className="py-3">
-                                                                <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase ${record.late ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
-                                                                    {record.late ? 'Late' : 'On Time'}
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                        {attendanceRecords.length > 30 && (
-                                            <p className="text-[10px] text-muted-foreground/70 mt-4 text-center">Showing latest 30 records of {attendanceRecords.length} total</p>
-                                        )}
-                                    </div>
-                                )}
+                                <AttendanceTimeline employeeId={id} />
                             </div>
                         )}
 

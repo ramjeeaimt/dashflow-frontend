@@ -5,6 +5,7 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import { toast } from 'react-hot-toast';
+import WorkModeBadge, { policyFromEmployee } from '../../attendance/components/WorkModeBadge';
 
 /** * 1. ENUMS 
  */
@@ -266,7 +267,10 @@ const EmployeeTable = ({
                   <div className="flex items-center space-x-4 cursor-pointer" onClick={() => onViewEmployee(employee)}>
                     <EmployeeAvatar employee={employee} size="md" />
                     <div>
-                      <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{employee.name || `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || '—'}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{employee.name || `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || '—'}</p>
+                        <WorkModeBadge policy={policyFromEmployee(employee)} hideOffice />
+                      </div>
                       {employee.employeeCode ? (
                         <p className="text-[10px] text-muted-foreground/70 font-bold uppercase mt-1">{employee.employeeCode}</p>
                       ) : (
@@ -344,7 +348,10 @@ const EmployeeTable = ({
               <div className="flex items-center space-x-4">
                 <EmployeeAvatar employee={employee} size="lg" />
                 <div>
-                  <p className="text-base font-bold text-foreground">{employee.name || '—'}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-base font-bold text-foreground">{employee.name || '—'}</p>
+                    <WorkModeBadge policy={policyFromEmployee(employee)} hideOffice />
+                  </div>
                   {employee.employeeCode ? (
                     <p className="text-[10px] text-primary font-bold uppercase mt-0.5">{employee.employeeCode}</p>
                   ) : (

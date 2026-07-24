@@ -58,7 +58,10 @@ const useProjectStore = create((set, get) => ({
     },
     // ----------------------------------
 
-    fetchProjects: async (companyId) => {
+    fetchProjects: async (companyId, force = false) => {
+        if (!force && get().projects.length > 0) {
+            return;
+        }
         set({ loading: true, error: null });
         try {
             const response = await projectService.getAll(companyId);
@@ -81,7 +84,6 @@ const useProjectStore = create((set, get) => ({
     },
 
     
-
     fetchTasks: async (projectId) => {
         set({ loading: true });
         try {
@@ -95,21 +97,21 @@ const useProjectStore = create((set, get) => ({
     createProject: async (projectData, companyId) => {
         try {
             await projectService.create(projectData);
-            await get().fetchProjects(companyId);
+            await get().fetchProjects(companyId, true);
         } catch (error) { throw error; }
     },
 
     updateProject: async (id, projectData, companyId) => {
         try {
             await projectService.update(id, projectData);
-            await get().fetchProjects(companyId);
+            await get().fetchProjects(companyId, true);
         } catch (error) { throw error; }
     },
 
     deleteProject: async (id, companyId) => {
         try {
             await projectService.delete(id);
-            await get().fetchProjects(companyId);
+            await get().fetchProjects(companyId, true);
         } catch (error) { throw error; }
     },
 

@@ -7,7 +7,10 @@ export const useClientStore = create((set, get) => ({
   clients: [],
   isLoading: false,
 
-  fetchClients: async () => {
+  fetchClients: async (force = false) => {
+    if (!force && get().clients.length > 0) {
+      return;
+    }
     set({ isLoading: true });
     try {
       const response = await apiClient.get(CLIENTS_URL);

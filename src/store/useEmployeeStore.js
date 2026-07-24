@@ -43,7 +43,11 @@ const useEmployeeStore = create((set, get) => ({
     error: null,
     stats: null,
 
-    fetchEmployees: async (companyId, filters = {}) => {
+    fetchEmployees: async (companyId, filters = {}, force = false) => {
+        const hasFilters = Object.keys(filters).length > 0;
+        if (!force && !hasFilters && get().employees.length > 0) {
+            return;
+        }
         set({ loading: true, error: null });
         try {
             const data = await employeeService.getAll({ ...filters, companyId });
@@ -67,7 +71,7 @@ const useEmployeeStore = create((set, get) => ({
         set({ loading: true });
         try {
             await employeeService.create(employeeData);
-            await get().fetchEmployees(companyId);
+            await get().fetchEmployees(companyId, {}, true);
             set({ loading: false });
         } catch (error) {
             set({ error: error.message, loading: false });
@@ -79,7 +83,7 @@ const useEmployeeStore = create((set, get) => ({
         set({ loading: true });
         try {
             await employeeService.update(id, employeeData);
-            await get().fetchEmployees(companyId);
+            await get().fetchEmployees(companyId, {}, true);
             set({ loading: false });
         } catch (error) {
             set({ error: error.message, loading: false });
@@ -90,7 +94,7 @@ const useEmployeeStore = create((set, get) => ({
     deleteEmployee: async (id, companyId) => {
         try {
             await employeeService.delete(id);
-            await get().fetchEmployees(companyId);
+            await get().fetchEmployees(companyId, {}, true);
         } catch (error) {
             throw error;
         }

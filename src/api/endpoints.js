@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
         CHECK_OUT: '/attendance/check-out',
         TODAY: (employeeId) => `/attendance/today/${employeeId}`,
         ANALYTICS: '/attendance/analytics',
+        TIMELINE: (employeeId) => `/attendance/timeline/${employeeId}`,
         RECORD: (id) => `/attendance/${id}`,
         REVOKE: (employeeId) => `/attendance/revoke/${employeeId}`,
     },

@@ -3,11 +3,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, isLoading, token } = useAuthStore();
+    const { isAuthenticated, isLoading, token, user } = useAuthStore();
     const location = useLocation();
 
-    // Show loading while checking authentication
-    if (isLoading && token) {
+    if (isLoading && token && !user) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center">

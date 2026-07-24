@@ -59,6 +59,20 @@ export const attendanceService = {
         return resData?.data !== undefined ? resData.data : resData;
     },
 
+    // Gap-free day-by-day timeline for one employee: every calendar date in the
+    // window, including weekends, leave and work-from-home days.
+    async getTimeline(employeeId, { startDate, endDate } = {}) {
+        const params = {};
+        if (startDate) params.startDate = startDate;
+        if (endDate) params.endDate = endDate;
+        const response = await apiClient.get(
+            API_ENDPOINTS.ATTENDANCE.TIMELINE(employeeId),
+            { params }
+        );
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
+    },
+
     // Get attendance analytics
     async getAnalytics(filters = {}) {
         const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.ANALYTICS, { params: filters });

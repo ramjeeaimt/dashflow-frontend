@@ -8,8 +8,10 @@ export const useLeaveStore = create((set, get) => ({
   isLoading: false,
   error: null,
 
-  //  Fixed Function Name to match your component
-  fetchEmployeeLeaves: async (employeeId:any) => {
+  fetchEmployeeLeaves: async (employeeId:any, force = false) => {
+    if (!force && get().leaves.length > 0 && get().leaves[0]?.employeeId === employeeId) {
+      return;
+    }
     set({ isLoading: true });
     try {
       // API call with params for specific employee

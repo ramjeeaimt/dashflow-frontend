@@ -3,49 +3,24 @@ import { useParams } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import Icon from '../../../components/AppIcon';
-import { attendanceService } from '../../../services/attendance.service';
 import financeService from '../../../services/finance.service';
 import employeeService from '../../../services/employee.service';
+import AttendanceTimeline from '../../attendance/components/AttendanceTimeline';
 
 const EmployeeProfileAdmin = () => {
   const { id } = useParams();
   const [employee, setEmployee] = useState(null);
-  const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [payslipRecords, setPayslipRecords] = useState([]);
   const [profileTab, setProfileTab] = useState('attendance');
-  const [latestAttendance, setLatestAttendance] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [empData, attDataRaw, payData] = await Promise.all([
+        const [empData, payData] = await Promise.all([
           employeeService.getById(id),
-          attendanceService.getAll({ employeeId: id }),
           financeService.getEmployeePayrolls(id),
         ]);
-
         setEmployee(empData);
-
-        // Normalize attendance data
-        const attData = Array.isArray(attDataRaw)
-          ? attDataRaw
-          : attDataRaw && Array.isArray(attDataRaw.data)
-          ? attDataRaw.data
-          : [];
-
-        console.log('Fetched attendance:', attData);
-        setAttendanceRecords(attData);
-
-        // Compute latest attendance
-        if (attData.length > 0) {
-          const latest = attData.reduce((a, b) =>
-            new Date(b.checkInTime) > new Date(a.checkInTime) ? b : a
-          );
-          setLatestAttendance(latest);
-        } else {
-          setLatestAttendance(null);
-        }
-
         setPayslipRecords(Array.isArray(payData) ? payData : []);
       } catch (err) {
         console.error('Failed to fetch admin employee data:', err);
@@ -112,61 +87,7 @@ const EmployeeProfileAdmin = () => {
           {/* Attendance Tab */}
           {profileTab === 'attendance' && (
             <div className="p-8">
-              {latestAttendance && (
-                <div className="mb-6 p-4 bg-muted/60 rounded-xl border border-border">
-                  <p className="text-sm font-medium text-foreground">Latest Check‑in: {new Date(latestAttendance.checkInTime).toLocaleString()}</p>
-                  <p className="text-sm text-muted-foreground">Status: {latestAttendance.late ? 'Late' : 'On Time'}</p>
-                </div>
-              )}
-              {attendanceRecords.length === 0 ? (
-                <div className="text-center py-12">
-                  <Icon name="Calendar" size={40} className="text-slate-200 mx-auto mb-4" />
-                  <p className="text-sm font-bold text-muted-foreground/70">No attendance records found</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Date</th>
-                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Check‑in</th>
-                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Check‑out</th>
-                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3 pr-4">Hours</th>
-                        <th className="text-left text-[10px] font-bold text-muted-foreground/70 uppercase pb-3">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {attendanceRecords.slice(0, 30).map(record => {
-                        const checkIn = record.checkInTime ? new Date(record.checkInTime) : null;
-                        const checkOut = record.checkOutTime ? new Date(record.checkOutTime) : null;
-                        const hours = checkIn && checkOut ? ((checkOut - checkIn) / 3600000).toFixed(1) : '--';
-                        return (
-                          <tr key={record.id} className="border-b border-slate-50 hover:bg-muted/30 transition-all">
-                            <td className="py-3 pr-4 text-sm font-medium text-foreground">
-                              {checkIn ? checkIn.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--'}
-                            </td>
-                            <td className="py-3 pr-4 text-sm text-muted-foreground">
-                              {checkIn ? checkIn.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '--'}
-                            </td>
-                            <td className="py-3 pr-4 text-sm text-muted-foreground">
-                              {checkOut ? checkOut.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '--'}
-                            </td>
-                            <td className="py-3 pr-4 text-sm text-muted-foreground">{hours} hrs</td>
-                            <td className="py-3">
-                              <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase ${record.late ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
-                                {record.late ? 'Late' : 'On Time'}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                  {attendanceRecords.length > 30 && (
-                    <p className="text-[10px] text-muted-foreground/70 mt-4 text-center">Showing latest 30 records of {attendanceRecords.length} total</p>
-                  )}
-                </div>
-              )}
+              <AttendanceTimeline employeeId={id} />
             </div>
           )}
 
