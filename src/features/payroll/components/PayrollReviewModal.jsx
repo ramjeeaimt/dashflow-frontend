@@ -17,10 +17,14 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
     const [evaluatedEmailBodyHtml, setEvaluatedEmailBodyHtml] = useState('');
 
     useEffect(() => {
+        setEvaluatedPayslipHtml('');
+        setEvaluatedEmailBodyHtml('');
+
         const loadTemplates = async () => {
-            if (isOpen && payroll && user?.company?.id) {
+            const activeCompanyId = user?.company?.id || user?.companyId;
+            if (isOpen && payroll && activeCompanyId) {
                 try {
-                    const res = await api.get(`/system-company/id/${user.company.id}`);
+                    const res = await api.get(`/system-company/id/${activeCompanyId}`);
                     const latestCompany = res.data?.data || res.data;
 
                     let payslipHtml = payroll.customPayslipHtml || latestCompany.payslipEmailTemplate || '<div>No Payslip Template Configured.</div>';
