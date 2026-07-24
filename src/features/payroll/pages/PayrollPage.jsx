@@ -82,6 +82,7 @@ const PayrollPage = () => {
         notes: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showInactiveInSelect, setShowInactiveInSelect] = useState(false);
 
     const months = [
         { value: 1, label: 'January' },
@@ -110,11 +111,10 @@ const PayrollPage = () => {
 
     // ========== NEW: Fetch employees when modal opens ==========
     useEffect(() => {
-        const activeCompanyId = user?.company?.id || user?.companyId;
-        if (isManualModalOpen && activeCompanyId) {
+        if (isManualModalOpen && user?.company?.id) {
             const fetchEmployees = async () => {
                 try {
-                    const employees = await employeeService.getAll({ companyId: activeCompanyId });
+                    const employees = await employeeService.getAll({ companyId: user.company.id });
                     setEmployeesList(employees);
                 } catch (error) {
                     console.error('Failed to fetch employees:', error);
@@ -199,10 +199,9 @@ const PayrollPage = () => {
 
     const fetchAllEmployees = async () => {
         setIsEmployeesLoading(true);
-        const activeCompanyId = user?.company?.id || user?.companyId;
         try {
-            const employees = await employeeService.getAll({ companyId: activeCompanyId });
-            setEmployeesList(employees);
+            const employees = await employeeService.getAll({ companyId: user.company.id });
+            setEmployeesList(employees.filter(e => e.status?.toLowerCase() === 'active'));
         } catch (error) {
             console.error('Failed to fetch employees:', error);
         } finally {
@@ -216,15 +215,8 @@ const PayrollPage = () => {
         const payrollMap = new Map();
         (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
 
-        // Display active employees + any inactive employee who has a payroll record for the selected month/year
-        const visibleEmployees = (employeesList || []).filter(emp => {
-            const hasPayroll = payrollMap.has(emp.id);
-            const isActive = emp.status?.toLowerCase() === 'active';
-            return isActive || hasPayroll;
-        });
-
-        // Create a list including all visible employees
-        const allRows = visibleEmployees.map(emp => {
+        // Create a list including all employees
+        const allRows = employeesList.map(emp => {
             const existingPayroll = payrollMap.get(emp.id);
             return {
                 id: existingPayroll?.id || `temp-${emp.id}`,
@@ -503,6 +495,7 @@ const PayrollPage = () => {
     const handleManuallyPayroll = () => {
         setIsEditing(false);
         setCurrentPayrollId(null);
+        setShowInactiveInSelect(false);
         // Reset form with current month/year
         setManualFormData({
             employeeId: '',
@@ -527,8 +520,7 @@ const PayrollPage = () => {
         localStorage.setItem('selected_email_template_id', templateId);
         // Persist globally for the company
         try {
-            const activeCompanyId = user?.company?.id || user?.companyId;
-            await api.patch(`/system-company/${activeCompanyId}`, {
+            await api.patch(`/system-company/${user?.company?.id}`, {
                 activeEmailTemplateId: templateId === 'default' ? null : templateId,
             });
             if (templateId === 'default') {
@@ -544,6 +536,7 @@ const PayrollPage = () => {
     const handleEditPayroll = (record) => {
         setIsEditing(true);
         setCurrentPayrollId(record.id);
+        setShowInactiveInSelect(true);
         setManualFormData({
             employeeId: record.employeeId,
             basicSalary: record.basicSalary || 0,
@@ -673,8 +666,8 @@ const PayrollPage = () => {
                                     className="flex-1 sm:flex-none bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                                 >
                                     {months.map(m => (
-                                        <option 
-                                            key={m.value} 
+                                        <option
+                                            key={m.value}
                                             value={m.value}
                                             disabled={selectedYear === currentYear && m.value > currentMonth}
                                         >
@@ -834,12 +827,11 @@ const PayrollPage = () => {
                                                         {row.isGenerated ? `₹${row.netSalary}` : '-'}
                                                     </td>
                                                     <td className="px-3 sm:px-6 py-4">
-                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                                            row.status === 'paid' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                                                            row.status === 'sent' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                                                            row.status === 'draft' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-                                                            'bg-muted text-muted-foreground border border-border'
-                                                        }`}>
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${row.status === 'paid' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                                                                row.status === 'sent' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                                                                    row.status === 'draft' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                                                                        'bg-muted text-muted-foreground border border-border'
+                                                            }`}>
                                                             {row.status.replace('-', ' ')}
                                                         </span>
                                                     </td>
@@ -860,16 +852,16 @@ const PayrollPage = () => {
                                                                                 setCreatingManualIds(prev => ({ ...prev, [row.employeeId]: true }));
                                                                                 // 1. Generate the calculated draft using backend logic
                                                                                 await financeService.bulkGenerateRealPayroll(
-                                                                                    selectedMonth, 
-                                                                                    selectedYear, 
-                                                                                    user.company.id, 
+                                                                                    selectedMonth,
+                                                                                    selectedYear,
+                                                                                    user.company.id,
                                                                                     row.employeeId
                                                                                 );
-                                                                                
+
                                                                                 // 2. Fetch fresh data to get the generated record
                                                                                 const freshPayrolls = await financeService.getPayroll(user.company.id, selectedMonth, selectedYear);
                                                                                 const newRecord = freshPayrolls.find(p => p.employeeId === row.employeeId);
-                                                                                
+
                                                                                 if (newRecord) {
                                                                                     // 3. Immediately open the HTML/PDF editor for the new draft
                                                                                     setReviewPayroll(newRecord);
@@ -1010,21 +1002,36 @@ const PayrollPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Employee Selection */}
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-foreground mb-1">Employee *</label>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label className="block text-sm font-medium text-foreground">Employee *</label>
+                                        {!isEditing && (
+                                            <label className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground cursor-pointer select-none">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={showInactiveInSelect}
+                                                    onChange={(e) => setShowInactiveInSelect(e.target.checked)}
+                                                    className="rounded border-border text-primary focus:ring-primary mr-1.5 h-3.5 w-3.5"
+                                                />
+                                                Include Inactive Employees
+                                            </label>
+                                        )}
+                                    </div>
                                     <select
                                         name="employeeId"
                                         value={manualFormData.employeeId}
                                         onChange={handleManualInputChange}
                                         required
                                         disabled={isEditing}
-                                        className="w-full bg-background disabled:bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-background disabled:bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                                     >
                                         <option value="">Select Employee</option>
-                                        {employeesList.map(emp => (
-                                            <option key={emp.id} value={emp.id}>
-                                                {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode}){emp.status?.toLowerCase() !== 'active' ? ' - Inactive' : ''}
-                                            </option>
-                                        ))}
+                                        {employeesList
+                                            .filter(emp => showInactiveInSelect || emp.status?.toLowerCase() === 'active' || emp.id === manualFormData.employeeId)
+                                            .map(emp => (
+                                                <option key={emp.id} value={emp.id}>
+                                                    {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode || 'N/A'}){emp.status?.toLowerCase() !== 'active' ? ' - Inactive' : ''}
+                                                </option>
+                                            ))}
                                     </select>
                                 </div>
 
@@ -1236,7 +1243,7 @@ const PayrollPage = () => {
                                             await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id, row.employeeId);
                                             await fetchPayroll();
                                             toast.success('Payroll recalculated successfully!');
-                                        } catch(err) {
+                                        } catch (err) {
                                             console.error(err);
                                             toast.error('Failed to regenerate payroll.');
                                         } finally {
