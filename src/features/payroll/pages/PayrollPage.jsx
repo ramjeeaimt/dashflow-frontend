@@ -111,10 +111,11 @@ const PayrollPage = () => {
 
     // ========== NEW: Fetch employees when modal opens ==========
     useEffect(() => {
-        if (isManualModalOpen && user?.company?.id) {
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (isManualModalOpen && activeCompanyId) {
             const fetchEmployees = async () => {
                 try {
-                    const employees = await employeeService.getAll({ companyId: user.company.id });
+                    const employees = await employeeService.getAll({ companyId: activeCompanyId });
                     setEmployeesList(employees);
                 } catch (error) {
                     console.error('Failed to fetch employees:', error);
@@ -130,7 +131,8 @@ const PayrollPage = () => {
 
             // 🔹 Generate payroll via Backend
             // The backend is smart enough to skip existing drafts and finalized records
-            await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id);
+            const activeCompanyId = user?.company?.id || user?.companyId;
+            await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, activeCompanyId);
 
             toast.success("Bulk payroll generation completed successfully");
             setIsBulkConfirmModalOpen(false);
@@ -147,10 +149,11 @@ const PayrollPage = () => {
     };
 
     const fetchPayroll = async () => {
-        // ... (your existing fetchPayroll logic, unchanged)
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (!activeCompanyId) return;
         setIsLoading(true);
         try {
-            const data = await financeService.getPayroll(user?.company?.id, selectedMonth, selectedYear);
+            const data = await financeService.getPayroll(activeCompanyId, selectedMonth, selectedYear);
             setPayrollData(data);
         } catch (error) {
             console.error('Failed to fetch payroll:', error);
@@ -160,7 +163,8 @@ const PayrollPage = () => {
     };
 
     useEffect(() => {
-        if (user?.company?.id) {
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (activeCompanyId) {
             fetchPayroll();
             fetchAllEmployees();
         }
@@ -215,8 +219,15 @@ const PayrollPage = () => {
         const payrollMap = new Map();
         (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
 
-        // Create a list including all employees
-        const allRows = employeesList.map(emp => {
+        // Filter: show active employees, or inactive employees who have a payroll record generated for this month
+        const visibleEmployees = (employeesList || []).filter(emp => {
+            const hasPayroll = payrollMap.has(emp.id);
+            const isActive = emp.status?.toLowerCase() === 'active';
+            return isActive || hasPayroll;
+        });
+
+        // Create a list including visible employees
+        const allRows = visibleEmployees.map(emp => {
             const existingPayroll = payrollMap.get(emp.id);
             return {
                 id: existingPayroll?.id || `temp-${emp.id}`,
@@ -475,10 +486,11 @@ const PayrollPage = () => {
     const handleGenerateIndividual = async (row) => {
         try {
             setIsLoading(true);
+            const activeCompanyId = user?.company?.id || user?.companyId;
             await financeService.bulkGenerateRealPayroll(
                 selectedMonth,
                 selectedYear,
-                user.company.id,
+                activeCompanyId,
                 row.employeeId
             );
             toast.success("Payroll generated for " + row.employee.user?.firstName);
@@ -858,16 +870,17 @@ const PayrollPage = () => {
                                                                             if (creatingManualIds[row.employeeId]) return;
                                                                             try {
                                                                                 setCreatingManualIds(prev => ({ ...prev, [row.employeeId]: true }));
+                                                                                const activeCompanyId = user?.company?.id || user?.companyId;
                                                                                 // 1. Generate the calculated draft using backend logic
                                                                                 await financeService.bulkGenerateRealPayroll(
                                                                                     selectedMonth,
                                                                                     selectedYear,
-                                                                                    user.company.id,
+                                                                                    activeCompanyId,
                                                                                     row.employeeId
                                                                                 );
 
                                                                                 // 2. Fetch fresh data to get the generated record
-                                                                                const freshPayrolls = await financeService.getPayroll(user.company.id, selectedMonth, selectedYear);
+                                                                                const freshPayrolls = await financeService.getPayroll(activeCompanyId, selectedMonth, selectedYear);
                                                                                 const newRecord = freshPayrolls.find(p => p.employeeId === row.employeeId);
 
                                                                                 if (newRecord) {
@@ -1250,7 +1263,8 @@ const PayrollPage = () => {
                                         if (regeneratingIds[row.id]) return;
                                         try {
                                             setRegeneratingIds(prev => ({ ...prev, [row.id]: true }));
-                                            await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, user.company.id, row.employeeId);
+                                            const activeCompanyId = user?.company?.id || user?.companyId;
+                                            await financeService.bulkGenerateRealPayroll(selectedMonth, selectedYear, activeCompanyId, row.employeeId);
                                             await fetchPayroll();
                                             toast.success('Payroll recalculated successfully!');
                                         } catch (err) {
