@@ -16,6 +16,7 @@ import { attendanceService } from '../../../services/attendance.service';
 import AttendanceTimeline, { WorkModeSummary } from '../../attendance/components/AttendanceTimeline';
 import AttendanceCalendar from '../../attendance/components/AttendanceCalendar';
 import WorkModeBadge from '../../attendance/components/WorkModeBadge';
+import IdCardModal from '../components/IdCardModal';
 
 const RECORD_TABS = [
     { key: 'attendance', label: 'Attendance', icon: 'Clock' },
@@ -79,6 +80,7 @@ const EmployeeDetailsPage = () => {
     const [savingPromotion, setSavingPromotion] = useState(false);
     const [editingDob, setEditingDob] = useState(false);
     const [dobValue, setDobValue] = useState('');
+    const [showIdCard, setShowIdCard] = useState(false);
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -357,7 +359,7 @@ const EmployeeDetailsPage = () => {
                             <button onClick={openPromote} className="px-4 py-2 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2">
                                 <Icon name="TrendingUp" size={14} /> Promote
                             </button>
-                            <button onClick={() => alert('ID Card Generated!')} className="px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-all flex items-center gap-2">
+                            <button onClick={() => setShowIdCard(true)} className="px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-all flex items-center gap-2">
                                 <Icon name="CreditCard" size={14} /> Generate ID Card
                             </button>
                             <div className="relative">
@@ -699,6 +701,15 @@ const EmployeeDetailsPage = () => {
                     </div>
                 </div>
             </main>
+
+            {/* ID CARD MODAL */}
+            {showIdCard && (
+                <IdCardModal
+                    employee={employee}
+                    company={employee.company || currentUser?.company}
+                    onClose={() => setShowIdCard(false)}
+                />
+            )}
 
             {/* PROMOTION MODAL */}
             {promoteModal && (

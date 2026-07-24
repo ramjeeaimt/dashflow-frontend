@@ -90,10 +90,11 @@ const FinancePolicySettings = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      if (!user?.company?.id) return;
+      const activeCompanyId = user?.company?.id || user?.companyId;
+      if (!activeCompanyId) return;
       try {
         setLoading(true);
-        const res = await api.get(`/system-company/id/${user.company.id}`);
+        const res = await api.get(`/system-company/id/${activeCompanyId}`);
         const c = res.data?.data || res.data;
         if (c) {
           setForm({
@@ -120,7 +121,8 @@ const FinancePolicySettings = () => {
   const set = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSave = async () => {
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     try {
       setSaving(true);
       setSaved(false);
@@ -134,7 +136,7 @@ const FinancePolicySettings = () => {
         payslipEmailTemplate: emailTemplate,
         salaryEmailBodyTemplate: salaryEmailBodyTemplate,
       };
-      await api.patch(`/system-company/${user.company.id}`, payload);
+      await api.patch(`/system-company/${activeCompanyId}`, payload);
       
       const updatedUser = {
         ...user,
@@ -179,9 +181,10 @@ const FinancePolicySettings = () => {
     set('payrollAlertEmails', newEmailsString);
     setNewEmailInput('');
 
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     try {
-      await api.patch(`/system-company/${user.company.id}`, { payrollAlertEmails: newEmailsString });
+      await api.patch(`/system-company/${activeCompanyId}`, { payrollAlertEmails: newEmailsString });
       const updatedUser = { ...user, company: { ...user.company, payrollAlertEmails: newEmailsString } };
       useAuthStore.setState({ user: updatedUser });
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -225,9 +228,10 @@ const FinancePolicySettings = () => {
     const newEmailsString = updatedList.join(', ');
     set('payrollAlertEmails', newEmailsString);
 
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     try {
-      await api.patch(`/system-company/${user.company.id}`, { payrollAlertEmails: newEmailsString });
+      await api.patch(`/system-company/${activeCompanyId}`, { payrollAlertEmails: newEmailsString });
       const updatedUser = { ...user, company: { ...user.company, payrollAlertEmails: newEmailsString } };
       useAuthStore.setState({ user: updatedUser });
       localStorage.setItem('user', JSON.stringify(updatedUser));

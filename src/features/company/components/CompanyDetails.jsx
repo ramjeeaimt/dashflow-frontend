@@ -25,12 +25,13 @@ const CompanyDetails = () => {
     });
 
     const fetchCompany = async () => {
-        if (!user?.company?.id) return;
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (!activeCompanyId) return;
         try {
             setLoading(true);
 
             // Fetch by ID
-            const response = await api.get(`/system-company/id/${user.company.id}`);
+            const response = await api.get(`/system-company/id/${activeCompanyId}`);
             const data = response.data;
             const company = data?.data || data;
 
@@ -69,13 +70,14 @@ const CompanyDetails = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user?.company?.id) {
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (!activeCompanyId) {
             alert('User or company information is missing. Please try logging in again.');
             return;
         }
         try {
             setSaving(true);
-            await api.patch(`/system-company/${user.company.id}`, formData);
+            await api.patch(`/system-company/${activeCompanyId}`, formData);
             alert('Company details updated successfully');
             setIsEditing(false);
             fetchCompany(); // Refresh data

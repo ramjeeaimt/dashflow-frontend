@@ -64,10 +64,11 @@ const AttendancePolicySettings = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      if (!user?.company?.id) return;
+      const activeCompanyId = user?.company?.id || user?.companyId;
+      if (!activeCompanyId) return;
       try {
         setLoading(true);
-        const res = await api.get(`/system-company/id/${user.company.id}`);
+        const res = await api.get(`/system-company/id/${activeCompanyId}`);
         const c = res.data?.data || res.data;
         if (c) {
           setForm({
@@ -94,11 +95,12 @@ const AttendancePolicySettings = () => {
   const set = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSave = async () => {
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     try {
       setSaving(true);
       setSaved(false);
-      await api.patch(`/system-company/${user.company.id}`, form);
+      await api.patch(`/system-company/${activeCompanyId}`, form);
       
       const updatedUser = {
         ...user,
@@ -143,9 +145,10 @@ const AttendancePolicySettings = () => {
     set('attendanceAlertEmails', newEmailsString);
     setNewEmailInput('');
 
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     try {
-      await api.patch(`/system-company/${user.company.id}`, { attendanceAlertEmails: newEmailsString });
+      await api.patch(`/system-company/${activeCompanyId}`, { attendanceAlertEmails: newEmailsString });
       const updatedUser = { ...user, company: { ...user.company, attendanceAlertEmails: newEmailsString } };
       useAuthStore.setState({ user: updatedUser });
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -159,9 +162,10 @@ const AttendancePolicySettings = () => {
     const newEmailsString = updatedList.join(', ');
     set('attendanceAlertEmails', newEmailsString);
 
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     try {
-      await api.patch(`/system-company/${user.company.id}`, { attendanceAlertEmails: newEmailsString });
+      await api.patch(`/system-company/${activeCompanyId}`, { attendanceAlertEmails: newEmailsString });
       const updatedUser = { ...user, company: { ...user.company, attendanceAlertEmails: newEmailsString } };
       useAuthStore.setState({ user: updatedUser });
       localStorage.setItem('user', JSON.stringify(updatedUser));

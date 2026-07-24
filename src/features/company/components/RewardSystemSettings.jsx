@@ -56,10 +56,11 @@ const RewardSystemSettings = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      if (!user?.company?.id) return;
+      const activeCompanyId = user?.company?.id || user?.companyId;
+      if (!activeCompanyId) return;
       try {
         setLoading(true);
-        const res = await api.get(`/system-company/id/${user.company.id}`);
+        const res = await api.get(`/system-company/id/${activeCompanyId}`);
         const c = res.data?.data || res.data;
         if (c) {
           setForm({
@@ -82,7 +83,8 @@ const RewardSystemSettings = () => {
   const set = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSave = async () => {
-    if (!user?.company?.id) return;
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (!activeCompanyId) return;
     if (form.rewardPointsLateDeduction > form.rewardPointsPerDay) {
       alert('Late deduction points cannot exceed points earned per day.');
       return;
@@ -90,7 +92,7 @@ const RewardSystemSettings = () => {
     try {
       setSaving(true);
       setSaved(false);
-      await api.patch(`/system-company/${user.company.id}`, form);
+      await api.patch(`/system-company/${activeCompanyId}`, form);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
