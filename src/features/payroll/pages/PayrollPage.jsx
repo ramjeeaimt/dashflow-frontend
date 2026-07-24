@@ -596,7 +596,7 @@ const PayrollPage = () => {
             const deductions = parseFloat(manualFormData.deductions) || 0;
             const overtime = parseFloat(manualFormData.overtime) || 0;
             const calculatedNetSalary = basic + allowances + overtime - deductions;
-
+            const activeCompanyId = user?.company?.id || user?.companyId;
             const payload = {
                 ...manualFormData,
                 basicSalary: basic,
@@ -604,7 +604,7 @@ const PayrollPage = () => {
                 deductions: deductions,
                 overtime: overtime,
                 netSalary: calculatedNetSalary,
-                companyId: user.company.id,
+                companyId: activeCompanyId,
                 month: parseInt(manualFormData.month),
                 year: parseInt(manualFormData.year)
             };
@@ -1049,8 +1049,9 @@ const PayrollPage = () => {
                                     <select
                                         name="month"
                                         value={manualFormData.month}
-                                        disabled
-                                        className="w-full bg-muted text-muted-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
+                                        onChange={handleManualInputChange}
+                                        disabled={isEditing}
+                                        className={`w-full border border-border rounded-lg px-3 py-2 text-sm cursor-pointer ${isEditing ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-background text-foreground'}`}
                                     >
                                         {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                                     </select>
@@ -1060,8 +1061,9 @@ const PayrollPage = () => {
                                     <select
                                         name="year"
                                         value={manualFormData.year}
-                                        disabled
-                                        className="w-full bg-muted text-muted-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-not-allowed"
+                                        onChange={handleManualInputChange}
+                                        disabled={isEditing}
+                                        className={`w-full border border-border rounded-lg px-3 py-2 text-sm cursor-pointer ${isEditing ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-background text-foreground'}`}
                                     >
                                         {[2023, 2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
