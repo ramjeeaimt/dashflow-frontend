@@ -27,11 +27,20 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                     const res = await api.get(`/system-company/id/${activeCompanyId}`);
                     const latestCompany = res.data?.data || res.data;
 
-                    let payslipHtml = payroll.customPayslipHtml || latestCompany.payslipEmailTemplate || '<div>No Payslip Template Configured.</div>';
-                    let emailBodyHtml = payroll.customEmailBodyHtml || latestCompany.salaryEmailBodyTemplate || '<div>No Email Body Template Configured.</div>';
+                    const isValidCustomHtml = (html) => {
+                        if (!html) return false;
+                        const cleaned = html.replace(/<[^>]*>/g, '').trim();
+                        if (cleaned.includes('No Payslip Template Configured') || cleaned.includes('No Email Body Template Configured') || !cleaned) {
+                            return false;
+                        }
+                        return true;
+                    };
 
-                    // Only replace placeholders if we are generating from the template (not if we already have custom HTML)
-                    const isNewHtml = !payroll.customPayslipHtml && !payroll.customEmailBodyHtml;
+                    const hasValidCustomPayslip = isValidCustomHtml(payroll.customPayslipHtml);
+                    const hasValidCustomEmail = isValidCustomHtml(payroll.customEmailBodyHtml);
+
+                    let payslipHtml = hasValidCustomPayslip ? payroll.customPayslipHtml : (latestCompany.payslipEmailTemplate || '<div>No Payslip Template Configured.</div>');
+                    let emailBodyHtml = hasValidCustomEmail ? payroll.customEmailBodyHtml : (latestCompany.salaryEmailBodyTemplate || '<div>No Email Body Template Configured.</div>');
 
                     const empName = `${payroll.employee?.user?.firstName || ''} ${payroll.employee?.user?.lastName || ''}`.trim() || 'Employee';
                     const empEmail = payroll.employee?.user?.email || '';
@@ -140,13 +149,8 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                         return res;
                     };
 
-                    if (isNewHtml) {
-                        setEvaluatedPayslipHtml(replacePlaceholders(payslipHtml));
-                        setEvaluatedEmailBodyHtml(replacePlaceholders(emailBodyHtml));
-                    } else {
-                        setEvaluatedPayslipHtml(payslipHtml);
-                        setEvaluatedEmailBodyHtml(emailBodyHtml);
-                    }
+                    setEvaluatedPayslipHtml(hasValidCustomPayslip ? payslipHtml : replacePlaceholders(payslipHtml));
+                    setEvaluatedEmailBodyHtml(hasValidCustomEmail ? emailBodyHtml : replacePlaceholders(emailBodyHtml));
                 } catch (error) {
                     console.error("Error fetching company templates:", error);
                     setEvaluatedPayslipHtml('<div>Error loading templates.</div>');
