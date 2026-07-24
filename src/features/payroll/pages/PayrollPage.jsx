@@ -791,7 +791,14 @@ const PayrollPage = () => {
                                                                 {row.employee?.user?.firstName?.[0]}{row.employee?.user?.lastName?.[0]}
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-medium text-foreground">{row.employee?.user?.firstName} {row.employee?.user?.lastName}</p>
+                                                                <p className="text-sm font-medium text-foreground flex items-center gap-1.5 flex-wrap">
+                                                                    <span>{row.employee?.user?.firstName} {row.employee?.user?.lastName}</span>
+                                                                    {row.employee?.status?.toLowerCase() !== 'active' && (
+                                                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 text-[9px] font-extrabold uppercase tracking-wider border border-slate-200">
+                                                                            Inactive
+                                                                        </span>
+                                                                    )}
+                                                                </p>
                                                                 <p className="text-xs text-muted-foreground">{row.employee?.employeeCode}</p>
                                                             </div>
                                                         </div>
