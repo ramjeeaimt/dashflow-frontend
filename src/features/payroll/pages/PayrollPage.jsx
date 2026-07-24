@@ -110,10 +110,11 @@ const PayrollPage = () => {
 
     // ========== NEW: Fetch employees when modal opens ==========
     useEffect(() => {
-        if (isManualModalOpen && user?.company?.id) {
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (isManualModalOpen && activeCompanyId) {
             const fetchEmployees = async () => {
                 try {
-                    const employees = await employeeService.getAll({ companyId: user.company.id });
+                    const employees = await employeeService.getAll({ companyId: activeCompanyId });
                     setEmployeesList(employees);
                 } catch (error) {
                     console.error('Failed to fetch employees:', error);
@@ -198,9 +199,10 @@ const PayrollPage = () => {
 
     const fetchAllEmployees = async () => {
         setIsEmployeesLoading(true);
+        const activeCompanyId = user?.company?.id || user?.companyId;
         try {
-            const employees = await employeeService.getAll({ companyId: user.company.id });
-            setEmployeesList(employees.filter(e => e.status?.toLowerCase() === 'active'));
+            const employees = await employeeService.getAll({ companyId: activeCompanyId });
+            setEmployeesList(employees);
         } catch (error) {
             console.error('Failed to fetch employees:', error);
         } finally {
@@ -214,8 +216,15 @@ const PayrollPage = () => {
         const payrollMap = new Map();
         (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
 
-        // Create a list including all employees
-        const allRows = employeesList.map(emp => {
+        // Display active employees + any inactive employee who has a payroll record for the selected month/year
+        const visibleEmployees = (employeesList || []).filter(emp => {
+            const hasPayroll = payrollMap.has(emp.id);
+            const isActive = emp.status?.toLowerCase() === 'active';
+            return isActive || hasPayroll;
+        });
+
+        // Create a list including all visible employees
+        const allRows = visibleEmployees.map(emp => {
             const existingPayroll = payrollMap.get(emp.id);
             return {
                 id: existingPayroll?.id || `temp-${emp.id}`,
@@ -518,7 +527,8 @@ const PayrollPage = () => {
         localStorage.setItem('selected_email_template_id', templateId);
         // Persist globally for the company
         try {
-            await api.patch(`/system-company/${user?.company?.id}`, {
+            const activeCompanyId = user?.company?.id || user?.companyId;
+            await api.patch(`/system-company/${activeCompanyId}`, {
                 activeEmailTemplateId: templateId === 'default' ? null : templateId,
             });
             if (templateId === 'default') {
@@ -1012,7 +1022,7 @@ const PayrollPage = () => {
                                         <option value="">Select Employee</option>
                                         {employeesList.map(emp => (
                                             <option key={emp.id} value={emp.id}>
-                                                {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode})
+                                                {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode}){emp.status?.toLowerCase() !== 'active' ? ' - Inactive' : ''}
                                             </option>
                                         ))}
                                     </select>
