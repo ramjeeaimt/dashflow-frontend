@@ -142,3 +142,13 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* Sidebar width adjustments: override Tailwind w-60 and ml-60 classes to 270px */
+@media (min-width: 1024px) {
+  .lg\:w-60 {
+    width: 270px !important;
+  }
+  .lg\:ml-60 {
+    margin-left: 270px !important;
+  }
+}

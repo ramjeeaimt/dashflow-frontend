@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 
-const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange }) => {
+const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange, tasks = [], activeTimer = null, onStartTimer, onStopTimer }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [startTime, setStartTime] = useState(null);
@@ -11,21 +11,34 @@ const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange }) => {
   const [showIdleModal, setShowIdleModal] = useState(false);
   const [idleTime, setIdleTime] = useState(0);
 
+  // Real tasks only. "General work" lets someone track time without picking a
+  // task, and carries no id so the backend stores a null taskId.
   const taskOptions = [
-    { value: 'development', label: 'Software Development' },
-    { value: 'meeting', label: 'Team Meeting' },
-    { value: 'review', label: 'Code Review' },
-    { value: 'documentation', label: 'Documentation' },
-    { value: 'testing', label: 'Quality Testing' },
-    { value: 'planning', label: 'Project Planning' },
-    { value: 'research', label: 'Research & Analysis' },
-    { value: 'training', label: 'Training & Learning' }
+    { value: '', label: 'General work (no task)' },
+    ...tasks.map(task => ({ value: task.id, label: task.title })),
   ];
+
+  // Sync with backend active timer if loaded
+  useEffect(() => {
+    if (activeTimer) {
+      setIsRunning(true);
+      const startMs = new Date(activeTimer.startTime).getTime();
+      setStartTime(startMs);
+      setElapsedTime(Math.max(0, Math.floor((Date.now() - startMs) / 1000)));
+      if (activeTimer.taskId) {
+        onTaskChange(activeTimer.taskId);
+      }
+    } else {
+      setIsRunning(false);
+      setElapsedTime(0);
+      setStartTime(null);
+    }
+  }, [activeTimer]);
 
   // Timer effect
   useEffect(() => {
     let interval = null;
-    if (isRunning) {
+    if (isRunning && startTime) {
       interval = setInterval(() => {
         const now = Date.now();
         const elapsed = Math.floor((now - startTime) / 1000);
@@ -81,15 +94,24 @@ const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange }) => {
     return `${hours?.toString()?.padStart(2, '0')}:${minutes?.toString()?.padStart(2, '0')}:${secs?.toString()?.padStart(2, '0')}`;
   };
 
-  const handleStartStop = () => {
+  const handleStartStop = async () => {
     if (isRunning) {
-      // Stop timer
+      const description = window.prompt("Enter a brief description of what you worked on (optional):") || "";
       setIsRunning(false);
       setStartTime(null);
+      if (onStopTimer) {
+        await onStopTimer(description);
+      }
     } else {
-      // Start timer
-      setIsRunning(true);
-      setStartTime(Date.now() - (elapsedTime * 1000));
+      if (onStartTimer) {
+        const newTimer = await onStartTimer();
+        if (newTimer) {
+          setIsRunning(true);
+          const startMs = new Date(newTimer.startTime).getTime();
+          setStartTime(startMs);
+          setElapsedTime(0);
+        }
+      }
     }
   };
 
@@ -155,7 +177,6 @@ const TimerWidget = ({ onTimeUpdate, currentTask, onTaskChange }) => {
               variant={isRunning ? "destructive" : "default"}
               size="lg"
               onClick={handleStartStop}
-              disabled={!currentTask}
               iconName={isRunning ? "Pause" : "Play"}
               iconPosition="left"
               className="px-8"

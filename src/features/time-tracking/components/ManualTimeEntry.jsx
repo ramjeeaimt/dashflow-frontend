@@ -4,7 +4,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 
-const ManualTimeEntry = ({ onAddEntry, onClose }) => {
+const ManualTimeEntry = ({ onAddEntry, onClose, tasks = [] }) => {
   const [formData, setFormData] = useState({
     date: new Date()?.toISOString()?.split('T')?.[0],
     task: '',
@@ -18,29 +18,17 @@ const ManualTimeEntry = ({ onAddEntry, onClose }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Real tasks only — plus a "General work" option so time can be logged
+  // without tying it to a task.
   const taskOptions = [
-    { value: 'development', label: 'Software Development' },
-    { value: 'meeting', label: 'Team Meeting' },
-    { value: 'review', label: 'Code Review' },
-    { value: 'documentation', label: 'Documentation' },
-    { value: 'testing', label: 'Quality Testing' },
-    { value: 'planning', label: 'Project Planning' },
-    { value: 'research', label: 'Research & Analysis' },
-    { value: 'training', label: 'Training & Learning' },
-    { value: 'support', label: 'Customer Support' },
-    { value: 'admin', label: 'Administrative Tasks' }
+    { value: '', label: 'General work (no task)' },
+    ...tasks.map(task => ({ value: task.id, label: task.title })),
   ];
 
-  const projectOptions = [
-    { value: 'crm-system', label: 'CRM System' },
-    { value: 'hrm-module', label: 'HRM Module' },
-    { value: 'api-documentation', label: 'API Documentation' },
-    { value: 'mobile-app', label: 'Mobile Application' },
-    { value: 'dashboard-redesign', label: 'Dashboard Redesign' },
-    { value: 'security-audit', label: 'Security Audit' },
-    { value: 'performance-optimization', label: 'Performance Optimization' },
-    { value: 'client-project', label: 'Client Project' }
-  ];
+  const projectOptions = Array.from(new Set(tasks.map(t => t.projectId).filter(Boolean))).map(projId => {
+    const proj = tasks.find(t => t.projectId === projId)?.project;
+    return { value: projId, label: proj?.projectName || proj?.name || 'Project' };
+  });
 
   const categoryOptions = [
     { value: 'work', label: 'Work Time' },

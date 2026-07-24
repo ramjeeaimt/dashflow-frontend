@@ -249,10 +249,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <button
         key={item.key}
         onClick={() => handleLeafNavigation(item.path)}
-        className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-[13px] transition-colors ${isActive
- ? 'bg-sidebar-active text-sidebar-foreground font-medium'
- : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
- } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
+        className={`w-full flex items-center gap-3 rounded-md px-3 py-1.5 text-[13px] transition-colors ${isActive
+          ? 'bg-sidebar-active text-sidebar-foreground font-medium'
+          : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+        } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
         title={isCollapsed && !mobile ? item.label : undefined}
       >
         <Icon name={item.icon} size={17} />
@@ -262,60 +262,67 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   };
 
   const renderGroupItem = (item, mobile = false) => {
-    const expanded = mobile || openGroups[item.key];
     const active = isGroupActive(item);
-    return (
-      <div key={item.key} className="space-y-1">
+
+    if (isCollapsed && !mobile) {
+      return (
         <button
-          onClick={() => handleGroupClick(item)}
-          className={`w-full flex items-center gap-3 rounded-md px-3 py-2 text-[13px] transition-colors ${active
- ? 'text-sidebar-foreground font-medium'
- : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
- } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
-          title={isCollapsed && !mobile ? item.label : undefined}
+          key={item.key}
+          onClick={() => {
+            const firstChild = item.children?.[0];
+            if (firstChild?.path) handleLeafNavigation(firstChild.path);
+          }}
+          className={`w-full flex items-center justify-center rounded-md px-3 py-2 text-[13px] transition-colors ${active
+            ? 'text-sidebar-foreground font-medium bg-white/5'
+            : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+          }`}
+          title={item.label}
         >
           <Icon name={item.icon} size={17} />
-          {(!isCollapsed || mobile) && (
-            <>
-              <span className="flex-1 truncate text-left">{item.label}</span>
-              <Icon name={expanded ? 'ChevronDown' : 'ChevronRight'} size={14} className="text-sidebar-muted" />
-            </>
-          )}
         </button>
+      );
+    }
 
-        {(!isCollapsed || mobile) && expanded && (
-          <div className="ml-4 space-y-1 border-l border-sidebar-border pl-3">
-            {item.children.map((child) => {
-              const childActive = isPathActive(child.path);
-              return (
-                <button
-                  key={child.key}
-                  onClick={() => handleLeafNavigation(child.path)}
-                  className={`w-full rounded-md px-3 py-2 text-left text-[12px] transition-colors ${childActive
- ? 'bg-sidebar-active text-sidebar-foreground font-medium'
- : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
- }`}
-                >
-                  {child.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
+    return (
+      <div key={item.key} className="space-y-0.5">
+        <div
+          className={`w-full flex items-center gap-3 rounded-md px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-sidebar-muted/80`}
+        >
+          <Icon name={item.icon} size={14} className="text-sidebar-muted/50" />
+          <span className="flex-1 truncate text-left">{item.label}</span>
+        </div>
+
+        <div className="ml-4 space-y-0.5 border-l border-sidebar-border/60 pl-3">
+          {item.children.map((child) => {
+            const childActive = isPathActive(child.path);
+            return (
+              <button
+                key={child.key}
+                onClick={() => handleLeafNavigation(child.path)}
+                className={`w-full rounded-md px-3 py-1 text-left text-[12px] transition-colors ${childActive
+                  ? 'bg-sidebar-active text-sidebar-foreground font-semibold'
+                  : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+                }`}
+              >
+                {child.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
     );
   };
 
   const renderSectionContent = (mobile = false) => (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {normalizedSections.map((section) => (
-        <div key={section.key} className="space-y-1.5">
+        <div key={section.key} className="space-y-1">
           {(!isCollapsed || mobile) && (
-            <p className="px-3 text-[11px] font-medium uppercase tracking-wide text-sidebar-muted/70">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-sidebar-muted/50 mb-1">
               {section.label}
             </p>
           )}
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {section.items.map((item) => item.children ? renderGroupItem(item, mobile) : renderLeafItem(item, mobile))}
           </div>
         </div>
@@ -348,20 +355,23 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
  }`}>
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border min-h-[64px]">
           {!isCollapsed ? (
-            <BrandMark variant="dark" />
+            <>
+              <BrandMark variant="dark" />
+              <button
+                onClick={onToggleCollapse}
+                className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-md transition-colors duration-150"
+              >
+                <Icon name="ChevronLeft" size={16} />
+              </button>
+            </>
           ) : (
-            <div className="flex items-center justify-center w-full">
-              <BrandGlyph size={26} />
-            </div>
+            <button
+              onClick={onToggleCollapse}
+              className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-md transition-colors duration-150 mx-auto"
+            >
+              <Icon name="ChevronRight" size={16} />
+            </button>
           )}
-
-          <button
-            onClick={onToggleCollapse}
-            className={`p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-md transition-colors duration-150 ${isCollapsed ? 'mx-auto mt-2' : ''
- }`}
-          >
-            <Icon name={isCollapsed ? 'ChevronRight' : 'ChevronLeft'} size={16} />
-          </button>
         </div>
 
         <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">

@@ -26,6 +26,14 @@ export const API_ENDPOINTS = {
         BY_ID: (id) => `/projects/${id}`,
         CLIENTS: '/projects/clients'
     },
+    TASKS: {
+        BASE: '/tasks',
+        BY_ID: (id) => `/tasks/${id}`,
+        MOVE: (id) => `/tasks/${id}/move`,
+        COMMENTS: (id) => `/tasks/${id}/comments`,
+        ACTIVITY: (id) => `/tasks/${id}/activity`,
+        TIME_LOGS: (id) => `/tasks/${id}/time-logs`,
+    },
     DESIGNATIONS: {
         BASE: '/designations',
         BY_ID: (id) => `/designations/${id}`,

@@ -3,45 +3,6 @@ import Icon from 'components/AppIcon';
 import apiClient from 'api/client';
 import { API_ENDPOINTS } from 'api/endpoints';
 
-const SAMPLE_MSGS = [
-  { 
-    id: 1, 
-    from: 'Alice Smith', 
-    email: 'alice@example.com', 
-    subject: 'Application for MERN Developer', 
-    body: "Hello, please find my resume attached. I have 3 years of experience in React and Node.js.\n\nI am very interested in this role and would love to discuss further.", 
-    date: '04/06/2026',
-    time: '10:30 AM',
-    read: false,
-    label: 'Recruitment',
-    avatar: 'AS'
-  },
-  { 
-    id: 2, 
-    from: 'Support Team', 
-    email: 'inquiry@site.com', 
-    subject: 'Job Posting Query', 
-    body: "Is this role remote? We've had a few questions from candidates asking about the hybrid policy mentioned on the website.", 
-    date: '04/05/2026',
-    time: '02:15 PM',
-    read: true,
-    label: 'Query',
-    avatar: 'ST'
-  },
-  { 
-    id: 3, 
-    from: 'John Doe', 
-    email: 'john.doe@techcorp.io', 
-    subject: 'Partnership Proposal', 
-    body: "Hi Admin,\n\nI am John from TechCorp. We are interested in partnering with your company for the upcoming recruitment drive. Let us know if you have time for a brief call next week.", 
-    date: '04/04/2026',
-    time: '09:00 AM',
-    read: true,
-    label: 'Business',
-    avatar: 'JD'
-  },
-];
-
 const LABEL_COLORS = {
   'Recruitment': 'bg-primary/10 text-primary',
   'Query': 'bg-amber-100 text-amber-700',
@@ -72,18 +33,12 @@ export default function MessagesTab() {
         avatar: (c.name || 'C')[0].toUpperCase(),
         raw: c
       }));
-      if (list.length > 0) {
-          setMsgs(list);
-          setOpenId(list[0].id || list[0]._id);
-      } else {
-        setMsgs(SAMPLE_MSGS);
-        setOpenId(SAMPLE_MSGS[0].id);
-      }
+      setMsgs(list);
+      setOpenId(list[0]?.id ?? null);
     } catch (err) {
       console.error('Failed to load messages', err);
-      // fallback to sample for now
-      setMsgs(SAMPLE_MSGS);
-      setOpenId(SAMPLE_MSGS[0].id);
+      setMsgs([]);
+      setOpenId(null);
     }
   }
   const [search, setSearch] = useState('');

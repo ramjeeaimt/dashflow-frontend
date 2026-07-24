@@ -38,7 +38,8 @@ const useAttendanceStore = create((set, get) => ({
                 attendanceService.getAnalytics({ companyId })
             ]);
 
-            const validEmployees = Array.isArray(employeesList) ? employeesList : employeesList?.data || [];
+            const validEmployees = (Array.isArray(employeesList) ? employeesList : employeesList?.data || [])
+                .filter(emp => !emp.status || emp.status.toLowerCase() === 'active');
             const validAttendance = Array.isArray(attendanceRecords) ? attendanceRecords : attendanceRecords?.data || [];
 
             // Merge logic

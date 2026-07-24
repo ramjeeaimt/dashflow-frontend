@@ -8,6 +8,8 @@ import {
   Wallet,
   ChevronRight,
   Pencil,
+  Trash2,
+  Building2,
 } from "lucide-react";
 import Header from "../../../components/ui/Header";
 import Sidebar from "../../../components/ui/Sidebar";
@@ -39,6 +41,7 @@ const Projects = () => {
   const [phase, setPhase] = useState("");
   const [budget, setBudget] = useState("");
   const [deadlineStatus, setDeadlineStatus] = useState("");
+  const [projectType, setProjectType] = useState("");
   const [sort, setSort] = useState("Priority");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -46,8 +49,17 @@ const Projects = () => {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   const { user, isAuthenticated } = useAuthStore();
-  const { projects, loading, fetchProjects } = useProjectStore();
+  const { projects, loading, fetchProjects, deleteProject } = useProjectStore();
   const navigate = useNavigate();
+
+  const handleDelete = async (projectId) => {
+    if (!window.confirm("Are you sure you want to delete this project? This will permanently delete the project and all its tasks.")) return;
+    try {
+      await deleteProject(projectId, user.company.id);
+    } catch (err) {
+      alert("Failed to delete project");
+    }
+  };
 
   useEffect(() => {
     if (isAuthenticated && user?.company?.id) {
@@ -88,6 +100,9 @@ const Projects = () => {
       if (search && !haystack.includes(search.toLowerCase())) return false;
       if (phase && p.phase !== phase) return false;
 
+      if (projectType === "company" && !p.isCompanyProject) return false;
+      if (projectType === "client" && p.isCompanyProject) return false;
+
       if (deadlineStatus === "Overdue" && !p.isOverdue) return false;
       if (
         deadlineStatus === "Due this week" &&
@@ -125,7 +140,7 @@ const Projects = () => {
       return [...filtered].sort((a, b) => b.totalPayment - a.totalPayment);
 
     return filtered; // "Priority" — server order: overdue, at-risk, on-track, completed
-  }, [allProjects, view, search, phase, deadlineStatus, budget, sort]);
+  }, [allProjects, view, search, phase, deadlineStatus, budget, sort, projectType]);
 
   const breadcrumbItems = [
     { label: "Dashboard", path: "/dashboard" },
@@ -229,6 +244,8 @@ const Projects = () => {
               setSort={setSort}
               deadlineStatus={deadlineStatus}
               setDeadlineStatus={setDeadlineStatus}
+              projectType={projectType}
+              setProjectType={setProjectType}
             />
 
             {loading ? (
@@ -252,6 +269,7 @@ const Projects = () => {
                   setSelectedProjectId(id);
                   setIsEditModalOpen(true);
                 }}
+                onDelete={handleDelete}
               />
             )}
           </div>
@@ -306,7 +324,7 @@ const SummaryCard = ({ icon, label, value, tone = "primary" }) => (
   </div>
 );
 
-const ProjectTable = ({ projects, onOpen, onEdit }) => (
+const ProjectTable = ({ projects, onOpen, onEdit, onDelete }) => (
   <div className="overflow-x-auto">
     <table className="w-full min-w-[900px]">
       <thead>
@@ -339,8 +357,14 @@ const ProjectTable = ({ projects, onOpen, onEdit }) => (
                     aria-hidden="true"
                   />
                   <div className="min-w-0">
-                    <div className="text-sm font-medium text-foreground truncate">
+                    <div className="text-sm font-medium text-foreground truncate flex items-center gap-2">
                       {project.projectName || "Untitled project"}
+                      {project.isCompanyProject && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wider">
+                          <Building2 size={10} />
+                          Internal
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {health.label}
@@ -411,6 +435,16 @@ const ProjectTable = ({ projects, onOpen, onEdit }) => (
                     className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                   >
                     <Pencil size={15} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(project.id);
+                    }}
+                    aria-label={`Delete ${project.projectName}`}
+                    className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={15} />
                   </button>
                   <ChevronRight
                     size={16}

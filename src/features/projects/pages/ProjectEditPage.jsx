@@ -27,6 +27,7 @@ const ProjectEdit = () => {
         paymentReceived: "",
         assignedPeople: "",
         assignedEmployeeIds: [],
+        isCompanyProject: false,
     });
     const [employees, setEmployees] = useState([]);
     const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -178,6 +179,19 @@ const ProjectEdit = () => {
                                         value={project.githubLink}
                                         onChange={handleChange}
                                     />
+                                     <div className="flex items-center space-x-3 mt-1.5 md:col-span-2">
+                                         <input
+                                             type="checkbox"
+                                             id="isCompanyProject"
+                                             name="isCompanyProject"
+                                             checked={project.isCompanyProject || false}
+                                             onChange={(e) => setProject({ ...project, isCompanyProject: e.target.checked })}
+                                             className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                         />
+                                         <label htmlFor="isCompanyProject" className="text-sm font-semibold text-gray-700 cursor-pointer">
+                                             Internal Company Project (No Client)
+                                         </label>
+                                     </div>
                                     <InputField
                                         label="Client Name"
                                         name="clientName"

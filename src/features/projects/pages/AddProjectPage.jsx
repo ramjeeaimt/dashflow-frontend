@@ -36,6 +36,7 @@ const AddProject = () => {
     deadline: "",
     assignedPeople: "",
     assignedEmployeeIds: [],
+    isCompanyProject: false,
     clientName: "",
     clientEmail: "",
     contactInfo: "",
@@ -248,6 +249,19 @@ const AddProject = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <InputField label="Project Name" name="projectName" value={formData.projectName} onChange={handleChange} placeholder="Enter project name" icon={<FolderPlus size={14} />} required />
                   <SelectField label="Phase" name="phase" value={formData.phase} onChange={handleChange} options={["Planning", "Development", "Testing", "Deployment", "Completed"]} />
+                  <div className="flex items-center space-x-3 mt-1.5 md:col-span-2">
+                    <input
+                      type="checkbox"
+                      id="isCompanyProject"
+                      name="isCompanyProject"
+                      checked={formData.isCompanyProject || false}
+                      onChange={(e) => setFormData({ ...formData, isCompanyProject: e.target.checked })}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                    />
+                    <label htmlFor="isCompanyProject" className="text-sm font-semibold text-gray-700 cursor-pointer">
+                      Internal Company Project (No Client)
+                    </label>
+                  </div>
                   <InputField label="Start Date" type="date" name="assigningDate" value={formData.assigningDate} onChange={handleChange} icon={<Calendar size={14} />} />
                   <InputField label="Deadline" type="date" name="deadline" value={formData.deadline} onChange={handleChange} icon={<Clock size={14} />} />
                   <div className="md:col-span-2">

@@ -19,7 +19,8 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
         totalPayment: "",
         paymentReceived: "",
         assignedEmployeeIds: [],
-        notes: ""
+        notes: "",
+        isCompanyProject: false
     });
     
     const [employees, setEmployees] = useState([]);
@@ -47,6 +48,7 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
 
             setProject({
                 ...pData,
+                isCompanyProject: pData.isCompanyProject || false,
                 deadline: pData.deadline ? pData.deadline.split('T')[0] : "",
                 assigningDate: pData.assigningDate ? pData.assigningDate.split('T')[0] : "",
                 totalPayment: pData.totalPayment || 0,
@@ -132,6 +134,19 @@ const ProjectEditModal = ({ projectId, onClose, onSaveSuccess }) => {
                             {/* Basic Section */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormInput label="Project Name" name="projectName" value={project.projectName} onChange={handleChange} required />
+                                <div className="flex items-center space-x-3 mt-1.5 md:col-span-2">
+                                     <input
+                                         type="checkbox"
+                                         id="isCompanyProjectModal"
+                                         name="isCompanyProject"
+                                         checked={project.isCompanyProject || false}
+                                         onChange={(e) => setProject(prev => ({ ...prev, isCompanyProject: e.target.checked }))}
+                                         className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                     />
+                                     <label htmlFor="isCompanyProjectModal" className="text-sm font-semibold text-gray-700 cursor-pointer">
+                                         Internal Company Project (No Client)
+                                     </label>
+                                 </div>
                                 <FormInput label="Client Name" name="clientName" value={project.clientName} onChange={handleChange} required />
                                 <FormInput label="Client Email" name="clientEmail" type="email" value={project.clientEmail} onChange={handleChange} required />
                                 <FormInput label="Contact Info" name="contactInfo" value={project.contactInfo} onChange={handleChange} />

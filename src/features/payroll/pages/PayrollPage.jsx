@@ -16,19 +16,31 @@ const PayrollPage = () => {
     const [payrollData, setPayrollData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isEmployeesLoading, setIsEmployeesLoading] = useState(true);
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const saved = localStorage.getItem('payableMonth');
-        return saved ? parseInt(saved, 10) : new Date().getMonth() + 1;
+        return saved ? parseInt(saved, 10) : currentMonth;
     });
     const [selectedYear, setSelectedYear] = useState(() => {
         const saved = localStorage.getItem('payableYear');
-        return saved ? parseInt(saved, 10) : new Date().getFullYear();
+        return saved ? parseInt(saved, 10) : currentYear;
     });
 
     useEffect(() => {
-        localStorage.setItem('payableMonth', selectedMonth.toString());
-        localStorage.setItem('payableYear', selectedYear.toString());
-    }, [selectedMonth, selectedYear]);
+        // Enforce no future dates validation
+        const isFuture = selectedYear > currentYear || (selectedYear === currentYear && selectedMonth > currentMonth);
+        if (isFuture) {
+            setSelectedMonth(currentMonth);
+            setSelectedYear(currentYear);
+            localStorage.setItem('payableMonth', currentMonth.toString());
+            localStorage.setItem('payableYear', currentYear.toString());
+        } else {
+            localStorage.setItem('payableMonth', selectedMonth.toString());
+            localStorage.setItem('payableYear', selectedYear.toString());
+        }
+    }, [selectedMonth, selectedYear, currentMonth, currentYear]);
 
     const { user } = useAuthStore();
 
@@ -216,7 +228,7 @@ const PayrollPage = () => {
                 leaveDeduction: existingPayroll ? Math.round(existingPayroll.leaveDeduction ?? 0) : 0,
                 halfDeduction: existingPayroll ? Math.round(existingPayroll.halfDeduction ?? 0) : 0,
                 netSalary: existingPayroll ? Math.round(existingPayroll.netSalary ?? 0) : Math.round(emp.salary || 0),
-                status: (existingPayroll?.status === 'pending' ? 'draft' : existingPayroll?.status === 'paid' ? 'sent' : existingPayroll?.status) || 'not-generated',
+                status: (existingPayroll?.status === 'pending' ? 'draft' : existingPayroll?.status) || 'not-generated',
                 month: existingPayroll?.month || selectedMonth,
                 year: existingPayroll?.year || selectedYear,
                 record: existingPayroll
@@ -648,22 +660,70 @@ const PayrollPage = () => {
                                 <select
                                     value={selectedMonth}
                                     onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                                    className="flex-1 sm:flex-none bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="flex-1 sm:flex-none bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                                 >
-                                    {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    {months.map(m => (
+                                        <option 
+                                            key={m.value} 
+                                            value={m.value}
+                                            disabled={selectedYear === currentYear && m.value > currentMonth}
+                                        >
+                                            {m.label}
+                                        </option>
+                                    ))}
                                 </select>
                                 <select
                                     value={selectedYear}
                                     onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                                    className="flex-1 sm:flex-none bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="flex-1 sm:flex-none bg-card border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                                 >
-                                    {[2023, 2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+                                    {Array.from({ length: currentYear - 2023 + 1 }, (_, i) => 2023 + i).map(y => (
+                                        <option key={y} value={y}>{y}</option>
+                                    ))}
                                 </select>
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                                 <Button onClick={() => setIsBulkConfirmModalOpen(true)} iconName="Plus" className="w-full sm:w-auto">Generate Bulk Payroll</Button>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Monthly Summary Stats Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+                        <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Employees</span>
+                            <span className="text-xl font-bold text-foreground mt-2">{combinedPayrollData.length}</span>
+                        </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Budget</span>
+                            <span className="text-xl font-bold text-primary mt-2">
+                                ₹{Math.round(combinedPayrollData.filter(r => r.isGenerated).reduce((sum, r) => sum + (parseFloat(r.netSalary) || 0), 0)).toLocaleString('en-IN')}
+                            </span>
+                        </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm">
+                            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Total Distributed</span>
+                            <span className="text-xl font-bold text-emerald-600 mt-2">
+                                ₹{Math.round(combinedPayrollData.filter(r => r.isGenerated && r.status === 'paid').reduce((sum, r) => sum + (parseFloat(r.netSalary) || 0), 0)).toLocaleString('en-IN')}
+                            </span>
+                        </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm">
+                            <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Draft Count</span>
+                            <span className="text-xl font-bold text-amber-500 mt-2">
+                                {combinedPayrollData.filter(r => r.isGenerated && r.status === 'draft').length}
+                            </span>
+                        </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm">
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Sent Count</span>
+                            <span className="text-xl font-bold text-blue-500 mt-2">
+                                {combinedPayrollData.filter(r => r.isGenerated && r.status === 'sent').length}
+                            </span>
+                        </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between shadow-sm">
+                            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Paid Count</span>
+                            <span className="text-xl font-bold text-emerald-500 mt-2">
+                                {combinedPayrollData.filter(r => r.isGenerated && r.status === 'paid').length}
+                            </span>
                         </div>
                     </div>
 
@@ -732,7 +792,9 @@ const PayrollPage = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-3 sm:px-6 py-4 text-sm">₹{row.basicSalary}</td>
+                                                    <td className="px-3 sm:px-6 py-4 text-sm">
+                                                        {row.isGenerated ? `₹${row.basicSalary}` : '-'}
+                                                    </td>
                                                     <td className="px-3 sm:px-6 py-4 text-sm text-green-600">
                                                         {row.isGenerated ? `+₹${row.allowances}` : '-'}
                                                     </td>
@@ -759,12 +821,15 @@ const PayrollPage = () => {
                                                         ) : '-'}
                                                     </td>
                                                     <td className="px-3 sm:px-6 py-4 text-sm font-bold text-foreground whitespace-nowrap">
-                                                        {row.isGenerated ? `₹${row.netSalary}` : `₹${row.basicSalary}`}
+                                                        {row.isGenerated ? `₹${row.netSalary}` : '-'}
                                                     </td>
                                                     <td className="px-3 sm:px-6 py-4">
-                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${row.status === 'sent' ? 'bg-green-100 text-green-800' :
- row.status === 'not-generated' ? 'bg-muted text-muted-foreground' : 'bg-yellow-100 text-yellow-800'
- }`}>
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                                            row.status === 'paid' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                                                            row.status === 'sent' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                                                            row.status === 'draft' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                                                            'bg-muted text-muted-foreground border border-border'
+                                                        }`}>
                                                             {row.status.replace('-', ' ')}
                                                         </span>
                                                     </td>
@@ -873,23 +938,37 @@ const PayrollPage = () => {
                                                                             setIsReviewModalOpen(true);
                                                                         }}
                                                                         className="p-2 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-                                                                        title="View"
+                                                                        title="View Payslip"
                                                                     >
                                                                         <Icon name="Eye" size={18} />
                                                                     </button>
-                                                                    {row.status === 'draft' && (
+                                                                    <button
+                                                                        onClick={() => handleEditPayroll(row.record)}
+                                                                        className="p-2 text-muted-foreground/70 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                                                        title="Edit Payroll Details"
+                                                                    >
+                                                                        <Icon name="Pencil" size={18} />
+                                                                    </button>
+                                                                    {(row.status === 'draft' || row.status === 'sent') && (
                                                                         <button
                                                                             onClick={() => {
                                                                                 setReviewPayroll(row.record);
                                                                                 setReviewModalMode('edit');
                                                                                 setIsReviewModalOpen(true);
                                                                             }}
-                                                                            className="p-2 text-muted-foreground/70 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-                                                                            title="Edit Customizations"
+                                                                            className="p-2 text-muted-foreground/70 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                                            title="Edit Payslip Template HTML"
                                                                         >
-                                                                            <Icon name="Pencil" size={18} />
+                                                                            <Icon name="FileText" size={18} />
                                                                         </button>
                                                                     )}
+                                                                    <button
+                                                                        onClick={() => handleDeletePayroll(row.id)}
+                                                                        className="p-2 text-muted-foreground/70 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                                        title="Delete Payroll Record"
+                                                                    >
+                                                                        <Icon name="Trash2" size={18} />
+                                                                    </button>
                                                                 </>
                                                             )}
                                                         </div>
@@ -927,7 +1006,8 @@ const PayrollPage = () => {
                                         value={manualFormData.employeeId}
                                         onChange={handleManualInputChange}
                                         required
-                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                        disabled={isEditing}
+                                        className="w-full bg-background disabled:bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                                     >
                                         <option value="">Select Employee</option>
                                         {employeesList.map(emp => (
@@ -1031,10 +1111,11 @@ const PayrollPage = () => {
                                         name="status"
                                         value={manualFormData.status}
                                         onChange={handleManualInputChange}
-                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm"
+                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm cursor-pointer"
                                     >
                                         <option value="draft">Draft</option>
                                         <option value="sent">Sent</option>
+                                        <option value="paid">Paid</option>
                                     </select>
                                 </div>
 

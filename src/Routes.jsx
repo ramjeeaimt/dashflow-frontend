@@ -9,7 +9,7 @@ import { isAdminUser } from "./config/roles";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./features/misc/pages/NotFoundPage";
 import CompanyRegistration from './features/company/pages/CompanyRegistrationPage';
-import TaskManagement from './features/tasks/pages/TaskManagementPage';
+import TaskManagement from './features/tasks/pages/TaskBoardPage';
 import Dashboard from './features/dashboard/pages/DashboardPage';
 import EmployeeManagement from './features/employee/pages/EmployeeManagementPage';
 import TimeTrackingPage from './features/time-tracking/pages/TimeTrackingPage';

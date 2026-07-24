@@ -96,7 +96,7 @@ const Header = ({ onToggleSidebar }) => {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-background border-b border-border z-40 h-16">
-      <div className="flex items-center justify-between gap-3 h-full px-3 sm:px-6 lg:pl-[264px]">
+      <div className="flex items-center justify-between gap-3 h-full px-3 sm:px-6 lg:pl-[294px]">
 
         {/* Left: mobile menu + page context */}
         <div className="flex items-center gap-2 min-w-0">

@@ -6,14 +6,15 @@ const Filter = ({
     phase, setPhase, 
     budget, setBudget, 
     sort, setSort,
-    deadlineStatus, setDeadlineStatus 
+    deadlineStatus, setDeadlineStatus,
+    projectType, setProjectType
 }) => {
     
     const budgetOptions = ["Low Budget", "Medium Budget", "High Budget"];
     const deadlineOptions = ["All Deadlines", "Overdue", "Due this week", "Upcoming"];
     const sortOptions = ["Priority", "Recently Added", "Closest Deadline", "Highest Value"];
 
-    const hasFilters = Boolean(search || phase || budget || deadlineStatus) || sort !== "Priority";
+    const hasFilters = Boolean(search || phase || budget || deadlineStatus || projectType) || sort !== "Priority";
 
     const selectClass =
         "px-3 py-2 bg-card border border-border rounded-lg text-sm text-foreground focus:border-primary focus:ring-1 focus:ring-ring outline-none transition-colors cursor-pointer";
@@ -63,6 +64,12 @@ const Filter = ({
                 ))}
             </select>
 
+            <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className={selectClass}>
+                <option value="">All project types</option>
+                <option value="company">Internal Company Projects</option>
+                <option value="client">Client Projects</option>
+            </select>
+
             <select value={sort} onChange={(e) => setSort(e.target.value)} className={selectClass}>
                 {sortOptions.map((opt) => (
                     <option key={opt} value={opt}>Sort: {opt}</option>
@@ -77,6 +84,7 @@ const Filter = ({
                         setBudget("");
                         setSort("Priority");
                         setDeadlineStatus("");
+                        setProjectType("");
                     }}
                     className="flex items-center gap-1.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
