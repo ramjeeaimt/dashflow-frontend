@@ -687,6 +687,7 @@ const PayrollPage = () => {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                <Button onClick={() => handleManuallyPayroll()} variant="secondary" iconName="Plus" className="w-full sm:w-auto">Create Manual</Button>
                                 <Button onClick={() => setIsBulkConfirmModalOpen(true)} iconName="Plus" className="w-full sm:w-auto">Generate Bulk Payroll</Button>
                             </div>
                         </div>
