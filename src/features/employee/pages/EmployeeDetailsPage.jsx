@@ -3,6 +3,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import Icon from '../../../components/AppIcon';
+import { toast } from 'react-hot-toast';
+import EmployeeModal from '../components/EmployeeModal';
 import employeeService from '../../../services/employee.service';
 import financeService from '../../../services/finance.service';
 import uploadService from '../../upload/uploadService';
@@ -86,6 +88,7 @@ const EmployeeDetailsPage = () => {
     const [editingDob, setEditingDob] = useState(false);
     const [dobValue, setDobValue] = useState('');
     const [showIdCard, setShowIdCard] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -331,6 +334,53 @@ const EmployeeDetailsPage = () => {
             setBusyPayslip(null);
         }
     };
+
+    const handleSaveEmployee = async (employeeData) => {
+        try {
+            const payload = {
+                employeeCode: employeeData.employeeCode || '',
+                firstName: employeeData.firstName || '',
+                lastName: employeeData.lastName || '',
+                email: employeeData.email || '',
+                phone: employeeData.phone || '',
+                companyId: currentUser?.company?.id || currentUser?.companyId || '',
+                departmentId: employeeData.departmentId || '',
+                designationId: employeeData.designationId || '',
+                role: employeeData.roleIds?.[0] || '',
+                roleIds: employeeData.roleIds || [],
+                hireDate: employeeData.hireDate || new Date().toISOString(),
+                salary: employeeData.salary || '',
+                manager: employeeData.manager || '',
+                branch: employeeData.branch || '',
+                employmentType: employeeData.employmentType || '',
+                status: employeeData.status || 'active',
+                address: employeeData.address || '',
+                emergencyContact: employeeData.emergencyContact || '',
+                emergencyPhone: employeeData.emergencyPhone || '',
+                skills: employeeData.skills || [],
+                permissionIds: employeeData.permissionIds || [],
+                avatar: employeeData.avatar || '',
+                documents: employeeData.documents || [],
+                startTime: employeeData.startTime || '',
+                endTime: employeeData.endTime || '',
+                checkInTime: employeeData.checkInTime || '',
+                employeeType: employeeData.employeeType || 'office',
+                workFromHome: employeeData.workFromHome || false
+            };
+
+            await employeeService.update(employee.id, payload);
+            toast.success('Employee details updated successfully!');
+            setIsEditModalOpen(false);
+            
+            // Re-fetch details to update UI immediately
+            const updatedEmp = await employeeService.getById(id);
+            setEmployee(updatedEmp);
+        } catch (err) {
+            const message = err?.response?.data?.message || err?.message || 'Failed to update employee details.';
+            toast.error(message);
+            throw new Error(message);
+        }
+    };
     const currentRoleIds = employee?.user?.roles?.map(r => r.id) || [];
     const isIntern = employee?.employmentType?.toLowerCase() === 'intern';
     const documents = employee?.documents || [];
@@ -371,6 +421,9 @@ const EmployeeDetailsPage = () => {
                                     <h1 className="font-bold text-foreground">Employee Command Center</h1>
                                 </div>
                                 <div className="flex items-center gap-2">
+                                    <button onClick={() => setIsEditModalOpen(true)} className="px-4 py-2 bg-blue-50 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition-all flex items-center gap-2">
+                                        <Icon name="Pencil" size={14} /> Edit Details
+                                    </button>
                                     <button onClick={openPromote} className="px-4 py-2 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2">
                                         <Icon name="TrendingUp" size={14} /> Promote
                                     </button>
@@ -761,6 +814,17 @@ const EmployeeDetailsPage = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* EDIT EMPLOYEE MODAL */}
+            {isEditModalOpen && (
+                <EmployeeModal
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                    employee={employee}
+                    mode="edit"
+                    onSave={handleSaveEmployee}
+                />
             )}
         </div>
     );
