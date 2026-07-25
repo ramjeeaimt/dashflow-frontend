@@ -1,4 +1,5 @@
 import { toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
@@ -819,12 +820,14 @@ const PayrollPage = () => {
                                                 <tr className="hover:bg-muted/30 transition-colors">
                                                     <td className="px-3 sm:px-6 py-4">
                                                         <div className="flex items-center space-x-3">
-                                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                                            <Link to={`/employees/${row.employeeId}`} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs hover:bg-primary/20 transition-colors">
                                                                 {row.employee?.user?.firstName?.[0]}{row.employee?.user?.lastName?.[0]}
-                                                            </div>
+                                                            </Link>
                                                             <div>
                                                                 <p className="text-sm font-medium text-foreground flex items-center gap-1.5 flex-wrap">
-                                                                    <span>{row.employee?.user?.firstName} {row.employee?.user?.lastName}</span>
+                                                                    <Link to={`/employees/${row.employeeId}`} className="hover:text-primary hover:underline transition-colors font-semibold">
+                                                                        {row.employee?.user?.firstName} {row.employee?.user?.lastName}
+                                                                    </Link>
                                                                     {row.employee?.status?.toLowerCase() !== 'active' && (
                                                                         <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 text-[9px] font-extrabold uppercase tracking-wider border border-slate-200">
                                                                             Inactive
