@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import Icon from '../../../components/AppIcon';
@@ -60,7 +60,12 @@ const EmployeeDetailsPage = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [activeMenu, setActiveMenu] = useState(null);
     const [payslipRecords, setPayslipRecords] = useState([]);
-    const [profileTab, setProfileTab] = useState('attendance');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabFromUrl = searchParams.get('tab') || 'attendance';
+    const profileTab = RECORD_TABS.some(t => t.key === tabFromUrl) ? tabFromUrl : 'attendance';
+    const setProfileTab = (tabKey) => {
+        setSearchParams({ tab: tabKey });
+    };
     const [workMode, setWorkMode] = useState(null);
 
     // Records data
@@ -326,55 +331,65 @@ const EmployeeDetailsPage = () => {
             setBusyPayslip(null);
         }
     };
-
-    if (loading) return <div className="h-screen flex items-center justify-center"><Icon name="Loader" className="animate-spin text-primary" size={40} /></div>;
-    if (!employee) return <div>Not found</div>;
-
-    const currentRoleIds = employee.user?.roles?.map(r => r.id) || [];
-    const isIntern = employee.employmentType?.toLowerCase() === 'intern';
-    const documents = employee.documents || [];
-
-    const timeline = [
+    const currentRoleIds = employee?.user?.roles?.map(r => r.id) || [];
+    const isIntern = employee?.employmentType?.toLowerCase() === 'intern';
+    const documents = employee?.documents || [];
+ 
+    const timeline = employee ? [
         { title: 'Onboarded', date: employee.hireDate, icon: 'UserPlus', color: 'bg-primary' },
         { title: isIntern ? 'Started as Intern' : 'Started as Employee', date: employee.hireDate, icon: 'FileText', color: 'bg-slate-500' },
         currentRoleIds.some(rid => roles.find(r => r.id === rid)?.name === 'Manager') &&
         { title: 'Promoted to Management', date: 'Active', icon: 'TrendingUp', color: 'bg-primary' }
-    ].filter(Boolean);
-
+    ].filter(Boolean) : [];
+ 
     return (
         <div className="min-h-screen bg-[#FBFBFE]">
             <Header />
             <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-
+ 
             <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16 pb-12`}>
                 <div className="max-w-6xl mx-auto px-6 py-6">
 
-                    {/* TOP ACTION BAR */}
-                    <div className="flex items-center justify-between mb-6 bg-card p-3 rounded-lg border border-border shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted/60 rounded-xl transition-all"><Icon name="ArrowLeft" size={20} className="text-muted-foreground/70" /></button>
-                            <h1 className="font-bold text-foreground">Employee Command Center</h1>
+                    {loading ? (
+                        <div className="h-[60vh] flex flex-col items-center justify-center">
+                            <Icon name="Loader" className="animate-spin text-primary mb-2" size={40} />
+                            <p className="text-muted-foreground text-sm font-medium">Loading employee details...</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button onClick={openPromote} className="px-4 py-2 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2">
-                                <Icon name="TrendingUp" size={14} /> Promote
-                            </button>
-                            <button onClick={() => setShowIdCard(true)} className="px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-all flex items-center gap-2">
-                                <Icon name="CreditCard" size={14} /> Generate ID Card
-                            </button>
-                            <div className="relative">
-                                <button onClick={() => setActiveMenu(activeMenu === 'main' ? null : 'main')} className="p-2 bg-sidebar text-white rounded-xl shadow-sm "><Icon name="MoreHorizontal" size={20} /></button>
-                                {activeMenu === 'main' && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-sm py-2 z-50">
-                                        <button onClick={() => handleAction('block')} className="w-full px-4 py-2 text-left text-xs font-bold text-muted-foreground hover:bg-muted/60 flex items-center gap-2"><Icon name="Slash" size={14} /> Block Access</button>
-                                        <button onClick={() => handleAction('inactive')} className="w-full px-4 py-2 text-left text-xs font-bold text-muted-foreground hover:bg-muted/60 flex items-center gap-2"><Icon name="Moon" size={14} /> Make Inactive</button>
-                                        <div className="border-t border-slate-50 my-1"></div>
-                                        <button onClick={() => handleAction('terminate')} className="w-full px-4 py-2 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2"><Icon name="UserX" size={14} /> Terminate</button>
+                    ) : !employee ? (
+                        <div className="bg-card rounded-lg p-12 border border-border/60 text-center shadow-sm">
+                            <Icon name="UserX" className="text-muted-foreground/30 mx-auto mb-4" size={48} />
+                            <h2 className="text-lg font-bold text-foreground mb-1">Employee Not Found</h2>
+                            <p className="text-muted-foreground text-sm mb-4">The employee record could not be found or you do not have permission to view it.</p>
+                            <button onClick={() => navigate(-1)} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary/95 transition-all">Go Back</button>
+                        </div>
+                    ) : (
+                        <>
+                            {/* TOP ACTION BAR */}
+                            <div className="flex items-center justify-between mb-6 bg-card p-3 rounded-lg border border-border shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted/60 rounded-xl transition-all"><Icon name="ArrowLeft" size={20} className="text-muted-foreground/70" /></button>
+                                    <h1 className="font-bold text-foreground">Employee Command Center</h1>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={openPromote} className="px-4 py-2 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2">
+                                        <Icon name="TrendingUp" size={14} /> Promote
+                                    </button>
+                                    <button onClick={() => setShowIdCard(true)} className="px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-all flex items-center gap-2">
+                                        <Icon name="CreditCard" size={14} /> Generate ID Card
+                                    </button>
+                                    <div className="relative">
+                                        <button onClick={() => setActiveMenu(activeMenu === 'main' ? null : 'main')} className="p-2 bg-sidebar text-white rounded-xl shadow-sm "><Icon name="MoreHorizontal" size={20} /></button>
+                                        {activeMenu === 'main' && (
+                                            <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-sm py-2 z-50">
+                                                <button onClick={() => handleAction('block')} className="w-full px-4 py-2 text-left text-xs font-bold text-muted-foreground hover:bg-muted/60 flex items-center gap-2"><Icon name="Slash" size={14} /> Block Access</button>
+                                                <button onClick={() => handleAction('inactive')} className="w-full px-4 py-2 text-left text-xs font-bold text-muted-foreground hover:bg-muted/60 flex items-center gap-2"><Icon name="Moon" size={14} /> Make Inactive</button>
+                                                <div className="border-t border-slate-50 my-1"></div>
+                                                <button onClick={() => handleAction('terminate')} className="w-full px-4 py-2 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2"><Icon name="UserX" size={14} /> Terminate</button>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -699,6 +714,8 @@ const EmployeeDetailsPage = () => {
                             </div>
                         </div>
                     </div>
+                </>
+            )}
                 </div>
             </main>
 
