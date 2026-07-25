@@ -219,11 +219,13 @@ const PayrollPage = () => {
         const payrollMap = new Map();
         (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
 
-        // Filter: show active employees, or inactive employees who have a payroll record generated for this month
+        // Filter: show active employees (excluding interns), or any employee (active, inactive, or intern) who has a payroll record generated for this month
         const visibleEmployees = (employeesList || []).filter(emp => {
             const hasPayroll = payrollMap.has(emp.id);
             const isActive = emp.status?.toLowerCase() === 'active';
-            return isActive || hasPayroll;
+            const isIntern = emp.employmentType?.toLowerCase() === 'intern' || 
+                             emp.designation?.name?.toLowerCase().includes('intern');
+            return (isActive && !isIntern) || hasPayroll;
         });
 
         // Create a list including visible employees
