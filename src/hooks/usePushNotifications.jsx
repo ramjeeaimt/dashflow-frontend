@@ -61,6 +61,18 @@ export const usePushNotifications = (userId) => {
 
             // Display a custom toast when a push notification is received while app is open
             if (payload.notification) {
+                // Play notification sound if the title or body mentions check-in / check-out
+                const textToMatch = `${payload.notification.title || ''} ${payload.notification.body || ''}`.toLowerCase();
+                if (textToMatch.includes('check-in') || textToMatch.includes('checked in') || textToMatch.includes('check in')) {
+                    try {
+                        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-200.wav');
+                        audio.volume = 0.6;
+                        audio.play().catch(e => console.log('[usePushNotifications] Audio playback failed/blocked by browser autoplay policy:', e));
+                    } catch (err) {
+                        console.error('[usePushNotifications] Failed to play notification sound:', err);
+                    }
+                }
+
                 toast(
                     (t) => (
                         <div className="flex flex-col relative w-full pr-4">
