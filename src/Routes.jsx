@@ -31,6 +31,7 @@ import CompanyProfile from './features/company/pages/CompanyProfilePage';
 import RolesManagement from './features/settings/pages/RolesManagementPage';
 import UserPermissionsPage from './features/settings/pages/UserPermissionsPage';
 import PayrollPage from './features/payroll/pages/PayrollPage';
+import PayrollDetailsPage from './features/payroll/pages/PayrollDetailsPage';
 import AddProject from "./features/projects/pages/AddProjectPage";
 import Project from "./features/projects/pages/ProjectListPage";
 import ProjectDetails from "./features/projects/pages/ProjectDetailsPage";
@@ -192,6 +193,11 @@ const Routes = () => {
           <Route path="/payroll" element={
             <ProtectedRoute>
               <PayrollPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/payroll/:id" element={
+            <ProtectedRoute>
+              <PayrollDetailsPage />
             </ProtectedRoute>
           } />
           <Route path="/settings/roles" element={

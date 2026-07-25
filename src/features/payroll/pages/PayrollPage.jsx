@@ -1,5 +1,5 @@
 import { toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
@@ -13,6 +13,7 @@ import api, { LONG_TIMEOUT } from '../../../api/client';
 import PayrollDetailsModal from '../components/PayrollDetailsModal';
 import PayrollReviewModal from '../components/PayrollReviewModal';
 const PayrollPage = () => {
+    const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [payrollData, setPayrollData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -979,8 +980,7 @@ const PayrollPage = () => {
                                                                     ) : null}
                                                                     <button
                                                                         onClick={() => {
-                                                                            setSelectedPayroll(row.record);
-                                                                            setIsDetailsModalOpen(true);
+                                                                            navigate(`/payroll/${row.record.id}`);
                                                                         }}
                                                                         className="p-2 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                                                                         title="View Details"
