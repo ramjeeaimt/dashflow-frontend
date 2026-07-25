@@ -821,7 +821,16 @@ const EmployeeDetailsPage = () => {
                 <EmployeeModal
                     isOpen={isEditModalOpen}
                     onClose={() => setIsEditModalOpen(false)}
-                    employee={employee}
+                    employee={{
+                        ...employee,
+                        firstName: employee?.user?.firstName || '',
+                        lastName: employee?.user?.lastName || '',
+                        email: employee?.user?.email || '',
+                        phone: employee?.user?.phone || '',
+                        roleIds: employee?.user?.roles?.map(r => typeof r === 'string' ? r : (r?.id || r)) || [],
+                        permissionIds: employee?.user?.permissions?.map(p => typeof p === 'string' ? p : (p?.id || p)) || [],
+                        departmentId: employee?.department?.id || employee?.departmentId || ''
+                    }}
                     mode="edit"
                     onSave={handleSaveEmployee}
                 />
