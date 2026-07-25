@@ -979,12 +979,11 @@ const PayrollPage = () => {
                                                                     ) : null}
                                                                     <button
                                                                         onClick={() => {
-                                                                            setReviewPayroll(row.record);
-                                                                            setReviewModalMode('view');
-                                                                            setIsReviewModalOpen(true);
+                                                                            setSelectedPayroll(row.record);
+                                                                            setIsDetailsModalOpen(true);
                                                                         }}
                                                                         className="p-2 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-                                                                        title="View Payslip"
+                                                                        title="View Details"
                                                                     >
                                                                         <Icon name="Eye" size={18} />
                                                                     </button>
