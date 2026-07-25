@@ -89,6 +89,14 @@ const EmployeeDetailsPage = () => {
     const [dobValue, setDobValue] = useState('');
     const [showIdCard, setShowIdCard] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+    const [leaveFormData, setLeaveFormData] = useState({
+        startDate: '',
+        endDate: '',
+        type: 'casual',
+        reason: '',
+        status: 'APPROVED'
+    });
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -381,6 +389,64 @@ const EmployeeDetailsPage = () => {
             throw new Error(message);
         }
     };
+
+    const handleUpdateLeaveStatus = async (leaveId, newStatus) => {
+        try {
+            await leaveService.updateStatus(leaveId, newStatus);
+            toast.success(`Leave status updated to ${newStatus}`);
+            // Re-fetch employee leaves to update UI
+            const leavesData = await leaveService.getEmployeeLeaves(id);
+            setLeaves(leavesData?.data || leavesData || []);
+        } catch (error) {
+            console.error('Failed to update leave status:', error);
+            toast.error('Failed to update leave status');
+        }
+    };
+
+    const handleDeleteLeave = async (leaveId) => {
+        if (!window.confirm('Are you sure you want to delete this leave record?')) return;
+        try {
+            await leaveService.delete(leaveId);
+            toast.success('Leave record deleted successfully');
+            // Re-fetch employee leaves to update UI
+            const leavesData = await leaveService.getEmployeeLeaves(id);
+            setLeaves(leavesData?.data || leavesData || []);
+        } catch (error) {
+            console.error('Failed to delete leave record:', error);
+            toast.error('Failed to delete leave record');
+        }
+    };
+
+    const handleRecordLeaveSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const activeCompanyId = currentUser?.company?.id || currentUser?.companyId;
+            const payload = {
+                ...leaveFormData,
+                employeeId: employee.id,
+                companyId: activeCompanyId
+            };
+            await leaveService.create(payload);
+            toast.success('Leave recorded successfully');
+            setIsLeaveModalOpen(false);
+            
+            // Re-fetch employee leaves
+            const leavesData = await leaveService.getEmployeeLeaves(id);
+            setLeaves(leavesData?.data || leavesData || []);
+            
+            // Reset form
+            setLeaveFormData({
+                startDate: '',
+                endDate: '',
+                type: 'casual',
+                reason: '',
+                status: 'APPROVED'
+            });
+        } catch (error) {
+            console.error('Failed to record leave:', error);
+            toast.error(error?.response?.data?.message || 'Failed to record leave');
+        }
+    };
     const currentRoleIds = employee?.user?.roles?.map(r => r.id) || [];
     const isIntern = employee?.employmentType?.toLowerCase() === 'intern';
     const documents = employee?.documents || [];
@@ -667,6 +733,16 @@ const EmployeeDetailsPage = () => {
                                 {/* Leaves */}
                                 {profileTab === 'leaves' && (
                                     <div className="p-6">
+                                        <div className="flex items-center justify-between mb-4 border-b border-border/40 pb-3">
+                                            <p className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wide">Leave History ({leaves.length})</p>
+                                            <button
+                                                onClick={() => setIsLeaveModalOpen(true)}
+                                                className="px-3 py-1.5 bg-sidebar text-white text-xs font-bold rounded-xl flex items-center gap-1.5 hover:opacity-95 transition-all shadow-sm"
+                                            >
+                                                <Icon name="Plus" size={13} /> Record Leave
+                                            </button>
+                                        </div>
+
                                         {leaves.length === 0 ? (
                                             <EmptyState icon="Palmtree" title="No leave records" hint="Leave requests taken by this employee will appear here." />
                                         ) : (
@@ -677,7 +753,35 @@ const EmployeeDetailsPage = () => {
                                                             <p className="text-sm font-bold text-foreground capitalize">{lv.type} leave · {inclusiveDays(lv.startDate, lv.endDate)} day{inclusiveDays(lv.startDate, lv.endDate) !== 1 ? 's' : ''}</p>
                                                             <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{fmtDate(lv.startDate)} → {fmtDate(lv.endDate)}{lv.reason ? ` · ${lv.reason}` : ''}</p>
                                                         </div>
-                                                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border shrink-0 ml-3 ${pill(lv.status)}`}>{lv.status || 'pending'}</span>
+                                                        <div className="flex items-center gap-2 shrink-0 ml-3">
+                                                            <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${pill(lv.status)}`}>{lv.status || 'pending'}</span>
+                                                            
+                                                            {lv.status?.toUpperCase() === 'PENDING' && (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleUpdateLeaveStatus(lv.id, 'APPROVED')}
+                                                                        title="Approve Leave"
+                                                                        className="p-1.5 border border-emerald-200 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors"
+                                                                    >
+                                                                        <Icon name="Check" size={12} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleUpdateLeaveStatus(lv.id, 'REJECTED')}
+                                                                        title="Reject Leave"
+                                                                        className="p-1.5 border border-rose-200 rounded-lg hover:bg-rose-50 text-rose-600 transition-colors"
+                                                                    >
+                                                                        <Icon name="X" size={12} />
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            <button
+                                                                onClick={() => handleDeleteLeave(lv.id)}
+                                                                title="Delete Leave Record"
+                                                                className="p-1.5 border border-border rounded-lg hover:bg-muted text-muted-foreground hover:text-rose-600 transition-colors"
+                                                            >
+                                                                <Icon name="Trash" size={12} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -834,6 +938,90 @@ const EmployeeDetailsPage = () => {
                     mode="edit"
                     onSave={handleSaveEmployee}
                 />
+            )}
+
+            {/* RECORD LEAVE MODAL */}
+            {isLeaveModalOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={() => setIsLeaveModalOpen(false)}>
+                    <div className="bg-card w-full max-w-md rounded-2xl shadow-xl border border-border" onClick={(e) => e.stopPropagation()}>
+                        <form onSubmit={handleRecordLeaveSubmit}>
+                            <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between">
+                                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                                    <Icon name="Palmtree" size={16} className="text-primary" /> Record Leave
+                                </h3>
+                                <button type="button" onClick={() => setIsLeaveModalOpen(false)} className="p-1 hover:bg-muted/60 rounded-lg text-muted-foreground/70"><Icon name="X" size={18} /></button>
+                            </div>
+                            <div className="p-6 space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Start Date</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={leaveFormData.startDate}
+                                            onChange={(e) => setLeaveFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                                            className="mt-1 w-full border border-border rounded-lg px-3 py-2 text-sm bg-card"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">End Date</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={leaveFormData.endDate}
+                                            onChange={(e) => setLeaveFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                                            className="mt-1 w-full border border-border rounded-lg px-3 py-2 text-sm bg-card"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Leave Type</label>
+                                    <select
+                                        value={leaveFormData.type}
+                                        onChange={(e) => setLeaveFormData(prev => ({ ...prev, type: e.target.value }))}
+                                        className="mt-1 w-full border border-border rounded-lg px-3 py-2 text-sm bg-card"
+                                    >
+                                        <option value="casual">Casual Leave</option>
+                                        <option value="sick">Sick Leave</option>
+                                        <option value="unpaid">Unpaid Leave</option>
+                                        <option value="earned">Earned Leave</option>
+                                        <option value="maternity">Maternity Leave</option>
+                                        <option value="paternity">Paternity Leave</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Status</label>
+                                    <select
+                                        value={leaveFormData.status}
+                                        onChange={(e) => setLeaveFormData(prev => ({ ...prev, status: e.target.value }))}
+                                        className="mt-1 w-full border border-border rounded-lg px-3 py-2 text-sm bg-card"
+                                    >
+                                        <option value="APPROVED">Approved (Direct Grant)</option>
+                                        <option value="PENDING">Pending Review</option>
+                                        <option value="REJECTED">Rejected</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Reason / Notes</label>
+                                    <textarea
+                                        rows="3"
+                                        required
+                                        placeholder="Enter the reason or approval notes..."
+                                        value={leaveFormData.reason}
+                                        onChange={(e) => setLeaveFormData(prev => ({ ...prev, reason: e.target.value }))}
+                                        className="mt-1 w-full border border-border rounded-lg px-3 py-2 text-sm bg-card resize-none"
+                                    />
+                                </div>
+                            </div>
+                            <div className="px-6 py-4 border-t border-slate-50 flex justify-end gap-2">
+                                <button type="button" onClick={() => setIsLeaveModalOpen(false)} className="px-4 py-2 text-xs font-bold text-muted-foreground rounded-xl hover:bg-muted/60">Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-sidebar text-white text-xs font-bold rounded-xl flex items-center gap-2">
+                                    Save Leave Record
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );
