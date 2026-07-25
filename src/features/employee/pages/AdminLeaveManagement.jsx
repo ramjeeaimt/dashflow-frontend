@@ -105,7 +105,7 @@ const AdminLeaveManagement = () => {
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
 
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} pt-16 pb-8`}>
+            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
                 <div className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-8">
 
                     {/* Stats Header */}
