@@ -115,7 +115,11 @@ const PayrollPage = () => {
         if (isManualModalOpen && activeCompanyId) {
             const fetchEmployees = async () => {
                 try {
-                    const employees = await employeeService.getAll({ companyId: activeCompanyId });
+                    const params = { companyId: activeCompanyId };
+                    if (!showInactiveInSelect) {
+                        params.status = 'active';
+                    }
+                    const employees = await employeeService.getAll(params);
                     setEmployeesList(employees);
                 } catch (error) {
                     console.error('Failed to fetch employees:', error);
@@ -123,7 +127,7 @@ const PayrollPage = () => {
             };
             fetchEmployees();
         }
-    }, [isManualModalOpen, user]);
+    }, [isManualModalOpen, showInactiveInSelect, user]);
 
     const generatePayroll = async () => {
         try {
@@ -203,9 +207,18 @@ const PayrollPage = () => {
 
     const fetchAllEmployees = async () => {
         setIsEmployeesLoading(true);
+        const activeCompanyId = user?.company?.id || user?.companyId;
+        if (!activeCompanyId) {
+            setIsEmployeesLoading(false);
+            return;
+        }
         try {
-            const employees = await employeeService.getAll({ companyId: user.company.id });
-            setEmployeesList(employees.filter(e => e.status?.toLowerCase() === 'active'));
+            const employees = await employeeService.getAll({
+                companyId: activeCompanyId,
+                status: 'active',
+                excludeInterns: 'true',
+            });
+            setEmployeesList(employees);
         } catch (error) {
             console.error('Failed to fetch employees:', error);
         } finally {
@@ -219,13 +232,18 @@ const PayrollPage = () => {
         const payrollMap = new Map();
         (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
 
-        // Filter: show active employees (excluding interns), or any employee (active, inactive, or intern) who has a payroll record generated for this month
-        const visibleEmployees = (employeesList || []).filter(emp => {
-            const hasPayroll = payrollMap.has(emp.id);
-            const isActive = emp.status?.toLowerCase() === 'active';
-            const isIntern = emp.employmentType?.toLowerCase() === 'intern' || 
-                             emp.designation?.name?.toLowerCase().includes('intern');
-            return (isActive && !isIntern) || hasPayroll;
+        // Create a set of employee IDs from employeesList
+        const employeeIds = new Set(employeesList.map(e => e.id));
+
+        // Start with the list of employees fetched from the API
+        const visibleEmployees = [...employeesList];
+
+        // For any generated payroll record of an employee not in the employeesList, append them
+        (payrollData || []).forEach(p => {
+            if (p.employee && !employeeIds.has(p.employeeId)) {
+                visibleEmployees.push(p.employee);
+                employeeIds.add(p.employeeId);
+            }
         });
 
         // Create a list including visible employees
@@ -1048,13 +1066,11 @@ const PayrollPage = () => {
                                         className="w-full bg-background disabled:bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                                     >
                                         <option value="">Select Employee</option>
-                                        {employeesList
-                                            .filter(emp => showInactiveInSelect || emp.status?.toLowerCase() === 'active' || emp.id === manualFormData.employeeId)
-                                            .map(emp => (
-                                                <option key={emp.id} value={emp.id}>
-                                                    {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode || 'N/A'}){emp.status?.toLowerCase() !== 'active' ? ' - Inactive' : ''}
-                                                </option>
-                                            ))}
+                                        {employeesList.map(emp => (
+                                            <option key={emp.id} value={emp.id}>
+                                                {emp.user?.firstName} {emp.user?.lastName} ({emp.employeeCode || 'N/A'}){emp.status?.toLowerCase() !== 'active' ? ' - Inactive' : ''}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 
