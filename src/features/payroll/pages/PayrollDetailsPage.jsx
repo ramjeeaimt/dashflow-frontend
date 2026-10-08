@@ -230,6 +230,14 @@ const PayrollDetailsPage = () => {
                                     <span className="text-foreground font-bold">{payroll.workDays || 0} days</span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
+                                    <span>Company Holidays (Paid)</span>
+                                    <span className="text-indigo-600 font-bold">{payroll.holidaysCount || 0} days</span>
+                                </div>
+                                <div className="flex justify-between font-medium text-muted-foreground">
+                                    <span>Half Days</span>
+                                    <span className="text-amber-600 font-bold">{payroll.halfDaysCount || 0} days</span>
+                                </div>
+                                <div className="flex justify-between font-medium text-muted-foreground">
                                     <span>Paid Leaves Used (CL)</span>
                                     <span className="text-emerald-600 font-bold">{payroll.paidLeaves || 0} days</span>
                                 </div>

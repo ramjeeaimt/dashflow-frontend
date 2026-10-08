@@ -57,10 +57,19 @@ const AttendancePolicySettings = () => {
     attendanceAlertEmails: '',
     casualLeavesPerYear: 12,
     workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+    saturdayRule: 'second_saturday_half_day',
+    holidays: [],
   });
 
   const [newEmailInput, setNewEmailInput] = useState('');
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
+  const [showHolidayModal, setShowHolidayModal] = useState(false);
+  const [holidayInput, setHolidayInput] = useState({
+    name: '',
+    date: '',
+    type: 'full',
+    description: '',
+  });
 
   useEffect(() => {
     const fetch = async () => {
@@ -81,6 +90,8 @@ const AttendancePolicySettings = () => {
             attendanceAlertEmails: c.attendanceAlertEmails || '',
             casualLeavesPerYear: c.casualLeavesPerYear ?? 12,
             workingDays: c.workingDays || ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+            saturdayRule: c.saturdayRule || 'second_saturday_half_day',
+            holidays: Array.isArray(c.holidays) ? c.holidays : [],
           });
         }
       } catch (e) {
@@ -93,6 +104,53 @@ const AttendancePolicySettings = () => {
   }, [user]);
 
   const set = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+
+  const handleAddHoliday = async (e) => {
+    e?.preventDefault();
+    if (!holidayInput.name.trim() || !holidayInput.date) {
+      alert('Please enter a holiday name and select a date.');
+      return;
+    }
+    const newHoliday = {
+      id: Date.now().toString(),
+      name: holidayInput.name.trim(),
+      date: holidayInput.date,
+      type: holidayInput.type || 'full',
+      description: holidayInput.description?.trim() || '',
+    };
+    const updated = [...(form.holidays || []), newHoliday].sort((a, b) => (a.date > b.date ? 1 : -1));
+    set('holidays', updated);
+    setHolidayInput({ name: '', date: '', type: 'full', description: '' });
+    setShowHolidayModal(false);
+
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (activeCompanyId) {
+      try {
+        await api.patch(`/system-company/${activeCompanyId}`, { holidays: updated });
+        const updatedUser = { ...user, company: { ...user.company, holidays: updated } };
+        useAuthStore.setState({ user: updatedUser });
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error('Failed to auto-save holiday', err);
+      }
+    }
+  };
+
+  const handleDeleteHoliday = async (holidayId) => {
+    const updated = (form.holidays || []).filter((h) => (h.id || h.date) !== holidayId);
+    set('holidays', updated);
+    const activeCompanyId = user?.company?.id || user?.companyId;
+    if (activeCompanyId) {
+      try {
+        await api.patch(`/system-company/${activeCompanyId}`, { holidays: updated });
+        const updatedUser = { ...user, company: { ...user.company, holidays: updated } };
+        useAuthStore.setState({ user: updatedUser });
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error('Failed to auto-save holiday deletion', err);
+      }
+    }
+  };
 
   const handleSave = async () => {
     const activeCompanyId = user?.company?.id || user?.companyId;
@@ -371,6 +429,187 @@ const AttendancePolicySettings = () => {
         </div>
       </div>
 
+      {/* Saturday & Weekend Policy */}
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <Icon name="CalendarCheck" size={16} className="text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Saturday Office Policy</p>
+              <p className="text-xs text-muted-foreground/70">Configure recurring Saturday working schedules and office half-days</p>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+            {form.saturdayRule === 'second_saturday_half_day' ? '2nd Sat Half-Day Active' : 'Custom Saturday Rule'}
+          </span>
+        </div>
+        <div className="p-6 space-y-3">
+          {[
+            {
+              id: 'second_saturday_half_day',
+              label: '2nd Saturday Half Day',
+              badge: 'Recommended Office Policy',
+              desc: 'Every 2nd Saturday of the month is treated as an official half day for the entire office. Attendance calendar highlights it automatically, and payroll generates full credit without missing day deductions.',
+            },
+            {
+              id: 'second_fourth_saturday_off',
+              label: '2nd & 4th Saturday Off',
+              desc: '2nd and 4th Saturdays of each month are weekly off holidays. 1st, 3rd, and 5th Saturdays are regular working days.',
+            },
+            {
+              id: 'second_saturday_off',
+              label: '2nd Saturday Off',
+              desc: 'Only the 2nd Saturday of each month is a full holiday off. Remaining Saturdays are standard working days.',
+            },
+            {
+              id: 'all_half_day',
+              label: 'All Saturdays Half Day',
+              desc: 'All Saturdays throughout the month are designated as half working days.',
+            },
+            {
+              id: 'all_working',
+              label: 'All Saturdays Full Working Day',
+              desc: 'Standard 6-day work week: every Saturday is treated as a full working day.',
+            },
+            {
+              id: 'all_off',
+              label: 'All Saturdays Off (5-Day Work Week)',
+              desc: 'Standard 5-day work week: every Saturday is a non-working weekend holiday.',
+            },
+          ].map((rule) => {
+            const isSelected = (form.saturdayRule || 'second_saturday_half_day') === rule.id;
+            return (
+              <div
+                key={rule.id}
+                onClick={() => set('saturdayRule', rule.id)}
+                className={`p-4 rounded-xl border cursor-pointer transition-all flex items-start gap-3.5 ${
+                  isSelected
+                    ? 'border-primary bg-primary/[0.03] shadow-sm ring-1 ring-primary/30'
+                    : 'border-border bg-card hover:bg-muted/40 hover:border-border'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="saturdayRule"
+                  checked={isSelected}
+                  onChange={() => set('saturdayRule', rule.id)}
+                  className="mt-1 h-4 w-4 text-primary focus:ring-primary border-border cursor-pointer"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-foreground">{rule.label}</span>
+                    {rule.badge && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        {rule.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{rule.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Company Holidays & Festivals Manager */}
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+              <Icon name="Sparkles" size={16} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Company Holidays & Festivals</p>
+              <p className="text-xs text-muted-foreground/70">Declare paid national holidays, festivals, and company off-days for accurate payslips</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowHolidayModal(true)}
+            className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-semibold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+          >
+            <Icon name="Plus" size={14} />
+            <span>Add Holiday</span>
+          </button>
+        </div>
+
+        <div className="p-6">
+          {(!form.holidays || form.holidays.length === 0) ? (
+            <div className="text-center py-8 border border-dashed border-border rounded-xl bg-muted/30">
+              <Icon name="Calendar" size={32} className="mx-auto mb-2 text-muted-foreground/40" />
+              <p className="text-sm font-semibold text-foreground">No declared holidays yet</p>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
+                Add festivals like Diwali, Eid, Christmas, or national holidays so employees receive paid holiday credit in payroll.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowHolidayModal(true)}
+                className="mt-4 px-4 py-1.5 bg-card border border-border text-foreground hover:bg-muted/60 text-xs font-semibold rounded-lg transition-all"
+              >
+                + Add First Holiday
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between text-xs text-muted-foreground pb-2">
+                <span>{form.holidays.length} Declared Holiday{form.holidays.length > 1 ? 's' : ''}</span>
+                <span className="text-[11px] text-muted-foreground/70">Recognized as paid time-off in payroll</span>
+              </div>
+              <div className="divide-y divide-border/60 border border-border rounded-xl overflow-hidden bg-card">
+                {form.holidays.map((h, idx) => {
+                  const holidayDate = new Date(h.date);
+                  const isValidDate = !isNaN(holidayDate.getTime());
+                  const dateStr = isValidDate
+                    ? holidayDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : h.date;
+
+                  return (
+                    <div key={h.id || idx} className="p-3.5 flex items-center justify-between hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-lg bg-amber-500/10 border border-amber-500/20 flex flex-col items-center justify-center text-amber-700">
+                          <span className="text-[10px] font-bold uppercase leading-none">
+                            {isValidDate ? holidayDate.toLocaleDateString('en-GB', { month: 'short' }) : 'DATE'}
+                          </span>
+                          <span className="text-base font-extrabold leading-none mt-0.5">
+                            {isValidDate ? holidayDate.getDate() : '--'}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-foreground">{h.name}</span>
+                            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                              h.type === 'half'
+                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-100'
+                                : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                            }`}>
+                              {h.type === 'half' ? 'Half-Day Festival' : 'Full Day Paid Holiday'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {dateStr} {h.description ? `• ${h.description}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteHoliday(h.id || h.date)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground/60 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                        title="Delete holiday"
+                      >
+                        <Icon name="Trash2" size={15} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Check-in Window */}
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
@@ -480,6 +719,16 @@ const AttendancePolicySettings = () => {
       <div className="bg-muted/60 border border-border rounded-xl p-5 mb-8 text-xs text-muted-foreground space-y-1.5">
         <p className="font-semibold text-foreground mb-2 text-sm">Policy Preview</p>
         <p>• Company operates on <strong>{form.workingDays?.length || 0} days</strong> a week.</p>
+        <p>• Saturday policy: <strong>
+          {form.saturdayRule === 'second_saturday_half_day' && '2nd Saturday Half Day (Office Policy)'}
+          {form.saturdayRule === 'second_fourth_saturday_off' && '2nd & 4th Saturday Off'}
+          {form.saturdayRule === 'second_saturday_off' && '2nd Saturday Off'}
+          {form.saturdayRule === 'all_half_day' && 'All Saturdays Half Day'}
+          {form.saturdayRule === 'all_working' && 'All Saturdays Full Day'}
+          {form.saturdayRule === 'all_off' && 'All Saturdays Off (5-Day Week)'}
+          {!form.saturdayRule && '2nd Saturday Half Day (Office Policy)'}
+        </strong>.</p>
+        <p>• Declared holidays: <strong>{form.holidays?.length || 0} paid festival/company holiday(s)</strong> configured.</p>
         <p>• Employees can check in from <strong>{form.earlyCheckInBuffer} min before</strong> shift start.</p>
         <p>• Check-ins {form.checkInCutoffMinutes > 0 ? <>are blocked after <strong>{form.checkInCutoffMinutes} min</strong> past shift start.</> : <>have <strong>no time cutoff</strong>.</>}</p>
         <p>• An employee is marked <strong>Late</strong> if they check in more than <strong>{form.lateThresholdMinutes} min</strong> after shift start.</p>
@@ -505,6 +754,115 @@ const AttendancePolicySettings = () => {
           {saving ? 'Saving…' : 'Save Policy'}
         </button>
       </div>
+
+      {/* Add Holiday Modal */}
+      {showHolidayModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+                  <Icon name="Sparkles" size={16} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Add Company Holiday / Festival</h4>
+                  <p className="text-xs text-muted-foreground">Sets a paid holiday date for the entire office</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowHolidayModal(false)}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted"
+              >
+                <Icon name="X" size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddHoliday} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Holiday / Festival Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Diwali, Eid al-Fitr, Independence Day"
+                  value={holidayInput.name}
+                  onChange={(e) => setHolidayInput({ ...holidayInput, name: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring placeholder-slate-400 bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Date</label>
+                <input
+                  type="date"
+                  required
+                  value={holidayInput.date}
+                  onChange={(e) => setHolidayInput({ ...holidayInput, date: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Holiday Duration Type</label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <label className={`p-3 rounded-lg border cursor-pointer flex items-center gap-2 text-xs font-semibold transition-all ${
+                    holidayInput.type === 'full' ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-muted-foreground'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="holidayType"
+                      checked={holidayInput.type === 'full'}
+                      onChange={() => setHolidayInput({ ...holidayInput, type: 'full' })}
+                      className="text-primary focus:ring-primary"
+                    />
+                    <span>Full Day (Paid)</span>
+                  </label>
+                  <label className={`p-3 rounded-lg border cursor-pointer flex items-center gap-2 text-xs font-semibold transition-all ${
+                    holidayInput.type === 'half' ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-muted-foreground'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="holidayType"
+                      checked={holidayInput.type === 'half'}
+                      onChange={() => setHolidayInput({ ...holidayInput, type: 'half' })}
+                      className="text-primary focus:ring-primary"
+                    />
+                    <span>Half Day Festival</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Description / Remarks (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Office closed for festival celebration"
+                  value={holidayInput.description}
+                  onChange={(e) => setHolidayInput({ ...holidayInput, description: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring placeholder-slate-400 bg-background text-foreground"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border mt-5">
+                <button
+                  type="button"
+                  onClick={() => setShowHolidayModal(false)}
+                  className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-semibold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                >
+                  <Icon name="Plus" size={14} />
+                  <span>Save Holiday</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
