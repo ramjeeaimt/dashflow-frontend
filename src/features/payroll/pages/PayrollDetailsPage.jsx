@@ -20,23 +20,32 @@ const PayrollDetailsPage = () => {
             setLoading(true);
             try {
                 const payrollData = await financeService.getPayrollById(id);
+                if (!payrollData) {
+                    throw new Error("Payroll record not found");
+                }
                 setPayroll(payrollData);
 
                 // Fetch employee leaves to show history for this specific cycle month/year
                 if (payrollData?.employeeId) {
-                    const leavesData = await leaveService.getEmployeeLeaves(payrollData.employeeId);
-                    const leavesList = leavesData?.data || leavesData || [];
+                    try {
+                        const leavesData = await leaveService.getEmployeeLeaves(payrollData.employeeId);
+                        const leavesList = leavesData?.data?.data || leavesData?.data || leavesData || [];
 
-                    // Filter leaves falling within the payroll month/year
-                    const cycleMonth = payrollData.month;
-                    const cycleYear = payrollData.year;
-                    const filtered = leavesList.filter(lv => {
-                        const start = new Date(lv.startDate);
-                        const end = new Date(lv.endDate);
-                        return (start.getMonth() + 1 === cycleMonth && start.getFullYear() === cycleYear) ||
-                               (end.getMonth() + 1 === cycleMonth && end.getFullYear() === cycleYear);
-                    });
-                    setLeaves(filtered);
+                        // Filter leaves falling within the payroll month/year
+                        const cycleMonth = Number(payrollData.month);
+                        const cycleYear = Number(payrollData.year);
+                        const filtered = Array.isArray(leavesList) ? leavesList.filter(lv => {
+                            if (!lv || !lv.startDate || !lv.endDate) return false;
+                            const start = new Date(lv.startDate);
+                            const end = new Date(lv.endDate);
+                            return (start.getMonth() + 1 === cycleMonth && start.getFullYear() === cycleYear) ||
+                                   (end.getMonth() + 1 === cycleMonth && end.getFullYear() === cycleYear);
+                        }) : [];
+                        setLeaves(filtered);
+                    } catch (leaveErr) {
+                        console.warn("Non-fatal: could not load employee leaves:", leaveErr);
+                        setLeaves([]);
+                    }
                 }
             } catch (err) {
                 console.error("Failed to load payroll details:", err);
@@ -109,6 +118,8 @@ const PayrollDetailsPage = () => {
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Employee';
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const monthLabel = monthNames[payroll.month - 1] || '---';
+
+    const perDayRate = payroll.totalWorkingDays > 0 ? (payroll.basicSalary / payroll.totalWorkingDays) : 0;
 
     return (
         <div className="min-h-screen bg-[#FBFBFE]">
@@ -183,7 +194,14 @@ const PayrollDetailsPage = () => {
                             </h3>
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Leave Deduction</span>
+                                    <div>
+                                        <span>Leave Deduction</span>
+                                        {payroll.unpaidLeaves > 0 && (
+                                            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                                                ({payroll.unpaidLeaves} unpaid day{payroll.unpaidLeaves > 1 ? 's' : ''} × {formatCurrency(perDayRate)}/day)
+                                            </p>
+                                        )}
+                                    </div>
                                     <span className="text-rose-600 font-bold">-{formatCurrency(payroll.leaveDeduction || 0)}</span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
@@ -218,6 +236,10 @@ const PayrollDetailsPage = () => {
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <span>Unpaid Leaves (Deducted)</span>
                                     <span className="text-rose-600 font-bold">{payroll.unpaidLeaves || 0} days</span>
+                                </div>
+                                <div className="flex justify-between font-medium text-muted-foreground pt-1.5 border-t border-border/20">
+                                    <span>Daily Salary Rate</span>
+                                    <span className="text-foreground font-bold">{formatCurrency(perDayRate)}/day</span>
                                 </div>
                             </div>
                         </div>

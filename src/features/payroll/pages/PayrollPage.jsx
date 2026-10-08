@@ -12,12 +12,10 @@ import { employeeService } from '../../../services/employee.service';
 import api, { LONG_TIMEOUT } from '../../../api/client';
 import PayrollDetailsModal from '../components/PayrollDetailsModal';
 import PayrollReviewModal from '../components/PayrollReviewModal';
+import { usePayrollStore } from '../../../store/payrollStore';
 const PayrollPage = () => {
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [payrollData, setPayrollData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isEmployeesLoading, setIsEmployeesLoading] = useState(true);
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
 
@@ -29,6 +27,23 @@ const PayrollPage = () => {
         const saved = localStorage.getItem('payableYear');
         return saved ? parseInt(saved, 10) : currentYear;
     });
+
+    const [payrollData, setPayrollData] = useState(() => {
+        const store = usePayrollStore.getState();
+        if (store.cachedMonth === selectedMonth && store.cachedYear === selectedYear) {
+            return store.payrolls || [];
+        }
+        return [];
+    });
+    const [isLoading, setIsLoading] = useState(() => {
+        const store = usePayrollStore.getState();
+        if (store.cachedMonth === selectedMonth && store.cachedYear === selectedYear) {
+            const cached = store.payrolls;
+            return !(cached && cached.length > 0);
+        }
+        return true;
+    });
+    const [isEmployeesLoading, setIsEmployeesLoading] = useState(true);
 
     useEffect(() => {
         // Enforce no future dates validation
@@ -154,13 +169,18 @@ const PayrollPage = () => {
         }
     };
 
-    const fetchPayroll = async () => {
+    const fetchPayroll = async (isQuiet = false) => {
         const activeCompanyId = user?.company?.id || user?.companyId;
         if (!activeCompanyId) return;
-        setIsLoading(true);
+        if (!isQuiet) setIsLoading(true);
         try {
             const data = await financeService.getPayroll(activeCompanyId, selectedMonth, selectedYear);
             setPayrollData(data);
+            usePayrollStore.setState({
+                payrolls: data,
+                cachedMonth: selectedMonth,
+                cachedYear: selectedYear
+            });
         } catch (error) {
             console.error('Failed to fetch payroll:', error);
         } finally {
@@ -171,7 +191,9 @@ const PayrollPage = () => {
     useEffect(() => {
         const activeCompanyId = user?.company?.id || user?.companyId;
         if (activeCompanyId) {
-            fetchPayroll();
+            const store = usePayrollStore.getState();
+            const hasCache = store.cachedMonth === selectedMonth && store.cachedYear === selectedYear && store.payrolls?.length > 0;
+            fetchPayroll(hasCache);
             fetchAllEmployees();
         }
         // Load persisted template or global active template on mount / when user changes

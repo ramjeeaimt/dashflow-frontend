@@ -101,8 +101,8 @@ const financeService = {
 
 
     getPayrollById: async (id) => {
-        const res = await apiClient.get(`/payroll/${id}`);
-        return res.data;
+        const res = await apiClient.get(`${API_ENDPOINTS.FINANCE.BASE}/payroll/${id}`);
+        return res.data?.data || res.data;
     },
 
     updatePayroll: async (id, data) => {

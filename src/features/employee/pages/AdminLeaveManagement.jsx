@@ -5,6 +5,8 @@ import {
     MoreVertical, MessageSquare, ShieldAlert, Trash2
 } from "lucide-react";
 import financeService from "services/finance.service";
+import { employeeService } from "services/employee.service";
+import { leaveService } from "services/leaveService";
 import Sidebar from "components/ui/Sidebar";
 import Header from "components/ui/Header";
 
@@ -18,6 +20,18 @@ const AdminLeaveManagement = () => {
     // New Modal State for Decisions
     const [decisionModal, setDecisionModal] = useState({ isOpen: false, type: null, leaveId: null, note: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Add Leave Modal States
+    const [isAddLeaveModalOpen, setIsAddLeaveModalOpen] = useState(false);
+    const [employeesList, setEmployeesList] = useState([]);
+    const [isAddingLeave, setIsAddingLeave] = useState(false);
+    const [addLeaveForm, setAddLeaveForm] = useState({
+        employeeId: '',
+        type: 'casual',
+        startDate: '',
+        endDate: '',
+        reason: ''
+    });
 
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -43,6 +57,44 @@ const AdminLeaveManagement = () => {
     };
 
     useEffect(() => { fetchAllLeaves(); }, []);
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const data = await employeeService.getAll();
+                setEmployeesList(Array.isArray(data) ? data : (data?.data || []));
+            } catch (err) {
+                console.error("Failed to fetch employees:", err);
+            }
+        };
+        fetchEmployees();
+    }, []);
+
+    const handleAddLeaveSubmit = async (e) => {
+        e.preventDefault();
+        if (addLeaveForm.startDate > addLeaveForm.endDate) {
+            return alert("Start date cannot be after end date.");
+        }
+        setIsAddingLeave(true);
+        try {
+            await leaveService.create(addLeaveForm);
+            alert("Leave record added successfully as PENDING review! You can approve it from the decision list.");
+            setIsAddLeaveModalOpen(false);
+            setAddLeaveForm({
+                employeeId: '',
+                type: 'casual',
+                startDate: '',
+                endDate: '',
+                reason: ''
+            });
+            fetchAllLeaves();
+        } catch (err) {
+            console.error("Failed to create leave:", err);
+            alert(err.response?.data?.message || "Failed to create leave record.");
+        } finally {
+            setIsAddingLeave(false);
+        }
+    };
 
     const handleStatusUpdate = async (id, status, note) => {
         if (!id) return alert("Error: ID not found!");
@@ -110,12 +162,20 @@ const AdminLeaveManagement = () => {
 
                     {/* Stats Header */}
                     <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 pb-4">
-                        <div>
-                            <div className="flex items-center gap-2 mb-2 text-primary font-semibold text-[10px] uppercase tracking-wide">
-                                <ShieldAlert size={14} /> Admin Control Panel
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2 text-primary font-semibold text-[10px] uppercase tracking-wide">
+                                    <ShieldAlert size={14} /> Admin Control Panel
+                                </div>
+                                <h1 className="text-3xl font-semibold text-foreground tracking-tight">Leave & Attendance</h1>
+                                <p className="text-sm text-muted-foreground font-medium mt-1">Manage employee leave requests and approvals.</p>
                             </div>
-                            <h1 className="text-3xl font-semibold text-foreground tracking-tight">Leave & Attendance</h1>
-                            <p className="text-sm text-muted-foreground font-medium mt-1">Manage employee leave requests and approvals.</p>
+                            <button
+                                onClick={() => setIsAddLeaveModalOpen(true)}
+                                className="mt-4 md:mt-0 flex items-center gap-2 bg-primary hover:bg-primary/95 text-white font-bold px-4 py-2.5 rounded-xl shadow-sm text-xs transition-all duration-200"
+                            >
+                                <CalendarDays size={16} /> Add Leave Record
+                            </button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full xl:w-auto">
                             <StatBox label="Pending Review" value={stats.pending} color="amber" icon={<Clock size={16} />} />
@@ -229,7 +289,7 @@ const AdminLeaveManagement = () => {
                                     onClick={() => handleStatusUpdate(decisionModal.leaveId, decisionModal.type, decisionModal.note)}
                                     disabled={isSubmitting}
                                     className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-xs uppercase tracking-wide text-white shadow-md transition-all disabled:opacity-70 disabled:cursor-wait ${decisionModal.type === 'APPROVED' ? 'bg-emerald-500 hover:bg-emerald-600 ' : 'bg-rose-500 hover:bg-rose-600 '
- }`}
+                                 }`}
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -242,6 +302,117 @@ const AdminLeaveManagement = () => {
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Leave Modal */}
+            {isAddLeaveModalOpen && (
+                <div className="fixed inset-0 bg-sidebar/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-card rounded-2xl w-full max-w-lg shadow-sm border border-border overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 border-b border-border flex justify-between items-center bg-muted/40">
+                            <div>
+                                <h3 className="text-lg font-bold text-foreground">Add Leave Record</h3>
+                                <p className="text-xs text-muted-foreground/80 mt-1">Record a leave on behalf of an employee.</p>
+                            </div>
+                            <button 
+                                onClick={() => setIsAddLeaveModalOpen(false)}
+                                className="p-1.5 hover:bg-muted text-muted-foreground rounded-full transition-all"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleAddLeaveSubmit} className="p-6 space-y-4">
+                            {/* Employee Dropdown */}
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Select Employee</label>
+                                <select
+                                    required
+                                    value={addLeaveForm.employeeId}
+                                    onChange={(e) => setAddLeaveForm(prev => ({ ...prev, employeeId: e.target.value }))}
+                                    className="w-full p-3 bg-muted/60 border border-border rounded-xl text-sm font-medium focus:bg-card focus:border-primary outline-none transition-all"
+                                >
+                                    <option value="">-- Choose Employee --</option>
+                                    {employeesList.map(emp => (
+                                        <option key={emp.id} value={emp.id}>
+                                            {emp.user ? `${emp.user.firstName} ${emp.user.lastName || ''}`.trim() : 'Unnamed'} ({emp.employeeCode})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Leave Type */}
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Leave Type</label>
+                                <select
+                                    required
+                                    value={addLeaveForm.type}
+                                    onChange={(e) => setAddLeaveForm(prev => ({ ...prev, type: e.target.value }))}
+                                    className="w-full p-3 bg-muted/60 border border-border rounded-xl text-sm font-medium focus:bg-card focus:border-primary outline-none transition-all"
+                                >
+                                    <option value="sick">Sick Leave</option>
+                                    <option value="casual">Casual Leave</option>
+                                    <option value="earned">Earned Leave</option>
+                                    <option value="unpaid">Unpaid Leave</option>
+                                </select>
+                            </div>
+
+                            {/* Dates */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Start Date</label>
+                                    <input
+                                        type="date"
+                                        required
+                                        value={addLeaveForm.startDate}
+                                        onChange={(e) => setAddLeaveForm(prev => ({ ...prev, startDate: e.target.value }))}
+                                        className="w-full p-3 bg-muted/60 border border-border rounded-xl text-sm font-medium focus:bg-card focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">End Date</label>
+                                    <input
+                                        type="date"
+                                        required
+                                        value={addLeaveForm.endDate}
+                                        onChange={(e) => setAddLeaveForm(prev => ({ ...prev, endDate: e.target.value }))}
+                                        className="w-full p-3 bg-muted/60 border border-border rounded-xl text-sm font-medium focus:bg-card focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Reason */}
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Reason</label>
+                                <textarea
+                                    required
+                                    placeholder="Provide a reason for the leave record..."
+                                    className="w-full p-3 bg-muted/60 border border-border rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all resize-none animate-none"
+                                    rows="3"
+                                    value={addLeaveForm.reason}
+                                    onChange={(e) => setAddLeaveForm(prev => ({ ...prev, reason: e.target.value }))}
+                                />
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-3 pt-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddLeaveModalOpen(false)}
+                                    className="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wide text-muted-foreground bg-muted hover:bg-border transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isAddingLeave}
+                                    className="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wide text-white bg-primary hover:bg-primary/90 transition-all disabled:opacity-50"
+                                >
+                                    {isAddingLeave ? 'Adding...' : 'Add Record'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

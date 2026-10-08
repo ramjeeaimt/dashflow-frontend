@@ -80,7 +80,7 @@ export const API_ENDPOINTS = {
         BY_ID: (id) => `/leaves/${id}`,
         //  Add this line to match your @Patch(':id/status') controller
         UPDATE_STATUS: (id) => `/leaves/${id}/status`,
-        BY_EMPLOYEE: (employeeId) => `/leaves/employee/${employeeId}`,
+        BY_EMPLOYEE: (employeeId) => `/leaves?employeeId=${employeeId}`,
     },
     WFH_REQUESTS: {
         BASE: '/wfh-requests',
