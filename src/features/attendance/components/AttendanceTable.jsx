@@ -237,6 +237,8 @@ const AttendanceTable = ({
       early_checkin: { color: 'bg-primary/10 text-primary border-border', label: 'Early In', icon: 'Clock', iconColor: 'text-sky-500' },
       early_departure: { color: 'bg-orange-50 text-orange-700 border-orange-200', label: 'Early Out', icon: 'LogOut', iconColor: 'text-orange-500' },
       wfh: { color: 'bg-primary/10 text-primary border-border', label: 'WFH', icon: 'Home', iconColor: 'text-primary' },
+      holiday: { color: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Holiday', icon: 'Sparkles', iconColor: 'text-amber-500' },
+      holiday_half: { color: 'bg-indigo-50 text-indigo-700 border-indigo-200', label: 'Half-Day Holiday', icon: 'Sparkles', iconColor: 'text-indigo-500' },
       not_checked_in: { color: 'bg-gray-50 text-gray-600 border-gray-200', label: 'Not Checked In', icon: 'MinusCircle', iconColor: 'text-gray-400' }
     };
 
