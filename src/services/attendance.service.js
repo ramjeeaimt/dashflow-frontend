@@ -111,6 +111,20 @@ export const attendanceService = {
         const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.REVOKE(employeeId));
         const resData = response.data;
         return resData?.data !== undefined ? resData.data : resData;
+    },
+
+    // Toggle late deduction waived status for an attendance record
+    async toggleWaiveLate(id, waived, reason = '') {
+        const response = await apiClient.patch(API_ENDPOINTS.ATTENDANCE.WAIVE_LATE(id), { waived, reason });
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
+    },
+
+    // Waive late deduction by employee ID and date
+    async waiveLateByDate(employeeId, date, waived, reason = '') {
+        const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.WAIVE_LATE_BY_DATE, { employeeId, date, waived, reason });
+        const resData = response.data;
+        return resData?.data !== undefined ? resData.data : resData;
     }
 };
 

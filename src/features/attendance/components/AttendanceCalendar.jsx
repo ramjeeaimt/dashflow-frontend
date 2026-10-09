@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import Icon from '../../../components/AppIcon';
 import { attendanceService } from '../../../services/attendance.service';
+import useAuthStore from '../../../store/useAuthStore';
+import { toast } from 'react-hot-toast';
 
 /**
  * Month-grid attendance view with rich hover inspection, check-in/out times,
- * leave reasons, holiday detection, and Saturday policy badges.
+ * leave reasons, holiday detection, Saturday policy badges, and admin late-deduction waiving.
  */
 
 const DAY_STYLE = {
@@ -39,12 +41,99 @@ const pad = (n) => String(n).padStart(2, '0');
 const toISO = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
 const AttendanceCalendar = ({ employeeId }) => {
+    const { user } = useAuthStore();
     const now = new Date();
     const [cursor, setCursor] = useState({ year: now.getFullYear(), month: now.getMonth() });
     const [days, setDays] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hoveredCell, setHoveredCell] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false);
     const containerRef = useRef(null);
+    const hoverTimeoutRef = useRef(null);
+
+    const isAdminOrManager =
+        user?.roles?.some((r) => ['Super Admin', 'Admin', 'HR Manager', 'Manager'].includes(r.name)) ||
+        ['admin@difmo.com', 'info@difmo.com', 'hello@system.com'].includes(user?.email?.toLowerCase()) ||
+        Boolean(user?.isSuperAdmin) ||
+        Boolean(user?.role && ['admin', 'manager', 'owner', 'superadmin'].includes(user.role.toLowerCase()));
+
+    const handleToggleWaiveLate = async (targetCell, waived) => {
+        if (!targetCell) return;
+        const targetAttendanceId = targetCell.info?.attendanceId;
+        const targetDate = targetCell.iso;
+        const adminDisplayName = user?.firstName
+            ? `${user.firstName} ${user.lastName || ''}`.trim()
+            : user?.email || 'Admin';
+
+        try {
+            setActionLoading(true);
+            if (targetAttendanceId) {
+                await attendanceService.toggleWaiveLate(targetAttendanceId, waived);
+            } else {
+                await attendanceService.waiveLateByDate(employeeId, targetDate, waived);
+            }
+            toast.success(waived ? 'Late deduction waived by admin' : 'Late deduction restored');
+
+            // Optimistically update days list
+            setDays((prevDays) =>
+                prevDays.map((d) => {
+                    if (d.date === targetDate) {
+                        return {
+                            ...d,
+                            lateDeductionWaived: waived,
+                            lateDeductionWaivedBy: waived ? adminDisplayName : null,
+                        };
+                    }
+                    return d;
+                })
+            );
+
+            // Optimistically update currently hovered popover
+            setHoveredCell((prev) => {
+                if (!prev || prev.iso !== targetDate) return prev;
+                return {
+                    ...prev,
+                    info: {
+                        ...prev.info,
+                        lateDeductionWaived: waived,
+                        lateDeductionWaivedBy: waived ? adminDisplayName : null,
+                    },
+                };
+            });
+        } catch (err) {
+            console.error('Failed to toggle late deduction waiver:', err);
+            toast.error('Failed to update late deduction status');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleCellMouseEnter = (e, cellData) => {
+        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+        const rect = e.currentTarget.getBoundingClientRect();
+        const parentRect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+        setHoveredCell({
+            ...cellData,
+            x: rect.left - parentRect.left + rect.width / 2,
+            y: rect.top - parentRect.top,
+        });
+    };
+
+    const handleCellMouseLeave = () => {
+        hoverTimeoutRef.current = setTimeout(() => {
+            setHoveredCell(null);
+        }, 280);
+    };
+
+    const handlePopoverMouseEnter = () => {
+        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    };
+
+    const handlePopoverMouseLeave = () => {
+        hoverTimeoutRef.current = setTimeout(() => {
+            setHoveredCell(null);
+        }, 150);
+    };
 
     const { year, month } = cursor;
     const firstDay = new Date(year, month, 1);
@@ -157,19 +246,8 @@ const AttendanceCalendar = ({ employeeId }) => {
                             return (
                                 <div
                                     key={iso}
-                                    onMouseEnter={(e) => {
-                                        const rect = e.currentTarget.getBoundingClientRect();
-                                        const containerRect = containerRef.current?.getBoundingClientRect() || { top: 0, left: 0 };
-                                        setHoveredCell({
-                                            day,
-                                            iso,
-                                            info,
-                                            type,
-                                            x: rect.left - containerRect.left + rect.width / 2,
-                                            y: rect.top - containerRect.top,
-                                        });
-                                    }}
-                                    onMouseLeave={() => setHoveredCell(null)}
+                                    onMouseEnter={(e) => handleCellMouseEnter(e, { day, iso, info, type })}
+                                    onMouseLeave={handleCellMouseLeave}
                                     className={`aspect-square rounded-xl border flex flex-col items-center justify-center relative cursor-pointer transition-all duration-200 transform hover:scale-[1.07] hover:shadow-md hover:z-20 ${style} ${
                                         info?.isToday ? 'ring-2 ring-primary ring-offset-2 font-black' : ''
                                     }`}
@@ -202,6 +280,11 @@ const AttendanceCalendar = ({ employeeId }) => {
                                             <Icon name="Sparkles" size={9} />
                                         </span>
                                     )}
+                                    {type === 'late' && info?.lateDeductionWaived && (
+                                        <span className="absolute top-1 left-1 text-emerald-600" title="Late Deduction Waived by Admin">
+                                            <Icon name="CheckCircle" size={9} />
+                                        </span>
+                                    )}
                                 </div>
                             );
                         })}
@@ -210,7 +293,9 @@ const AttendanceCalendar = ({ employeeId }) => {
                     {/* Rich Floating Popover Card on Hover */}
                     {hoveredCell && (
                         <div
-                            className="absolute z-50 pointer-events-none transition-all duration-150 transform -translate-x-1/2 -translate-y-full mb-2 w-72"
+                            onMouseEnter={handlePopoverMouseEnter}
+                            onMouseLeave={handlePopoverMouseLeave}
+                            className="absolute z-50 pointer-events-auto transition-all duration-150 transform -translate-x-1/2 -translate-y-full mb-2 w-72"
                             style={{
                                 left: `${hoveredCell.x}px`,
                                 top: `${hoveredCell.y - 8}px`,
@@ -224,7 +309,11 @@ const AttendanceCalendar = ({ employeeId }) => {
                                     </span>
                                     <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
                                         hoveredCell.type === 'present' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                                        hoveredCell.type === 'late' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                                        hoveredCell.type === 'late' ? (
+                                            hoveredCell.info?.lateDeductionWaived
+                                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                        ) :
                                         hoveredCell.type === 'half-day' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' :
                                         hoveredCell.type === 'wfh' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' :
                                         hoveredCell.type === 'holiday' || hoveredCell.type === 'holiday_half' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
@@ -233,7 +322,11 @@ const AttendanceCalendar = ({ employeeId }) => {
                                         hoveredCell.type === 'upcoming' ? 'bg-slate-800 text-slate-400' :
                                         'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                                     }`}>
-                                        {hoveredCell.info?.policyLabel || hoveredCell.type.replace('_', ' ')}
+                                        {hoveredCell.type === 'late' ? (
+                                            hoveredCell.info?.lateDeductionWaived ? 'Late (Waived)' : 'Late (Half-Day)'
+                                        ) : (
+                                            hoveredCell.info?.policyLabel || hoveredCell.type.replace('_', ' ')
+                                        )}
                                     </span>
                                 </div>
 
@@ -268,6 +361,69 @@ const AttendanceCalendar = ({ employeeId }) => {
                                         )}
                                     </div>
                                 ) : null}
+
+                                {/* Late Arrival Deduction Status & Admin Waiver Action */}
+                                {(hoveredCell.type === 'late' || hoveredCell.info?.isLate) && (
+                                    <div className={`p-2.5 rounded-xl border text-[10px] space-y-1.5 ${
+                                        hoveredCell.info?.lateDeductionWaived
+                                            ? 'bg-emerald-950/40 border-emerald-700/50 text-emerald-200'
+                                            : 'bg-amber-950/40 border-amber-700/50 text-amber-200'
+                                    }`}>
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-bold flex items-center gap-1">
+                                                <Icon
+                                                    name={hoveredCell.info?.lateDeductionWaived ? 'CheckCircle' : 'AlertCircle'}
+                                                    size={12}
+                                                    className={hoveredCell.info?.lateDeductionWaived ? 'text-emerald-400' : 'text-amber-400'}
+                                                />
+                                                {hoveredCell.info?.lateDeductionWaived ? 'Late (Deduction Waived)' : 'Late: Half-Day Deducted'}
+                                            </span>
+                                            <span className={`px-1.5 py-0.2 rounded text-[8.5px] font-bold uppercase tracking-wider ${
+                                                hoveredCell.info?.lateDeductionWaived ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                                            }`}>
+                                                {hoveredCell.info?.lateDeductionWaived ? 'Waived' : 'Deducted'}
+                                            </span>
+                                        </div>
+
+                                        <p className="text-[9px] text-slate-300 leading-relaxed">
+                                            {hoveredCell.info?.lateDeductionWaived
+                                                ? `Salary deduction cancelled by ${hoveredCell.info?.lateDeductionWaivedBy || 'Admin'}. Full day will be credited.`
+                                                : 'Arrived after grace period. 50% half-day pay will be deducted in payroll unless waived.'}
+                                        </p>
+
+                                        {isAdminOrManager && (
+                                            <div className="pt-1 border-t border-slate-700/60 flex items-center justify-end">
+                                                {hoveredCell.info?.lateDeductionWaived ? (
+                                                    <button
+                                                        type="button"
+                                                        disabled={actionLoading}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleToggleWaiveLate(hoveredCell, false);
+                                                        }}
+                                                        className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-[9.5px] font-semibold transition-all border border-slate-600 flex items-center gap-1 shadow-sm disabled:opacity-50"
+                                                    >
+                                                        <Icon name="RotateCcw" size={10} />
+                                                        <span>Re-apply Deduction</span>
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        disabled={actionLoading}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleToggleWaiveLate(hoveredCell, true);
+                                                        }}
+                                                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[9.5px] font-bold transition-all shadow-sm flex items-center gap-1 disabled:opacity-50"
+                                                    >
+                                                        <Icon name="Check" size={10} />
+                                                        <span>Cancel Late Deduction</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* Leave details if on leave */}
                                 {hoveredCell.info?.leave && (

@@ -53,6 +53,7 @@ const AttendancePolicySettings = () => {
     checkInCutoffMinutes: 240,
     halfDayMinHours: 4,
     halfDayPayPercent: 50,
+    enableLateDeduction: true,
     enableLateEmailAlert: true,
     attendanceAlertEmails: '',
     casualLeavesPerYear: 12,
@@ -86,6 +87,7 @@ const AttendancePolicySettings = () => {
             checkInCutoffMinutes: c.checkInCutoffMinutes ?? 240,
             halfDayMinHours: c.halfDayMinHours ?? 4,
             halfDayPayPercent: c.halfDayPayPercent ?? 50,
+            enableLateDeduction: c.enableLateDeduction ?? true,
             enableLateEmailAlert: c.enableLateEmailAlert ?? true,
             attendanceAlertEmails: c.attendanceAlertEmails || '',
             casualLeavesPerYear: c.casualLeavesPerYear ?? 12,
@@ -274,6 +276,17 @@ const AttendancePolicySettings = () => {
               checked={form.enableLateEmailAlert}
               onChange={(v) => set('enableLateEmailAlert', v)}
               label={form.enableLateEmailAlert ? 'Enabled — late arrivals receive an email warning' : 'Disabled'}
+            />
+          </FieldGroup>
+
+          <FieldGroup
+            label="Late Salary Deduction"
+            hint="Deduct half-day salary for late check-in during monthly payroll. Admins can waive/cancel deductions on individual days in the Attendance Calendar or Timeline."
+          >
+            <Toggle
+              checked={form.enableLateDeduction}
+              onChange={(v) => set('enableLateDeduction', v)}
+              label={form.enableLateDeduction ? 'Enabled — half-day salary deducted for late check-ins (admin can waive)' : 'Disabled — no salary deductions for late check-ins'}
             />
           </FieldGroup>
 
@@ -735,6 +748,7 @@ const AttendancePolicySettings = () => {
         <p>• Working <strong>{form.halfDayMinHours}+ hours</strong> qualifies as a half-day, paid at <strong>{form.halfDayPayPercent}%</strong> of daily rate.</p>
         <p>• Employees receive <strong>{form.casualLeavesPerYear} casual leaves</strong> per year.</p>
         <p>• Late arrival email warnings are <strong>{form.enableLateEmailAlert ? 'enabled' : 'disabled'}</strong>.</p>
+        <p>• Late arrival payroll deduction: <strong>{form.enableLateDeduction ? 'Active (half-day pay deducted per late arrival, admin can waive)' : 'Disabled (no deduction)'}</strong>.</p>
       </div>
 
       {/* Save */}

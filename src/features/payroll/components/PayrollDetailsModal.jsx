@@ -150,7 +150,14 @@ const PayrollDetailsModal = ({ isOpen, onClose, payroll, onSendEmail }) => {
                                     <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 font-bold">
                                         <TrendingDown size={14} />
                                     </div>
-                                    <span className="text-sm font-bold text-foreground">Total Deductions</span>
+                                    <div>
+                                        <span className="text-sm font-bold text-foreground">Total Deductions</span>
+                                        {payroll.lateDeductionCount > 0 && (
+                                            <p className="text-[10px] text-muted-foreground/70">
+                                                Includes {payroll.lateDeductionCount} late arrival{payroll.lateDeductionCount > 1 ? 's' : ''} (half-day pay)
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                                 <span className="text-sm font-bold text-rose-600">-{formatCurrency(payroll.deductions)}</span>
                             </div>

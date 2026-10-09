@@ -14,6 +14,8 @@ export const API_ENDPOINTS = {
         TIMELINE: (employeeId) => `/attendance/timeline/${employeeId}`,
         RECORD: (id) => `/attendance/${id}`,
         REVOKE: (employeeId) => `/attendance/revoke/${employeeId}`,
+        WAIVE_LATE: (id) => `/attendance/${id}/waive-late`,
+        WAIVE_LATE_BY_DATE: '/attendance/waive-late-by-date',
     },
     EMPLOYEES: {
         BASE: '/employees',

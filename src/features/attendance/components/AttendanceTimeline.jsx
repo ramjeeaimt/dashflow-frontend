@@ -50,6 +50,20 @@ const statusMeta = (type, day) => {
       icon: 'Sparkles',
     };
   }
+  if (type === 'late' || day?.isLate) {
+    if (day?.lateDeductionWaived) {
+      return {
+        label: 'Late (Waived)',
+        className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        icon: 'CheckCircle',
+      };
+    }
+    return {
+      label: 'Late (1/2 Deducted)',
+      className: 'bg-amber-50 text-amber-800 border-amber-200',
+      icon: 'Clock',
+    };
+  }
   return STATUS_META[type] || STATUS_META.absent;
 };
 
@@ -108,6 +122,21 @@ const AttendanceTimeline = ({ employeeId }) => {
       setError('Could not load attendance records.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleWaiveLate = async (day, waived) => {
+    try {
+      if (day.attendanceId) {
+        await attendanceService.toggleWaiveLate(day.attendanceId, waived);
+      } else {
+        await attendanceService.waiveLateByDate(employeeId, day.date, waived);
+      }
+      toast.success(waived ? 'Late deduction waived by admin' : 'Late deduction restored');
+      load();
+    } catch (err) {
+      console.error('Failed to toggle late deduction waiver:', err);
+      toast.error('Failed to update late deduction status');
     }
   };
 
@@ -250,7 +279,11 @@ const AttendanceTimeline = ({ employeeId }) => {
       {summary && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
           <SummaryTile label="Present" value={summary.present} tone="text-success" />
-          <SummaryTile label="Late" value={summary.late} tone="text-warning" />
+          <SummaryTile
+            label={summary.lateWaived > 0 ? `Late (${summary.lateWaived} waived)` : 'Late'}
+            value={summary.late}
+            tone="text-warning"
+          />
           <SummaryTile label="WFH" value={summary.wfh} tone="text-primary" />
           <SummaryTile label="Off-site" value={summary.offsite ?? 0} tone="text-warning" />
           <SummaryTile label="Leave" value={summary.leave} tone="text-error" />
@@ -329,6 +362,7 @@ const AttendanceTimeline = ({ employeeId }) => {
                   isAdminOrManager={isAdminOrManager}
                   onOpenHolidayModal={handleOpenHolidayModal}
                   onRemoveHoliday={handleRemoveHoliday}
+                  onToggleWaiveLate={handleToggleWaiveLate}
                 />
               ))}
             </tbody>
@@ -477,7 +511,7 @@ const AttendanceTimeline = ({ employeeId }) => {
   );
 };
 
-const DayRow = ({ day, isAdminOrManager, onOpenHolidayModal, onRemoveHoliday }) => {
+const DayRow = ({ day, isAdminOrManager, onOpenHolidayModal, onRemoveHoliday, onToggleWaiveLate }) => {
   const meta = statusMeta(day.type, day);
   const checkIn = formatTime(day.checkInTime);
   const checkOut = formatTime(day.checkOutTime);
@@ -533,6 +567,13 @@ const DayRow = ({ day, isAdminOrManager, onOpenHolidayModal, onRemoveHoliday }) 
               WFH
             </span>
           )}
+          {/* Late Waived indicator badge on date */}
+          {(day.type === 'late' || day.isLate) && day.lateDeductionWaived && (
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <Icon name="CheckCircle" size={9} />
+              Waived
+            </span>
+          )}
         </div>
       </td>
 
@@ -567,6 +608,37 @@ const DayRow = ({ day, isAdminOrManager, onOpenHolidayModal, onRemoveHoliday }) 
             <span className="text-xs text-muted-foreground capitalize">
               {day.leave.type}
             </span>
+          )}
+
+          {/* Admin Late Deduction Waiver Actions */}
+          {(day.type === 'late' || day.isLate) && isAdminOrManager && (
+            day.lateDeductionWaived ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleWaiveLate?.(day, false);
+                }}
+                title={`Waived by ${day.lateDeductionWaivedBy || 'Admin'}. Click to re-apply 50% half-day deduction.`}
+                className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1 transition-all"
+              >
+                <Icon name="RotateCcw" size={10} />
+                <span>Re-apply Deduction</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleWaiveLate?.(day, true);
+                }}
+                title="Cancel / Waive half-day pay deduction for this late arrival"
+                className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1 shadow-2xs transition-all"
+              >
+                <Icon name="Check" size={11} />
+                <span>Cancel Deduction</span>
+              </button>
+            )
           )}
 
           {/* Quick Admin Holiday Actions */}
@@ -671,6 +743,13 @@ const buildTooltip = (day) => {
   }
 
   if (day.workMode?.detail) lines.push(day.workMode.detail);
+  if (day.type === 'late' || day.isLate) {
+    if (day.lateDeductionWaived) {
+      lines.push(`Late Check-in: Half-day deduction WAIVED by ${day.lateDeductionWaivedBy || 'Admin'}. Full day paid.`);
+    } else {
+      lines.push('Late Check-in: 50% half-day salary deducted in payroll (Admin can waive).');
+    }
+  }
   if (day.isWeekend && !day.checkInTime) lines.push('Sunday — weekly off.');
   if (day.type === 'absent') lines.push('No check-in recorded for this working day.');
   if (day.notes) lines.push(`Notes: ${day.notes}`);

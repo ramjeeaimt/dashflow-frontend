@@ -205,7 +205,14 @@ const PayrollDetailsPage = () => {
                                     <span className="text-rose-600 font-bold">-{formatCurrency(payroll.leaveDeduction || 0)}</span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Half-Day Deduction</span>
+                                    <div>
+                                        <span>Half-Day & Late Deductions</span>
+                                        {payroll.lateDeductionCount > 0 && (
+                                            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                                                ({payroll.lateDeductionCount} late arrival{payroll.lateDeductionCount > 1 ? 's' : ''} penalized as half-day)
+                                            </p>
+                                        )}
+                                    </div>
                                     <span className="text-rose-600 font-bold">-{formatCurrency(payroll.halfDeduction || 0)}</span>
                                 </div>
                                 <div className="flex justify-between border-t border-border/40 pt-2 font-bold text-foreground">
@@ -236,6 +243,17 @@ const PayrollDetailsPage = () => {
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <span>Half Days</span>
                                     <span className="text-amber-600 font-bold">{payroll.halfDaysCount || 0} days</span>
+                                </div>
+                                <div className="flex justify-between font-medium text-muted-foreground">
+                                    <span>Late Arrivals</span>
+                                    <span className="text-amber-600 font-bold">
+                                        {payroll.lateCount || 0} days
+                                        {payroll.lateCount > 0 && (
+                                            <span className="text-[11px] font-normal text-muted-foreground ml-1.5">
+                                                ({payroll.lateDeductionCount || 0} deducted, {(payroll.lateCount || 0) - (payroll.lateDeductionCount || 0)} waived)
+                                            </span>
+                                        )}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <span>Paid Leaves Used (CL)</span>
