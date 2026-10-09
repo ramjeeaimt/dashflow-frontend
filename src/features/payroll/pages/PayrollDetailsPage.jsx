@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import Icon from '../../../components/AppIcon';
 import financeService from '../../../services/finance.service';
 import { leaveService } from '../../../services/leaveService';
+import PayrollReviewModal from '../components/PayrollReviewModal';
 import { toast } from 'react-hot-toast';
 
 const PayrollDetailsPage = () => {
@@ -15,50 +16,106 @@ const PayrollDetailsPage = () => {
     const [payroll, setPayroll] = useState(null);
     const [leaves, setLeaves] = useState([]);
 
-    useEffect(() => {
-        const fetchPayrollDetails = async () => {
-            setLoading(true);
-            try {
-                const payrollData = await financeService.getPayrollById(id);
-                if (!payrollData) {
-                    throw new Error("Payroll record not found");
-                }
-                setPayroll(payrollData);
+    // Sibling payroll records for switching employees within this cycle
+    const [cyclePayrolls, setCyclePayrolls] = useState([]);
+    const [loadingCycle, setLoadingCycle] = useState(false);
 
-                // Fetch employee leaves to show history for this specific cycle month/year
-                if (payrollData?.employeeId) {
-                    try {
-                        const leavesData = await leaveService.getEmployeeLeaves(payrollData.employeeId);
-                        const leavesList = leavesData?.data?.data || leavesData?.data || leavesData || [];
+    // Modal & action button states
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+    const [isPrintingPdf, setIsPrintingPdf] = useState(false);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [isRecalculating, setIsRecalculating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-                        // Filter leaves falling within the payroll month/year
-                        const cycleMonth = Number(payrollData.month);
-                        const cycleYear = Number(payrollData.year);
-                        const filtered = Array.isArray(leavesList) ? leavesList.filter(lv => {
-                            if (!lv || !lv.startDate || !lv.endDate) return false;
-                            const start = new Date(lv.startDate);
-                            const end = new Date(lv.endDate);
-                            return (start.getMonth() + 1 === cycleMonth && start.getFullYear() === cycleYear) ||
-                                   (end.getMonth() + 1 === cycleMonth && end.getFullYear() === cycleYear);
-                        }) : [];
-                        setLeaves(filtered);
-                    } catch (leaveErr) {
-                        console.warn("Non-fatal: could not load employee leaves:", leaveErr);
-                        setLeaves([]);
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to load payroll details:", err);
-                toast.error("Failed to load payroll details.");
-            } finally {
-                setLoading(false);
+    // Edit form state
+    const [editFormData, setEditFormData] = useState({
+        basicSalary: 0,
+        allowances: 0,
+        deductions: 0,
+        overtime: 0,
+        status: 'draft',
+        notes: ''
+    });
+
+    const fetchPayrollDetails = useCallback(async (payrollId) => {
+        setLoading(true);
+        try {
+            const payrollData = await financeService.getPayrollById(payrollId);
+            if (!payrollData) {
+                throw new Error("Payroll record not found");
             }
-        };
+            setPayroll(payrollData);
 
-        if (id) {
-            fetchPayrollDetails();
+            // Populate edit form
+            setEditFormData({
+                basicSalary: payrollData.basicSalary || 0,
+                allowances: payrollData.allowances || 0,
+                deductions: payrollData.deductions || 0,
+                overtime: payrollData.overtime || 0,
+                status: payrollData.status || 'draft',
+                notes: payrollData.notes || ''
+            });
+
+            // Fetch sibling cycle payrolls if not already fetched or if month/year changed
+            if (payrollData?.companyId && payrollData?.month && payrollData?.year) {
+                fetchCyclePayrolls(payrollData.companyId, payrollData.month, payrollData.year);
+            }
+
+            // Fetch employee leaves to show history for this specific cycle month/year
+            if (payrollData?.employeeId) {
+                try {
+                    const leavesData = await leaveService.getEmployeeLeaves(payrollData.employeeId);
+                    const leavesList = leavesData?.data?.data || leavesData?.data || leavesData || [];
+
+                    const cycleMonth = Number(payrollData.month);
+                    const cycleYear = Number(payrollData.year);
+                    const filtered = Array.isArray(leavesList) ? leavesList.filter(lv => {
+                        if (!lv || !lv.startDate || !lv.endDate) return false;
+                        const start = new Date(lv.startDate);
+                        const end = new Date(lv.endDate);
+                        return (start.getMonth() + 1 === cycleMonth && start.getFullYear() === cycleYear) ||
+                               (end.getMonth() + 1 === cycleMonth && end.getFullYear() === cycleYear);
+                    }) : [];
+                    setLeaves(filtered);
+                } catch (leaveErr) {
+                    console.warn("Non-fatal: could not load employee leaves:", leaveErr);
+                    setLeaves([]);
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load payroll details:", err);
+            toast.error("Failed to load payroll details.");
+        } finally {
+            setLoading(false);
         }
-    }, [id]);
+    }, []);
+
+    const fetchCyclePayrolls = async (companyId, month, year) => {
+        setLoadingCycle(true);
+        try {
+            const list = await financeService.getPayroll(companyId, month, year);
+            const array = Array.isArray(list) ? list : [];
+            // Sort alphabetically by employee first name
+            array.sort((a, b) => {
+                const nameA = (a.employee?.user?.firstName || '').toLowerCase();
+                const nameB = (b.employee?.user?.firstName || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            setCyclePayrolls(array);
+        } catch (err) {
+            console.warn("Could not load sibling cycle payrolls:", err);
+        } finally {
+            setLoadingCycle(false);
+        }
+    };
+
+    useEffect(() => {
+        if (id) {
+            fetchPayrollDetails(id);
+        }
+    }, [id, fetchPayrollDetails]);
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -79,6 +136,141 @@ const PayrollDetailsPage = () => {
         const e = new Date(end);
         const diff = e.getTime() - s.getTime();
         return Math.round(diff / (1000 * 60 * 60 * 24)) + 1;
+    };
+
+    // --- Action Handlers ---
+
+    // 1. Download PDF
+    const handleDownloadPdf = async () => {
+        if (!payroll?.id) return;
+        setIsDownloadingPdf(true);
+        try {
+            const blob = await financeService.getPayslipPdf(payroll.id);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const empCode = payroll.employee?.employeeCode || 'EMP';
+            a.download = `payslip-${empCode}-${payroll.month}-${payroll.year}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => window.URL.revokeObjectURL(url), 2000);
+            toast.success('Payslip PDF downloaded');
+        } catch (err) {
+            console.error('PDF download error:', err);
+            toast.error('Failed to download PDF payslip.');
+        } finally {
+            setIsDownloadingPdf(false);
+        }
+    };
+
+    // 2. Print / Preview PDF
+    const handlePrintPdf = async () => {
+        if (!payroll?.id) return;
+        setIsPrintingPdf(true);
+        try {
+            const blob = await financeService.getPayslipPdf(payroll.id);
+            const url = window.URL.createObjectURL(blob);
+            window.open(url, '_blank', 'noopener');
+            setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+        } catch (err) {
+            console.error('Print error:', err);
+            toast.error('Failed to preview payslip.');
+        } finally {
+            setIsPrintingPdf(false);
+        }
+    };
+
+    // 3. Toggle Status (Paid / Draft)
+    const handleTogglePaidStatus = async () => {
+        if (!payroll?.id) return;
+        const newStatus = payroll.status === 'paid' ? 'draft' : 'paid';
+        setIsUpdatingStatus(true);
+        try {
+            await financeService.updatePayroll(payroll.id, { status: newStatus });
+            setPayroll(prev => ({ ...prev, status: newStatus }));
+            setCyclePayrolls(prev => prev.map(p => p.id === payroll.id ? { ...p, status: newStatus } : p));
+            toast.success(`Payroll marked as ${newStatus.toUpperCase()}`);
+        } catch (err) {
+            console.error('Failed to update status:', err);
+            toast.error('Failed to update payroll status.');
+        } finally {
+            setIsUpdatingStatus(false);
+        }
+    };
+
+    // 4. Recalculate / Regenerate
+    const handleRecalculate = async () => {
+        if (!payroll?.id) return;
+        const confirmMsg = `Recalculate payroll for ${payroll.employee?.user?.firstName || 'this employee'} (${payroll.month}/${payroll.year}) from latest attendance & leaves?`;
+        if (!window.confirm(confirmMsg)) return;
+
+        setIsRecalculating(true);
+        try {
+            await financeService.bulkGenerateRealPayroll(
+                payroll.month,
+                payroll.year,
+                payroll.companyId,
+                payroll.employeeId
+            );
+            toast.success('Payroll recalculated successfully from live attendance!');
+            await fetchPayrollDetails(payroll.id);
+        } catch (err) {
+            console.error('Recalculate failed:', err);
+            toast.error('Failed to recalculate payroll.');
+        } finally {
+            setIsRecalculating(false);
+        }
+    };
+
+    // 5. Save Manual Edits
+    const handleSaveEdit = async (e) => {
+        e.preventDefault();
+        if (!payroll?.id) return;
+        try {
+            const basic = parseFloat(editFormData.basicSalary) || 0;
+            const allow = parseFloat(editFormData.allowances) || 0;
+            const ded = parseFloat(editFormData.deductions) || 0;
+            const ot = parseFloat(editFormData.overtime) || 0;
+            const calculatedNet = Math.max(0, basic + allow + ot - ded);
+
+            const payload = {
+                basicSalary: basic,
+                allowances: allow,
+                deductions: ded,
+                overtime: ot,
+                netSalary: calculatedNet,
+                status: editFormData.status,
+                notes: editFormData.notes
+            };
+
+            await financeService.updatePayroll(payroll.id, payload);
+            setPayroll(prev => ({ ...prev, ...payload }));
+            setCyclePayrolls(prev => prev.map(p => p.id === payroll.id ? { ...p, ...payload } : p));
+            setIsEditModalOpen(false);
+            toast.success('Payroll details updated successfully!');
+        } catch (err) {
+            console.error('Failed to save payroll edits:', err);
+            toast.error('Failed to save changes.');
+        }
+    };
+
+    // 6. Delete Payroll
+    const handleDeletePayroll = async () => {
+        if (!payroll?.id) return;
+        const empName = payroll.employee?.user?.firstName || 'Employee';
+        if (!window.confirm(`Are you sure you want to delete the payroll record for ${empName}? This cannot be undone.`)) return;
+
+        setIsDeleting(true);
+        try {
+            await financeService.deletePayroll(payroll.id);
+            toast.success('Payroll record deleted');
+            navigate('/payroll');
+        } catch (err) {
+            console.error('Delete failed:', err);
+            toast.error('Failed to delete payroll record.');
+            setIsDeleting(false);
+        }
     };
 
     if (loading) {
@@ -118,8 +310,12 @@ const PayrollDetailsPage = () => {
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Employee';
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const monthLabel = monthNames[payroll.month - 1] || '---';
-
     const perDayRate = payroll.totalWorkingDays > 0 ? (payroll.basicSalary / payroll.totalWorkingDays) : 0;
+
+    // Sibling navigation indices
+    const currentIdx = cyclePayrolls.findIndex(p => p.id === payroll.id);
+    const prevPayroll = currentIdx > 0 ? cyclePayrolls[currentIdx - 1] : null;
+    const nextPayroll = currentIdx >= 0 && currentIdx < cyclePayrolls.length - 1 ? cyclePayrolls[currentIdx + 1] : null;
 
     return (
         <div className="min-h-screen bg-[#FBFBFE]">
@@ -128,39 +324,186 @@ const PayrollDetailsPage = () => {
 
             <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16 pb-12`}>
                 <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
-                    {/* Top back navigation */}
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted/60 rounded-xl transition-all">
-                            <Icon name="ArrowLeft" size={20} className="text-muted-foreground/70" />
-                        </button>
-                        <div>
-                            <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Back to Payroll Suite</span>
-                            <h1 className="text-xl font-bold text-foreground">Payslip Audit Details</h1>
+
+                    {/* Top Navigation Row: Back Link & Employee Switcher */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => navigate('/payroll')} className="p-2 hover:bg-muted/60 rounded-xl transition-all border border-border/50">
+                                <Icon name="ArrowLeft" size={20} className="text-muted-foreground/70" />
+                            </button>
+                            <div>
+                                <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Back to Payroll Suite</span>
+                                <h1 className="text-xl font-bold text-foreground">Payslip Audit Details</h1>
+                            </div>
+                        </div>
+
+                        {/* Employee Switcher Toolbar */}
+                        <div className="flex items-center gap-2 self-start sm:self-auto bg-card p-1.5 rounded-2xl border border-border shadow-xs">
+                            <button
+                                onClick={() => prevPayroll && navigate(`/payroll/${prevPayroll.id}`)}
+                                disabled={!prevPayroll}
+                                className="p-1.5 hover:bg-muted/80 rounded-xl text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                title={prevPayroll ? `Previous: ${prevPayroll.employee?.user?.firstName || 'Employee'}` : 'First employee in cycle'}
+                            >
+                                <Icon name="ChevronLeft" size={18} />
+                            </button>
+
+                            <div className="relative">
+                                <select
+                                    value={payroll.id}
+                                    onChange={(e) => navigate(`/payroll/${e.target.value}`)}
+                                    className="appearance-none bg-muted/40 hover:bg-muted/70 text-foreground text-xs font-semibold py-1.5 pl-3 pr-8 rounded-xl border border-border/60 focus:outline-hidden focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer max-w-[210px] sm:max-w-[260px] truncate"
+                                >
+                                    {cyclePayrolls.length > 0 ? (
+                                        cyclePayrolls.map((cp, idx) => {
+                                            const u = cp.employee?.user || {};
+                                            const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Employee';
+                                            const code = cp.employee?.employeeCode || 'N/A';
+                                            return (
+                                                <option key={cp.id} value={cp.id}>
+                                                    {idx + 1}. {name} ({code}) · {formatCurrency(cp.netSalary)}
+                                                </option>
+                                            );
+                                        })
+                                    ) : (
+                                        <option value={payroll.id}>{fullName} ({employee.employeeCode || 'N/A'})</option>
+                                    )}
+                                </select>
+                                <Icon name="ChevronDown" size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                            </div>
+
+                            <button
+                                onClick={() => nextPayroll && navigate(`/payroll/${nextPayroll.id}`)}
+                                disabled={!nextPayroll}
+                                className="p-1.5 hover:bg-muted/80 rounded-xl text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                title={nextPayroll ? `Next: ${nextPayroll.employee?.user?.firstName || 'Employee'}` : 'Last employee in cycle'}
+                            >
+                                <Icon name="ChevronRight" size={18} />
+                            </button>
+
+                            {cyclePayrolls.length > 0 && (
+                                <span className="text-[10px] font-bold text-muted-foreground/70 px-2 py-0.5 bg-muted rounded-lg border border-border/40 hidden md:inline-block">
+                                    {currentIdx >= 0 ? currentIdx + 1 : 1}/{cyclePayrolls.length}
+                                </span>
+                            )}
                         </div>
                     </div>
 
-                    {/* Employee Profile Header Summary */}
-                    <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-primary text-white rounded-[16px] flex items-center justify-center text-lg font-bold">
-                                {user.firstName?.[0] || 'E'}{user.lastName?.[0] || ''}
+                    {/* Employee Profile Header Summary + Action Toolbar */}
+                    <div className="bg-card rounded-2xl border border-border shadow-sm p-6 space-y-5">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 bg-primary text-white rounded-[16px] flex items-center justify-center text-lg font-bold shadow-xs">
+                                    {user.firstName?.[0] || 'E'}{user.lastName?.[0] || ''}
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-lg font-bold text-foreground">{fullName}</h2>
+                                        {employee.department && (
+                                            <span className="text-[10px] font-semibold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md border border-border/40">
+                                                {typeof employee.department === 'string' ? employee.department : employee.department.name}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground/80 font-medium mt-0.5">
+                                        ID: {employee.employeeCode || 'N/A'} · {payroll.month}/{payroll.year} Cycle
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-foreground">{fullName}</h2>
-                                <p className="text-xs text-muted-foreground/80 font-medium">ID: {employee.employeeCode || 'N/A'} · {payroll.month}/{payroll.year} Cycle</p>
+
+                            <div className="flex items-center gap-4 self-end md:self-auto">
+                                <div className="text-right">
+                                    <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Net Payable</span>
+                                    <h3 className="text-xl font-extrabold text-foreground">{formatCurrency(payroll.netSalary)}</h3>
+                                </div>
+                                <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full uppercase border ${
+                                    payroll.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                    payroll.status === 'sent' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-amber-50 text-amber-600 border-amber-100'
+                                }`}>
+                                    {payroll.status || 'draft'}
+                                </span>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="text-right">
-                                <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wide">Net Payable</span>
-                                <h3 className="text-xl font-extrabold text-foreground">{formatCurrency(payroll.netSalary)}</h3>
+
+                        {/* All Action Buttons Row */}
+                        <div className="pt-4 border-t border-border/50 flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                                {/* Mark as Paid / Mark as Draft Toggle */}
+                                <button
+                                    onClick={handleTogglePaidStatus}
+                                    disabled={isUpdatingStatus}
+                                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border shadow-xs transition-all ${
+                                        payroll.status === 'paid'
+                                            ? 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200'
+                                            : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
+                                    }`}
+                                >
+                                    <Icon name={payroll.status === 'paid' ? "RotateCcw" : "CheckCircle2"} size={15} />
+                                    {payroll.status === 'paid' ? "Mark as Draft" : "Mark as Paid"}
+                                </button>
+
+                                {/* Review & Send Email Modal */}
+                                <button
+                                    onClick={() => setIsReviewModalOpen(true)}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 shadow-xs transition-all"
+                                >
+                                    <Icon name="Mail" size={15} />
+                                    Review & Send Email
+                                </button>
+
+                                {/* Download PDF */}
+                                <button
+                                    onClick={handleDownloadPdf}
+                                    disabled={isDownloadingPdf}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card hover:bg-muted/80 text-foreground text-xs font-semibold rounded-xl border border-border shadow-xs transition-all disabled:opacity-50"
+                                >
+                                    <Icon name={isDownloadingPdf ? "Loader2" : "Download"} size={15} className={isDownloadingPdf ? "animate-spin" : ""} />
+                                    {isDownloadingPdf ? "Downloading..." : "Download PDF"}
+                                </button>
+
+                                {/* Print / Preview PDF */}
+                                <button
+                                    onClick={handlePrintPdf}
+                                    disabled={isPrintingPdf}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card hover:bg-muted/80 text-foreground text-xs font-semibold rounded-xl border border-border shadow-xs transition-all disabled:opacity-50"
+                                >
+                                    <Icon name="Printer" size={15} />
+                                    Print
+                                </button>
+
+                                {/* Recalculate Live Attendance */}
+                                <button
+                                    onClick={handleRecalculate}
+                                    disabled={isRecalculating}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card hover:bg-muted/80 text-foreground text-xs font-semibold rounded-xl border border-border shadow-xs transition-all disabled:opacity-50"
+                                    title="Recalculate from live attendance, late arrivals, half-days, and holidays"
+                                >
+                                    <Icon name="RefreshCw" size={15} className={isRecalculating ? "animate-spin" : ""} />
+                                    {isRecalculating ? "Recalculating..." : "Recalculate"}
+                                </button>
                             </div>
-                            <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full uppercase border ${
-                                payroll.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                payroll.status === 'sent' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-amber-50 text-amber-600 border-amber-100'
-                            }`}>
-                                {payroll.status || 'draft'}
-                            </span>
+
+                            <div className="flex items-center gap-2">
+                                {/* Edit Details */}
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-card hover:bg-muted/80 text-foreground text-xs font-semibold rounded-xl border border-border shadow-xs transition-all"
+                                >
+                                    <Icon name="Pencil" size={15} />
+                                    Edit
+                                </button>
+
+                                {/* Delete Payroll */}
+                                <button
+                                    onClick={handleDeletePayroll}
+                                    disabled={isDeleting}
+                                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-xl border border-rose-200 transition-all disabled:opacity-50"
+                                    title="Delete this payroll record"
+                                >
+                                    <Icon name="Trash2" size={15} />
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -330,6 +673,144 @@ const PayrollDetailsPage = () => {
                     )}
                 </div>
             </main>
+
+            {/* Review & Send Email Modal */}
+            {isReviewModalOpen && (
+                <PayrollReviewModal
+                    isOpen={isReviewModalOpen}
+                    onClose={() => setIsReviewModalOpen(false)}
+                    payroll={payroll}
+                    mode="send"
+                    onSend={async () => {
+                        toast.success('Payslip email dispatched successfully!');
+                        setPayroll(prev => ({ ...prev, status: 'sent' }));
+                        setCyclePayrolls(prev => prev.map(p => p.id === payroll.id ? { ...p, status: 'sent' } : p));
+                        setIsReviewModalOpen(false);
+                    }}
+                />
+            )}
+
+            {/* Edit Payroll Modal */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+                    <div className="bg-card border border-border rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                            <div>
+                                <h3 className="text-base font-bold text-foreground">Edit Payroll Details</h3>
+                                <p className="text-xs text-muted-foreground">{fullName} · {payroll.month}/{payroll.year} Cycle</p>
+                            </div>
+                            <button
+                                onClick={() => setIsEditModalOpen(false)}
+                                className="p-1 hover:bg-muted/70 rounded-lg text-muted-foreground hover:text-foreground"
+                            >
+                                <Icon name="X" size={18} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveEdit} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground block mb-1">Basic Salary (₹)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={editFormData.basicSalary}
+                                        onChange={(e) => setEditFormData({ ...editFormData, basicSalary: e.target.value })}
+                                        className="w-full text-xs font-semibold bg-background border border-border rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/20"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground block mb-1">Allowances (₹)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={editFormData.allowances}
+                                        onChange={(e) => setEditFormData({ ...editFormData, allowances: e.target.value })}
+                                        className="w-full text-xs font-semibold bg-background border border-border rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground block mb-1">Deductions (₹)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={editFormData.deductions}
+                                        onChange={(e) => setEditFormData({ ...editFormData, deductions: e.target.value })}
+                                        className="w-full text-xs font-semibold bg-background border border-border rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground block mb-1">Overtime Pay (₹)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={editFormData.overtime}
+                                        onChange={(e) => setEditFormData({ ...editFormData, overtime: e.target.value })}
+                                        className="w-full text-xs font-semibold bg-background border border-border rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground block mb-1">Payroll Status</label>
+                                    <select
+                                        value={editFormData.status}
+                                        onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                                        className="w-full text-xs font-semibold bg-background border border-border rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/20"
+                                    >
+                                        <option value="draft">Draft</option>
+                                        <option value="sent">Sent</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-muted-foreground block mb-1">Calculated Net Salary</label>
+                                    <div className="text-xs font-bold text-foreground bg-muted/50 border border-border/50 rounded-xl px-3 py-2">
+                                        {formatCurrency(
+                                            Math.max(
+                                                0,
+                                                (parseFloat(editFormData.basicSalary) || 0) +
+                                                (parseFloat(editFormData.allowances) || 0) +
+                                                (parseFloat(editFormData.overtime) || 0) -
+                                                (parseFloat(editFormData.deductions) || 0)
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-muted-foreground block mb-1">Manager Remarks / Notes</label>
+                                <textarea
+                                    value={editFormData.notes}
+                                    onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
+                                    rows={2}
+                                    className="w-full text-xs bg-background border border-border rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary/20"
+                                    placeholder="Add any manual deduction reasons or remarks..."
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEditModalOpen(false)}
+                                    className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted/60 rounded-xl"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary/90 shadow-xs"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
