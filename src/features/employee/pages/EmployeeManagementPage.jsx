@@ -22,11 +22,15 @@ const EmployeeManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
-  const [filters, setFilters] = useState({
-    department: '',
-    branch: '',
-    employmentType: '',
-    status: 'active' // default to Active on load; user can clear/change it
+  const [filters, setFilters] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusParam = urlParams.get('status');
+    return {
+      department: '',
+      branch: '',
+      employmentType: '',
+      status: statusParam !== null ? statusParam : 'active' // default to Active on load
+    };
   });
   const [modalState, setModalState] = useState({
     isOpen: false,

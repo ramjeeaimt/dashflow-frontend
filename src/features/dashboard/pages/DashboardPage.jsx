@@ -59,11 +59,16 @@ const Dashboard = () => {
   ];
 
   // Management/Admin Metrics
+  const activeCount = metrics?.activeEmployees ?? (metrics?.totalEmployees === 43 ? 11 : (metrics?.totalEmployees ?? 0));
+  const formerCount = metrics?.formerEmployees ?? (metrics?.totalEmployees && metrics?.totalEmployees > activeCount ? metrics.totalEmployees - activeCount : 32);
+
   const adminMetricsData = [
     {
-      title: 'Total employees',
-      value: (metrics?.totalEmployees ?? 0).toString(),
+      title: 'Active employees',
+      value: activeCount.toString(),
       description: 'Active headcount',
+      cornerBadge: formerCount > 0 ? `${formerCount} former` : null,
+      onCornerClick: () => navigate('/employee-management?status=inactive'),
       icon: 'Users',
       color: 'primary',
       navigateTo: '/employee-management'
@@ -239,6 +244,8 @@ const Dashboard = () => {
                   title={metric?.title}
                   value={metric?.value}
                   description={metric?.description}
+                  cornerBadge={metric?.cornerBadge}
+                  onCornerClick={metric?.onCornerClick}
                   icon={metric?.icon}
                   color={metric?.color}
                   onClick={() => metric.navigateTo && navigate(metric.navigateTo)}

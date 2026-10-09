@@ -4,6 +4,8 @@ import dashboardService from '../services/dashboard.service';
 const useDashboardStore = create((set, get) => ({
     metrics: {
         totalEmployees: 0,
+        activeEmployees: 0,
+        formerEmployees: 0,
         presentToday: 0,
         tasksCompleted: 0,
         avgProductivity: 0,
