@@ -75,12 +75,11 @@ const useAuthStore = create((set, get) => ({
 
         set({ isLoading: true, error: null });
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Login timed out. Please check your internet or server.')), 10000)
+            setTimeout(() => reject(new Error('Login timed out. Please check your internet or server.')), 60000)
         );
 
         try {
-
-            // Race the login request against the 10-second timeout
+            // Race the login request against the 60-second timeout
             const response = await Promise.race([
                 authService.login(email, password),
                 timeoutPromise

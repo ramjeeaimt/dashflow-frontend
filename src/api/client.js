@@ -13,7 +13,7 @@ export const LONG_TIMEOUT = 180000; // 3 minutes
 const apiClient = axios.create({
 
     baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5002/api',
-    timeout: 30000, // fail fast instead of hanging the UI on a dead backend
+    timeout: 60000, // 60s to allow server cold-starts or complex queries without premature client aborts
     headers: {
         'Content-Type': 'application/json',
     },
