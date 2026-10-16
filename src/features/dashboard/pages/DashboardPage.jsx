@@ -1,24 +1,22 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
-import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import {
   MetricsCard,
   AttendanceChart,
   ProductivityChart,
-  QuickActionCard,
   FinancialSummaryCard,
   useDashboardStore
 } from 'features/dashboard';
 import useAuthStore from '../../../store/useAuthStore';
 import Icon from '../../../components/AppIcon';
+import { CardGridSkeleton, Bone } from '../../../components/ui/Skeleton';
 import { useNavigate } from 'react-router-dom';
-
-//  IMPORT EMPLOYEE MODAL & STORE
 import { EmployeeModal, useEmployeeStore } from 'features/employee';
 import { isAdminUser, isSystemAdmin } from '../../../config/roles';
+import ZeroStateGuide from '../components/ZeroStateGuide';
+import { useDashboardTour, resetDashboardTour } from '../components/DashboardTour';
 
 const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -179,10 +177,44 @@ const Dashboard = () => {
 
       await createEmployee(payload, user?.company?.id);
       setIsEmployeeModalOpen(false);
-      alert('Employee added successfully!');
+      if (user?.company?.id) {
+        refreshDashboard(user.company.id, isManagement, user.id);
+      }
     } catch (err) {
       alert('Failed to add employee: ' + (err?.response?.data?.message || err?.message || 'Unknown error'));
     }
+  };
+
+  const isZeroState = useMemo(() => {
+    if (!isManagement || loading) return false;
+    const present = metrics?.presentToday ?? 0;
+    const projects = metrics?.activeProjects ?? 0;
+    const productivity = metrics?.avgProductivity ?? 0;
+    return present === 0 && projects === 0 && productivity === 0 && activeCount <= 1;
+  }, [isManagement, loading, metrics, activeCount]);
+
+  const [tourEnabled, setTourEnabled] = useState(false);
+
+  useEffect(() => {
+    if (loading || !isManagement) return;
+    const forceTour = localStorage.getItem('dashflow_show_tour') === '1';
+    if (forceTour || isZeroState) {
+      if (forceTour) localStorage.removeItem('dashflow_show_tour');
+      setTourEnabled(true);
+    }
+  }, [loading, isManagement, isZeroState]);
+
+  const openAddEmployee = useCallback(() => setIsEmployeeModalOpen(true), []);
+
+  useDashboardTour({
+    enabled: tourEnabled && !loading && isManagement,
+    onAddEmployee: openAddEmployee,
+  });
+
+  const replayTour = () => {
+    resetDashboardTour();
+    setTourEnabled(false);
+    setTimeout(() => setTourEnabled(true), 50);
   };
 
   return (
@@ -209,6 +241,7 @@ const Dashboard = () => {
 
           {/* ── Greeting hero ─────────────────────────────────────────── */}
           <motion.div
+            id="tour-greeting"
             variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
             className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
           >
@@ -223,8 +256,9 @@ const Dashboard = () => {
             </div>
             {can('create', 'employee') && (
               <button
+                id="tour-add-employee"
                 onClick={() => setIsEmployeeModalOpen(true)}
-                className="inline-flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors self-start sm:self-auto"
+                className="inline-flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground text-sm font-medium rounded-lg shadow-sm shadow-primary/25 hover:bg-primary/90 transition-colors self-start sm:self-auto"
               >
                 <Icon name="UserPlus" size={15} />
                 Add employee
@@ -232,9 +266,19 @@ const Dashboard = () => {
             )}
           </motion.div>
 
+          {isZeroState && (
+            <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+              <ZeroStateGuide onAddEmployee={openAddEmployee} onStartTour={replayTour} />
+            </motion.div>
+          )}
+
           {/* ── Stat row ──────────────────────────────────────────────── */}
-          {isManagement && (
+          {isManagement && loading && (
+            <CardGridSkeleton />
+          )}
+          {isManagement && !loading && (
             <motion.div
+              id="tour-metrics"
               variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
               className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
             >
@@ -260,14 +304,14 @@ const Dashboard = () => {
             className="grid grid-cols-1 lg:grid-cols-3 gap-4"
           >
             {(isManagement || isTechnical) && (
-              <div className="lg:col-span-2 bg-card p-6 rounded-lg border border-border card-shadow">
+              <div id="tour-attendance" className="lg:col-span-2 bg-card p-6 rounded-lg border border-border card-shadow">
                 <AttendanceChart data={charts?.attendance} loading={loading} />
               </div>
             )}
 
             {filteredQuickActions.length > 0 && (
               <div className={(isManagement || isTechnical) ? '' : 'lg:col-span-3'}>
-                <div className="bg-card rounded-lg border border-border card-shadow p-5 h-full">
+                <div id="tour-quick-actions" className="bg-card rounded-lg border border-border card-shadow p-5 h-full">
                   <h2 className="font-display text-sm font-semibold tracking-tight text-foreground mb-4">
                     Quick actions
                   </h2>
@@ -331,8 +375,18 @@ const Dashboard = () => {
                 </span>
               </div>
 
-              <div className="bg-card border border-border rounded-lg card-shadow p-6">
-                {feed.recentActivity.length > 0 ? (
+              <div className="bg-card border border-border rounded-xl card-shadow p-6">
+                {loading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <Bone className="h-7 w-7 rounded-full shrink-0" />
+                        <Bone className="h-3.5 flex-1" />
+                        <Bone className="h-3 w-16" />
+                      </div>
+                    ))}
+                  </div>
+                ) : feed.recentActivity.length > 0 ? (
                   <ol className="relative border-l border-border ml-3 space-y-6">
                     {feed.recentActivity.map((log) => {
                       let iconName = 'Info';

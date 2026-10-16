@@ -3,7 +3,33 @@ import Select from '../../../components/ui/Select';
 import { Checkbox } from '../../../components/ui/Checkbox';
 import Icon from '../../../components/AppIcon';
 
-const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
+export const CONFIG_MINI_STEPS = [
+  {
+    key: 'locale',
+    title: 'Set your timezone & currency',
+    description: 'Used for scheduling, payroll, and reports.',
+    required: true,
+    fields: ['timezone', 'currency'],
+  },
+  {
+    key: 'schedule',
+    title: 'When does your team work?',
+    description: 'Working days and default hours for attendance.',
+    required: true,
+    fields: ['workingDays', 'workStartTime', 'workEndTime'],
+  },
+  {
+    key: 'features',
+    title: 'Which features do you want enabled?',
+    description: 'Optional — you can change these anytime in settings.',
+    required: false,
+    fields: ['enableTimeTracking', 'enableScreenMonitoring', 'enablePayroll'],
+  },
+];
+
+const ConfigurationStep = ({ formData, setFormData, errors, setErrors, miniStep = 0 }) => {
+  const step = CONFIG_MINI_STEPS[miniStep] || CONFIG_MINI_STEPS[0];
+
   const timezoneOptions = [
     { value: 'America/New_York', label: 'Eastern Time (ET) - New York' },
     { value: 'America/Chicago', label: 'Central Time (CT) - Chicago' },
@@ -46,8 +72,7 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
       ...prev,
       [field]: value
     }));
-    
-    // Clear error when user makes a selection
+
     if (errors?.[field]) {
       setErrors(prev => ({
         ...prev,
@@ -57,33 +82,25 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
   };
 
   const handleWorkingDayChange = (dayId, checked) => {
-    const updatedDays = checked 
+    const updatedDays = checked
       ? [...formData?.workingDays, dayId]
       : formData?.workingDays?.filter(day => day !== dayId);
-    
+
     handleInputChange('workingDays', updatedDays);
   };
 
   const handleSelectAllWorkingDays = () => {
-    const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-    handleInputChange('workingDays', weekdays);
+    handleInputChange('workingDays', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
   };
 
   const handleClearAllWorkingDays = () => {
     handleInputChange('workingDays', []);
   };
 
-  return (
-    <div className="p-6">
-      <div className="mb-6 border-b border-border/50 pb-4">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Workspace Configuration</h2>
-        <p className="text-muted-foreground">
-          Define your core operational standards. These foundation settings will shape how your enterprise manages time, capital, and resources.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column - Time & Currency */}
+  const renderFields = () => {
+    switch (step.key) {
+      case 'locale':
+        return (
           <div className="space-y-6">
             <Select
               label="Timezone"
@@ -94,9 +111,8 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
               error={errors?.timezone}
               required
               searchable
-              description="This will be used for all timestamps and scheduling"
+              description="Used for all timestamps and scheduling"
             />
-
             <Select
               label="Primary Currency"
               placeholder="Select your currency"
@@ -108,34 +124,34 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
               searchable
               description="Used for payroll, expenses, and financial reporting"
             />
-
-            {/* Date Format Preview */}
             <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <Icon name="Calendar" size={16} className="text-primary" />
-                <h4 className="text-sm font-medium text-foreground">Date & Time Format Preview</h4>
+                <h4 className="text-sm font-medium text-foreground">Preview</h4>
               </div>
               <div className="text-sm text-muted-foreground space-y-1">
                 <p>Date: {new Date()?.toLocaleDateString('en-US')}</p>
-                <p>Time: {new Date()?.toLocaleTimeString('en-US', { 
+                <p>Time: {new Date()?.toLocaleTimeString('en-US', {
                   timeZone: formData?.timezone || 'America/New_York',
-                  hour12: true 
+                  hour12: true
                 })}</p>
                 <p>Currency: {formData?.currency ? `${formData?.currency} 1,234.56` : 'USD 1,234.56'}</p>
               </div>
             </div>
           </div>
+        );
 
-          {/* Right Column - Working Days */}
+      case 'schedule':
+        return (
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Working Days <span className="text-error">*</span>
               </label>
               <p className="text-xs text-muted-foreground mb-4">
-                Select the days your company operates. This affects attendance tracking and scheduling.
+                Select the days your company operates.
               </p>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">Select Days:</span>
@@ -157,7 +173,7 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-3">
                   {workingDays?.map((day) => (
                     <Checkbox
@@ -169,21 +185,17 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
                   ))}
                 </div>
               </div>
-              
+
               {errors?.workingDays && (
                 <p className="text-sm text-error mt-2">{errors?.workingDays}</p>
               )}
             </div>
 
-            {/* Working Hours */}
             <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Icon name="Clock" size={16} className="text-primary" />
                 <h4 className="text-sm font-medium text-foreground">Default Working Hours</h4>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">
-                Standard working hours can be customized per employee after setup.
-              </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1">Start Time</label>
@@ -205,33 +217,51 @@ const ConfigurationStep = ({ formData, setFormData, errors, setErrors }) => {
                 </div>
               </div>
             </div>
-
-            {/* Feature Preferences */}
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">Feature Preferences</h4>
-              <div className="space-y-3">
-                <Checkbox
-                  label="Enable Time Tracking"
-                  description="Track employee work hours and productivity"
-                  checked={formData?.enableTimeTracking}
-                  onChange={(e) => handleInputChange('enableTimeTracking', e?.target?.checked)}
-                />
-                <Checkbox
-                  label="Enable Screen Monitoring"
-                  description="Monitor employee screens for remote work (requires consent)"
-                  checked={formData?.enableScreenMonitoring}
-                  onChange={(e) => handleInputChange('enableScreenMonitoring', e?.target?.checked)}
-                />
-                <Checkbox
-                  label="Enable Payroll Module"
-                  description="Manage salaries, deductions, and generate payslips"
-                  checked={formData?.enablePayroll}
-                  onChange={(e) => handleInputChange('enablePayroll', e?.target?.checked)}
-                />
-              </div>
-            </div>
           </div>
-        </div>
+        );
+
+      case 'features':
+        return (
+          <div className="space-y-4">
+            <Checkbox
+              label="Enable Time Tracking"
+              description="Track employee work hours and productivity"
+              checked={formData?.enableTimeTracking}
+              onChange={(e) => handleInputChange('enableTimeTracking', e?.target?.checked)}
+            />
+            <Checkbox
+              label="Enable Screen Monitoring"
+              description="Monitor employee screens for remote work (requires consent)"
+              checked={formData?.enableScreenMonitoring}
+              onChange={(e) => handleInputChange('enableScreenMonitoring', e?.target?.checked)}
+            />
+            <Checkbox
+              label="Enable Payroll Module"
+              description="Manage salaries, deductions, and generate payslips"
+              checked={formData?.enablePayroll}
+              onChange={(e) => handleInputChange('enablePayroll', e?.target?.checked)}
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <div className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary mb-2">
+          Configuration
+        </p>
+        <h2 className="font-display text-2xl sm:text-[1.75rem] font-semibold tracking-tight text-foreground mb-2">
+          {step.title}
+        </h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+      </div>
+
+      <div className="min-h-[160px]">{renderFields()}</div>
     </div>
   );
 };

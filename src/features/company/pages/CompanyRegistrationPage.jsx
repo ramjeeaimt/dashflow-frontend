@@ -1,41 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../store/useAuthStore';
-import ProgressIndicator from '../components/ProgressIndicator';
-import CompanyInfoStep from '../components/CompanyInfoStep';
-import AdminAccountStep from '../components/AdminAccountStep';
-import ConfigurationStep from '../components/ConfigurationStep';
-import PricingPanel from '../components/PricingPanel';
+import CompanyInfoStep, { COMPANY_MINI_STEPS } from '../components/CompanyInfoStep';
+import AdminAccountStep, { getAdminMiniSteps } from '../components/AdminAccountStep';
+import ConfigurationStep, { CONFIG_MINI_STEPS } from '../components/ConfigurationStep';
 import NavigationControls from '../components/NavigationControls';
+import BrandMark from '../../../components/BrandMark';
 import Icon from '../../../components/AppIcon';
+import Button from '../../../components/ui/Button';
+import LottiePlayer from '../../../components/ui/LottiePlayer';
+import {
+  SoftShapes,
+  HeroIllustration,
+} from '../../landing/components/LandingIllustrations';
+
+const PANEL_COPY = {
+  1: {
+    eyebrow: 'Company',
+    title: 'Tell us about your company.',
+    body: 'A few details now — you can refine everything later from settings.',
+  },
+  2: {
+    eyebrow: 'Admin',
+    title: 'Set up your admin account.',
+    body: 'This person manages the workspace, invites, and billing.',
+  },
+  3: {
+    eyebrow: 'Preferences',
+    title: 'Finish with your defaults.',
+    body: 'Timezone, schedule, and modules — change them anytime.',
+  },
+};
 
 const CompanyRegistration = () => {
   const navigate = useNavigate();
-  const { register, isLoading: storeLoading, error: storeError } = useAuthStore();
+  const { register, user } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
+  const [miniStep, setMiniStep] = useState(0);
+  const [quickSetup, setQuickSetup] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
 
   const steps = [
-    {
-      id: 1,
-      title: 'Company Info',
-      description: 'Basic company details'
-    },
-    {
-      id: 2,
-      title: 'Admin Account',
-      description: 'Administrator setup'
-    },
-    {
-      id: 3,
-      title: 'Configuration',
-      description: 'Initial settings'
-    }
+    { id: 1, title: 'Company Info', description: 'Basic company details' },
+    { id: 2, title: 'Admin Account', description: 'Administrator setup' },
+    { id: 3, title: 'Configuration', description: 'Initial settings' },
   ];
 
   const [formData, setFormData] = useState({
-    // Company Information
     companyName: '',
     website: '',
     industry: '',
@@ -46,16 +59,12 @@ const CompanyRegistration = () => {
     city: '',
     postalCode: '',
     country: '',
-
-    // Admin Account
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
     confirmPassword: '',
-
-    // Configuration
     timezone: 'America/New_York',
     currency: 'USD',
     workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
@@ -63,14 +72,31 @@ const CompanyRegistration = () => {
     workEndTime: '17:00',
     enableTimeTracking: true,
     enableScreenMonitoring: false,
-    enablePayroll: true
+    enablePayroll: true,
   });
 
-  const { user } = useAuthStore();
+  const isLinking = !!user;
+
+  const allMiniSteps = useMemo(() => {
+    if (currentStep === 1) return COMPANY_MINI_STEPS;
+    if (currentStep === 2) return getAdminMiniSteps(isLinking);
+    return CONFIG_MINI_STEPS;
+  }, [currentStep, isLinking]);
+
+  const activeMiniSteps = useMemo(() => {
+    if (!quickSetup) return allMiniSteps;
+    return allMiniSteps.filter((s) => s.required);
+  }, [allMiniSteps, quickSetup]);
+
+  const currentMini = activeMiniSteps[miniStep] || activeMiniSteps[0];
+  const isLastMini = miniStep >= activeMiniSteps.length - 1;
+  const isFirstOverall = currentStep === 1 && miniStep === 0;
+  const isLastOverall = currentStep === steps.length && isLastMini;
+  const panel = PANEL_COPY[currentStep] || PANEL_COPY[1];
 
   useEffect(() => {
     if (user && !formData.email) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
@@ -80,93 +106,13 @@ const CompanyRegistration = () => {
     }
   }, [user]);
 
-  // Validation functions
-  const validateStep1 = () => {
-    const newErrors = {};
-
-    if (!formData?.companyName?.trim()) {
-      newErrors.companyName = 'Company name is required';
+  useEffect(() => {
+    if (miniStep >= activeMiniSteps.length) {
+      setMiniStep(Math.max(0, activeMiniSteps.length - 1));
     }
+  }, [activeMiniSteps.length, miniStep]);
 
-    if (!formData?.industry) {
-      newErrors.industry = 'Please select an industry';
-    }
-
-    if (!formData?.companySize) {
-      newErrors.companySize = 'Please select company size';
-    }
-
-    if (!formData?.country?.trim()) {
-      newErrors.country = 'Country is required';
-    }
-
-    if (formData?.website && !isValidUrl(formData?.website)) {
-      newErrors.website = 'Please enter a valid website URL';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
-  };
-
-  const validateStep2 = () => {
-    const newErrors = {};
-
-    if (!formData?.firstName?.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-
-    if (!formData?.lastName?.trim()) {
-      newErrors.lastName = 'Last name is required';
-    }
-
-    if (!formData?.email?.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!isValidEmail(formData?.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData?.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData?.password?.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long';
-    } else if (!isStrongPassword(formData?.password)) {
-      newErrors.password = 'Password must contain uppercase, lowercase, number, and special character';
-    }
-
-    if (!formData?.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData?.password !== formData?.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
-  };
-
-  const validateStep3 = () => {
-    const newErrors = {};
-
-    if (!formData?.timezone) {
-      newErrors.timezone = 'Please select a timezone';
-    }
-
-    if (!formData?.currency) {
-      newErrors.currency = 'Please select a currency';
-    }
-
-    if (formData?.workingDays?.length === 0) {
-      newErrors.workingDays = 'Please select at least one working day';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
-  };
-
-  // Utility functions
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex?.test(email);
-  };
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const isValidUrl = (url) => {
     try {
@@ -178,72 +124,184 @@ const CompanyRegistration = () => {
   };
 
   const isStrongPassword = (password) => {
-    const hasUppercase = /[A-Z]/?.test(password);
-    const hasLowercase = /[a-z]/?.test(password);
-    const hasNumber = /\d/?.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/?.test(password);
-    return hasUppercase && hasLowercase && hasNumber && hasSpecial;
+    return (
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /\d/.test(password) &&
+      /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    );
   };
 
-  // Navigation handlers
+  const validateCurrentMini = () => {
+    const newErrors = {};
+    const key = currentMini?.key;
+
+    if (currentStep === 1) {
+      if (key === 'name' && !formData.companyName?.trim()) {
+        newErrors.companyName = 'Company name is required';
+      }
+      if (key === 'website' && formData.website && !isValidUrl(formData.website)) {
+        newErrors.website = 'Please enter a valid website URL';
+      }
+      if (key === 'classification') {
+        if (!formData.industry) newErrors.industry = 'Please select an industry';
+        if (!formData.companySize) newErrors.companySize = 'Please select company size';
+      }
+      if (key === 'location' && !formData.country?.trim()) {
+        newErrors.country = 'Country is required';
+      }
+    }
+
+    if (currentStep === 2) {
+      if (key === 'name') {
+        if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
+      }
+      if (key === 'contact' && !isLinking) {
+        if (!formData.email?.trim()) {
+          newErrors.email = 'Email is required';
+        } else if (!isValidEmail(formData.email)) {
+          newErrors.email = 'Please enter a valid email address';
+        }
+      }
+      if (key === 'password') {
+        if (!formData.password) {
+          newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+          newErrors.password = 'Password must be at least 8 characters long';
+        } else if (!isStrongPassword(formData.password)) {
+          newErrors.password =
+            'Password must contain uppercase, lowercase, number, and special character';
+        }
+        if (!formData.confirmPassword) {
+          newErrors.confirmPassword = 'Please confirm your password';
+        } else if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        }
+      }
+    }
+
+    if (currentStep === 3) {
+      if (key === 'locale') {
+        if (!formData.timezone) newErrors.timezone = 'Please select a timezone';
+        if (!formData.currency) newErrors.currency = 'Please select a currency';
+      }
+      if (key === 'schedule' && (!formData.workingDays || formData.workingDays.length === 0)) {
+        newErrors.workingDays = 'Please select at least one working day';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const canProceed = () => {
+    const key = currentMini?.key;
+    if (!currentMini?.required) return true;
+
+    if (currentStep === 1) {
+      if (key === 'name') return !!formData.companyName?.trim();
+      if (key === 'classification') return !!formData.industry && !!formData.companySize;
+      if (key === 'location') return !!formData.country?.trim();
+      return true;
+    }
+
+    if (currentStep === 2) {
+      if (key === 'name') return !!formData.firstName?.trim() && !!formData.lastName?.trim();
+      if (key === 'contact') return isLinking || (!!formData.email?.trim() && isValidEmail(formData.email));
+      if (key === 'password') {
+        return (
+          !!formData.password &&
+          formData.password.length >= 8 &&
+          formData.password === formData.confirmPassword
+        );
+      }
+      return true;
+    }
+
+    if (currentStep === 3) {
+      if (key === 'locale') return !!formData.timezone && !!formData.currency;
+      if (key === 'schedule') return formData.workingDays?.length > 0;
+      return true;
+    }
+
+    return false;
+  };
+
+  const advance = () => {
+    if (!isLastMini) {
+      setMiniStep((m) => m + 1);
+      setErrors({});
+      return;
+    }
+
+    if (currentStep < steps.length) {
+      setCurrentStep((s) => s + 1);
+      setMiniStep(0);
+      setErrors({});
+    }
+  };
+
   const handleNext = () => {
-    let isValid = false;
+    if (!validateCurrentMini()) return;
+    advance();
+  };
 
-    switch (currentStep) {
-      case 1:
-        isValid = validateStep1();
-        break;
-      case 2:
-        isValid = validateStep2();
-        break;
-      case 3:
-        isValid = validateStep3();
-        break;
-      default:
-        isValid = true;
-    }
-
-    if (isValid && currentStep < steps?.length) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  const handleSkip = () => {
+    if (currentMini?.required) return;
+    setErrors({});
+    advance();
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    if (miniStep > 0) {
+      setMiniStep((m) => m - 1);
       setErrors({});
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (currentStep > 1) {
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      const prevMinis =
+        prevStep === 1
+          ? quickSetup
+            ? COMPANY_MINI_STEPS.filter((s) => s.required)
+            : COMPANY_MINI_STEPS
+          : prevStep === 2
+            ? quickSetup
+              ? getAdminMiniSteps(isLinking).filter((s) => s.required)
+              : getAdminMiniSteps(isLinking)
+            : quickSetup
+              ? CONFIG_MINI_STEPS.filter((s) => s.required)
+              : CONFIG_MINI_STEPS;
+      setMiniStep(prevMinis.length - 1);
+      setErrors({});
     }
   };
 
   const handleComplete = async () => {
-    if (!validateStep3()) return;
+    if (!validateCurrentMini()) return;
 
     setIsLoading(true);
+    setSubmitError('');
 
     try {
-      // Call actual registration API
       const registrationData = {
-        // Company Info
         companyName: formData.companyName,
         companyWebsite: formData.website,
         industry: formData.industry,
         companySize: formData.companySize,
-        logo: formData.logo, // Assuming logo is a URL string for now
+        logo: formData.logo,
         companyAddress: formData.address,
         city: formData.city,
         postalCode: formData.postalCode,
         country: formData.country,
-
-        // Admin Account
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
-
-        // Configuration
         timezone: formData.timezone,
         currency: formData.currency,
         workingDays: formData.workingDays,
@@ -254,51 +312,43 @@ const CompanyRegistration = () => {
         enablePayroll: formData.enablePayroll,
       };
 
-      const response=await register(registrationData);
-      localStorage.setItem('user', JSON.stringify(response.user || response.data?.user));
-
-      // Store registration data in localStorage
+      const response = await register(registrationData);
+      const payload = response?.data || response;
+      localStorage.setItem('user', JSON.stringify(payload.user || response.user));
       localStorage.setItem('companyRegistration', JSON.stringify(registrationData));
       localStorage.setItem('isRegistered', 'true');
-      localStorage.removeItem('companyRegistrationDraft'); // Clear draft
+      localStorage.setItem('dashflow_show_tour', '1');
+      localStorage.removeItem('dashflow_dashboard_tour_v1');
+      localStorage.removeItem('companyRegistrationDraft');
 
-      // Show success message and redirect to login
-      // Ideally, we should show a preview/success modal here as requested
-      // For now, we'll use the alert and redirect, but we can enhance this to a modal if needed
-      // The user asked for "show registration preview after final success"
-      // This implies a view where they see what they registered before logging in?
-      // Or maybe just a success screen. Let's redirect to a success page or show a modal.
-      // Since we don't have a success page, let's use a modal or just redirect to login with a success state.
-
-      alert('Registration completed successfully! Redirecting to your dashboard...');
       navigate('/dashboard');
-
-    } catch (error) { 
+    } catch (error) {
       console.error('Registration failed:', error);
-      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
-      alert(errorMessage);
+      const apiMessage = error.response?.data?.message;
+      const message = Array.isArray(apiMessage)
+        ? apiMessage.join(', ')
+        : apiMessage ||
+          (error.code === 'ERR_NETWORK' || !error.response
+            ? 'Cannot reach the server. Make sure the backend is running on port 5002.'
+            : 'Registration failed. Please try again.');
+      setSubmitError(message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
-  // Check if current step can proceed
-  const canProceed = () => {
-    switch (currentStep) {
-      case 1:
-        return formData?.companyName && formData?.industry && formData?.companySize && formData?.country;
-      case 2:
-        return formData?.firstName && formData?.lastName && formData?.email &&
-          formData?.password && formData?.confirmPassword &&
-          formData?.password === formData?.confirmPassword;
-      case 3:
-        return formData?.timezone && formData?.currency && formData?.workingDays?.length > 0;
-      default:
-        return false;
-    }
+  const toggleQuickSetup = () => {
+    const next = !quickSetup;
+    setQuickSetup(next);
+
+    const currentKey = currentMini?.key;
+    const nextList = next
+      ? allMiniSteps.filter((s) => s.required)
+      : allMiniSteps;
+    const mappedIndex = nextList.findIndex((s) => s.key === currentKey);
+    setMiniStep(mappedIndex >= 0 ? mappedIndex : 0);
   };
 
-  // Render current step content
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -308,17 +358,21 @@ const CompanyRegistration = () => {
             setFormData={setFormData}
             errors={errors}
             setErrors={setErrors}
+            miniStep={COMPANY_MINI_STEPS.findIndex((s) => s.key === currentMini?.key)}
           />
         );
-      case 2:
+      case 2: {
+        const adminSteps = getAdminMiniSteps(isLinking);
         return (
           <AdminAccountStep
             formData={formData}
             setFormData={setFormData}
             errors={errors}
             setErrors={setErrors}
+            miniStep={adminSteps.findIndex((s) => s.key === currentMini?.key)}
           />
         );
+      }
       case 3:
         return (
           <ConfigurationStep
@@ -326,6 +380,7 @@ const CompanyRegistration = () => {
             setFormData={setFormData}
             errors={errors}
             setErrors={setErrors}
+            miniStep={CONFIG_MINI_STEPS.findIndex((s) => s.key === currentMini?.key)}
           />
         );
       default:
@@ -333,13 +388,12 @@ const CompanyRegistration = () => {
     }
   };
 
-  // Auto-save form data to localStorage
   useEffect(() => {
     const savedData = localStorage.getItem('companyRegistrationDraft');
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
-        setFormData(prev => ({ ...prev, ...parsedData }));
+        setFormData((prev) => ({ ...prev, ...parsedData }));
       } catch (error) {
         console.error('Failed to load saved registration data:', error);
       }
@@ -350,79 +404,186 @@ const CompanyRegistration = () => {
     localStorage.setItem('companyRegistrationDraft', JSON.stringify(formData));
   }, [formData]);
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Hero Header - Reduced spacing */}
-      <div className="bg-card border-b border-border py-6 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl mb-3">
-            <Icon name="Building2" size={24} className="text-primary" />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            Build Your Enterprise Workspace
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-            Experience the next generation of workforce management. Set up your profile to unlock powerful features.
-          </p>
-        </div>
-      </div>
+  const overallProgress = useMemo(() => {
+    const companyCount = quickSetup
+      ? COMPANY_MINI_STEPS.filter((s) => s.required).length
+      : COMPANY_MINI_STEPS.length;
+    const adminCount = quickSetup
+      ? getAdminMiniSteps(isLinking).filter((s) => s.required).length
+      : getAdminMiniSteps(isLinking).length;
+    const configCount = quickSetup
+      ? CONFIG_MINI_STEPS.filter((s) => s.required).length
+      : CONFIG_MINI_STEPS.length;
+    const total = companyCount + adminCount + configCount;
+    let completed = 0;
+    if (currentStep > 1) completed += companyCount;
+    if (currentStep > 2) completed += adminCount;
+    completed += miniStep;
+    return Math.round(((completed + 1) / total) * 100);
+  }, [currentStep, miniStep, quickSetup, isLinking]);
 
-      <div className="flex-1 py-8 px-6">
-        <div className="max-w-5xl mx-auto">
-          {/* Progress Section - Reduced margin */}
-          <div className="mb-8">
-            <ProgressIndicator
-              currentStep={currentStep}
-              totalSteps={steps?.length}
-              steps={steps}
+  return (
+    <div className="min-h-screen flex bg-background">
+      {/* Left — brand + illustration */}
+      <aside className="hidden lg:flex lg:w-[44%] relative flex-col justify-between overflow-hidden border-r border-border/60 bg-[#f7f6fb] p-10 xl:p-12">
+        <SoftShapes className="absolute inset-0 w-full h-full pointer-events-none" />
+
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex">
+            <BrandMark size="md" />
+          </Link>
+        </div>
+
+        <div className="relative z-10 flex-1 flex flex-col justify-center py-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary mb-3">
+            {panel.eyebrow}
+          </p>
+          <h1 className="font-display text-3xl xl:text-4xl font-semibold tracking-tight text-foreground max-w-sm leading-tight">
+            {panel.title}
+          </h1>
+          <p className="mt-3 text-sm text-muted-foreground max-w-sm leading-relaxed">
+            {panel.body}
+          </p>
+
+          <div className="mt-10 max-w-md">
+            <HeroIllustration className="w-full h-auto drop-shadow-sm" />
+          </div>
+        </div>
+
+        <div className="relative z-10 flex items-center gap-3">
+          {steps.map((s) => {
+            const active = s.id === currentStep;
+            const done = s.id < currentStep;
+            return (
+              <div key={s.id} className="flex items-center gap-2">
+                <span
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
+                    active
+                      ? 'bg-primary text-white'
+                      : done
+                        ? 'bg-primary/15 text-primary'
+                        : 'bg-white text-muted-foreground border border-border'
+                  }`}
+                >
+                  {done ? <Icon name="Check" size={14} /> : s.id}
+                </span>
+                <span
+                  className={`text-xs font-medium hidden xl:inline ${
+                    active ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
+                >
+                  {s.title}
+                </span>
+                {s.id < steps.length && (
+                  <span className="w-6 h-px bg-border mx-1 hidden xl:block" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </aside>
+
+      {/* Right — form column */}
+      <main className="flex-1 flex flex-col min-h-screen">
+        <header className="flex items-center justify-between gap-4 px-6 sm:px-10 pt-6 pb-4">
+          <Link to="/" className="lg:hidden inline-flex">
+            <BrandMark size="sm" />
+          </Link>
+
+          <div className="ml-auto inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 p-1">
+            <Button
+              variant={quickSetup ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => !quickSetup && toggleQuickSetup()}
+              className="rounded-full h-8 px-3 text-xs"
+            >
+              Quick Setup
+            </Button>
+            <Button
+              variant={!quickSetup ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => quickSetup && toggleQuickSetup()}
+              className="rounded-full h-8 px-3 text-xs"
+            >
+              Full Setup
+            </Button>
+          </div>
+        </header>
+
+        {/* Single overall progress */}
+        <div className="px-6 sm:px-10">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+            <span>
+              Question {miniStep + 1} of {activeMiniSteps.length}
+            </span>
+            <span>
+              Step {currentStep} of {steps.length}
+            </span>
+          </div>
+          <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+              style={{ width: `${overallProgress}%` }}
             />
           </div>
-
-          {/* Form Card */}
-          <div className="bg-card rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border/50 overflow-hidden">
-            <div className="p-2 md:p-4">
-              {renderStepContent()}
-            </div>
-            
-            {/* Navigation Bar inside the card */}
-            <div className="px-8 py-6 bg-[#FAFAFA] border-t border-border/50">
-              <NavigationControls
-                currentStep={currentStep}
-                totalSteps={steps?.length}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
-                onComplete={handleComplete}
-                isLoading={isLoading}
-                canProceed={canProceed()}
+          <div className="flex items-center gap-1.5 mt-3">
+            {activeMiniSteps.map((s, i) => (
+              <div
+                key={s.key}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  i === miniStep
+                    ? 'w-6 bg-primary'
+                    : i < miniStep
+                      ? 'w-3 bg-primary/40'
+                      : 'w-3 bg-border'
+                }`}
+                title={s.title}
               />
-            </div>
-          </div>
-
-          {/* Footer Info */}
-          <div className="mt-8 text-center text-sm text-muted-foreground">
-            <p>© 2024 DashFlow Enterprise. All rights reserved. | Security & Compliance</p>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Loading Overlay */}
+        <div className="flex-1 flex flex-col px-6 sm:px-10 py-8">
+          <div className="flex-1 max-w-lg w-full mx-auto lg:mx-0 lg:ml-4 xl:ml-10">
+            {renderStepContent()}
+          </div>
+
+          <div className="max-w-lg w-full mx-auto lg:mx-0 lg:ml-4 xl:ml-10 mt-auto pt-6">
+            {submitError && (
+              <div className="mb-4 rounded-xl border border-error/20 bg-error/10 px-4 py-3 text-sm text-error">
+                {submitError}
+              </div>
+            )}
+            <NavigationControls
+              onPrevious={handlePrevious}
+              onNext={handleNext}
+              onComplete={handleComplete}
+              onSkip={handleSkip}
+              isLoading={isLoading}
+              canProceed={canProceed()}
+              canSkip={!currentMini?.required}
+              showBack={!isFirstOverall}
+              isLastStep={isLastOverall}
+              compact
+            />
+          </div>
+        </div>
+
+        <footer className="px-6 sm:px-10 py-4 text-center lg:text-left text-xs text-muted-foreground">
+          © {new Date().getFullYear()} Dashflow. All rights reserved.
+        </footer>
+      </main>
+
       {isLoading && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-lg p-10 text-center max-w-md mx-4 shadow-sm">
-            <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
-              <Icon name="Building2" size={40} className="text-primary animate-pulse" />
+          <div className="bg-card border border-border rounded-2xl p-8 sm:p-10 text-center max-w-md mx-4 shadow-sm">
+            <div className="w-40 h-40 mx-auto -mt-2 mb-1">
+              <LottiePlayer src="/lottie/workspace-setup.json" className="w-full h-full" />
             </div>
-            <h3 className="text-2xl font-bold text-foreground mb-3">
-              Configuring Workspace
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              We're initializing your secure environment and preparing your dashboard. This usually takes less than a minute.
+            <h3 className="text-xl font-semibold text-foreground mb-2">Configuring workspace</h3>
+            <p className="text-sm text-muted-foreground">
+              Preparing your secure environment and dashboard.
             </p>
-            <div className="flex items-center justify-center space-x-3">
-              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-            </div>
           </div>
         </div>
       )}

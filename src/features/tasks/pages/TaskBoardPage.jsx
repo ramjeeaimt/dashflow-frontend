@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  LayoutGrid, List as ListIcon, Calendar as CalendarIcon, Plus, Search, Loader2, CheckSquare,
+  LayoutGrid, List as ListIcon, Calendar as CalendarIcon, Plus, Search, CheckSquare,
 } from 'lucide-react';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
@@ -14,6 +14,7 @@ import TaskListView from '../components/TaskListView';
 import TaskCalendar from '../components/TaskCalendar';
 import TaskFormModal from '../components/TaskFormModal';
 import TaskDetailDrawer from '../components/TaskDetailDrawer';
+import { PageSkeleton } from '../../../components/ui/Skeleton';
 
 const VIEWS = [
   { key: 'board', label: 'Board', icon: LayoutGrid },
@@ -265,10 +266,7 @@ const TaskBoardPage = () => {
 
           {/* Content */}
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-24">
-              <Loader2 size={28} className="text-primary animate-spin mb-3" />
-              <p className="text-sm text-muted-foreground">Loading tasks…</p>
-            </div>
+            <PageSkeleton />
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-4">

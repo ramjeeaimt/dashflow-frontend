@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { DetailSkeleton } from "../../../components/ui/Skeleton";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -83,10 +84,7 @@ const ProjectDetails = () => {
       >
         <div className="max-w-6xl mx-auto">
           {loading ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-              <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin mb-4" />
-              <p className="text-sm text-muted-foreground">Loading project…</p>
-            </div>
+            <DetailSkeleton />
           ) : !project ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
               <h2 className="text-base font-medium text-foreground mb-1">

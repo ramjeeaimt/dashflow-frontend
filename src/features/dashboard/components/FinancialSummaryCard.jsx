@@ -38,7 +38,7 @@ const FinancialSummaryCard = ({ data, loading }) => {
                 <Icon name="Activity" size={14} />
                 <span>FISCAL SUMMARY</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Financial Health</h3>
+            <h3 className="text-base font-semibold text-foreground tracking-tight">Finance</h3>
             <p className="text-xs text-muted-foreground/70 font-medium tracking-tight">Real-time aggregate data stream</p>
         </div>
 

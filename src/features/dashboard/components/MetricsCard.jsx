@@ -4,6 +4,14 @@ import Icon from '../../../components/AppIcon';
 // Quiet stat tile: white surface, hairline border, muted label, tabular number.
 // The `color` prop is kept for API compatibility but no longer floods the card —
 // numbers and labels carry the hierarchy, not hues.
+const TONE = {
+  primary: 'bg-primary/10 text-primary',
+  success: 'bg-success/10 text-success',
+  purple: 'bg-accent text-primary',
+  warning: 'bg-warning/10 text-warning',
+  error: 'bg-error/10 text-error',
+};
+
 const MetricsCard = ({ 
   title, 
   value, 
@@ -14,11 +22,13 @@ const MetricsCard = ({
   cornerBadge,
   onCornerClick
 }) => {
+  const tone = TONE[color] || TONE.primary;
+
   return (
     <div
       onClick={onClick}
-      className={`relative p-5 bg-card border border-border rounded-lg h-full flex items-start justify-between transition-colors ${
-        onClick ? 'cursor-pointer hover:border-muted-foreground/40' : ''
+      className={`relative p-5 bg-card border border-border rounded-xl card-shadow h-full flex items-start justify-between transition-colors ${
+        onClick ? 'cursor-pointer hover:border-primary/30' : ''
       }`}
     >
       <div>
@@ -34,7 +44,7 @@ const MetricsCard = ({
       </div>
 
       <div className="flex flex-col items-end justify-between self-stretch shrink-0 pl-2">
-        <div className="w-9 h-9 bg-muted rounded-md flex items-center justify-center text-muted-foreground shrink-0">
+        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${tone}`}>
           <Icon name={icon} size={18} strokeWidth={2} />
         </div>
         {cornerBadge && (

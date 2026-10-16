@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
+import { PageSkeleton } from '../../../components/ui/Skeleton';
 import {
   EmployeeTable,
   EmployeeFilters,
@@ -64,8 +65,21 @@ const EmployeeManagement = () => {
     }
   }, [user, isAuthenticated, fetchEmployees]);
 
+  const isAdminEmployee = (employee) => {
+    const adminNames = new Set(['admin', 'administration', 'super admin', 'superadmin']);
+    const role = (employee?.role || '').toString().trim().toLowerCase();
+    if (adminNames.has(role)) return true;
+    const code = (employee?.employeeCode || employee?.employeeId || '').toString().trim().toUpperCase();
+    if (code.startsWith('ADM-')) return true;
+    const roles = employee?.user?.roles || employee?.roles || [];
+    return roles.some((r) => adminNames.has((r?.name || r || '').toString().trim().toLowerCase()));
+  };
+
   const filteredAndSortedEmployees = useMemo(() => {
     let filtered = employees.filter((employee) => {
+      // Workspace admins are not staff employees
+      if (isAdminEmployee(employee)) return false;
+
       const matchesSearch = searchTerm === '' ||
         employee?.name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         employee?.email?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
@@ -266,11 +280,8 @@ const EmployeeManagement = () => {
           onMobileClose={() => setIsMobileSidebarOpen(false)}
         />
         <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8`}>
-          <div className="p-4 sm:p-6 flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="mt-4 text-muted-foreground">Loading employees...</p>
-            </div>
+          <div className="p-4 sm:p-6">
+            <PageSkeleton />
           </div>
         </main>
       </div>

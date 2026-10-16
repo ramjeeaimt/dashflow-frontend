@@ -8,6 +8,9 @@ export default defineConfig({
     server: {
         port: 5173,
     },
+    optimizeDeps: {
+        include: ['lenis', 'lottie-react', 'driver.js'],
+    },
     define: {
         'process.env': {},
     },

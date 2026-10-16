@@ -5,7 +5,47 @@ import Button from '../../../components/ui/Button';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 
-const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
+export const COMPANY_MINI_STEPS = [
+  {
+    key: 'name',
+    title: 'What is your company name?',
+    description: 'This will be displayed across your dashboard and reports.',
+    required: true,
+    fields: ['companyName'],
+  },
+  {
+    key: 'website',
+    title: 'Do you have a company website?',
+    description: 'Optional — you can add this later anytime.',
+    required: false,
+    fields: ['website'],
+  },
+  {
+    key: 'classification',
+    title: 'Tell us about your business',
+    description: 'Industry and size help us tailor features and pricing.',
+    required: true,
+    fields: ['industry', 'companySize'],
+  },
+  {
+    key: 'logo',
+    title: 'Add your company logo',
+    description: 'Optional — upload a PNG, JPG, or SVG (max 5MB).',
+    required: false,
+    fields: ['logo'],
+  },
+  {
+    key: 'location',
+    title: 'Where is your company based?',
+    description: 'Country is required. Address details are optional.',
+    required: true,
+    fields: ['country', 'address', 'city', 'postalCode'],
+  },
+];
+
+const CompanyInfoStep = ({ formData, setFormData, errors, setErrors, miniStep = 0 }) => {
+  const step = COMPANY_MINI_STEPS[miniStep] || COMPANY_MINI_STEPS[0];
+
   const industryOptions = [
     { value: 'technology', label: 'Technology & Software' },
     { value: 'healthcare', label: 'Healthcare & Medical' },
@@ -35,8 +75,7 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
       ...prev,
       [field]: value
     }));
-    
-    // Clear error when user starts typing
+
     if (errors?.[field]) {
       setErrors(prev => ({
         ...prev,
@@ -48,14 +87,14 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
   const handleLogoUpload = (event) => {
     const file = event?.target?.files?.[0];
     if (file) {
-      if (file?.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file?.size > 5 * 1024 * 1024) {
         setErrors(prev => ({
           ...prev,
           logo: 'Logo file size must be less than 5MB'
         }));
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormData(prev => ({
@@ -80,39 +119,39 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
     }));
   };
 
-  return (
-    <div className="p-6">
-      <div className="mb-6 border-b border-border/50 pb-4">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Company Profile</h2>
-        <p className="text-muted-foreground">
-          Provide your business details to help us customize your experience and configure your enterprise workspace.
-        </p>
-      </div>
+  const renderFields = () => {
+    switch (step.key) {
+      case 'name':
+        return (
+          <Input
+            label="Company Name"
+            type="text"
+            placeholder="Enter your company name"
+            value={formData?.companyName}
+            onChange={(e) => handleInputChange('companyName', e?.target?.value)}
+            error={errors?.companyName}
+            required
+            autoFocus
+          />
+        );
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column - Basic Info */}
+      case 'website':
+        return (
+          <Input
+            label="Company Website"
+            type="url"
+            placeholder="https://www.yourcompany.com"
+            value={formData?.website}
+            onChange={(e) => handleInputChange('website', e?.target?.value)}
+            error={errors?.website}
+            description="Optional: Your company's official website"
+            autoFocus
+          />
+        );
+
+      case 'classification':
+        return (
           <div className="space-y-6">
-            <Input
-              label="Company Name"
-              type="text"
-              placeholder="Enter your company name"
-              value={formData?.companyName}
-              onChange={(e) => handleInputChange('companyName', e?.target?.value)}
-              error={errors?.companyName}
-              required
-              description="This will be displayed across your dashboard and reports"
-            />
-
-            <Input
-              label="Company Website"
-              type="url"
-              placeholder="https://www.yourcompany.com"
-              value={formData?.website}
-              onChange={(e) => handleInputChange('website', e?.target?.value)}
-              error={errors?.website}
-              description="Optional: Your company's official website"
-            />
-
             <Select
               label="Industry"
               placeholder="Select your industry"
@@ -124,7 +163,6 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
               searchable
               description="This helps us provide industry-specific features"
             />
-
             <Select
               label="Company Size"
               placeholder="Select number of employees"
@@ -136,84 +174,97 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
               description="Determines available features and pricing tier"
             />
           </div>
+        );
 
-          {/* Right Column - Logo & Address */}
-          <div className="space-y-6">
-            {/* Logo Upload */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Company Logo
-              </label>
-              <p className="text-xs text-muted-foreground mb-4">
-                Upload your company logo (PNG, JPG, SVG - Max 5MB)
-              </p>
-              
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                {formData?.logo ? (
-                  <div className="space-y-4">
-                    <div className="w-24 h-24 mx-auto bg-muted rounded-lg overflow-hidden">
-                      <Image
-                        src={formData?.logo}
-                        alt="Company logo preview showing uploaded brand image"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <div className="flex items-center justify-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById('logo-upload')?.click()}
-                        iconName="Upload"
-                        iconPosition="left"
-                      >
-                        Change Logo
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={removeLogo}
-                        iconName="Trash2"
-                        iconPosition="left"
-                      >
-                        Remove
-                      </Button>
-                    </div>
+      case 'logo':
+        return (
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Company Logo
+            </label>
+            <p className="text-xs text-muted-foreground mb-4">
+              Upload your company logo (PNG, JPG, SVG - Max 5MB)
+            </p>
+
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center max-w-md mx-auto">
+              {formData?.logo ? (
+                <div className="space-y-4">
+                  <div className="w-24 h-24 mx-auto bg-muted rounded-lg overflow-hidden">
+                    <Image
+                      src={formData?.logo}
+                      alt="Company logo preview"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-muted rounded-lg flex items-center justify-center">
-                      <Icon name="Building2" size={24} className="text-muted-foreground" />
-                    </div>
-                    <div>
-                      <Button
-                        variant="outline"
-                        onClick={() => document.getElementById('logo-upload')?.click()}
-                        iconName="Upload"
-                        iconPosition="left"
-                      >
-                        Upload Logo
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Drag and drop or click to browse
-                      </p>
-                    </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                      iconName="Upload"
+                      iconPosition="left"
+                    >
+                      Change Logo
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeLogo}
+                      iconName="Trash2"
+                      iconPosition="left"
+                    >
+                      Remove
+                    </Button>
                   </div>
-                )}
-                
-                <input
-                  id="logo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                  className="hidden"
-                />
-              </div>
-              {errors?.logo && (
-                <p className="text-sm text-error mt-2">{errors?.logo}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-muted rounded-lg flex items-center justify-center">
+                    <Icon name="Upload" size={24} className="text-muted-foreground" />
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline"
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                      iconName="Upload"
+                      iconPosition="left"
+                    >
+                      Upload Logo
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Drag and drop or click to browse
+                    </p>
+                  </div>
+                </div>
               )}
-            </div>
 
-            {/* Address Information */}
+              <input
+                id="logo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+            </div>
+            {errors?.logo && (
+              <p className="text-sm text-error mt-2 text-center">{errors?.logo}</p>
+            )}
+          </div>
+        );
+
+      case 'location':
+        return (
+          <div className="space-y-6">
+            <Input
+              label="Country"
+              type="text"
+              placeholder="Country"
+              value={formData?.country}
+              onChange={(e) => handleInputChange('country', e?.target?.value)}
+              error={errors?.country}
+              required
+              autoFocus
+            />
             <Input
               label="Company Address"
               type="text"
@@ -221,9 +272,8 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
               value={formData?.address}
               onChange={(e) => handleInputChange('address', e?.target?.value)}
               error={errors?.address}
-              description="Main office or headquarters address"
+              description="Optional — main office or headquarters"
             />
-
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="City"
@@ -242,19 +292,28 @@ const CompanyInfoStep = ({ formData, setFormData, errors, setErrors }) => {
                 error={errors?.postalCode}
               />
             </div>
-
-            <Input
-              label="Country"
-              type="text"
-              placeholder="Country"
-              value={formData?.country}
-              onChange={(e) => handleInputChange('country', e?.target?.value)}
-              error={errors?.country}
-              required
-            />
           </div>
-        </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <div className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary mb-2">
+          Company profile
+        </p>
+        <h2 className="font-display text-2xl sm:text-[1.75rem] font-semibold tracking-tight text-foreground mb-2">
+          {step.title}
+        </h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
       </div>
+
+      <div className="min-h-[160px]">{renderFields()}</div>
+    </div>
   );
 };
 

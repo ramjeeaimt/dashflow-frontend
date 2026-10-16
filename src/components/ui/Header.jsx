@@ -10,16 +10,19 @@ import { isAdminUser } from '../../config/roles';
 // Quick-nav destinations searched from the header. Admin-only routes are
 // filtered by role before matching.
 const NAV_TARGETS = [
-  { label: 'Dashboard', path: '/dashboard', keywords: 'home overview' },
-  { label: 'Employees', path: '/employee-management', keywords: 'people staff team', admin: true },
+  { label: 'Home', path: '/dashboard', keywords: 'home overview dashboard' },
+  { label: 'People', path: '/employee-management', keywords: 'employees staff team directory', admin: true },
   { label: 'Attendance', path: '/attendance-management', keywords: 'checkin checkout presence' },
-  { label: 'Leave management', path: '/employee-leave', keywords: 'holiday vacation time off approvals', admin: true },
-  { label: 'My leaves', path: '/employee/leaves', keywords: 'holiday vacation time off request' },
+  { label: 'Leave requests', path: '/employee-leave', keywords: 'holiday vacation time off approvals', admin: true },
+  { label: 'My leave', path: '/employee/leaves', keywords: 'holiday vacation time off request' },
   { label: 'Payroll', path: '/payroll', keywords: 'salary payslip finance', admin: true },
+  { label: 'Finance', path: '/finance', keywords: 'expenses invoices money', admin: true },
   { label: 'Projects', path: '/projects', keywords: 'work clients delivery' },
-  { label: 'Tasks', path: '/task-management', keywords: 'todo assignments' },
+  { label: 'Tasks', path: '/task-management', keywords: 'todo assignments board kanban' },
   { label: 'Time tracking', path: '/time-tracking', keywords: 'timesheet hours timer' },
-  { label: 'Notifications', path: '/notifications', keywords: 'alerts messages' },
+  { label: 'Hiring', path: '/difmo-jobs', keywords: 'jobs careers recruitment', admin: true },
+  { label: 'Inbox', path: '/notifications', keywords: 'alerts messages notifications' },
+  { label: 'Company', path: '/company-profile', keywords: 'settings profile organization', admin: true },
   { label: 'Permissions', path: '/settings/user-permissions', keywords: 'roles permissions access settings', admin: true },
   { label: 'Roles', path: '/settings/roles', keywords: 'roles access settings', admin: true },
   { label: 'Clients', path: '/client-management', keywords: 'customers accounts', admin: true },
@@ -27,18 +30,34 @@ const NAV_TARGETS = [
 ];
 
 const PAGE_TITLES = [
-  ['/employee-dashboard', 'Dashboard'],
-  ['/dashboard', 'Dashboard'],
-  ['/employee-management', 'Employees'],
-  ['/attendance', 'Attendance'],
-  ['/leaves', 'Leaves'],
-  ['/payroll', 'Payroll'],
+  ['/employee-dashboard', 'Home'],
+  ['/employee-management', 'People'],
+  ['/employees/', 'Employee'],
+  ['/employee-leave', 'Leave requests'],
+  ['/employee/leaves', 'My leave'],
+  ['/employee/payroll', 'My payroll'],
+  ['/employee-attendance', 'My attendance'],
+  ['/employee-check-in-check-out', 'Check in'],
+  ['/attendance-analytics', 'Attendance analytics'],
+  ['/attendance-management', 'Attendance'],
+  ['/add-project', 'New project'],
   ['/task-management', 'Tasks'],
+  ['/time-tracking', 'Time'],
+  ['/monitoring-dashboard', 'Monitoring'],
+  ['/notifications/templates', 'Email templates'],
+  ['/notifications', 'Inbox'],
+  ['/company-profile', 'Company'],
+  ['/settings/user-permissions', 'Permissions'],
+  ['/settings/roles', 'Roles'],
+  ['/client-management', 'Clients'],
+  ['/client-details', 'Client'],
+  ['/difmo-jobs', 'Hiring'],
+  ['/global-users', 'All users'],
+  ['/system/companies', 'Companies'],
+  ['/finance', 'Finance'],
+  ['/payroll', 'Payroll'],
   ['/projects', 'Projects'],
-  ['/time-tracking', 'Time tracking'],
-  ['/settings', 'Settings'],
-  ['/monitoring', 'Monitoring'],
-  ['/notifications', 'Notifications'],
+  ['/dashboard', 'Home'],
   ['/profile', 'Profile'],
 ];
 
@@ -54,7 +73,10 @@ const Header = ({ onToggleSidebar }) => {
   const inputRef = useRef(null);
 
   const pageTitle = useMemo(() => {
-    const hit = PAGE_TITLES.find(([prefix]) => location.pathname.includes(prefix));
+    const path = location.pathname;
+    const hit = [...PAGE_TITLES]
+      .sort((a, b) => b[0].length - a[0].length)
+      .find(([prefix]) => path === prefix || path.startsWith(prefix));
     return hit ? hit[1] : 'Workspace';
   }, [location.pathname]);
 
@@ -95,7 +117,7 @@ const Header = ({ onToggleSidebar }) => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-background border-b border-border z-40 h-16">
+    <header className="fixed top-0 left-0 right-0 bg-card border-b border-border z-40 h-16">
       <div className="flex items-center justify-between gap-3 h-full px-3 sm:px-6 lg:pl-[294px]">
 
         {/* Left: mobile menu + page context */}
@@ -130,8 +152,8 @@ const Header = ({ onToggleSidebar }) => {
                 setOpen(true);
               }}
               onFocus={() => query && setOpen(true)}
-              placeholder="Go to…"
-              className="w-full h-9 pl-9 pr-12 bg-muted/70 border border-transparent focus:border-border focus:bg-card rounded-md text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors"
+              placeholder="Search people, payroll, tasks…"
+              className="w-full h-9 pl-9 pr-12 bg-background border border-border focus:border-primary/40 focus:bg-card focus:ring-2 focus:ring-primary/15 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors"
             />
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border rounded px-1.5 py-0.5 bg-card">
               /

@@ -6,6 +6,7 @@ import Sidebar from '../../../components/ui/Sidebar';
 import useAuthStore from '../../../store/useAuthStore';
 import useNotificationStore from '../../../store/useNotificationStore';
 import notificationService from '../../../services/notification.service';
+import { Bone } from '../../../components/ui/Skeleton';
 import employeeService from '../../../services/employee.service';
 import clientService from '../../../services/client.service';
 import { Checkbox } from '../../../components/ui/Checkbox';
@@ -683,8 +684,13 @@ const NotificationsPage = () => {
 
                   <div className="space-y-3">
                     {isLoadingData && (
-                      <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground/70">
-                        Loading history...
+                      <div className="space-y-3">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-2">
+                            <Bone className="h-4 w-40" />
+                            <Bone className="h-3 w-full" />
+                          </div>
+                        ))}
                       </div>
                     )}
 

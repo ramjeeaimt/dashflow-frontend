@@ -6,6 +6,7 @@ import AppImage from '../../../components/AppImage';
 import AttendanceModal from './AttendanceModal';
 import EditAttendanceModal from './EditAttendanceModal';
 import { Checkbox } from '../../../components/ui/Checkbox';
+import { PageSkeleton } from '../../../components/ui/Skeleton';
 
 const DEFAULT_VISIBLE_COLUMNS = {
   employeeName: true,
@@ -312,16 +313,7 @@ const AttendanceTable = ({
   };
 
   if (loading) {
-    return (
-      <div className="bg-card border border-border rounded-lg shadow-sm">
-        <div className="flex items-center justify-center py-24">
-          <div className="flex flex-col items-center gap-4">
-            <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-xs font-bold text-muted-foreground/70">Loading Attendance Records...</span>
-          </div>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   return (

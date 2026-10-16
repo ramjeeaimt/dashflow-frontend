@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
 import Icon from '../../../components/AppIcon';
+import { FormSkeleton } from '../../../components/ui/Skeleton';
 
 const FieldGroup = ({ label, hint, children }) => (
   <div className="py-5 border-b border-border last:border-0">
@@ -103,7 +104,7 @@ const RewardSystemSettings = () => {
     }
   };
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground/70">Loading reward settings…</div>;
+  if (loading) return <FormSkeleton />;
 
   return (
     <div className="max-w-3xl mx-auto">

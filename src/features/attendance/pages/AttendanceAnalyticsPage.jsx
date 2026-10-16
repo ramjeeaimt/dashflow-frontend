@@ -3,6 +3,7 @@ import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import Icon from '../../../components/AppIcon';
+import { PageSkeleton } from '../../../components/ui/Skeleton';
 import MetricsCard from '../components/MetricsCard';
 import AttendanceTrendChart from '../components/AttendanceTrendChart';
 import DepartmentAnalytics from '../components/DepartmentAnalytics';
@@ -149,10 +150,7 @@ const AttendanceAnalytics = () => {
           />
 
           {isLoading && !analyticsData ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-muted-foreground font-medium italic">Loading real-time analytics data...</p>
-            </div>
+            <PageSkeleton variant="cards" />
           ) : (
             <>
               {/* Key Metrics */}

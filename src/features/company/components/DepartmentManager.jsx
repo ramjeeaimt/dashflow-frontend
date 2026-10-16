@@ -5,6 +5,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Icon from '../../../components/AppIcon';
 import Select from '../../../components/ui/Select';
+import { FormSkeleton } from '../../../components/ui/Skeleton';
 
 const DepartmentManager = () => {
     const { user } = useAuthStore();
@@ -129,7 +130,7 @@ const DepartmentManager = () => {
             </div>
 
             {loading ? (
-                <div>Loading...</div>
+                <FormSkeleton />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {departments.map((dept) => (

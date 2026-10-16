@@ -16,10 +16,10 @@ const AttendanceChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-card rounded-lg p-6 h-[450px] animate-pulse">
-        <div className="h-6 w-48 bg-muted rounded-lg mb-2"></div>
-        <div className="h-4 w-64 bg-muted/60 rounded-lg mb-8"></div>
-        <div className="h-64 w-full bg-muted/50 rounded-lg"></div>
+      <div className="h-[320px] space-y-3">
+        <div className="skeleton-shimmer h-4 w-32 rounded-md"></div>
+        <div className="skeleton-shimmer h-3 w-48 rounded-md"></div>
+        <div className="skeleton-shimmer h-56 w-full rounded-xl"></div>
       </div>
     );
   }
@@ -30,8 +30,8 @@ const AttendanceChart = ({ data, loading }) => {
     <div className="bg-card h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
         <div className="space-y-1">
-          <h3 className="text-xl font-bold text-foreground tracking-tight">Attendance Dynamics</h3>
-          <p className="text-xs text-muted-foreground/70 font-medium">Daily presence trends and personnel manifest</p>
+          <h3 className="text-base font-semibold text-foreground tracking-tight">Attendance</h3>
+          <p className="text-xs text-muted-foreground">Who was present across the week</p>
         </div>
         <div className="flex items-center p-1 bg-muted/60 rounded-lg border border-border">
           <button

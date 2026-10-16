@@ -36,7 +36,7 @@ import AddProject from "./features/projects/pages/AddProjectPage";
 import Project from "./features/projects/pages/ProjectListPage";
 import ProjectDetails from "./features/projects/pages/ProjectDetailsPage";
 import ProjectEdit from "./features/projects/pages/ProjectEditPage";
-import PrivacyPolicy from "features/landing/pages/PrivacyPolicy";
+import PolicyPage from "features/landing/pages/PolicyPage";
 import FinanceDashboard from './features/finance/pages/FinanceDashboardPage';
 
 import Pricing from "features/landing/pages/Pricing";
@@ -78,7 +78,7 @@ const Routes = () => {
           <Route path="/" element={
             isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />
           } />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/privacy-policy" element={<PolicyPage />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/login" element={<Login />} />

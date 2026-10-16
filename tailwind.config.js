@@ -78,7 +78,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {

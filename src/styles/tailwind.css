@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
 @tailwind base;
 @tailwind components;
@@ -7,59 +7,58 @@
 @layer base {
   :root {
     /*
-     * ── Dashflow design system ──────────────────────────────────────────
-     * Warm paper surfaces, ink text, ONE deep-green accent, dark charcoal
-     * sidebar. Display type: Space Grotesk. Body: Inter.
-     * Hierarchy comes from type, spacing and hairlines — never floods.
+     * Dashflow design system — light workspace, violet accent.
+     * Canvas is cool gray, surfaces are white, the sidebar is a light rail.
+     * Display type: Plus Jakarta Sans. Body: Inter.
      */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* Core */
-    --color-background: #f7f6f2;   /* warm paper */
-    --color-foreground: #1d1c19;   /* warm ink */
-    --color-border: #e7e4dd;       /* warm hairline */
+    --color-background: #f4f5f8;
+    --color-foreground: #1c1f2a;
+    --color-border: #e6e8ef;
     --color-input: #ffffff;
-    --color-ring: #17694e;
+    --color-ring: #6d5efc;
 
     /* Surfaces */
     --color-card: #ffffff;
-    --color-card-foreground: #1d1c19;
+    --color-card-foreground: #1c1f2a;
     --color-popover: #ffffff;
-    --color-popover-foreground: #1d1c19;
+    --color-popover-foreground: #1c1f2a;
 
     /* Muted */
-    --color-muted: #efede7;
-    --color-muted-foreground: #716e64;
+    --color-muted: #eef0f6;
+    --color-muted-foreground: #6b7289;
 
-    /* Primary — deep green, the only brand hue */
-    --color-primary: #17694e;
+    /* Primary — product violet */
+    --color-primary: #6d5efc;
     --color-primary-foreground: #ffffff;
 
     /* Secondary */
-    --color-secondary: #514f48;
+    --color-secondary: #2a2e3a;
     --color-secondary-foreground: #ffffff;
 
-    /* Accent = neutral interaction wash (hover/selected), not a hue */
-    --color-accent: #efede7;
-    --color-accent-foreground: #1d1c19;
+    /* Accent — selected / hover wash */
+    --color-accent: #efeaff;
+    --color-accent-foreground: #4c3fd4;
 
-    /* Semantic — desaturated, for text/badges only */
-    --color-success: #15803d;
+    /* Semantic */
+    --color-success: #0f9f6e;
     --color-success-foreground: #ffffff;
-    --color-warning: #a16207;
+    --color-warning: #d97706;
     --color-warning-foreground: #ffffff;
-    --color-error: #b3261e;
+    --color-error: #e11d48;
     --color-error-foreground: #ffffff;
-    --color-destructive: #b3261e;
+    --color-destructive: #e11d48;
     --color-destructive-foreground: #ffffff;
 
-    /* Sidebar — dark charcoal rail */
-    --color-sidebar: #191a17;
-    --color-sidebar-foreground: #f4f3ee;
-    --color-sidebar-muted: #9d9b91;
-    --color-sidebar-border: rgba(255, 255, 255, 0.08);
-    --color-sidebar-active: rgba(255, 255, 255, 0.09);
+    /* Sidebar — light rail */
+    --color-sidebar: #ffffff;
+    --color-sidebar-foreground: #1c1f2a;
+    --color-sidebar-muted: #6b7289;
+    --color-sidebar-border: #e6e8ef;
+    --color-sidebar-active: #efeaff;
   }
 
   * {
@@ -76,7 +75,7 @@
   h2,
   h3,
   h4 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
@@ -88,15 +87,14 @@
     letter-spacing: -0.01em;
   }
 
-  /* Numeric/display data — tabular Space Grotesk */
   .font-data {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
     font-feature-settings: "tnum" 1;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
   }
 
   .font-display {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 }
 
@@ -112,15 +110,26 @@
 
   /* Flat elevation scale: hairline borders carry structure; shadows are whispers */
   .card-shadow {
-    box-shadow: 0 1px 2px rgba(29, 28, 25, 0.04);
+    box-shadow: 0 1px 2px rgba(28, 31, 42, 0.04), 0 0 0 1px rgba(28, 31, 42, 0.02);
   }
 
   .modal-shadow {
-    box-shadow: 0 8px 24px rgba(29, 28, 25, 0.1);
+    box-shadow: 0 16px 40px rgba(28, 31, 42, 0.12);
   }
 
   .dropdown-shadow {
-    box-shadow: 0 4px 12px rgba(29, 28, 25, 0.07);
+    box-shadow: 0 8px 24px rgba(28, 31, 42, 0.1);
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, #e8eaf2 0%, #f7f8fb 45%, #e8eaf2 100%);
+    background-size: 220% 100%;
+    animation: skeleton-shimmer 1.35s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
   }
 
   .skeleton-pulse {

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Check, ArrowRight, User, LogOut, Zap, Shield, Crown } from 'lucide-react';
-import useAuthStore from '../../../store/useAuthStore'; // Adjust path based on your project structure
+import useAuthStore from '../../../store/useAuthStore';
+import BrandMark from '../../../components/BrandMark';
 
 const Pricing = () => {
     const { user, isAuthenticated, logout } = useAuthStore();
@@ -50,9 +51,7 @@ const Pricing = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center gap-8">
-                            <Link to="/" className="text-2xl font-semibold tracking-tighter text-primary">
-                                DIFMO<span className="text-gray-900">CRM</span>
-                            </Link>
+                            <Link to="/" aria-label="Dashflow home"><BrandMark /></Link>
                             <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
                                 <Link to="/features" className="hover:text-primary transition">Features</Link>
                                 <Link to="/pricing" className="text-primary font-bold border-b-2 border-primary">Pricing</Link>

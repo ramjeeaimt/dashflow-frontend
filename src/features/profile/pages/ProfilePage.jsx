@@ -6,6 +6,7 @@ import Header from "components/ui/Header";
 import Sidebar from "components/ui/Sidebar";
 import ImageUpload from "components/ui/ImageUpload";
 import Icon from "components/AppIcon";
+import { DetailSkeleton } from "components/ui/Skeleton";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -158,10 +159,7 @@ const Profile = () => {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-3 text-muted-foreground">
-            <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
-            <p className="text-sm">Loading profile…</p>
-          </div>
+          <DetailSkeleton />
         )}
       </div>
     );

@@ -6,6 +6,7 @@ import Icon from '../../../components/AppIcon';
 import financeService from '../../../services/finance.service';
 import { leaveService } from '../../../services/leaveService';
 import PayrollReviewModal from '../components/PayrollReviewModal';
+import { DetailSkeleton } from '../../../components/ui/Skeleton';
 import { toast } from 'react-hot-toast';
 
 const PayrollDetailsPage = () => {
@@ -275,13 +276,12 @@ const PayrollDetailsPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#FBFBFE]">
+            <div className="min-h-screen bg-background">
                 <Header />
                 <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
                 <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16`}>
-                    <div className="h-[60vh] flex flex-col items-center justify-center">
-                        <Icon name="Loader" className="animate-spin text-primary mb-2" size={40} />
-                        <p className="text-muted-foreground text-sm font-medium">Loading payroll details...</p>
+                    <div className="max-w-6xl mx-auto px-6 py-8">
+                        <DetailSkeleton />
                     </div>
                 </main>
             </div>
@@ -290,7 +290,7 @@ const PayrollDetailsPage = () => {
 
     if (!payroll) {
         return (
-            <div className="min-h-screen bg-[#FBFBFE]">
+            <div className="min-h-screen bg-background">
                 <Header />
                 <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
                 <main className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-60"} pt-16`}>
@@ -318,7 +318,7 @@ const PayrollDetailsPage = () => {
     const nextPayroll = currentIdx >= 0 && currentIdx < cyclePayrolls.length - 1 ? cyclePayrolls[currentIdx + 1] : null;
 
     return (
-        <div className="min-h-screen bg-[#FBFBFE]">
+        <div className="min-h-screen bg-background">
             <Header />
             <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 

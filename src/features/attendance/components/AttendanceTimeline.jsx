@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Icon from '../../../components/AppIcon';
+import { TableSkeleton } from '../../../components/ui/Skeleton';
 import { attendanceService } from '../../../services/attendance.service';
 import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
@@ -253,12 +254,7 @@ const AttendanceTimeline = ({ employeeId }) => {
   }, [timeline, hideEmptyWeekends]);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <div className="w-7 h-7 border-2 border-border border-t-primary rounded-full animate-spin mb-3" />
-        <p className="text-sm text-muted-foreground">Loading attendance…</p>
-      </div>
-    );
+    return <TableSkeleton rows={5} cols={4} />;
   }
 
   if (error) {

@@ -1,1042 +1,425 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
-    ArrowRight, CheckCircle, BarChart2, Users, Shield,
-    LogOut, User, Zap, Globe, MessageSquare, ChevronRight,
-    Clock, Target, TrendingUp, Briefcase, Calendar,
-    Download, Mail, Phone, Star, Play, Settings,
-    Bell, PieChart, Activity, Award, Rocket, IndianRupee,
-    Eye, EyeOff, Lock, Fingerprint, Heart, Share2,
-    Twitter, Linkedin, Facebook, Youtube, Menu, X
+  ArrowRight, CheckCircle, Users, Shield, Menu, X,
+  Clock, Briefcase, Calendar, Wallet,
+  LayoutDashboard, ChevronDown,
 } from 'lucide-react';
 import useAuthStore from '../../../store/useAuthStore';
+import BrandMark from '../../../components/BrandMark';
+import {
+  SoftShapes,
+  HeroIllustration,
+  ModularMap,
+  OrbitIllustration,
+  StepGlyph,
+} from '../components/LandingIllustrations';
+import ShineCard from '../components/ShineCard';
+import { useSoftScroll, softScrollTo } from '../hooks/useSoftScroll';
+
+const NAV = [
+  { label: 'Product', href: '#product' },
+  { label: 'How it works', href: '#how' },
+  { label: 'Pricing', to: '/pricing' },
+  { label: 'Privacy', to: '/privacy-policy' },
+];
+
+const MODULES = [
+  { icon: Users, title: 'People', text: 'Directory, roles, and employee records in one place.' },
+  { icon: Clock, title: 'Attendance', text: 'Check-in, timelines, and a calendar managers can trust.' },
+  { icon: Calendar, title: 'Leave', text: 'Requests, balances, and approvals without a spreadsheet.' },
+  { icon: Wallet, title: 'Payroll', text: 'Monthly pay runs and payslips beside finance.' },
+  { icon: Briefcase, title: 'Projects', text: 'Clients, delivery, and a board for work in flight.' },
+  { icon: Shield, title: 'Access', text: 'Roles so each person only sees their work.' },
+];
+
+const STEPS = [
+  { n: '01', title: 'Register the company', text: 'Name the workspace and set country defaults.' },
+  { n: '02', title: 'Invite your people', text: 'Add the admin, then bring the team in.' },
+  { n: '03', title: 'Run the week here', text: 'Attendance, leave, payroll, and tasks stay together.' },
+];
+
+const PLANS = [
+  {
+    name: 'Basic',
+    price: '₹1,999',
+    note: 'per month, billed annually',
+    text: 'For a small team getting the basics in order.',
+    points: ['Up to 10 employees', 'Project tracking', 'Client records', 'Email support'],
+    cta: 'Start free trial',
+    to: '/company-registration',
+  },
+  {
+    name: 'Business',
+    price: '₹4,999',
+    note: 'per month, billed annually',
+    text: 'For companies running payroll and permissions together.',
+    points: ['Unlimited employees', 'Payroll and expenses', 'Roles and permissions', 'Priority support'],
+    cta: 'Go Business',
+    to: '/company-registration',
+    popular: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    note: 'shaped around your setup',
+    text: 'For teams that need a dedicated setup.',
+    points: ['Dedicated database', 'Custom API access', 'Account manager'],
+    cta: 'See full pricing',
+    to: '/pricing',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'What is Dashflow?',
+    a: 'Dashflow is one workspace for people, attendance, leave, payroll, and projects — so HR and delivery do not live in five tools.',
+  },
+  {
+    q: 'How fast is setup?',
+    a: 'Quick setup asks one or two questions at a time. Optional steps can be skipped and finished later in Company settings.',
+  },
+  {
+    q: 'Can I skip logo and address?',
+    a: 'Yes. Only company name, industry, size, country, and your admin account are required to open a workspace.',
+  },
+  {
+    q: 'Is payroll included?',
+    a: 'Payroll sits next to attendance and leave on Business and above. Payslips go out from the same people records.',
+  },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 22 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07 } },
+};
+
+const ProductFrame = () => (
+  <div className="rounded-2xl border border-border bg-[#12141c] p-2 shadow-[0_24px_60px_rgba(28,31,42,0.2)]">
+    <div className="rounded-xl bg-card overflow-hidden border border-border">
+      <div className="flex items-center gap-2 h-9 px-3 border-b border-border bg-muted/50">
+        <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+        <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
+        <span className="w-2 h-2 rounded-full bg-[#28c840]" />
+        <span className="ml-2 text-[10px] text-muted-foreground">dashflow.app / home</span>
+      </div>
+      <div className="grid grid-cols-[100px_1fr] min-h-[200px]">
+        <aside className="border-r border-border p-2 space-y-0.5 bg-white">
+          {[['Home', true], ['People', false], ['Payroll', false], ['Tasks', false]].map(([label, active]) => (
+            <div
+              key={label}
+              className={`px-2 py-1.5 rounded-md text-[10px] font-medium ${active ? 'bg-accent text-primary' : 'text-muted-foreground'}`}
+            >
+              {label}
+            </div>
+          ))}
+        </aside>
+        <div className="p-3 bg-[#f4f5f8] space-y-2">
+          <div className="grid grid-cols-3 gap-1.5">
+            {[['Present', '42'], ['On leave', '3'], ['Tasks', '18']].map(([label, value]) => (
+              <div key={label} className="rounded-lg bg-white border border-border px-2 py-2">
+                <p className="text-[9px] text-muted-foreground">{label}</p>
+                <p className="text-sm font-semibold">{value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="rounded-lg bg-white border border-border divide-y divide-border">
+            {[['Payroll review', 'Due today'], ['Leave request', 'Waiting']].map(([title, status]) => (
+              <div key={title} className="flex items-center justify-between px-2.5 py-2">
+                <p className="text-[11px] font-medium">{title}</p>
+                <span className="text-[9px] text-primary bg-accent px-1.5 py-0.5 rounded-full">{status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const LandingPage = () => {
-    const { user, isAuthenticated, logout } = useAuthStore();
-    const navigate = useNavigate();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showNotification, setShowNotification] = useState(true);
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [chatMessage, setChatMessage] = useState('');
-    const [messages, setMessages] = useState([
-        { text: "Hello!  Welcome to Dashflow CRM. How can I help you today?", isBot: true }
-    ]);
+  const { isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState(0);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+  useSoftScroll();
 
-    const handleSendMessage = (e) => {
-        e.preventDefault();
-        if (!chatMessage.trim()) return;
+  const go = (href) => {
+    setMobileOpen(false);
+    softScrollTo(href);
+  };
 
-        const userMsg = { text: chatMessage, isBot: false };
-        setMessages(prev => [...prev, userMsg]);
-        const lowerMsg = chatMessage.toLowerCase();
-        setChatMessage('');
+  return (
+    <div className="min-h-screen bg-white text-foreground">
+      <div className="bg-[#1b1533] text-white">
+        <p className="max-w-6xl mx-auto px-4 py-2 text-center text-xs sm:text-sm">
+          People, attendance, payroll, and projects in one workspace.{' '}
+          <Link to="/features" className="underline underline-offset-4 text-white/80 hover:text-white">See the product</Link>
+        </p>
+      </div>
 
-        // Bot Logic
-        setTimeout(() => {
-            let botText = "That's a great question! Our team will get back to you shortly with more details. Is there anything specific about DIFMO CRM you'd like to know?";
-
-            if (lowerMsg.includes('payroll') || lowerMsg.includes('salary')) {
-                botText = "Our Payroll module automates TDS, PF, and ESI calculations specifically for Indian compliance. Would you like to see our payroll features?";
-            } else if (lowerMsg.includes('price') || lowerMsg.includes('pricing') || lowerMsg.includes('cost')) {
-                botText = "We offer flexible pricing starting from a Free Tier for small teams. You can find the full breakdown on our Pricing page!";
-            } else if (lowerMsg.includes('feature') || lowerMsg.includes('what') || lowerMsg.includes('do')) {
-                botText = "DIFMO CRM handles Projects, Attendance, Payroll, and Leave Management in one unified dashboard. It's built for efficiency!";
-            } else if (lowerMsg.includes('contact') || lowerMsg.includes('help') || lowerMsg.includes('support')) {
-                botText = "You can reach our support team at support@difmo.com or use the 'Contact Sales' button. We're here to help!";
-            } else if (lowerMsg.includes('register') || lowerMsg.includes('signup') || lowerMsg.includes('join') || lowerMsg.includes('start')) {
-                botText = "To register your company, simply click the 'Start Free Trial' button in the top menu. It takes less than 2 minutes to get your dedicated CRM instance ready!";
-            } else if (lowerMsg.includes('demo') || lowerMsg.includes('video')) {
-                botText = "You can watch our 5-minute product walkthrough right here on the landing page! Just scroll down to the 'See in Action' section.";
-            }
-
-            setMessages(prev => [...prev, { text: botText, isBot: true }]);
-        }, 1000);
-    };
-
-    const getFullName = () => {
-        if (!user) return 'User';
-        return user.firstName ? `${user.firstName} ${user.lastName}` : user.email?.split('@')[0] || 'User';
-    };
-
-    const getUserRole = () => {
-        if (!user?.role) return null;
-        const roles = {
-            SUPER_ADMIN: { label: 'Super Admin', color: 'purple' },
-            ADMIN: { label: 'Admin', color: 'red' },
-            MANAGER: { label: 'Manager', color: 'blue' },
-            EMPLOYEE: { label: 'Employee', color: 'green' }
-        };
-        return roles[user.role] || null;
-    };
-
-    const userRole = getUserRole();
-
-    // Demo data for different roles
-    const roleBasedContent = {
-        SUPER_ADMIN: {
-            metrics: [
-                { label: 'Total Companies', value: '24', change: '+3', icon: <Briefcase className="w-4 h-4" /> },
-                { label: 'Active Users', value: '1,847', change: '+12%', icon: <Users className="w-4 h-4" /> },
-                { label: 'Revenue (MTD)', value: '₹84.2L', change: '+8%', icon: <IndianRupee className="w-4 h-4" /> },
-                { label: 'System Health', value: '98.5%', change: 'Stable', icon: <Activity className="w-4 h-4" /> }
-            ],
-            quickActions: [
-                { label: 'Add New Company', icon: <Briefcase className="w-4 h-4" />, path: '/company-registration' },
-                { label: 'View Audit Logs', icon: <Shield className="w-4 h-4" />, path: '/audit-logs' },
-                { label: 'System Settings', icon: <Settings className="w-4 h-4" />, path: '/settings' }
-            ]
-        },
-        ADMIN: {
-            metrics: [
-                { label: 'Total Employees', value: '156', change: '+8', icon: <Users className="w-4 h-4" /> },
-                { label: 'Projects Active', value: '23', change: '5 due', icon: <Briefcase className="w-4 h-4" /> },
-                { label: 'Pending Approvals', value: '12', change: 'Urgent: 3', icon: <Clock className="w-4 h-4" /> },
-                { label: 'This Month Payroll', value: '₹42.5L', change: 'Processing', icon: <IndianRupee className="w-4 h-4" /> }
-            ],
-            quickActions: [
-                { label: 'Add Employee', icon: <User className="w-4 h-4" />, path: '/employees/add' },
-                { label: 'Create Project', icon: <Target className="w-4 h-4" />, path: '/projects/create' },
-                { label: 'Run Payroll', icon: <IndianRupee className="w-4 h-4" />, path: '/payroll/run' }
-            ]
-        },
-        MANAGER: {
-            metrics: [
-                { label: 'Team Members', value: '12', change: '+2', icon: <Users className="w-4 h-4" /> },
-                { label: 'Active Projects', value: '8', change: '3 completed', icon: <Briefcase className="w-4 h-4" /> },
-                { label: 'Team Leaves', value: '4', change: '2 pending', icon: <Calendar className="w-4 h-4" /> },
-                { label: 'Productivity', value: '94%', change: '+5%', icon: <TrendingUp className="w-4 h-4" /> }
-            ],
-            quickActions: [
-                { label: 'Assign Task', icon: <Target className="w-4 h-4" />, path: '/tasks/assign' },
-                { label: 'Team Calendar', icon: <Calendar className="w-4 h-4" />, path: '/calendar' },
-                { label: 'Approve Leaves', icon: <CheckCircle className="w-4 h-4" />, path: '/leaves/approve' }
-            ]
-        },
-        EMPLOYEE: {
-            metrics: [
-                { label: 'My Projects', value: '4', change: '2 active', icon: <Briefcase className="w-4 h-4" /> },
-                { label: 'Pending Tasks', value: '8', change: '3 due today', icon: <Target className="w-4 h-4" /> },
-                { label: 'Leave Balance', value: '12 days', change: 'Available', icon: <Calendar className="w-4 h-4" /> },
-                { label: 'Attendance', value: '92%', change: 'This month', icon: <Clock className="w-4 h-4" /> }
-            ],
-            quickActions: [
-                { label: 'Mark Attendance', icon: <Clock className="w-4 h-4" />, path: '/attendance/mark' },
-                { label: 'Apply Leave', icon: <Calendar className="w-4 h-4" />, path: '/leaves/apply' },
-                { label: 'View Payslip', icon: <IndianRupee className="w-4 h-4" />, path: '/payroll/payslips' }
-            ]
-        }
-    };
-
-    const currentRoleContent = user?.role ? roleBasedContent[user.role] : null;
-
-    return (
-        <div className="min-h-screen bg-gray-50 font-sans selection:bg-primary/10 selection:text-blue-900">
-            {/* Live Notification Banner */}
-            {showNotification && (
-                <div className="bg-primary text-white py-2.5 px-4 text-center text-[10px] sm:text-sm relative">
-                    <p className="inline-flex flex-wrap justify-center items-center gap-2">
-                        <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-300 fill-current" />
-                        <span className="font-medium">Live:</span> DIFMO CRM handles 10,000+ users with 99.9% uptime.
-                        <button className="underline font-bold hover:text-primary-foreground/70">View Demo →</button>
-                    </p>
-                    <button
-                        onClick={() => setShowNotification(false)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-white/80 hover:text-white"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                </div>
+      <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+          <Link to="/" aria-label="Dashflow home"><BrandMark /></Link>
+          <div className="hidden md:flex items-center gap-1">
+            {NAV.map((item) => item.to ? (
+              <Link key={item.label} to={item.to} className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted">{item.label}</Link>
+            ) : (
+              <button key={item.label} onClick={() => go(item.href)} className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted">{item.label}</button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" className="hidden sm:inline text-sm font-medium px-3 py-2 rounded-lg hover:bg-muted">Dashboard</Link>
+                <button onClick={() => { logout(); navigate('/login'); }} className="text-sm px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted">Log out</button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-medium px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted">Log in</Link>
+                <Link to="/company-registration" className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90">
+                  Start free trial <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
             )}
-
-            {/* Sticky Navigation */}
-            <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16 items-center">
-                        {/* Logo */}
-                        <Link to="/" className="flex items-center flex-shrink-0">
-                            <img 
-                                className="h-10 sm:h-12 w-auto object-contain" 
-                                src="/assets/images/crm.logo1.png" 
-                                alt="DIFMO CRM Logo" 
-                            />
-                        </Link>
-
-                        {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center space-x-1">
-                            <Link to="/features" className="px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition">Features</Link>
-                            <Link to="/pricing" className="px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition">Pricing</Link>
-                            <button onClick={() => navigate('/privacy-policy')} className="px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition">Privacy</button>
-                        </div>
-
-                        {/* Right Section */}
-                        <div className="flex items-center gap-2 sm:gap-4">
-                            {isAuthenticated ? (
-                                <div className="flex items-center gap-2">
-                                    <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 bg-muted hover:bg-border rounded-lg transition">
-                                        <User className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-xs font-bold text-foreground">{getFullName()}</span>
-                                    </Link>
-                                    <button onClick={handleLogout} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition">
-                                        <LogOut className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <Link to="/login" className="text-muted-foreground hover:text-foreground font-bold text-xs sm:text-sm px-3 py-2 hover:bg-muted rounded-lg transition">
-                                        Log in
-                                    </Link>
-                                    <Link
-                                        to="/company-registration"
-                                        className="hidden sm:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 shadow-md transition-all text-xs sm:text-sm font-bold"
-                                    >
-                                        Free Trial <ArrowRight className="w-4 h-4" />
-                                    </Link>
-                                </div>
-                            )}
-
-                            {/* Mobile Menu Button */}
-                            <button
-                                className="lg:hidden p-2 rounded-lg hover:bg-muted text-muted-foreground"
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            >
-                                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Mobile Menu */}
-                    {mobileMenuOpen && (
-                        <div className="lg:hidden py-4 border-t border-border animate-in slide-in-from-top duration-200">
-                            <div className="flex flex-col space-y-1">
-                                <Link to="/features" className="px-4 py-3 text-foreground hover:bg-primary/10 rounded-lg font-semibold">Features</Link>
-                                <Link to="/pricing" className="px-4 py-3 text-foreground hover:bg-primary/10 rounded-lg font-semibold">Pricing</Link>
-                                <Link to="/privacy-policy" className="px-4 py-3 text-foreground hover:bg-primary/10 rounded-lg font-semibold">Privacy Policy</Link>
-                                {!isAuthenticated && (
-                                    <Link to="/company-registration" className="mx-4 mt-2 px-4 py-3 bg-primary text-white rounded-lg font-bold text-center">
-                                        Start Free Trial
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </nav>
-
-            {/* Personalized Welcome Section for Authenticated Users */}
-            {isAuthenticated && currentRoleContent && (
-                <div className="bg-primary text-white py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <h1 className="text-2xl font-bold mb-2">
-                                    Welcome back, {getFullName()}!
-                                    <span className="ml-2 text-sm bg-white/20 px-3 py-1 rounded-full">
-                                        {userRole?.label}
-                                    </span>
-                                </h1>
-                                <p className="text-primary-foreground/80">
-                                    {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                                </p>
-                            </div>
-                            <Link
-                                to="/dashboard"
-                                className="mt-4 md:mt-0 bg-card text-primary px-6 py-2 rounded-lg font-semibold hover:bg-primary/10 transition flex items-center gap-2 w-fit"
-                            >
-                                Go to Dashboard <ArrowRight className="w-4 h-4" />
-                            </Link>
-                        </div>
-
-                        {/* Role-based Metrics */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                            {currentRoleContent.metrics.map((metric, idx) => (
-                                <div key={idx} className="bg-white/10 backdrop-blur-lg rounded-lg p-4 border border-white/20">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-primary-foreground/80 text-sm">{metric.label}</span>
-                                        <span className="text-white/80">{metric.icon}</span>
-                                    </div>
-                                    <div className="flex items-end justify-between">
-                                        <span className="text-2xl font-bold">{metric.value}</span>
-                                        <span className="text-xs text-green-300 bg-green-500/20 px-2 py-1 rounded">
-                                            {metric.change}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Quick Actions */}
-                        <div className="flex flex-wrap gap-3 mt-6">
-                            {currentRoleContent.quickActions.map((action, idx) => (
-                                <Link
-                                    key={idx}
-                                    to={action.path}
-                                    className="bg-white/10 hover:bg-white/20 backdrop-blur-lg px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition border border-white/20"
-                                >
-                                    {action.icon}
-                                    {action.label}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Hero Section */}
-            <header className="relative pt-12 sm:pt-20 pb-20 sm:pb-32 overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
-                        <div className="text-center lg:text-left lg:col-span-6">
-                            <h1 className="text-4xl sm:text-6xl lg:text-7xl tracking-tight font-semibold text-foreground leading-[1.1]">
-                                {isAuthenticated ? (
-                                    <>Grow business <br />
-                                        <span className="text-primary underline decoration-blue-100 underline-offset-8">With Us</span></>
-                                ) : (
-                                    <>Manage business <br />
-                                        <span className="text-primary underline decoration-blue-100 underline-offset-8">All in One Place</span></>
-                                )}
-                            </h1>
-
-                            <p className="mt-6 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0">
-                                {isAuthenticated
-                                    ? "Your team, projects, and payroll are waiting. Pick up right where you left off."
-                                    : "Unified projects, automated payroll, and deep analytics—all in one place. Built for modern Indian teams."}
-                            </p>
-
-                            {/* Trust Indicators */}
-                            <div className="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-muted-foreground">
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/60 rounded-full">
-                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                    <span>ISO 27001</span>
-                                </div>
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/60 rounded-full">
-                                    <Shield className="w-4 h-4 text-primary" />
-                                    <span>100% Secure</span>
-                                </div>
-                            </div>
-
-                            {/* CTA Buttons */}
-                            <div className="mt-10 flex flex-col sm:flex-row gap-4 sm:justify-center lg:justify-start">
-                                {isAuthenticated ? (
-                                    <Link
-                                        to="/dashboard"
-                                        className="flex items-center justify-center px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition shadow-sm group"
-                                    >
-                                        Go to Dashboard <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <Link
-                                            to="/company-registration"
-                                            className="flex items-center justify-center px-8 py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition shadow-sm group"
-                                        >
-                                            Start 14-day Trial <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
-                                        </Link>
-                                        <button
-                                            onClick={() => {
-                                                const demoSection = document.getElementById('demo-video');
-                                                demoSection?.scrollIntoView({ behavior: 'smooth' });
-                                            }}
-                                            className="flex items-center justify-center px-8 py-4 bg-gray-50 text-gray-900 rounded-xl font-bold hover:bg-gray-100 transition border border-gray-200 gap-2"
-                                        >
-                                            <Play className="w-4 h-4" /> Watch Demo
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Social Proof */}
-                            <div className="mt-10 flex items-center gap-4">
-                                <div className="flex -space-x-2">
-                                    {[1, 2, 3, 4].map((i) => (
-                                        <img
-                                            key={i}
-                                            className="w-8 h-8 rounded-full border-2 border-white"
-                                            src={`https://i.pravatar.cc/32?img=${i}`}
-                                            alt={`User ${i}`}
-                                        />
-                                    ))}
-                                </div>
-                                <div className="text-sm">
-                                    <span className="font-bold text-gray-900">2,000+</span>
-                                    <span className="text-gray-500"> teams trust us</span>
-                                </div>
-                                <div className="h-4 w-px bg-gray-300"></div>
-                                <div className="flex items-center gap-1 text-yellow-400">
-                                    <Star className="w-4 h-4 fill-current" />
-                                    <Star className="w-4 h-4 fill-current" />
-                                    <Star className="w-4 h-4 fill-current" />
-                                    <Star className="w-4 h-4 fill-current" />
-                                    <Star className="w-4 h-4 fill-current" />
-                                    <span className="ml-1 text-gray-600">4.9</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Dashboard Preview */}
-                        <div className="mt-16 lg:mt-0 lg:col-span-6 relative">
-                            <div className="relative mx-auto w-full">
-                                {/* Main Image */}
-                                <div className="relative rounded-lg shadow-sm overflow-hidden border-8 border-white">
-                                    <img
-                                        className="w-full object-cover"
-                                        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80"
-                                        alt="Dashboard Preview"
-                                    />
-
-                                    {/* Floating Stats */}
-                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur rounded-lg px-4 py-2 shadow-sm">
-                                        <div className="text-sm font-medium text-gray-600">Active Sessions</div>
-                                        <div className="text-lg font-bold text-green-600">1,847 online</div>
-                                    </div>
-
-                                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-lg px-4 py-2 shadow-sm">
-                                        <div className="text-sm font-medium text-gray-600">Response Time</div>
-                                        <div className="text-lg font-bold text-primary">89ms</div>
-                                    </div>
-                                </div>
-
-                                {/* Badge */}
-                                {/* <div className="absolute -bottom-4 -right-4 bg-primary text-white px-6 py-3 rounded-full shadow-sm">
-                                    <span className="font-bold">✨ New: AI Analytics</span>
-                                </div> */}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            {/* Demo Video Section */}
-            <section id="demo-video" className="py-20 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl font-semibold text-gray-900">See DIFMO CRM in Action</h2>
-                        <p className="text-gray-600 mt-4">Watch how teams are transforming their workflow</p>
-                    </div>
-
-                    <div className="relative rounded-lg overflow-hidden shadow-sm aspect-video max-w-4xl mx-auto">
-                        <img
-                            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80"
-                            alt="Video Thumbnail"
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <button className="w-20 h-20 bg-card rounded-full flex items-center justify-center transition shadow-sm">
-                                <Play className="w-8 h-8 text-primary ml-1" />
-                            </button>
-                        </div>
-
-                        {/* Video Stats */}
-                        <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur text-white px-4 py-2 rounded-lg text-sm">
-                            <span className="font-medium">12,847 views</span> • <span>2 days ago</span>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-center gap-8 mt-8 text-sm text-gray-500">
-                        <span>5-minute setup</span>
-                        <span>Enterprise-grade security</span>
-                        <span>Mobile app included</span>
-                    </div>
-                </div>
-            </section>
-
-            {/* Trust Bar with Real Companies */}
-            <section className="py-16 border-y border-gray-200 bg-card">
-                <div className="max-w-7xl mx-auto px-4 text-center">
-                    <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-8">Trusted by India's fastest growing companies</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-70 hover:opacity-100 transition">
-                        <div className="flex flex-col items-center">
-                            <span className="text-2xl font-bold text-gray-800">BharatPe</span>
-                            <span className="text-xs text-gray-400">Fintech</span>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <span className="text-2xl font-bold text-gray-800">Razorpay</span>
-                            <span className="text-xs text-gray-400">Payments</span>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <span className="text-2xl font-bold text-gray-800">CRED</span>
-                            <span className="text-xs text-gray-400">Loyalty</span>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <span className="text-2xl font-bold text-gray-800">Zerodha</span>
-                            <span className="text-xs text-gray-400">Broking</span>
-                        </div>
-                    </div>
-
-                    {/* Rating Badge */}
-                    <div className="mt-8 inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
-                        <Award className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-medium text-green-700">#1 CRM for SMBs 2024 - G2 Crowd</span>
-                    </div>
-                </div>
-            </section>
-
-            {/* How It Works Section - Interactive */}
-            <div className="bg-card py-20">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-semibold text-gray-900 tracking-tight">Get Started in 3 Simple Steps</h2>
-                        <p className="text-gray-500 mt-4 text-lg">Join 2,000+ Indian businesses already using DIFMO CRM</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-                        {/* Progress Line */}
-                        <div className="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-blue-200"></div>
-
-                        {/* Step 1 */}
-                        <div className="relative text-center group cursor-pointer">
-                            <div className="w-24 h-24 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm group-hover:shadow-sm mb-8">
-                                <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-semibold text-white">01</span>
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Register Your Company</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed px-4">
-                                Create your company profile in under 2 minutes. Get your dedicated instance on our secure cloud.
-                            </p>
-                            <div className="mt-4 text-xs text-primary font-medium">
-                                Avg. time: 2 mins ⏱️
-                            </div>
-                        </div>
-
-                        {/* Step 2 */}
-                        <div className="relative text-center group cursor-pointer">
-                            <div className="w-24 h-24 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm group-hover:shadow-sm mb-8">
-                                <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-semibold text-white">02</span>
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Invite Your Team</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed px-4">
-                                Bulk upload employees or send invites. Assign roles and permissions based on their functions.
-                            </p>
-                            <div className="mt-4 flex justify-center -space-x-2">
-                                <img className="w-6 h-6 rounded-full border-2 border-white" src="https://i.pravatar.cc/24?img=1" alt="Team" />
-                                <img className="w-6 h-6 rounded-full border-2 border-white" src="https://i.pravatar.cc/24?img=2" alt="Team" />
-                                <img className="w-6 h-6 rounded-full border-2 border-white" src="https://i.pravatar.cc/24?img=3" alt="Team" />
-                                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center border-2 border-white">+9</span>
-                            </div>
-                        </div>
-
-                        {/* Step 3 */}
-                        <div className="relative text-center group cursor-pointer">
-                            <div className="w-24 h-24 mx-auto bg-primary rounded-lg rotate-45 transform group-hover:rotate-0 transition-all duration-500 shadow-sm group-hover:shadow-sm mb-8">
-                                <div className="w-full h-full flex items-center justify-center -rotate-45 group-hover:rotate-0 transition-all duration-500">
-                                    <span className="text-3xl font-semibold text-white">03</span>
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Go Live & Scale</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed px-4">
-                                Start tracking projects, attendance, and payroll. Watch your business grow with real-time insights.
-                            </p>
-                            <div className="mt-4 flex items-center justify-center gap-1 text-green-600">
-                                <TrendingUp className="w-4 h-4" />
-                                <span className="text-xs font-medium">Average 40% efficiency gain</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Live Demo CTA */}
-                    <div className="mt-16 text-center">
-                        <Link
-                            to="/company-registration"
-                            className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-gray-800 transition group"
-                        >
-                            Start your 14-day free trial <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-                        </Link>
-                        <p className="mt-3 text-sm text-gray-500">No credit card required • Full access • Cancel anytime</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Features with Icons */}
-            <section className="py-24 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <span className="text-primary font-bold text-sm uppercase tracking-wider">Everything you need</span>
-                        <h2 className="text-4xl font-semibold text-gray-900 mt-2">One Platform, Infinite Possibilities</h2>
-                        <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
-                            Built for Indian businesses, with features that actually matter. No bloated modules, just pure productivity.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* Project Management */}
-                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
-                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/90 group-hover:text-white transition-all duration-300">
-                                <Briefcase className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition">Project Management</h3>
-                            <p className="text-gray-500 leading-relaxed mb-4">
-                                Kanban boards, Gantt charts, and timeline views. Assign tasks, track progress, and hit deadlines.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> 12 templates</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><Users className="w-3 h-3" /> Team collaboration</span>
-                            </div>
-                        </div>
-
-                        {/* HRM & Payroll */}
-                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
-                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/90 group-hover:text-white transition-all duration-300">
-                                <Users className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition">HRM & Payroll</h3>
-                            <p className="text-gray-500 leading-relaxed mb-4">
-                                Automated attendance, leave management, and payroll processing with TDS, PF, and ESI calculations.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                \u003cspan className="flex items-center gap-1"\u003e\u003cClock className="w-3 h-3" /\u003e Auto attendance\u003c/span\u003e
-                                \u003cspan\u003e•\u003c/span\u003e
-                                \u003cspan className="flex items-center gap-1"\u003e\u003cIndianRupee className="w-3 h-3" /\u003e Compliance ready\u003c/span\u003e
-                            </div>
-                        </div>
-
-                        {/* Analytics */}
-                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
-                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/90 group-hover:text-white transition-all duration-300">
-                                <PieChart className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition">Deep Analytics</h3>
-                            <p className="text-gray-500 leading-relaxed mb-4">
-                                Real-time dashboards, custom reports, and predictive insights powered by AI. Make data-driven decisions.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span className="flex items-center gap-1"><Activity className="w-3 h-3" /> Live metrics</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> AI predictions</span>
-                            </div>
-                        </div>
-
-                        {/* Security */}
-                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
-                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600 group-hover:text-white transition-all duration-300">
-                                <Shield className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-red-600 transition">Enterprise Security</h3>
-                            <p className="text-gray-500 leading-relaxed mb-4">
-                                Role-based access control, audit logs, and end-to-end encryption. ISO 27001 certified.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> RBAC</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><Fingerprint className="w-3 h-3" /> 2FA</span>
-                            </div>
-                        </div>
-
-                        {/* Communication */}
-                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
-                            <div className="w-14 h-14 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
-                                <MessageSquare className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-green-600 transition">Team Communication</h3>
-                            <p className="text-gray-500 leading-relaxed mb-4">
-                                In-app chat, video calls, and announcements. Keep everyone connected and aligned.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Chat</span>
-                                <span>•</span>
-                                {/* <span className="flex items-center gap-1"><Video className="w-3 h-3" /> HD calls</span> */}
-                            </div>
-                        </div>
-
-                        {/* API Access */}
-                        <div className="group p-8 bg-card rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300">
-                            <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
-                                <Zap className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-orange-600 transition">API & Integrations</h3>
-                            <p className="text-gray-500 leading-relaxed mb-4">
-                                Connect with your favorite tools. RESTful API, webhooks, and Zapier integration.
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span className="flex items-center gap-1"><Globe className="w-3 h-3" /> REST API</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Webhooks</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Feature Highlight */}
-                    {/* <div className="mt-16 bg-primary rounded-lg p-8 md:p-12 text-white">
-                        <div className="grid md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-4">
-                                    🚀 Just Launched
-                                </span>
-                                <h3 className="text-3xl font-bold mb-4">AI-Powered Insights</h3>
-                                <p className="text-primary-foreground/80 mb-6">
-                                    Our new AI engine analyzes your business data to predict churn, suggest upsells, and identify bottlenecks before they become problems.
-                                </p>
-                                <ul className="space-y-3">
-                                    {['Predictive analytics', 'Automated reports', 'Smart recommendations'].map((item, i) => (
-                                        <li key={i} className="flex items-center gap-2">
-                                            <CheckCircle className="w-5 h-5 text-primary-foreground/70" />
-                                            <span>{item}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button className="mt-8 bg-card text-primary px-6 py-3 rounded-xl font-bold hover:bg-primary/10 transition">
-                                    Learn more about AI features
-                                </button>
-                            </div>
-                            <div className="relative">
-                                <div className="bg-white/10 backdrop-blur rounded-lg p-6 border border-white/20">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <span className="font-semibold">Revenue Forecast</span>
-                                        <span className="text-green-300">+23% vs last month</span>
-                                    </div>
-                                    <div className="h-2 bg-white/20 rounded-full mb-6">
-                                        <div className="w-3/4 h-2 bg-green-400 rounded-full"></div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between text-sm">
-                                            <span>Customer Churn Risk</span>
-                                            <span className="text-yellow-300">2.3%</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span>Upsell Opportunities</span>
-                                            <span className="text-green-300">₹12.4L</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
-                </div>
-            </section>
-
-            {/* Testimonials */}
-            <section className="py-24 bg-card">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-semibold text-gray-900">Loved by Teams Across India</h2>
-                        <p className="text-gray-500 mt-4">See what our customers have to say about DIFMO CRM</p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {[
-                            {
-                                name: 'Rajesh Kumar',
-                                role: 'CEO, TechSolutions India',
-                                content: 'DIFMO CRM transformed how we manage projects and payroll. The role-based access is a game-changer for our 150+ employee company.',
-                                rating: 5,
-                                image: 'https://i.pravatar.cc/100?img=7'
-                            },
-                            {
-                                name: 'Priya Sharma',
-                                role: 'HR Manager, GrowthX',
-                                content: 'Finally a CRM that understands Indian payroll! PF, ESI, TDS all automated. Saved us 20+ hours every month.',
-                                rating: 5,
-                                image: 'https://i.pravatar.cc/100?img=5'
-                            },
-                            {
-                                name: 'Amit Verma',
-                                role: 'Project Lead, InnovateTech',
-                                content: 'The analytics dashboard gives us real-time insights into team productivity. Client reporting has never been easier.',
-                                rating: 5,
-                                image: 'https://i.pravatar.cc/100?img=3'
-                            }
-                        ].map((testimonial, idx) => (
-                            <div key={idx} className="bg-gray-50 p-8 rounded-lg border border-gray-200 hover:border-border transition group">
-                                <div className="flex items-center gap-4 mb-6">
-                                    <img
-                                        src={testimonial.image}
-                                        alt={testimonial.name}
-                                        className="w-12 h-12 rounded-full object-cover border-2 border-white group-hover:border-blue-400 transition"
-                                    />
-                                    <div>
-                                        <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                                        <p className="text-sm text-gray-500">{testimonial.role}</p>
-                                    </div>
-                                </div>
-                                <p className="text-gray-600 mb-4">"{testimonial.content}"</p>
-                                <div className="flex items-center gap-1 text-yellow-400">
-                                    {[...Array(testimonial.rating)].map((_, i) => (
-                                        <Star key={i} className="w-4 h-4 fill-current" />
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Stats */}
-                    <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                        <div>
-                            <div className="text-4xl font-semibold text-primary">2,000+</div>
-                            <div className="text-sm text-gray-500">Active Companies</div>
-                        </div>
-                        <div>
-                            <div className="text-4xl font-semibold text-primary">50K+</div>
-                            <div className="text-sm text-gray-500">Users</div>
-                        </div>
-                        <div>
-                            <div className="text-4xl font-semibold text-primary">99.9%</div>
-                            <div className="text-sm text-gray-500">Uptime SLA</div>
-                        </div>
-                        <div>
-                            <div className="text-4xl font-semibold text-primary">24/7</div>
-                            <div className="text-sm text-gray-500">Support</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Pricing Teaser */}
-            <section className="py-20 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-semibold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
-                    <p className="text-gray-500 mb-12 max-w-2xl mx-auto">Start free, scale as you grow. No hidden fees, no surprises.</p>
-
-                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        {/* Free Plan */}
-                        <div className="bg-card p-8 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                            <h3 className="text-xl font-bold mb-2">Starter</h3>
-                            <div className="text-3xl font-semibold mb-4">₹0<span className="text-sm font-normal text-gray-500">/mo</span></div>
-                            <p className="text-gray-500 text-sm mb-6">Perfect for small teams</p>
-                            <ul className="text-left space-y-3 mb-8">
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Up to 5 users</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Basic project management</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Attendance tracking</li>
-                            </ul>
-                            <Link to="/company-registration" className="block w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
-                                Get Started
-                            </Link>
-                        </div>
-
-                        {/* Pro Plan - Highlighted */}
-                        <div className="bg-primary text-white p-8 rounded-lg shadow-sm scale-105 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 bg-yellow-400 text-gray-900 px-3 py-1 text-xs font-bold rounded-bl-lg">
-                                POPULAR
-                            </div>
-                            <h3 className="text-xl font-bold mb-2">Professional</h3>
-                            <div className="text-3xl font-semibold mb-4">₹999<span className="text-sm font-normal text-primary-foreground/70">/mo</span></div>
-                            <p className="text-primary-foreground/80 text-sm mb-6">For growing businesses</p>
-                            <ul className="text-left space-y-3 mb-8">
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Up to 25 users</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Advanced analytics</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Automated payroll</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-primary-foreground/70" /> Priority support</li>
-                            </ul>
-                            <Link to="/company-registration" className="block w-full bg-card text-primary py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
-                                Start Free Trial
-                            </Link>
-                        </div>
-
-                        {/* Enterprise */}
-                        <div className="bg-card p-8 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                            <h3 className="text-xl font-bold mb-2">Enterprise</h3>
-                            <div className="text-3xl font-semibold mb-4">Custom</div>
-                            <p className="text-gray-500 text-sm mb-6">For large organizations</p>
-                            <ul className="text-left space-y-3 mb-8">
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Unlimited users</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Custom integrations</li>
-                                <li className="flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4 text-green-500" /> Dedicated account manager</li>
-                            </ul>
-                            <button onClick={() => navigate('/contact')} className="block w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
-                                Contact Sales
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Newsletter */}
-            <section className="py-20 bg-card">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="bg-primary rounded-lg p-12 text-white text-center">
-                        <h2 className="text-3xl font-bold mb-4">Stay Ahead of the Curve</h2>
-                        <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-                            Get product updates, CRM tips, and industry insights delivered to your inbox.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                className="flex-1 px-6 py-3 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white"
-                            />
-                            <button className="bg-card text-primary px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition whitespace-nowrap">
-                                Subscribe
-                            </button>
-                        </div>
-                        <p className="text-xs text-primary-foreground/70 mt-4">
-                            We respect your privacy. Unsubscribe at any time.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Modern Footer */}
-            <footer className="bg-gray-900 text-gray-300 pt-20 pb-10">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
-                        {/* Company Info */}
-                        <div className="col-span-2">
-                            <span className="text-2xl font-semibold text-white">DIFMO</span>
-                            <span className="text-gray-500 ml-1">CRM</span>
-                            <p className="mt-4 text-gray-500 text-sm leading-relaxed">
-                                Revolutionizing business management for the next generation of Indian entrepreneurs.
-                            </p>
-                            <div className="flex gap-4 mt-6">
-                                <a href="#" className="text-gray-400 hover:text-white transition"><Twitter className="w-5 h-5" /></a>
-                                <a href="#" className="text-gray-400 hover:text-white transition"><Linkedin className="w-5 h-5" /></a>
-                                <a href="#" className="text-gray-400 hover:text-white transition"><Facebook className="w-5 h-5" /></a>
-                                <a href="#" className="text-gray-400 hover:text-white transition"><Youtube className="w-5 h-5" /></a>
-                            </div>
-                        </div>
-
-                        {/* Product */}
-                        <div>
-                            <h4 className="text-white font-bold mb-4 text-sm">Product</h4>
-                            <ul className="space-y-3 text-sm">
-                                <li><Link to="/features" className="hover:text-blue-400 transition">Features</Link></li>
-                                <li><Link to="/pricing" className="hover:text-blue-400 transition">Pricing</Link></li>
-                                <li><Link to="/integrations" className="hover:text-blue-400 transition">Integrations</Link></li>
-                                <li><Link to="/roadmap" className="hover:text-blue-400 transition">Roadmap</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* Solutions */}
-                        <div>
-                            <h4 className="text-white font-bold mb-4 text-sm">Solutions</h4>
-                            <ul className="space-y-3 text-sm">
-                                <li><Link to="/small-business" className="hover:text-blue-400 transition">Small Business</Link></li>
-                                <li><Link to="/enterprise" className="hover:text-blue-400 transition">Enterprise</Link></li>
-                                <li><Link to="/startups" className="hover:text-blue-400 transition">Startups</Link></li>
-                                <li><Link to="/agencies" className="hover:text-blue-400 transition">Agencies</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* Resources */}
-                        <div>
-                            <h4 className="text-white font-bold mb-4 text-sm">Resources</h4>
-                            <ul className="space-y-3 text-sm">
-                                <li><Link to="/blog" className="hover:text-blue-400 transition">Blog</Link></li>
-                                <li><Link to="/guides" className="hover:text-blue-400 transition">Guides</Link></li>
-                                <li><Link to="/webinars" className="hover:text-blue-400 transition">Webinars</Link></li>
-                                <li><Link to="/case-studies" className="hover:text-blue-400 transition">Case Studies</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* Company */}
-                        <div>
-                            <h4 className="text-white font-bold mb-4 text-sm">Company</h4>
-                            <ul className="space-y-3 text-sm">
-                                <li><Link to="/about" className="hover:text-blue-400 transition">About Us</Link></li>
-                                <li><Link to="/careers" className="hover:text-blue-400 transition">Careers <span className="text-blue-400 text-xs">(Hiring)</span></Link></li>
-                                <li><Link to="/contact" className="hover:text-blue-400 transition">Contact</Link></li>
-                                <li><Link to="/press" className="hover:text-blue-400 transition">Press</Link></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Bottom Bar */}
-                    <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                        <div>© 2026 DIFMO-CRM. All rights reserved.</div>
-                        <div className="flex gap-6 mt-4 md:mt-0">
-                            <Link to="/privacy-policy" className="hover:text-gray-300 transition">Privacy Policy</Link>
-                            <Link to="/terms" className="hover:text-gray-300 transition">Terms of Service</Link>
-                            <Link to="/security" className="hover:text-gray-300 transition">Security</Link>
-                            <Link to="/sitemap" className="hover:text-gray-300 transition">Sitemap</Link>
-                        </div>
-                    </div>
-
-                    {/* Made in India Badge */}
-                    <div className="mt-8 text-center">
-                        <span className="inline-flex items-center gap-2 text-xs text-gray-600">
-                            <Heart className="w-3 h-3 text-red-500" /> Made with passion in Lucknow, India
-                        </span>
-                    </div>
-                </div>
-            </footer>
-
-            {/* Floating Help Button & Chat Window */}
-            <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
-                {isChatOpen && (
-                    <div className="mb-4 w-72 sm:w-80 bg-card rounded-lg shadow-sm border border-border overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-                        {/* Chat Header */}
-                        <div className="bg-primary p-4 text-white flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                                    <MessageSquare className="w-4 h-4 text-white" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold">DIFMO Support</p>
-                                    <p className="text-[10px] text-primary-foreground/80 uppercase tracking-wide font-medium">Online now</p>
-                                </div>
-                            </div>
-                            <button onClick={() => setIsChatOpen(false)} className="hover:bg-white/10 p-1 rounded-lg transition">
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        {/* Chat Messages */}
-                        <div className="h-64 overflow-y-auto p-4 space-y-4 bg-muted/60">
-                            {messages.map((msg, idx) => (
-                                <div key={idx} className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}>
-                                    <div className={`max-w-[85%] px-4 py-2 text-sm ${
- msg.isBot 
- ? 'bg-card text-foreground rounded-lg rounded-tl-none border border-border shadow-sm' 
- : 'bg-primary text-white rounded-lg rounded-tr-none shadow-md'
- }`}>
-                                        {msg.text}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Chat Input */}
-                        <form onSubmit={handleSendMessage} className="p-3 bg-card border-t border-border">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={chatMessage}
-                                    onChange={(e) => setChatMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="w-full bg-muted/60 border border-border rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary transition-all pr-10"
-                                />
-                                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary">
-                                    <ArrowRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
-                
-                <button 
-                    onClick={() => setIsChatOpen(!isChatOpen)}
-                    className={`${isChatOpen ? 'bg-sidebar' : 'bg-primary'} text-white p-4 rounded-full shadow-sm transition-all group relative`}
-                >
-                    {isChatOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
-                    {!isChatOpen && (
-                        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none shadow-sm">
-                            Need help? Chat with us
-                        </span>
-                    )}
-                </button>
-            </div>
-
-            {/* Cookie Consent (Simplified) */}
-            {/* <div className="fixed bottom-6 left-6 bg-card rounded-lg shadow-sm p-4 max-w-sm border border-gray-200 z-50 hidden md:block">
-                <p className="text-sm text-gray-600 mb-3">
-                    We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.
-                </p>
-                <div className="flex gap-2">
-                    <button className="flex-1 bg-primary text-white text-sm py-2 rounded-lg hover:bg-primary/90 transition">
-                        Accept
-                    </button>
-                    <button className="flex-1 bg-gray-100 text-gray-700 text-sm py-2 rounded-lg hover:bg-gray-200 transition">
-                        Decline
-                    </button>
-                </div>
-            </div> */}
+            <button className="md:hidden p-2 rounded-lg hover:bg-muted" onClick={() => setMobileOpen((v) => !v)} aria-label="Menu">
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
-    );
+        {mobileOpen && (
+          <div className="md:hidden border-t border-border bg-white px-4 py-3 space-y-1">
+            {NAV.map((item) => item.to ? (
+              <Link key={item.label} to={item.to} onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-lg text-sm hover:bg-muted">{item.label}</Link>
+            ) : (
+              <button key={item.label} onClick={() => go(item.href)} className="block w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-muted">{item.label}</button>
+            ))}
+            {!isAuthenticated && (
+              <Link to="/company-registration" className="block text-center mt-2 px-3 py-2.5 rounded-lg bg-primary text-white text-sm font-medium">Start free trial</Link>
+            )}
+          </div>
+        )}
+      </nav>
+
+      <header className="relative overflow-hidden border-b border-border">
+        <SoftShapes className="absolute right-0 top-0 w-[55%] h-full pointer-events-none hidden lg:block" />
+        <div className="relative max-w-6xl mx-auto px-4 pt-16 pb-20 lg:pt-20 lg:pb-24 grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={stagger}
+          >
+            <motion.p variants={fadeUp} className="inline-flex items-center gap-2 text-xs font-medium text-primary bg-accent px-2.5 py-1 rounded-full">
+              <LayoutDashboard className="w-3.5 h-3.5" /> HR and work, one workspace
+            </motion.p>
+            <motion.h1 variants={fadeUp} className="mt-5 font-display text-4xl sm:text-5xl leading-[1.08] font-semibold tracking-tight">
+              Run the company from the same place the team already works.
+            </motion.h1>
+            <motion.p variants={fadeUp} className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed">
+              Dashflow keeps people, attendance, leave, payroll, and projects together — so Monday does not start in five tools.
+            </motion.p>
+            <motion.div variants={fadeUp} className="mt-8 flex flex-col sm:flex-row gap-3">
+              <Link to="/company-registration" className="inline-flex items-center justify-center gap-2 h-12 px-5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90">
+                Start free trial <ArrowRight className="w-4 h-4" />
+              </Link>
+              <button onClick={() => go('#product')} className="inline-flex items-center justify-center gap-2 h-12 px-5 bg-white border border-border font-medium rounded-xl hover:bg-muted">
+                Look through the product
+              </button>
+            </motion.div>
+            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+              {['Quick setup', 'Skip optional steps', 'Role-based access'].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" />{t}</span>
+              ))}
+            </motion.div>
+          </motion.div>
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <HeroIllustration className="w-full rounded-[28px] border border-border shadow-sm" />
+            <div className="hidden sm:block absolute -bottom-8 -left-4 w-[78%] z-10">
+              <ProductFrame />
+            </div>
+          </motion.div>
+        </div>
+      </header>
+
+      <section id="product" className="bg-[#faf9f7] border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20">
+          <ModularMap />
+          <motion.div
+            className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={stagger}
+          >
+            {MODULES.map(({ icon: Icon, title, text }) => (
+              <motion.div key={title} variants={fadeUp}>
+                <div className="h-full rounded-2xl border border-border bg-white p-5">
+                  <div className="w-10 h-10 rounded-xl bg-accent text-primary flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-semibold">{title}</h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{text}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section id="how" className="max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">How it works</p>
+        <h2 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Three steps, then the team is inside.</h2>
+        <motion.div
+          className="mt-10 grid md:grid-cols-3 gap-4"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={stagger}
+        >
+          {STEPS.map((s) => (
+            <motion.div key={s.n} variants={fadeUp}>
+              <ShineCard pixels className="h-full rounded-2xl bg-[#faf9f7] border border-border p-6">
+                <StepGlyph step={s.n} className="h-24 w-auto mb-2" />
+                <span className="text-sm font-semibold text-primary">{s.n}</span>
+                <h3 className="mt-2 text-lg font-semibold">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.text}</p>
+              </ShineCard>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      <section className="bg-[#1b1533] text-white">
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide bg-white/10 px-3 py-1 rounded-full mb-4">
+              Rated for growing teams
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
+              Join companies running HR <span className="text-[#a78bfa]">in one place.</span>
+            </h2>
+            <p className="mt-4 text-white/70 text-sm leading-relaxed max-w-md">
+              From first check-in to month-end pay — without switching products.
+            </p>
+            <Link to="/company-registration" className="mt-8 inline-flex items-center gap-2 h-11 px-5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90">
+              Book a free trial <ArrowRight className="w-4 h-4" />
+            </Link>
+            <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/60">
+              {['No credit card', 'Skip optional steps', 'Setup in minutes'].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" />{t}</span>
+              ))}
+            </div>
+          </div>
+          <OrbitIllustration className="w-full max-w-md mx-auto" />
+        </div>
+      </section>
+
+      <section id="pricing" className="max-w-6xl mx-auto px-4 py-16 sm:py-20">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Pricing</p>
+        <h2 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Clear plans. The same product.</h2>
+        <motion.div
+          className="mt-10 grid md:grid-cols-3 gap-4"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={stagger}
+        >
+          {PLANS.map((plan) => (
+            <motion.div key={plan.name} variants={fadeUp}>
+              <div
+                className={`h-full rounded-2xl p-6 flex flex-col ${
+                  plan.popular
+                    ? 'bg-primary text-white'
+                    : 'bg-white border border-border'
+                }`}
+              >
+                <h3 className="font-semibold">{plan.name}</h3>
+                <p className="mt-4 font-display text-4xl font-semibold tracking-tight">{plan.price}</p>
+                <p className={`text-xs mt-1 ${plan.popular ? 'text-white/70' : 'text-muted-foreground'}`}>{plan.note}</p>
+                <p className={`mt-4 text-sm ${plan.popular ? 'text-white/80' : 'text-muted-foreground'}`}>{plan.text}</p>
+                <ul className="mt-5 space-y-2 flex-1">
+                  {plan.points.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-sm">
+                      <CheckCircle className={`w-4 h-4 mt-0.5 shrink-0 ${plan.popular ? 'text-white' : 'text-primary'}`} />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to={plan.to}
+                  className={`mt-6 inline-flex items-center justify-center h-11 rounded-xl text-sm font-medium ${plan.popular ? 'bg-white text-primary' : 'bg-foreground text-white'}`}
+                >
+                  {plan.cta}
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      <section className="border-t border-border bg-[#faf9f7]">
+        <div className="max-w-3xl mx-auto px-4 py-16">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">FAQ</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight mb-8">Frequently asked questions</h2>
+          <div className="divide-y divide-border border-y border-border">
+            {FAQS.map((item, i) => (
+              <button
+                key={item.q}
+                type="button"
+                onClick={() => setOpenFaq(openFaq === i ? -1 : i)}
+                className="w-full text-left py-5 flex items-start justify-between gap-4"
+              >
+                <div>
+                  <p className="font-medium text-foreground">{item.q}</p>
+                  {openFaq === i && <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.a}</p>}
+                </div>
+                <ChevronDown className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-border bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="sm:col-span-2">
+            <BrandMark />
+            <p className="mt-3 text-sm text-muted-foreground max-w-sm">People, attendance, payroll, and projects for teams that want one workspace.</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold mb-3">Product</p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
+              <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
+              <li><Link to="/company-registration" className="hover:text-foreground">Quick setup</Link></li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-semibold mb-3">Company</p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link to="/login" className="hover:text-foreground">Log in</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-foreground">Privacy policy</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="border-t border-border">
+          <p className="max-w-6xl mx-auto px-4 py-4 text-xs text-muted-foreground">© {new Date().getFullYear()} Dashflow</p>
+        </div>
+      </footer>
+    </div>
+  );
 };
 
 export default LandingPage;

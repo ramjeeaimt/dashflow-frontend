@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, ArrowLeft } from 'lucide-react';
 
-const PrivacyPolicy = () => {
+const PolicyPage = () => {
     const navigate = useNavigate();
 
     return (
@@ -163,4 +163,4 @@ const PolicySection = ({ id, title, content }) => (
     </section>
 );
 
-export default PrivacyPolicy;
+export default PolicyPage;

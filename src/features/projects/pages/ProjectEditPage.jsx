@@ -6,6 +6,7 @@ import Header from "../../../components/ui/Header";
 import Sidebar from "../../../components/ui/Sidebar";
 import BreadcrumbNavigation from "../../../components/ui/BreadcrumbNavigation";
 import { X } from "lucide-react";
+import { FormSkeleton } from "../../../components/ui/Skeleton";
 import { toast } from "react-hot-toast";
 
 const ProjectEdit = () => {
@@ -140,10 +141,7 @@ const ProjectEdit = () => {
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
             <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'} pt-16 pb-8 px-4 sm:px-6 md:px-8`}>
-                <div className="flex flex-col items-center justify-center h-[70vh]">
-                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-4 text-muted-foreground font-medium">Loading project details...</p>
-                </div>
+                <FormSkeleton />
             </main>
         </div>
     );

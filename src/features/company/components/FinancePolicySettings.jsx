@@ -3,6 +3,7 @@ import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
 import uploadService from '../../../features/upload/uploadService';
 import Icon from '../../../components/AppIcon';
+import { FormSkeleton } from '../../../components/ui/Skeleton';
 
 const FieldGroup = ({ label, hint, children }) => (
   <div className="py-5 border-b border-border last:border-0">
@@ -240,7 +241,7 @@ const FinancePolicySettings = () => {
     }
   };
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground/70">Loading policy settings…</div>;
+  if (loading) return <FormSkeleton />;
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -250,21 +251,21 @@ const FinancePolicySettings = () => {
         <p className="text-sm text-muted-foreground mt-1">Configure who should receive alerts regarding payroll generation and finance updates.</p>
       </div>
 
-      {/* Payroll Alerts */}
+      {/* Finance & Payroll Alerts */}
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
             <Icon name="DollarSign" size={16} className="text-emerald-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground">Payroll Notifications</p>
-            <p className="text-xs text-muted-foreground/70">Manage who receives alerts when payroll is generated.</p>
+            <p className="text-sm font-semibold text-foreground">Finance & Payroll Notifications</p>
+            <p className="text-xs text-muted-foreground/70">Manage who receives alerts when financial entries (credits/debits) are recorded or payroll is generated.</p>
           </div>
         </div>
         <div className="px-6">
           <FieldGroup
-            label="Payroll Alert Emails"
-            hint="Administrators (or finance staff) who will receive email notifications and push alerts when payroll is generated."
+            label="Finance & Payroll Alert Emails"
+            hint="Email addresses that will automatically receive real-time notifications on every financial transaction (credit/debit) and payroll generation."
           >
             <div className="space-y-4 max-w-lg">
               <form onSubmit={handleAddEmail} className="flex gap-2">

@@ -18,6 +18,7 @@ import useAuthStore from "../../../store/useAuthStore";
 import BreadcrumbNavigation from "../../../components/ui/BreadcrumbNavigation";
 import ProjectAnalyticsGraph from "./ProjectAnalyticsGraph";
 import ProjectEditModal from "../components/ProjectEditModal";
+import { PageSkeleton } from "../../../components/ui/Skeleton";
 import {
   decorateProject,
   HEALTH_META,
@@ -257,12 +258,7 @@ const Projects = () => {
             />
 
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-24">
-                <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin mb-4" />
-                <span className="text-sm text-muted-foreground">
-                  Loading projects…
-                </span>
-              </div>
+              <PageSkeleton />
             ) : visibleProjects.length === 0 ? (
               <EmptyState
                 view={view}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import Icon from '../../../components/AppIcon';
+import { Bone } from '../../../components/ui/Skeleton';
 import { attendanceService } from '../../../services/attendance.service';
 import useAuthStore from '../../../store/useAuthStore';
 import { toast } from 'react-hot-toast';
@@ -216,9 +217,10 @@ const AttendanceCalendar = ({ employeeId }) => {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-16 gap-2">
-                    <Icon name="Loader" size={28} className="animate-spin text-primary" />
-                    <span className="text-xs text-muted-foreground font-medium">Loading calendar timeline...</span>
+                <div className="grid grid-cols-7 gap-2 p-4">
+                    {Array.from({ length: 35 }).map((_, i) => (
+                        <Bone key={i} className="h-16 rounded-lg" />
+                    ))}
                 </div>
             ) : (
                 <>

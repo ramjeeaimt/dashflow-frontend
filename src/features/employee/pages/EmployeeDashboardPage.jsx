@@ -246,7 +246,7 @@ const EmployeeDashboard = () => {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
                         <div>
                             <BreadcrumbNavigation items={breadcrumbItems} />
-                            <h1 className="text-3xl font-semibold text-foreground mb-2">My Dashboard</h1>
+                            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1">My dashboard</h1>
                             <p className="text-muted-foreground">
                                 Welcome back, {user?.firstName || 'Employee'}!
                             </p>
@@ -258,7 +258,7 @@ const EmployeeDashboard = () => {
                             <LeaveForm employeeId={user?.id} />
                         </div> */}
 
-                        <div className="flex items-center space-x-4 mt-4 lg:mt-0 bg-card p-3 rounded-lg shadow-sm border border-gray-100">
+                        <div className="flex items-center space-x-4 mt-4 lg:mt-0 bg-card p-3 rounded-xl card-shadow border border-border">
                             <Clock className="w-5 h-5 text-primary" />
                             <div className="text-right">
                                 <p className="text-sm font-semibold text-foreground">

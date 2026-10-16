@@ -11,6 +11,7 @@ import {
     Layers, Box, Package, Shield, Key, AlertCircle
 } from 'lucide-react';
 import useAuthStore from '../../../store/useAuthStore';
+import BrandMark from '../../../components/BrandMark';
 
 const FeaturesPage = () => {
     const { user, isAuthenticated, logout } = useAuthStore();
@@ -413,13 +414,7 @@ const FeaturesPage = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center gap-4">
-                            <Link to="/" className="flex items-center gap-2">
-                                <span className="text-2xl font-semibold tracking-tighter bg-primary bg-clip-text text-transparent">
-                                    DIFMO
-                                </span>
-                                {/* <span className="text-2xl font-light text-gray-400">/</span> */}
-                                <span className="text-2xl font-semibold text-gray-700">CRM</span>
-                            </Link>
+                            <Link to="/" aria-label="Dashflow home"><BrandMark /></Link>
                             <div className="hidden md:flex items-center space-x-1 ml-4">
                                 <button 
                                     onClick={() => navigate('/features')} 
@@ -611,7 +606,7 @@ const FeaturesPage = () => {
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
                         {activeTab === 'all' 
-                            ? 'Discover everything DIFMO CRM has to offer. From payroll to project management, we\'ve got you covered.'
+                            ? 'Discover everything Dashflow covers, from payroll to project management.'
                             : `Explore our ${featureCategories.find(c => c.id === activeTab)?.name.toLowerCase()} features designed to streamline your workflow.`}
                     </p>
                 </div>
@@ -751,7 +746,7 @@ const FeaturesPage = () => {
                             />
                         </div>
                         <div className="p-4 text-center text-sm text-gray-500">
-                            Watch how DIFMO CRM transforms your business operations
+                            Watch how Dashflow handles people, payroll, and projects
                         </div>
                     </div>
                 </div>
@@ -851,7 +846,7 @@ const FeaturesPage = () => {
                         Ready to Transform Your Business?
                     </h2>
                     <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
-                        Join 2,000+ Indian companies already using DIFMO CRM to streamline operations and boost productivity.
+                        Open a Dashflow workspace and run people, payroll, and projects from one place.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link 
@@ -878,8 +873,7 @@ const FeaturesPage = () => {
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
                         <div className="col-span-2">
-                            <span className="text-2xl font-semibold text-white">DIFMO</span>
-                            <span className="text-gray-500 ml-1">CRM</span>
+                            <BrandMark tone="inverse" />
                             <p className="mt-4 text-gray-500 text-sm leading-relaxed max-w-xs">
                                 The complete business management platform for modern Indian companies.
                             </p>
@@ -933,7 +927,7 @@ const FeaturesPage = () => {
                     </div>
 
                     <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                        <div>© 2026 DIFMO-CRM. All rights reserved.</div>
+                        <div>© 2026 Dashflow. All rights reserved.</div>
                         <div className="flex gap-6 mt-4 md:mt-0">
                             <Link to="/privacy" className="hover:text-gray-300 transition">Privacy</Link>
                             <Link to="/terms" className="hover:text-gray-300 transition">Terms</Link>

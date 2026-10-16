@@ -30,7 +30,7 @@ const EmployeeProfileAdmin = () => {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-[#FBFBFE]">
+    <div className="min-h-screen bg-background">
       <Header />
       <Sidebar />
       <main className="pt-16 pb-12 px-6">

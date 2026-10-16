@@ -13,6 +13,7 @@ import api, { LONG_TIMEOUT } from '../../../api/client';
 import PayrollDetailsModal from '../components/PayrollDetailsModal';
 import PayrollReviewModal from '../components/PayrollReviewModal';
 import { usePayrollStore } from '../../../store/payrollStore';
+import { SkeletonRows } from '../../../components/ui/Skeleton';
 const PayrollPage = () => {
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -817,12 +818,7 @@ const PayrollPage = () => {
                                 </thead>
                                 <tbody className="divide-y divide-border">
                                     {(isLoading || isEmployeesLoading) ? (
-                                        <tr>
-                                            <td colSpan="7" className="px-3 sm:px-6 py-12 text-center">
-                                                <Icon name="Loader2" size={24} className="animate-spin text-primary mx-auto mb-2" />
-                                                <p className="text-muted-foreground">Loading payroll records...</p>
-                                            </td>
-                                        </tr>
+                                        <SkeletonRows rows={6} cols={7} />
                                     ) : (!combinedPayrollData || combinedPayrollData.length === 0) ? (
                                         <tr>
                                             <td colSpan="7" className="px-3 sm:px-6 py-12 text-center">

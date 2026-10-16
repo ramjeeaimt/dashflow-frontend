@@ -249,9 +249,9 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <button
         key={item.key}
         onClick={() => handleLeafNavigation(item.path)}
-        className={`w-full flex items-center gap-3 rounded-md px-3 py-1.5 text-[13px] transition-colors ${isActive
-          ? 'bg-sidebar-active text-sidebar-foreground font-medium'
-          : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+        className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-colors ${isActive
+          ? 'bg-sidebar-active text-primary font-semibold'
+          : 'text-sidebar-muted hover:bg-muted hover:text-sidebar-foreground'
         } ${isCollapsed && !mobile ? 'justify-center' : ''}`}
         title={isCollapsed && !mobile ? item.label : undefined}
       >
@@ -272,9 +272,9 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
             const firstChild = item.children?.[0];
             if (firstChild?.path) handleLeafNavigation(firstChild.path);
           }}
-          className={`w-full flex items-center justify-center rounded-md px-3 py-2 text-[13px] transition-colors ${active
-            ? 'text-sidebar-foreground font-medium bg-white/5'
-            : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+          className={`w-full flex items-center justify-center rounded-lg px-3 py-2 text-[13px] transition-colors ${active
+            ? 'text-primary font-semibold bg-sidebar-active'
+            : 'text-sidebar-muted hover:bg-muted hover:text-sidebar-foreground'
           }`}
           title={item.label}
         >
@@ -286,22 +286,22 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
     return (
       <div key={item.key} className="space-y-0.5">
         <div
-          className={`w-full flex items-center gap-3 rounded-md px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-sidebar-muted/80`}
+          className="w-full flex items-center gap-2.5 rounded-lg px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-sidebar-muted"
         >
-          <Icon name={item.icon} size={14} className="text-sidebar-muted/50" />
+          <Icon name={item.icon} size={14} className="text-sidebar-muted" />
           <span className="flex-1 truncate text-left">{item.label}</span>
         </div>
 
-        <div className="ml-4 space-y-0.5 border-l border-sidebar-border/60 pl-3">
+        <div className="ml-3 space-y-0.5 border-l border-sidebar-border pl-2">
           {item.children.map((child) => {
             const childActive = isPathActive(child.path);
             return (
               <button
                 key={child.key}
                 onClick={() => handleLeafNavigation(child.path)}
-                className={`w-full rounded-md px-3 py-1 text-left text-[12px] transition-colors ${childActive
-                  ? 'bg-sidebar-active text-sidebar-foreground font-semibold'
-                  : 'text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground'
+                className={`w-full rounded-lg px-3 py-1.5 text-left text-[13px] transition-colors ${childActive
+                  ? 'bg-sidebar-active text-primary font-semibold'
+                  : 'text-sidebar-muted hover:bg-muted hover:text-sidebar-foreground'
                 }`}
               >
                 {child.label}
@@ -318,7 +318,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       {normalizedSections.map((section) => (
         <div key={section.key} className="space-y-1">
           {(!isCollapsed || mobile) && (
-            <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-sidebar-muted/50 mb-1">
+            <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted mb-1">
               {section.label}
             </p>
           )}
@@ -341,8 +341,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       <aside className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border transform transition-transform duration-300 ease-in-out overflow-hidden flex flex-col ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
  }`}>
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border h-16">
-          <BrandMark variant="dark" />
-          <button onClick={onMobileClose} className="p-2 text-sidebar-muted hover:bg-white/5 hover:text-sidebar-foreground rounded-md">
+          <BrandMark />
+          <button onClick={onMobileClose} className="p-2 text-sidebar-muted hover:bg-muted hover:text-sidebar-foreground rounded-lg">
             <Icon name="X" size={20} />
           </button>
         </div>
@@ -356,10 +356,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border min-h-[64px]">
           {!isCollapsed ? (
             <>
-              <BrandMark variant="dark" />
+              <BrandMark />
               <button
                 onClick={onToggleCollapse}
-                className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-md transition-colors duration-150"
+                className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-muted rounded-lg transition-colors duration-150"
               >
                 <Icon name="ChevronLeft" size={16} />
               </button>
@@ -367,7 +367,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
           ) : (
             <button
               onClick={onToggleCollapse}
-              className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-md transition-colors duration-150 mx-auto"
+              className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-muted rounded-lg transition-colors duration-150 mx-auto"
             >
               <Icon name="ChevronRight" size={16} />
             </button>
@@ -380,8 +380,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
 
         {!isCollapsed && (
           <div className="border-t border-sidebar-border p-4">
-            <div className="flex items-center gap-3 rounded-md border border-sidebar-border bg-white/5 px-3 py-2.5">
-              <div className="w-8 h-8 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/70 px-3 py-2.5">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
                 {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
               </div>
               <div className="min-w-0">

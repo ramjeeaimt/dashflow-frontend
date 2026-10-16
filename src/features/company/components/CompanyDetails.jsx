@@ -4,6 +4,7 @@ import api from '../../../api/client';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Icon from '../../../components/AppIcon';
+import { FormSkeleton } from '../../../components/ui/Skeleton';
 
 const CompanyDetails = () => {
     const { user } = useAuthStore();
@@ -89,7 +90,7 @@ const CompanyDetails = () => {
         }
     };
 
-    if (loading && !formData.name) return <div>Loading...</div>;
+    if (loading && !formData.name) return <FormSkeleton />;
 
     return (
         <div className="max-w-4xl mx-auto">

@@ -3,6 +3,7 @@ import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import apiClient from '../../../api/client';
 import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
+import { SkeletonRows } from '../../../components/ui/Skeleton';
 
 const GlobalUsersPage = () => {
   const [founders, setFounders] = useState([]);
@@ -70,12 +71,7 @@ const GlobalUsersPage = () => {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {loading ? (
-                    <tr>
-                      <td colSpan="5" className="px-6 py-12 text-center text-muted-foreground/70">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <p className="mt-2 text-sm">Loading founders...</p>
-                      </td>
-                    </tr>
+                    <SkeletonRows rows={5} cols={5} />
                   ) : founders.length === 0 ? (
                     <tr>
                       <td colSpan="5" className="px-6 py-12 text-center text-muted-foreground/70">

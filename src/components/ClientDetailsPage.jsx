@@ -2,8 +2,9 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Phone, Building2, MapPin, Plus, Edit2, FileText, ExternalLink,
-  MessageSquare, Eye, Trash2, PlusCircle, ArrowLeft, Loader2
+  MessageSquare, Eye, Trash2, PlusCircle, ArrowLeft
 } from 'lucide-react';
+import { DetailSkeleton } from './ui/Skeleton';
 import { useClientStore } from '../store/useClientStore';
 import useProjectStore from '../store/useProjectStore';
 import Sidebar from './ui/Sidebar';
@@ -89,11 +90,8 @@ const ClientDetailsPage = () => {
 
   if (isInitialLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="animate-spin text-primary mx-auto mb-4" size={32} />
-          <p className="text-sm text-muted-foreground font-medium">Loading details...</p>
-        </div>
+      <div className="min-h-screen bg-background p-6">
+        <DetailSkeleton />
       </div>
     );
   }

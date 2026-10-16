@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../../components/ui/Header';
 import Sidebar from '../../../components/ui/Sidebar';
 import Icon from '../../../components/AppIcon';
+import { DetailSkeleton } from '../../../components/ui/Skeleton';
 import { toast } from 'react-hot-toast';
 import EmployeeModal from '../components/EmployeeModal';
 import employeeService from '../../../services/employee.service';
@@ -459,7 +460,7 @@ const EmployeeDetailsPage = () => {
     ].filter(Boolean) : [];
  
     return (
-        <div className="min-h-screen bg-[#FBFBFE]">
+        <div className="min-h-screen bg-background">
             <Header />
             <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
  
@@ -467,10 +468,7 @@ const EmployeeDetailsPage = () => {
                 <div className="max-w-6xl mx-auto px-6 py-6">
 
                     {loading ? (
-                        <div className="h-[60vh] flex flex-col items-center justify-center">
-                            <Icon name="Loader" className="animate-spin text-primary mb-2" size={40} />
-                            <p className="text-muted-foreground text-sm font-medium">Loading employee details...</p>
-                        </div>
+                        <DetailSkeleton />
                     ) : !employee ? (
                         <div className="bg-card rounded-lg p-12 border border-border/60 text-center shadow-sm">
                             <Icon name="UserX" className="text-muted-foreground/30 mx-auto mb-4" size={48} />
