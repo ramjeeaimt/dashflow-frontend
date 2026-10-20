@@ -51,6 +51,13 @@ const statusMeta = (type, day) => {
       icon: 'Sparkles',
     };
   }
+  if (day?.isMissingCheckout) {
+    return {
+      label: 'Half Day (No Check-out)',
+      className: 'bg-orange-50 text-orange-800 border-orange-200',
+      icon: 'Clock',
+    };
+  }
   if (type === 'late' || day?.isLate) {
     if (day?.lateDeductionWaived) {
       return {

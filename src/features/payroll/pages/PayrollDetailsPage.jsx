@@ -120,7 +120,8 @@ const PayrollDetailsPage = () => {
                     const exceptions = [];
                     for (const day of days) {
                         const isScheduledHalfDay = day.saturdayInfo?.policy === 'half_day' || day.type === 'holiday_half';
-                        const isLoggedHalfDay = day.type === 'half-day' && !isScheduledHalfDay;
+                        const isMissingCheckout = Boolean(day.isMissingCheckout || (day.checkInTime && !day.checkOutTime && day.date < new Date().toLocaleDateString('en-CA')));
+                        const isLoggedHalfDay = (day.type === 'half-day' && !isScheduledHalfDay) || isMissingCheckout;
                         const isLateArrival = day.isLate || day.type === 'late';
                         const isHalfDayLeave = day.leave && (day.leave.type?.toLowerCase().includes('half') || day.type === 'half-day');
 
@@ -130,7 +131,12 @@ const PayrollDetailsPage = () => {
                             let deductionText = '₹0 (Paid)';
                             let deductionType = 'free';
 
-                            if (isScheduledHalfDay) {
+                            if (isMissingCheckout) {
+                                category = 'Missing Check-Out';
+                                reasonLabel = 'Employee Did Not Check Out (Penalized as Half Day)';
+                                deductionText = `-₹${halfDeductionUnit.toLocaleString('en-IN')} (50% Pay Deducted)`;
+                                deductionType = 'deducted';
+                            } else if (isScheduledHalfDay) {
                                 category = 'Office Policy';
                                 reasonLabel = day.policyLabel || `${day.saturdayInfo?.isSecondSaturday ? '2nd Saturday' : 'Saturday'} Half-Day Shift`;
                                 deductionText = '₹0 (Official Half-Day)';
@@ -856,7 +862,11 @@ const PayrollDetailsPage = () => {
                                                         {day.checkInTime ? (
                                                             <span className="font-semibold text-foreground">
                                                                 {formatTime(day.checkInTime)}
-                                                                {day.checkOutTime && ` → ${formatTime(day.checkOutTime)}`}
+                                                                {day.checkOutTime ? (
+                                                                    ` → ${formatTime(day.checkOutTime)}`
+                                                                ) : day.isMissingCheckout ? (
+                                                                    <span className="text-rose-500 font-bold text-[11px] ml-1">→ Missing Check-Out</span>
+                                                                ) : ''}
                                                             </span>
                                                         ) : (
                                                             <span className="text-muted-foreground/60 italic">Official Schedule</span>

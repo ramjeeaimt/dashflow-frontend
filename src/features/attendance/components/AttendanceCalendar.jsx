@@ -273,7 +273,11 @@ const AttendanceCalendar = ({ employeeId }) => {
                                     <span className="text-sm font-bold leading-none">{day}</span>
 
                                     {/* Sub-label: Check-in time or Holiday / Half-day indicator */}
-                                    {info?.checkInTime ? (
+                                    {info?.isMissingCheckout ? (
+                                        <span className="text-[7.5px] font-bold mt-1 text-orange-700 tracking-tighter">
+                                            No Out (Half)
+                                        </span>
+                                    ) : info?.checkInTime ? (
                                         <span className="text-[8px] font-semibold mt-1 opacity-90 tracking-tight">
                                             {String(info.checkInTime).slice(0, 5)}
                                         </span>
@@ -288,6 +292,11 @@ const AttendanceCalendar = ({ employeeId }) => {
                                     ) : null}
 
                                     {/* Icons badges */}
+                                    {info?.isMissingCheckout && (
+                                        <span className="absolute top-1 left-1 text-orange-600 flex items-center justify-center font-bold text-[8px] bg-orange-100 rounded-full w-3.5 h-3.5 border border-orange-300" title="Missing Check-out: Penalized as Half Day">
+                                            ½
+                                        </span>
+                                    )}
                                     {info?.isWfh && (
                                         <span className="absolute top-1 right-1 text-indigo-600" title="Work From Home">
                                             <Icon name="Home" size={9} />
@@ -368,8 +377,10 @@ const AttendanceCalendar = ({ employeeId }) => {
                                             </div>
                                             <div className="bg-slate-800/80 p-1.5 rounded-lg border border-slate-700/50">
                                                 <span className="text-slate-400 block text-[9px]">Check Out</span>
-                                                <span className="text-blue-400 font-bold">
-                                                    {hoveredCell.info.checkOutTime || 'Not Out Yet'}
+                                                <span className={`font-bold ${hoveredCell.info?.isMissingCheckout ? 'text-rose-400' : 'text-blue-400'}`}>
+                                                    {hoveredCell.info?.isMissingCheckout
+                                                        ? 'Missing Check-out'
+                                                        : (hoveredCell.info?.checkOutTime || 'Not Out Yet')}
                                                 </span>
                                             </div>
                                         </div>
@@ -387,6 +398,24 @@ const AttendanceCalendar = ({ employeeId }) => {
                                         )}
                                     </div>
                                 ) : null}
+
+                                {/* Missing Check-Out Penalty Alert Card */}
+                                {hoveredCell.info?.isMissingCheckout && (
+                                    <div className="p-2.5 rounded-xl border border-orange-700/60 bg-orange-950/50 text-[10px] space-y-1.5">
+                                        <div className="flex items-center justify-between text-orange-300 font-bold">
+                                            <span className="flex items-center gap-1.5">
+                                                <Icon name="AlertTriangle" size={13} className="text-orange-400" />
+                                                Missing Check-Out Penalty
+                                            </span>
+                                            <span className="text-[8.5px] px-1.5 py-0.5 bg-orange-500/20 text-orange-300 border border-orange-500/30 rounded font-bold uppercase tracking-wider">
+                                                Half-Day Pay
+                                            </span>
+                                        </div>
+                                        <p className="text-[9.5px] text-slate-300 leading-relaxed">
+                                            Employee checked in at <strong className="text-white">{String(hoveredCell.info?.checkInTime || '').slice(0, 5)}</strong> but did not check out. Penalized as a <strong className="text-orange-300">Half Day</strong> (50% daily pay deducted).
+                                        </p>
+                                    </div>
+                                )}
 
                                 {/* Late Arrival Deduction Status & Admin Waiver Action */}
                                 {(hoveredCell.type === 'late' || hoveredCell.info?.isLate) && (
