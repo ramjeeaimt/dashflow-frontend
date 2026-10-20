@@ -5,21 +5,36 @@ import Sidebar from '../../../components/ui/Sidebar';
 import Icon from '../../../components/AppIcon';
 import financeService from '../../../services/finance.service';
 import { leaveService } from '../../../services/leaveService';
+import { attendanceService } from '../../../services/attendance.service';
 import PayrollReviewModal from '../components/PayrollReviewModal';
 import { DetailSkeleton } from '../../../components/ui/Skeleton';
 import { toast } from 'react-hot-toast';
 
+const formatTime = (time) => {
+    if (!time) return '---';
+    const [h, m] = String(time).split(':');
+    const hour = Number(h);
+    if (Number.isNaN(hour)) return time;
+    const suffix = hour >= 12 ? 'PM' : 'AM';
+    return `${hour % 12 === 0 ? 12 : hour % 12}:${m} ${suffix}`;
+};
+
 const PayrollDetailsPage = () => {
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [payroll, setPayroll] = useState(null);
     const [leaves, setLeaves] = useState([]);
+    const [halfDaysList, setHalfDaysList] = useState([]);
+    const [loadingTimeline, setLoadingTimeline] = useState(false);
+    const [waivingMap, setWaivingMap] = useState({});
 
     // Sibling payroll records for switching employees within this cycle
     const [cyclePayrolls, setCyclePayrolls] = useState([]);
     const [loadingCycle, setLoadingCycle] = useState(false);
+
 
     // Modal & action button states
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -85,7 +100,88 @@ const PayrollDetailsPage = () => {
                     setLeaves([]);
                 }
             }
+
+            // Fetch employee attendance timeline for this cycle to identify all half-day events & late penalties
+            if (payrollData?.employeeId && payrollData?.month && payrollData?.year) {
+                try {
+                    setLoadingTimeline(true);
+                    const cycleMonth = Number(payrollData.month);
+                    const cycleYear = Number(payrollData.year);
+                    const daysInMonth = new Date(cycleYear, cycleMonth, 0).getDate();
+                    const startDate = `${cycleYear}-${String(cycleMonth).padStart(2, '0')}-01`;
+                    const endDate = `${cycleYear}-${String(cycleMonth).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
+                    const timelineRes = await attendanceService.getTimeline(payrollData.employeeId, { startDate, endDate });
+                    const days = timelineRes?.days || (Array.isArray(timelineRes) ? timelineRes : []);
+
+                    const perDay = payrollData.totalWorkingDays > 0 ? (payrollData.basicSalary / payrollData.totalWorkingDays) : 0;
+                    const halfDeductionUnit = Math.round(perDay * 0.5);
+
+                    const exceptions = [];
+                    for (const day of days) {
+                        const isScheduledHalfDay = day.saturdayInfo?.policy === 'half_day' || day.type === 'holiday_half';
+                        const isLoggedHalfDay = day.type === 'half-day' && !isScheduledHalfDay;
+                        const isLateArrival = day.isLate || day.type === 'late';
+                        const isHalfDayLeave = day.leave && (day.leave.type?.toLowerCase().includes('half') || day.type === 'half-day');
+
+                        if (isScheduledHalfDay || isLoggedHalfDay || isLateArrival || isHalfDayLeave) {
+                            let category = 'Office Schedule';
+                            let reasonLabel = day.policyLabel || 'Official Half-Day Shift';
+                            let deductionText = '₹0 (Paid)';
+                            let deductionType = 'free';
+
+                            if (isScheduledHalfDay) {
+                                category = 'Office Policy';
+                                reasonLabel = day.policyLabel || `${day.saturdayInfo?.isSecondSaturday ? '2nd Saturday' : 'Saturday'} Half-Day Shift`;
+                                deductionText = '₹0 (Official Half-Day)';
+                                deductionType = 'scheduled';
+                            } else if (isLoggedHalfDay) {
+                                category = 'Half-Day Shift';
+                                reasonLabel = 'Logged Half-Day Attendance';
+                                deductionText = `-₹${halfDeductionUnit.toLocaleString('en-IN')}`;
+                                deductionType = 'deducted';
+                            } else if (isLateArrival) {
+                                category = 'Late Check-In';
+                                reasonLabel = `Late Arrival (${day.checkInTime ? formatTime(day.checkInTime) : 'Late'})`;
+                                if (day.lateDeductionWaived) {
+                                    deductionText = '₹0 (Waived by Admin)';
+                                    deductionType = 'waived';
+                                } else {
+                                    deductionText = `-₹${halfDeductionUnit.toLocaleString('en-IN')} (50% Pay Deducted)`;
+                                    deductionType = 'deducted';
+                                }
+                            } else if (isHalfDayLeave) {
+                                category = 'Half-Day Leave';
+                                reasonLabel = day.leave?.reason || `${day.leave?.type} Half-Day Leave`;
+                                deductionText = 'Subject to Leave Quota';
+                                deductionType = 'leave';
+                            }
+
+                            exceptions.push({
+                                ...day,
+                                category,
+                                reasonLabel,
+                                deductionText,
+                                deductionType,
+                                isScheduledHalfDay,
+                                isLoggedHalfDay,
+                                isLateArrival,
+                                isHalfDayLeave,
+                            });
+                        }
+                    }
+
+                    exceptions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                    setHalfDaysList(exceptions);
+                } catch (timelineErr) {
+                    console.warn("Non-fatal: could not load attendance timeline for payroll:", timelineErr);
+                    setHalfDaysList([]);
+                } finally {
+                    setLoadingTimeline(false);
+                }
+            }
         } catch (err) {
+
             console.error("Failed to load payroll details:", err);
             toast.error("Failed to load payroll details.");
         } finally {
@@ -139,7 +235,36 @@ const PayrollDetailsPage = () => {
         return Math.round(diff / (1000 * 60 * 60 * 24)) + 1;
     };
 
+    const handleToggleWaiveLate = async (day, waived) => {
+
+        if (!payroll?.employeeId) return;
+        const key = day.attendanceId || day.date;
+        setWaivingMap(prev => ({ ...prev, [key]: true }));
+        try {
+            if (day.attendanceId) {
+                await attendanceService.toggleWaiveLate(day.attendanceId, waived);
+            } else {
+                await attendanceService.waiveLateByDate(payroll.employeeId, day.date, waived);
+            }
+            toast.success(waived ? 'Late deduction waived by admin!' : 'Late deduction restored!');
+            // Recalculate payroll so numbers update live
+            await financeService.bulkGenerateRealPayroll(
+                payroll.month,
+                payroll.year,
+                payroll.companyId,
+                payroll.employeeId
+            );
+            await fetchPayrollDetails(payroll.id);
+        } catch (err) {
+            console.error('Failed to toggle waiver:', err);
+            toast.error('Failed to update late deduction status.');
+        } finally {
+            setWaivingMap(prev => ({ ...prev, [key]: false }));
+        }
+    };
+
     // --- Action Handlers ---
+
 
     // 1. Download PDF
     const handleDownloadPdf = async () => {
@@ -547,6 +672,20 @@ const PayrollDetailsPage = () => {
                                     </div>
                                     <span className="text-rose-600 font-bold">-{formatCurrency(payroll.leaveDeduction || 0)}</span>
                                 </div>
+                                {payroll.rejectedLeaveDeductionDays > 0 && (
+                                    <div className="flex justify-between font-medium text-rose-700 bg-rose-50/80 dark:bg-rose-950/20 p-2.5 rounded-xl border border-rose-200/80">
+                                        <div>
+                                            <span className="font-semibold flex items-center gap-1.5 text-xs text-rose-800 dark:text-rose-400">
+                                                <Icon name="AlertTriangle" size={13} className="text-rose-600" />
+                                                Rejected Leave Penalty
+                                            </span>
+                                            <p className="text-[10px] text-rose-600/90 mt-0.5">
+                                                ({payroll.rejectedLeaveDeductionDays} days deducted for unapproved absence)
+                                            </p>
+                                        </div>
+                                        <span className="text-rose-600 font-bold text-xs self-center">-{formatCurrency(payroll.rejectedLeaveDeductionAmount || 0)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <div>
                                         <span>Half-Day & Late Deductions</span>
@@ -583,20 +722,46 @@ const PayrollDetailsPage = () => {
                                     <span>Company Holidays (Paid)</span>
                                     <span className="text-indigo-600 font-bold">{payroll.holidaysCount || 0} days</span>
                                 </div>
-                                <div className="flex justify-between font-medium text-muted-foreground">
+                                <div className="flex justify-between items-center font-medium text-muted-foreground">
                                     <span>Half Days</span>
-                                    <span className="text-amber-600 font-bold">{payroll.halfDaysCount || 0} days</span>
-                                </div>
-                                <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Late Arrivals</span>
-                                    <span className="text-amber-600 font-bold">
-                                        {payroll.lateCount || 0} days
-                                        {payroll.lateCount > 0 && (
-                                            <span className="text-[11px] font-normal text-muted-foreground ml-1.5">
-                                                ({payroll.lateDeductionCount || 0} deducted, {(payroll.lateCount || 0) - (payroll.lateDeductionCount || 0)} waived)
-                                            </span>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-amber-600 font-bold">{payroll.halfDaysCount || 0} days</span>
+                                        {halfDaysList.filter(d => d.isScheduledHalfDay || d.isLoggedHalfDay).length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => document.getElementById('half-days-section')?.scrollIntoView({ behavior: 'smooth' })}
+                                                className="text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1"
+                                                title="View half-day dates"
+                                            >
+                                                <span>{halfDaysList.filter(d => d.isScheduledHalfDay || d.isLoggedHalfDay).map(d => new Date(`${d.date}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })).join(', ')}</span>
+                                                <Icon name="ArrowDown" size={10} />
+                                            </button>
                                         )}
-                                    </span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center font-medium text-muted-foreground">
+                                    <span>Late Arrivals</span>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-amber-600 font-bold">
+                                            {payroll.lateCount || 0} days
+                                            {payroll.lateCount > 0 && (
+                                                <span className="text-[11px] font-normal text-muted-foreground ml-1.5">
+                                                    ({payroll.lateDeductionCount || 0} deducted, {(payroll.lateCount || 0) - (payroll.lateDeductionCount || 0)} waived)
+                                                </span>
+                                            )}
+                                        </span>
+                                        {payroll.lateCount > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => document.getElementById('half-days-section')?.scrollIntoView({ behavior: 'smooth' })}
+                                                className="text-[10px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1"
+                                                title="Click to view late dates"
+                                            >
+                                                <span>View Dates</span>
+                                                <Icon name="ArrowDown" size={10} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <span>Paid Leaves Used (CL)</span>
@@ -612,6 +777,135 @@ const PayrollDetailsPage = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Detailed Half-Days & Late Penalties Breakdown */}
+                    <div id="half-days-section" className="bg-card rounded-2xl border border-border shadow-sm p-6 scroll-mt-20">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/40 pb-3 mb-4 gap-2">
+                            <h3 className="text-xs font-bold text-foreground uppercase tracking-wide flex items-center gap-1.5">
+                                <Icon name="Clock" size={14} className="text-amber-500" /> Half-Days & Late Penalties in {monthLabel} {payroll.year} ({halfDaysList.length})
+                            </h3>
+                            <span className="text-[11px] text-muted-foreground font-medium">
+                                Breakdown of official company half-days and penalized late check-ins
+                            </span>
+                        </div>
+
+                        {loadingTimeline ? (
+                            <div className="text-center py-8 text-muted-foreground/60 text-xs">
+                                Loading attendance exceptions...
+                            </div>
+                        ) : halfDaysList.length === 0 ? (
+                            <div className="text-center py-8 text-muted-foreground/60 text-sm">
+                                <Icon name="CheckCircle" size={24} className="mx-auto mb-2 text-emerald-500/50" />
+                                No half-day shifts or late check-in penalties registered for this calendar month.
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr className="text-muted-foreground uppercase tracking-wider font-bold border-b border-border/40">
+                                            <th className="py-2.5 px-3">Date</th>
+                                            <th className="py-2.5 px-3">Classification & Policy</th>
+                                            <th className="py-2.5 px-3">Punch Timings</th>
+                                            <th className="py-2.5 px-3">Work Hours</th>
+                                            <th className="py-2.5 px-3">Salary Impact</th>
+                                            <th className="py-2.5 px-3 text-right">Admin Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border/20">
+                                        {halfDaysList.map((day) => {
+                                            const isLate = day.isLateArrival;
+                                            const isWaived = day.lateDeductionWaived;
+                                            const key = day.attendanceId || day.date;
+                                            const isWaiving = Boolean(waivingMap[key]);
+
+                                            return (
+                                                <tr key={key} className="hover:bg-muted/30 transition-all">
+                                                    <td className="py-3 px-3 font-bold text-foreground whitespace-nowrap">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={`w-2 h-2 rounded-full ${
+                                                                day.deductionType === 'deducted' ? 'bg-rose-500' :
+                                                                day.deductionType === 'waived' ? 'bg-emerald-500' : 'bg-amber-500'
+                                                            }`} />
+                                                            <span>
+                                                                {new Date(`${day.date}T00:00:00`).toLocaleDateString('en-GB', {
+                                                                    weekday: 'short',
+                                                                    day: '2-digit',
+                                                                    month: 'short',
+                                                                    year: 'numeric'
+                                                                })}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-3 px-3">
+                                                        <div className="space-y-0.5">
+                                                            <span className={`inline-block px-2 py-0.5 text-[9.5px] font-bold rounded-md uppercase border ${
+                                                                day.deductionType === 'scheduled' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+                                                                day.deductionType === 'deducted' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                                                                day.deductionType === 'waived' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                                                'bg-muted text-muted-foreground border-border'
+                                                            }`}>
+                                                                {day.category}
+                                                            </span>
+                                                            <p className="text-[11px] text-muted-foreground font-medium">
+                                                                {day.reasonLabel}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-3 px-3 text-muted-foreground whitespace-nowrap">
+                                                        {day.checkInTime ? (
+                                                            <span className="font-semibold text-foreground">
+                                                                {formatTime(day.checkInTime)}
+                                                                {day.checkOutTime && ` → ${formatTime(day.checkOutTime)}`}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-muted-foreground/60 italic">Official Schedule</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-3 px-3 font-semibold text-foreground whitespace-nowrap">
+                                                        {day.workHours != null ? `${day.workHours} hrs` : day.isScheduledHalfDay ? 'Half-Day Shift' : '---'}
+                                                    </td>
+                                                    <td className="py-3 px-3 whitespace-nowrap">
+                                                        <span className={`font-bold ${
+                                                            day.deductionType === 'deducted' ? 'text-rose-600' :
+                                                            day.deductionType === 'waived' ? 'text-emerald-600' :
+                                                            'text-indigo-600'
+                                                        }`}>
+                                                            {day.deductionText}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 px-3 text-right whitespace-nowrap">
+                                                        {isLate ? (
+                                                            <button
+                                                                type="button"
+                                                                disabled={isWaiving}
+                                                                onClick={() => handleToggleWaiveLate(day, !isWaived)}
+                                                                className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-all inline-flex items-center gap-1 cursor-pointer disabled:opacity-50 ${
+                                                                    isWaived
+                                                                        ? 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                                                                        : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                                                }`}
+                                                            >
+                                                                {isWaiving ? (
+                                                                    <span className="animate-spin text-xs">⟳</span>
+                                                                ) : (
+                                                                    <Icon name={isWaived ? 'RotateCcw' : 'Check'} size={11} />
+                                                                )}
+                                                                <span>{isWaived ? 'Restore Deduction' : 'Cancel Late Deduction'}</span>
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-[10px] font-medium text-muted-foreground/60">
+                                                                Official Policy
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
 
                     {/* Detailed Leaves list taken in this month */}
@@ -647,12 +941,19 @@ const PayrollDetailsPage = () => {
                                                 <td className="py-3 px-3 font-semibold text-foreground">{inclusiveDays(lv.startDate, lv.endDate)} day(s)</td>
                                                 <td className="py-3 px-3 text-muted-foreground/80 max-w-xs truncate" title={lv.reason}>{lv.reason || '---'}</td>
                                                 <td className="py-3 px-3 text-right">
-                                                    <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${
-                                                        lv.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                        lv.status === 'REJECTED' ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-amber-50 text-amber-600 border-amber-100'
-                                                    }`}>
-                                                        {lv.status || 'pending'}
-                                                    </span>
+                                                    <div className="flex flex-col items-end gap-0.5">
+                                                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${
+                                                            lv.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                            lv.status === 'REJECTED' ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-amber-50 text-amber-600 border-amber-100'
+                                                        }`}>
+                                                            {lv.status || 'pending'}
+                                                        </span>
+                                                        {lv.status === 'REJECTED' && (
+                                                            <span className="text-[9.5px] text-rose-600 font-semibold italic">
+                                                                {lv.adminComment ? `"${lv.adminComment}"` : 'Deduct 2 days salary'}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
@@ -661,6 +962,7 @@ const PayrollDetailsPage = () => {
                             </div>
                         )}
                     </div>
+
 
                     {/* Manager Notes / Remarks */}
                     {payroll.notes && (

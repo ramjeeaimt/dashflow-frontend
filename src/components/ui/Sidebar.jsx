@@ -1,9 +1,18 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import useAuthStore from '../../store/useAuthStore';
 import BrandMark, { BrandGlyph } from '../BrandMark';
 import { ROLES, isGlobalOwner as isGlobalOwnerUser, isSystemAdmin as isSystemAdminUser, isPlatformSuperAdmin, hasRole, hasNonEmployeeRole } from '../../config/roles';
+
+// Persist sidebar scroll position across route navigations so clicking an item never jumps to the top
+let savedDesktopScroll = (() => {
+  try {
+    return Number(sessionStorage.getItem('dashflow_sidebar_scroll') || 0);
+  } catch {
+    return 0;
+  }
+})();
 
 const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, onMobileClose }) => {
   const navigate = useNavigate();
@@ -11,6 +20,8 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   const activePath = location.pathname;
   const { user, can } = useAuthStore();
   const [openGroups, setOpenGroups] = useState({});
+  const desktopNavRef = useRef(null);
+  const mobileNavRef = useRef(null);
 
   const isGlobalOwner = isGlobalOwnerUser(user);
   const isSystemAdmin = isSystemAdminUser(user);
@@ -206,6 +217,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
   // Open the group containing the active route BEFORE the browser paints, so a
   // freshly-mounted sidebar (each route renders its own) never flashes all-collapsed
   // then snaps open — that snap was the "jerk" on navigation.
+  // Open the group containing the active route BEFORE the browser paints
   useLayoutEffect(() => {
     setOpenGroups((prev) => {
       const next = { ...prev };
@@ -218,12 +230,39 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
       });
       return next;
     });
+
+    // Immediately restore scroll position before the browser paints
+    if (desktopNavRef.current && savedDesktopScroll > 0) {
+      desktopNavRef.current.scrollTop = savedDesktopScroll;
+    }
   }, [activePath, normalizedSections]);
+
+  // Secondary effect to ensure scroll stays in place after groups expand / child items layout
+  useEffect(() => {
+    if (desktopNavRef.current && savedDesktopScroll > 0) {
+      desktopNavRef.current.scrollTop = savedDesktopScroll;
+    }
+  }, [activePath, openGroups]);
+
+  const handleScroll = (e) => {
+    savedDesktopScroll = e.currentTarget.scrollTop;
+    try {
+      sessionStorage.setItem('dashflow_sidebar_scroll', String(savedDesktopScroll));
+    } catch {}
+  };
 
   const isPathActive = (path) => activePath === path || activePath.startsWith(`${path}/`);
   const isGroupActive = (item) => item.children?.some((child) => isPathActive(child.path));
 
   const handleLeafNavigation = (path) => {
+    // Save current sidebar scroll position right before routing
+    if (desktopNavRef.current) {
+      savedDesktopScroll = desktopNavRef.current.scrollTop;
+      try {
+        sessionStorage.setItem('dashflow_sidebar_scroll', String(savedDesktopScroll));
+      } catch {}
+    }
+
     // Don't re-navigate to the page we're already on — that would remount the
     // whole page (and this sidebar) for nothing, which reads as a jump.
     if (path && !isPathActive(path)) {
@@ -374,7 +413,11 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
           )}
         </div>
 
-        <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
+        <nav
+          ref={desktopNavRef}
+          onScroll={handleScroll}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4"
+        >
           {renderSectionContent(false)}
         </nav>
 

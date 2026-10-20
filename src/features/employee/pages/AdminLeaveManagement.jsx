@@ -9,8 +9,10 @@ import { employeeService } from "services/employee.service";
 import { leaveService } from "services/leaveService";
 import Sidebar from "components/ui/Sidebar";
 import Header from "components/ui/Header";
+import useAuthStore from "store/useAuthStore";
 
 const AdminLeaveManagement = () => {
+    const { user } = useAuthStore();
     const [leaves, setLeaves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState("ALL");
@@ -20,6 +22,7 @@ const AdminLeaveManagement = () => {
     // New Modal State for Decisions
     const [decisionModal, setDecisionModal] = useState({ isOpen: false, type: null, leaveId: null, note: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
 
     // Add Leave Modal States
     const [isAddLeaveModalOpen, setIsAddLeaveModalOpen] = useState(false);
@@ -101,10 +104,18 @@ const AdminLeaveManagement = () => {
 
         setIsSubmitting(true);
         try {
-            await financeService.updateLeaveStatus(id, status, note || "");
+            const reviewerName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Admin';
+            const finalNote = note || (status === 'REJECTED' ? 'Deduct two days of salary' : 'Approved');
+            await financeService.updateLeaveStatus(
+                id,
+                status,
+                finalNote,
+                reviewerName,
+                status === 'REJECTED' ? 2 : 1
+            );
             setLeaves(prev => prev.map(l =>
                 (l._id === id || l.id === id)
-                    ? { ...l, status: status.toUpperCase(), adminComment: note || "" }
+                    ? { ...l, status: status.toUpperCase(), adminComment: finalNote, reviewedByName: reviewerName, deductDays: status === 'REJECTED' ? 2 : 1 }
                     : l
             ));
             setExpandedRow(null);
@@ -116,6 +127,7 @@ const AdminLeaveManagement = () => {
             setIsSubmitting(false);
         }
     };
+
 
     const handleDeleteLeave = async (id) => {
         if (!window.confirm("Are you sure you want to delete this leave record permanently?")) return;
@@ -235,7 +247,12 @@ const AdminLeaveManagement = () => {
                                                 onDelete={handleDeleteLeave}
                                                 isExpanded={expandedRow === (leave._id || leave.id)}
                                                 onToggle={() => setExpandedRow(expandedRow === (leave._id || leave.id) ? null : (leave._id || leave.id))}
-                                                onOpenDecisionModal={(type, id) => setDecisionModal({ isOpen: true, type, leaveId: id, note: '' })}
+                                                onOpenDecisionModal={(type, id) => setDecisionModal({
+                                                    isOpen: true,
+                                                    type,
+                                                    leaveId: id,
+                                                    note: type === 'REJECTED' ? 'Deduct two days of salary' : 'Approved'
+                                                })}
                                             />
                                         ))
                                     ) : (
@@ -273,10 +290,42 @@ const AdminLeaveManagement = () => {
                                 autoFocus
                                 placeholder={decisionModal.type === 'APPROVED' ? "Type approval note/conditions here..." : "Type rejection reason here..."}
                                 className="w-full p-4 bg-muted/60 border border-border rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all shadow-inner resize-none"
-                                rows="4"
+                                rows="3"
                                 value={decisionModal.note}
                                 onChange={(e) => setDecisionModal(prev => ({ ...prev, note: e.target.value }))}
                             />
+
+                            {decisionModal.type === 'REJECTED' && (
+                                <div className="space-y-2">
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide block">Quick Reason Presets:</span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {[
+                                            'Deduct two days of salary',
+                                            'Unapproved absence — penalty applied',
+                                            'Critical project delivery pending',
+                                            'Personal leave quota exceeded'
+                                        ].map(preset => (
+                                            <button
+                                                key={preset}
+                                                type="button"
+                                                onClick={() => setDecisionModal(prev => ({ ...prev, note: preset }))}
+                                                className="text-[10px] font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-2.5 py-1 rounded-md transition-colors"
+                                            >
+                                                {preset}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-[10px] text-amber-800 space-y-0.5 mt-2">
+                                        <span className="font-bold flex items-center gap-1 text-amber-900">
+                                            <AlertCircle size={12} className="text-amber-600" /> Company Rejection Policy
+                                        </span>
+                                        <p className="leading-relaxed">
+                                            If the employee is absent on rejected leave days, <strong>2 days of salary per day</strong> will be deducted in monthly payroll.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="flex gap-3 pt-2">
                                 <button
                                     onClick={() => setDecisionModal({ isOpen: false, type: null, leaveId: null, note: '' })}
@@ -305,6 +354,7 @@ const AdminLeaveManagement = () => {
                     </div>
                 </div>
             )}
+
 
             {/* Add Leave Modal */}
             {isAddLeaveModalOpen && (
@@ -461,12 +511,37 @@ const LeaveRow = ({ leave, onDelete, isExpanded, onToggle, onOpenDecisionModal }
                     </div>
                 </td>
                 <td className="px-8 py-5">
-                    <span className={`px-3 py-1.5 rounded-full text-[9px] font-semibold uppercase tracking-wide border ${leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-100' :
- leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
- }`}>
-                        {leave.status}
-                    </span>
+                    <div className="flex flex-col items-start gap-1">
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
+                            leave.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            leave.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                            'bg-rose-50 text-rose-700 border-rose-200'
+                        }`}>
+                            {leave.status}
+                        </span>
+                        {leave.status !== 'PENDING' && (
+                            <span className="text-[10px] text-muted-foreground font-semibold">
+                                by <span className="text-foreground font-bold">{leave.reviewedByName || 'Admin'}</span>
+                            </span>
+                        )}
+                        {leave.adminComment && (
+                            <div className={`mt-0.5 text-[11px] font-medium px-2.5 py-1 rounded-lg border max-w-xs flex items-start gap-1.5 ${
+                                leave.status === 'REJECTED'
+                                    ? 'bg-rose-50/90 text-rose-800 border-rose-200/80'
+                                    : 'bg-emerald-50/90 text-emerald-800 border-emerald-200/80'
+                            }`}>
+                                <MessageSquare size={12} className={`shrink-0 mt-0.5 ${leave.status === 'REJECTED' ? 'text-rose-600' : 'text-emerald-600'}`} />
+                                <span className="leading-tight break-words">"{leave.adminComment}"</span>
+                            </div>
+                        )}
+                        {leave.status === 'REJECTED' && (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70 mt-0.5">
+                                <AlertCircle size={10} className="text-amber-600" /> Deduct 2 Days Salary
+                            </span>
+                        )}
+                    </div>
                 </td>
+
                 <td className="px-8 py-5 text-right">
                     <div className="flex justify-end items-center gap-2">
                         <button

@@ -28,22 +28,23 @@ const financeService = {
         }
     },
 
-    updateLeaveStatus: async (leaveId, status, adminComment = "") => {
+    updateLeaveStatus: async (leaveId, status, adminComment = "", reviewedByName = "Admin", deductDays = 1) => {
         try {
             if (!leaveId) throw new Error("Leave ID is missing!");
 
-            //  FIX: Aapka naya endpoint logic use kar rahe hain
-            // Ye banna chahiye: /leaves/123-abc/status
             const url = API_ENDPOINTS.LEAVES.UPDATE_STATUS(leaveId);
 
             console.log(" Calling API:", url);
 
             const response = await apiClient.patch(url, {
                 status: status.toUpperCase(),
-                adminComment: adminComment // Backend DTO mein ye hona chahiye
+                adminComment,
+                reviewedByName,
+                deductDays: status.toUpperCase() === 'REJECTED' ? 2 : deductDays
             });
 
             return response.data;
+
         } catch (error) {
             console.error("❌ Service Error (404/500):", error.response?.data || error.message);
             throw error;

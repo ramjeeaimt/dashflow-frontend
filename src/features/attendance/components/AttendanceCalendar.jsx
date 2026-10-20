@@ -112,11 +112,27 @@ const AttendanceCalendar = ({ employeeId }) => {
     const handleCellMouseEnter = (e, cellData) => {
         if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
         const rect = e.currentTarget.getBoundingClientRect();
-        const parentRect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+        const parentRect = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0, width: 300 };
+
+        // Calculate cell center relative to container
+        const rawX = rect.left - parentRect.left + rect.width / 2;
+        const popoverHalfWidth = 144; // w-72 is 288px
+        const padding = 12;
+
+        // Clamp X so popover card never bleeds past left or right edge of container
+        const minX = popoverHalfWidth + padding;
+        const maxX = Math.max(minX, (parentRect.width || 300) - popoverHalfWidth - padding);
+        const clampedX = Math.min(Math.max(rawX, minX), maxX);
+
+        // Check if there is enough room above the cell (needs ~220px)
+        const cellTop = rect.top - parentRect.top;
+        const placeBelow = cellTop < 220;
+
         setHoveredCell({
             ...cellData,
-            x: rect.left - parentRect.left + rect.width / 2,
-            y: rect.top - parentRect.top,
+            x: clampedX,
+            y: placeBelow ? (rect.bottom - parentRect.top + 8) : (cellTop - 8),
+            placeBelow,
         });
     };
 
@@ -287,7 +303,13 @@ const AttendanceCalendar = ({ employeeId }) => {
                                             <Icon name="CheckCircle" size={9} />
                                         </span>
                                     )}
+                                    {info?.rejectedLeave && (
+                                        <span className="absolute top-1 left-1 text-rose-600 flex items-center justify-center font-bold text-[8px] bg-rose-100 rounded-full w-3.5 h-3.5 border border-rose-300" title={`Leave Rejected: ${info.rejectedLeave.adminComment || 'Deduct two days of salary'}`}>
+                                            ✕
+                                        </span>
+                                    )}
                                 </div>
+
                             );
                         })}
                     </div>
@@ -297,10 +319,12 @@ const AttendanceCalendar = ({ employeeId }) => {
                         <div
                             onMouseEnter={handlePopoverMouseEnter}
                             onMouseLeave={handlePopoverMouseLeave}
-                            className="absolute z-50 pointer-events-auto transition-all duration-150 transform -translate-x-1/2 -translate-y-full mb-2 w-72"
+                            className={`absolute z-50 pointer-events-auto transition-all duration-150 transform -translate-x-1/2 ${
+                                hoveredCell.placeBelow ? 'translate-y-0 mt-1' : '-translate-y-full mb-2'
+                            } w-72`}
                             style={{
                                 left: `${hoveredCell.x}px`,
-                                top: `${hoveredCell.y - 8}px`,
+                                top: `${hoveredCell.y}px`,
                             }}
                         >
                             <div className="bg-slate-900/95 text-white p-3.5 rounded-2xl shadow-xl backdrop-blur-md border border-slate-700/80 text-xs space-y-2 animate-in fade-in zoom-in-95 duration-150">
@@ -444,6 +468,36 @@ const AttendanceCalendar = ({ employeeId }) => {
                                         )}
                                     </div>
                                 )}
+
+                                {/* Rejected Leave details if leave was rejected */}
+                                {hoveredCell.info?.rejectedLeave && (
+                                    <div className="bg-rose-950/60 border border-rose-700/60 rounded-xl p-2.5 text-[10px] space-y-1.5 shadow-sm">
+                                        <div className="flex justify-between items-center text-rose-300 font-bold capitalize">
+                                            <span>{hoveredCell.info.rejectedLeave.type} Leave Request</span>
+                                            <span className="text-[8.5px] px-1.5 py-0.5 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded font-bold uppercase">
+                                                REJECTED
+                                            </span>
+                                        </div>
+                                        <p className="text-slate-300 italic text-[9.5px] line-clamp-2">
+                                            "{hoveredCell.info.rejectedLeave.reason || 'No reason provided'}"
+                                        </p>
+                                        <div className="pt-1 border-t border-rose-900/50 space-y-1">
+                                            <div className="flex items-center justify-between text-slate-300 text-[9.5px]">
+                                                <span>Rejected By:</span>
+                                                <span className="font-bold text-white">{hoveredCell.info.rejectedLeave.reviewedByName || 'Admin'}</span>
+                                            </div>
+                                            <div className="flex items-start justify-between gap-2 text-rose-200 bg-rose-900/40 p-1.5 rounded-lg border border-rose-800/50 text-[9.5px]">
+                                                <span className="font-bold uppercase tracking-wider text-[8.5px]">Message:</span>
+                                                <span className="font-semibold text-right">"{hoveredCell.info.rejectedLeave.adminComment || 'Deduct two days of salary'}"</span>
+                                            </div>
+                                            <p className="text-[9px] text-amber-300 font-bold flex items-center gap-1 mt-1">
+                                                <Icon name="AlertCircle" size={11} className="text-amber-400" />
+                                                <span>Penalty: 2 Days Salary Deducted for Unauthorized Absence</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
 
                                 {/* Holiday / Festival info if holiday */}
                                 {hoveredCell.info?.holiday && (
