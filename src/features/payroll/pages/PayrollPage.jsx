@@ -241,7 +241,6 @@ const PayrollPage = () => {
             const employees = await employeeService.getAll({
                 companyId: activeCompanyId,
                 status: 'active',
-                excludeInterns: 'true',
             });
             setEmployeesList(employees);
         } catch (error) {
