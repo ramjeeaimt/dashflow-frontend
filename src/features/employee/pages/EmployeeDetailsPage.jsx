@@ -308,7 +308,7 @@ const EmployeeDetailsPage = () => {
     // ---- Birthday ----
     const saveDob = async () => {
         try {
-            await employeeService.update(id, { ...employee, dateOfBirth: dobValue || null });
+            await employeeService.update(id, { dateOfBirth: dobValue || null });
             const updated = await employeeService.getById(id);
             setEmployee(updated);
             setEditingDob(false);
@@ -547,14 +547,43 @@ const EmployeeDetailsPage = () => {
                                     <Icon name="Gift" size={14} className="text-primary" />
                                     {editingDob ? (
                                         <span className="flex items-center gap-1.5">
-                                            <input type="date" value={dobValue} onChange={(e) => setDobValue(e.target.value)} className="border border-border rounded-md px-2 py-1 text-xs" />
-                                            <button onClick={saveDob} className="text-primary font-bold">Save</button>
-                                            <button onClick={() => setEditingDob(false)} className="text-muted-foreground/70">Cancel</button>
+                                            <input 
+                                                type="date" 
+                                                value={dobValue} 
+                                                onChange={(e) => setDobValue(e.target.value)} 
+                                                className="border border-border bg-background rounded-md px-2 py-1 text-xs outline-none focus:border-primary" 
+                                            />
+                                            <button onClick={saveDob} className="text-primary font-bold hover:underline">Save</button>
+                                            <button onClick={() => setEditingDob(false)} className="text-muted-foreground/70 hover:text-muted-foreground">Cancel</button>
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
-                                            {employee.dateOfBirth ? new Date(employee.dateOfBirth).toLocaleDateString('en-IN', { day: '2-digit', month: 'long' }) : 'Birthday not set'}
-                                            <button onClick={() => { setDobValue(employee.dateOfBirth ? new Date(employee.dateOfBirth).toISOString().slice(0, 10) : ''); setEditingDob(true); }} className="text-primary font-bold">{employee.dateOfBirth ? 'Edit' : 'Add'}</button>
+                                            {employee.dateOfBirth ? (
+                                                (() => {
+                                                    try {
+                                                        const d = new Date(employee.dateOfBirth);
+                                                        return isNaN(d.getTime()) ? 'Birthday not set' : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+                                                    } catch {
+                                                        return 'Birthday not set';
+                                                    }
+                                                })()
+                                            ) : 'Birthday not set'}
+                                            <button 
+                                                onClick={() => { 
+                                                    let val = '';
+                                                    if (employee.dateOfBirth) {
+                                                        try {
+                                                            const d = new Date(employee.dateOfBirth);
+                                                            if (!isNaN(d.getTime())) val = d.toISOString().slice(0, 10);
+                                                        } catch {}
+                                                    }
+                                                    setDobValue(val); 
+                                                    setEditingDob(true); 
+                                                }} 
+                                                className="text-primary font-bold hover:underline"
+                                            >
+                                                {employee.dateOfBirth ? 'Edit' : 'Add'}
+                                            </button>
                                         </span>
                                     )}
                                 </div>

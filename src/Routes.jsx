@@ -54,6 +54,7 @@ import NotificationsPage from "features/notifications/pages/NotificationsPage";
 import TemplateDesignerPage from "features/notifications/pages/TemplateDesignerPage";
 import EmailTemplatesPage from "features/notifications/pages/EmailTemplatesPage";
 import EmployeeDashboard from "features/employee/pages/EmployeeDashboardPage";
+import { HolidayCalendarPage } from "features/holidays";
 
 import GlobalUsersPage from "features/admin/pages/GlobalUsersPage";
 
@@ -122,6 +123,17 @@ const Routes = () => {
           <Route path="/employee-leave" element={
             <ProtectedRoute>
               <AdminLeaveManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/holiday-calendar" element={
+            <ProtectedRoute>
+              <HolidayCalendarPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/holidays" element={
+            <ProtectedRoute>
+              <Navigate to="/holiday-calendar" replace />
             </ProtectedRoute>
           } />
 

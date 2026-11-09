@@ -6,6 +6,7 @@ import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import attendanceService from '../../../services/attendance.service';
 import employeeService from '../../../services/employee.service';
 import overtimeService from '../../../services/overtime.service';
+import holidayService from '../../../services/holiday.service';
 import { usePayrollStore } from '../../../store/payrollStore';
 import useAuthStore from '../../../store/useAuthStore';
 import {
@@ -54,6 +55,37 @@ const EmployeeDashboard = () => {
             (b.year - a.year) || (b.month - a.month),
         )[0] || null;
     }, [payrolls]);
+
+    const [holidaysList, setHolidaysList] = useState(
+        Array.isArray(user?.company?.holidays) ? user.company.holidays : []
+    );
+
+    useEffect(() => {
+        const loadHolidays = async () => {
+            const compId = user?.company?.id || user?.companyId;
+            if (!compId) return;
+            try {
+                const list = await holidayService.getHolidays(compId);
+                if (Array.isArray(list) && list.length > 0) {
+                    setHolidaysList(list);
+                }
+            } catch (err) {
+                console.error('Failed to load upcoming holidays:', err);
+            }
+        };
+        loadHolidays();
+    }, [user?.company?.id, user?.companyId]);
+
+    const upcomingHolidays = React.useMemo(() => {
+        const list = Array.isArray(holidaysList) && holidaysList.length > 0
+            ? holidaysList
+            : (Array.isArray(user?.company?.holidays) ? user.company.holidays : []);
+        const todayStr = new Date().toISOString().split('T')[0];
+        return list
+            .filter((h) => h.date >= todayStr)
+            .sort((a, b) => (a.date > b.date ? 1 : -1))
+            .slice(0, 3);
+    }, [holidaysList, user?.company?.holidays]);
 
     useEffect(() => {
         if (isAuthenticated && user?.id) {
@@ -379,19 +411,19 @@ const EmployeeDashboard = () => {
                                             </div>
                                         </div>
 
-                                        <div className="mt-4">
+                                        <div className="mt-4 space-y-2">
                                             {!todayAttendance && (
                                                 <button
                                                     onClick={handleCheckIn}
                                                     disabled={loading}
-                                                    className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary/90 transition shadow-sm font-medium flex items-center justify-center space-x-2"
+                                                    className="w-full bg-primary text-white py-2.5 rounded-xl hover:bg-primary/90 transition shadow-xs font-semibold text-xs tracking-wider uppercase flex items-center justify-center space-x-2"
                                                 >
                                                     {loading ? (
                                                         <span className="animate-pulse">Checking In...</span>
                                                     ) : (
                                                         <>
-                                                            <Icon name="LogIn" size={18} />
-                                                            <span>CHECK IN NOW</span>
+                                                            <Icon name="LogIn" size={17} />
+                                                            <span>Check In Now</span>
                                                         </>
                                                     )}
                                                 </button>
@@ -402,14 +434,14 @@ const EmployeeDashboard = () => {
                                                     <button
                                                         onClick={handleCheckOut}
                                                         disabled={loading}
-                                                        className="w-full bg-red-500 text-white py-2.5 rounded-lg hover:bg-red-600 transition shadow-sm font-medium flex items-center justify-center space-x-2"
+                                                        className="w-full bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl transition shadow-xs font-semibold text-xs tracking-wider uppercase flex items-center justify-center space-x-2"
                                                     >
                                                         {loading ? (
                                                             <span className="animate-pulse">Checking Out...</span>
                                                         ) : (
                                                             <>
-                                                                <Icon name="LogOut" size={18} />
-                                                                <span>CHECK OUT NOW</span>
+                                                                <Icon name="LogOut" size={17} />
+                                                                <span>Check Out Now</span>
                                                             </>
                                                         )}
                                                     </button>
@@ -424,16 +456,16 @@ const EmployeeDashboard = () => {
                                                                 alert('Failed to submit overtime request');
                                                             }
                                                         }}
-                                                        className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary/90 transition shadow-sm font-medium flex items-center justify-center space-x-2 mt-2"
+                                                        className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 py-2.5 rounded-xl transition font-semibold text-xs tracking-wider uppercase flex items-center justify-center space-x-2 mt-2"
                                                     >
-                                                        <Icon name="Clock" size={18} />
-                                                        <span>REQUEST OVERTIME</span>
+                                                        <Icon name="Clock" size={17} />
+                                                        <span>Request Overtime</span>
                                                     </button>
                                                 </>
                                             )}
 
                                             {todayAttendance && todayAttendance.checkOutTime && (
-                                                <div className="w-full bg-gray-100 text-gray-500 py-2.5 rounded-lg text-center text-sm font-medium cursor-default">
+                                                <div className="w-full bg-muted text-muted-foreground py-2.5 rounded-xl text-center text-xs font-semibold tracking-wide uppercase cursor-default border border-border">
                                                     Attendance Completed
                                                 </div>
                                             )}
@@ -493,6 +525,52 @@ const EmployeeDashboard = () => {
                                         <div className="py-6 text-center text-sm text-muted-foreground">
                                             No payslip issued yet. It appears here once your admin finalizes payroll.
                                         </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Upcoming Holidays */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                                <div className="p-4 border-b border-border flex items-center justify-between">
+                                    <h2 className="font-semibold flex items-center text-sm">
+                                        <Icon name="CalendarDays" size={17} className="mr-2 text-primary" />
+                                        Upcoming Holidays
+                                    </h2>
+                                    <button
+                                        onClick={() => navigate('/holiday-calendar')}
+                                        className="text-xs text-primary hover:underline bg-transparent border-none cursor-pointer"
+                                    >
+                                        View all
+                                    </button>
+                                </div>
+                                <div className="p-4 space-y-2.5">
+                                    {upcomingHolidays.length === 0 ? (
+                                        <p className="text-xs text-muted-foreground text-center py-3">
+                                            No upcoming holidays.
+                                        </p>
+                                    ) : (
+                                        upcomingHolidays.map((h) => (
+                                            <div
+                                                key={h.id || h.date}
+                                                onClick={() => navigate('/holiday-calendar')}
+                                                className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                                                        {new Date(h.date + 'T00:00:00').getDate()}
+                                                    </div>
+                                                    <div className="truncate">
+                                                        <p className="text-xs font-semibold text-foreground truncate">{h.name}</p>
+                                                        <p className="text-[11px] text-muted-foreground">
+                                                            {new Date(h.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', weekday: 'short' })}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
+                                                    {h.type === 'half' ? 'Half-Day' : 'Holiday'}
+                                                </span>
+                                            </div>
+                                        ))
                                     )}
                                 </div>
                             </div>

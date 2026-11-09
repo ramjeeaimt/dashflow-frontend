@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
 import Icon from '../../../components/AppIcon';
@@ -44,6 +45,7 @@ const Toggle = ({ checked, onChange, label }) => (
 );
 
 const AttendancePolicySettings = () => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -456,16 +458,25 @@ const AttendancePolicySettings = () => {
             </div>
           </div>
           <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-            {form.saturdayRule === 'second_saturday_half_day' ? '2nd Sat Half-Day Active' : 'Custom Saturday Rule'}
+            {form.saturdayRule === 'second_fourth_saturday_half_day'
+              ? 'Alternate Sat Half-Day Active'
+              : form.saturdayRule === 'second_saturday_half_day'
+              ? '2nd Sat Half-Day Active'
+              : 'Custom Saturday Rule'}
           </span>
         </div>
         <div className="p-6 space-y-3">
           {[
             {
+              id: 'second_fourth_saturday_half_day',
+              label: 'Alternate Saturdays Half Day (2nd & 4th Saturday)',
+              badge: 'Office Half-Day Policy',
+              desc: 'Every 2nd and 4th Saturday of the month is treated as an official half working day for the entire office. 1st, 3rd, and 5th Saturdays are regular full working days.',
+            },
+            {
               id: 'second_saturday_half_day',
-              label: '2nd Saturday Half Day',
-              badge: 'Recommended Office Policy',
-              desc: 'Every 2nd Saturday of the month is treated as an official half day for the entire office. Attendance calendar highlights it automatically, and payroll generates full credit without missing day deductions.',
+              label: '2nd Saturday Half Day Only',
+              desc: 'Only the 2nd Saturday of the month is treated as an official half day for the entire office. Remaining Saturdays are standard working days.',
             },
             {
               id: 'second_fourth_saturday_off',
@@ -540,14 +551,24 @@ const AttendancePolicySettings = () => {
               <p className="text-xs text-muted-foreground/70">Declare paid national holidays, festivals, and company off-days for accurate payslips</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowHolidayModal(true)}
-            className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-semibold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
-          >
-            <Icon name="Plus" size={14} />
-            <span>Add Holiday</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/holiday-calendar')}
+              className="px-3 py-1.5 border border-border hover:bg-muted text-foreground text-xs font-semibold rounded-lg shadow-2xs transition-all flex items-center gap-1.5"
+            >
+              <Icon name="Calendar" size={14} className="text-primary" />
+              <span>Full Calendar</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowHolidayModal(true)}
+              className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-semibold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+            >
+              <Icon name="Plus" size={14} />
+              <span>Add Holiday</span>
+            </button>
+          </div>
         </div>
 
         <div className="p-6">
@@ -734,13 +755,14 @@ const AttendancePolicySettings = () => {
         <p className="font-semibold text-foreground mb-2 text-sm">Policy Preview</p>
         <p>• Company operates on <strong>{form.workingDays?.length || 0} days</strong> a week.</p>
         <p>• Saturday policy: <strong>
+          {form.saturdayRule === 'second_fourth_saturday_half_day' && 'Alternate Saturdays (2nd & 4th) Half Day'}
           {form.saturdayRule === 'second_saturday_half_day' && '2nd Saturday Half Day (Office Policy)'}
           {form.saturdayRule === 'second_fourth_saturday_off' && '2nd & 4th Saturday Off'}
           {form.saturdayRule === 'second_saturday_off' && '2nd Saturday Off'}
           {form.saturdayRule === 'all_half_day' && 'All Saturdays Half Day'}
           {form.saturdayRule === 'all_working' && 'All Saturdays Full Day'}
           {form.saturdayRule === 'all_off' && 'All Saturdays Off (5-Day Week)'}
-          {!form.saturdayRule && '2nd Saturday Half Day (Office Policy)'}
+          {!form.saturdayRule && 'Alternate Saturdays (2nd & 4th) Half Day'}
         </strong>.</p>
         <p>• Declared holidays: <strong>{form.holidays?.length || 0} paid festival/company holiday(s)</strong> configured.</p>
         <p>• Employees can check in from <strong>{form.earlyCheckInBuffer} min before</strong> shift start.</p>

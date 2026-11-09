@@ -13,8 +13,9 @@ const NAV_TARGETS = [
   { label: 'Home', path: '/dashboard', keywords: 'home overview dashboard' },
   { label: 'People', path: '/employee-management', keywords: 'employees staff team directory', admin: true },
   { label: 'Attendance', path: '/attendance-management', keywords: 'checkin checkout presence' },
-  { label: 'Leave requests', path: '/employee-leave', keywords: 'holiday vacation time off approvals', admin: true },
-  { label: 'My leave', path: '/employee/leaves', keywords: 'holiday vacation time off request' },
+  { label: 'Holiday calendar', path: '/holiday-calendar', keywords: 'holiday calendar festival vacation days off public holidays' },
+  { label: 'Leave requests', path: '/employee-leave', keywords: 'vacation time off approvals', admin: true },
+  { label: 'My leave', path: '/employee/leaves', keywords: 'vacation time off request' },
   { label: 'Payroll', path: '/payroll', keywords: 'salary payslip finance', admin: true },
   { label: 'Finance', path: '/finance', keywords: 'expenses invoices money', admin: true },
   { label: 'Projects', path: '/projects', keywords: 'work clients delivery' },
@@ -35,6 +36,7 @@ const PAGE_TITLES = [
   ['/employees/', 'Employee'],
   ['/employee-leave', 'Leave requests'],
   ['/employee/leaves', 'My leave'],
+  ['/holiday-calendar', 'Holiday Calendar'],
   ['/employee/payroll', 'My payroll'],
   ['/employee-attendance', 'My attendance'],
   ['/employee-check-in-check-out', 'Check in'],
@@ -117,11 +119,11 @@ const Header = ({ onToggleSidebar }) => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-card border-b border-border z-40 h-16">
-      <div className="flex items-center justify-between gap-3 h-full px-3 sm:px-6 lg:pl-[294px]">
+    <header className="fixed top-0 left-0 lg:left-60 right-0 bg-card border-b border-border z-40 h-16">
+      <div className="flex items-center justify-between gap-3 h-full px-4 sm:px-6 lg:px-8">
 
         {/* Left: mobile menu + page context */}
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
           <button
             onClick={onToggleSidebar}
             className="lg:hidden p-2 -ml-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"

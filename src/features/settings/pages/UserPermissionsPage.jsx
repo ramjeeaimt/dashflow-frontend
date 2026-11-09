@@ -312,10 +312,10 @@ const UserPermissionsPage = () => {
                         </div>
 
                         {/* Search and Main Content Layout */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
                             {/* User List Panel (Left Side) */}
-                            <div className="lg:col-span-5 bg-card border border-border rounded-lg shadow-sm overflow-hidden flex flex-col max-h-[80vh]">
+                            <div className="lg:col-span-5 bg-card border border-border rounded-lg shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-7rem)] lg:sticky lg:top-20 self-start">
                                 <div className="p-5 border-b border-border bg-muted/50 space-y-4">
                                     <div className="relative">
                                         <Search className="absolute left-3.5 top-3.5 text-muted-foreground" size={18} />

@@ -69,7 +69,7 @@ const FinancePolicySettings = () => {
     </div>
 </body>
 </html>`);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   const [salaryEmailBodyTemplate, setSalaryEmailBodyTemplate] = useState(`<html>
 <head>
@@ -85,9 +85,9 @@ const FinancePolicySettings = () => {
     <p><strong>Company Owner</strong></p>
 </body>
 </html>`);
-  const [showBodyPreview, setShowBodyPreview] = useState(false);
-  const [isEmailTemplateEditable, setIsEmailTemplateEditable] = useState(false);
-  const [isBodyTemplateEditable, setIsBodyTemplateEditable] = useState(false);
+  const [showBodyPreview, setShowBodyPreview] = useState(true);
+  const [isEmailTemplateEditable, setIsEmailTemplateEditable] = useState(true);
+  const [isBodyTemplateEditable, setIsBodyTemplateEditable] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
@@ -528,37 +528,38 @@ const FinancePolicySettings = () => {
             <div className="border border-border rounded-lg overflow-hidden mt-6">
                 <div className="bg-muted/60 border-b border-border px-5 py-3 flex justify-between items-center">
                     <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        <Icon name="Code" size={16} /> HTML Format
+                        <Icon name={showPreview ? "Eye" : "Code"} size={16} /> {showPreview ? 'Salary Slip Preview' : 'HTML Format'}
                     </h3>
-                    <div className="flex gap-4 items-center">
-                        {!showPreview && (
-                            <button
-                                type="button"
-                                onClick={() => setIsEmailTemplateEditable(!isEmailTemplateEditable)}
-                                className={`text-sm font-medium flex items-center gap-1 ${isEmailTemplateEditable ? 'text-green-600' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                <Icon name="Edit2" size={16} />
-                                {isEmailTemplateEditable ? 'Editing...' : 'Edit Code'}
-                            </button>
-                        )}
+                    <div className="flex gap-3 items-center">
                         <button
                             type="button"
-                            onClick={() => setShowPreview(!showPreview)}
-                            className="text-sm font-medium text-primary hover:text-primary flex items-center gap-1"
+                            onClick={() => {
+                                if (showPreview) {
+                                    setShowPreview(false);
+                                    setIsEmailTemplateEditable(true);
+                                } else {
+                                    setShowPreview(true);
+                                }
+                            }}
+                            className={`text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
+                                showPreview
+                                    ? 'bg-card border-border text-foreground hover:bg-muted'
+                                    : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'
+                            }`}
                         >
-                            <Icon name={showPreview ? 'Code' : 'Eye'} size={16} />
-                            {showPreview ? 'Edit HTML' : 'Show Preview'}
+                            <Icon name={showPreview ? 'Code' : 'Eye'} size={15} />
+                            {showPreview ? 'Edit Code' : 'Show Preview'}
                         </button>
                     </div>
                 </div>
 
                 <div className="p-0">
                     {showPreview ? (
-                        <div className="bg-card p-8 overflow-auto max-h-[500px]">
+                        <div className="bg-card p-6 overflow-auto max-h-[500px]">
                             <div className="border border-dashed border-border rounded-lg p-4 bg-background">
-                                <p className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
+                                <p className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold">Salary Slip Live Preview</p>
                                 <div 
-                                    className="bg-card shadow-sm mx-auto"
+                                    className="bg-card shadow-sm mx-auto overflow-x-auto"
                                     dangerouslySetInnerHTML={{ __html: emailTemplate }} 
                                 />
                             </div>
@@ -567,8 +568,7 @@ const FinancePolicySettings = () => {
                         <textarea
                             value={emailTemplate}
                             onChange={(e) => setEmailTemplate(e.target.value)}
-                            readOnly={!isEmailTemplateEditable}
-                            className={`w-full h-[400px] p-5 font-mono text-sm text-foreground bg-sidebar !text-green-400 focus:outline-none ${!isEmailTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
+                            className="w-full h-[400px] p-5 font-mono text-sm text-emerald-400 bg-slate-950 focus:outline-none"
                             spellCheck="false"
                         />
                     )}
@@ -593,37 +593,38 @@ const FinancePolicySettings = () => {
             <div className="border border-border rounded-lg overflow-hidden">
                 <div className="bg-muted/60 border-b border-border px-5 py-3 flex justify-between items-center">
                     <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        <Icon name="Code" size={16} /> Email Body HTML Format
+                        <Icon name={showBodyPreview ? "Eye" : "Code"} size={16} /> {showBodyPreview ? 'Email Body Preview' : 'Email Body HTML Format'}
                     </h3>
-                    <div className="flex gap-4 items-center">
-                        {!showBodyPreview && (
-                            <button
-                                type="button"
-                                onClick={() => setIsBodyTemplateEditable(!isBodyTemplateEditable)}
-                                className={`text-sm font-medium flex items-center gap-1 ${isBodyTemplateEditable ? 'text-green-600' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                <Icon name="Edit2" size={16} />
-                                {isBodyTemplateEditable ? 'Editing...' : 'Edit Code'}
-                            </button>
-                        )}
+                    <div className="flex gap-3 items-center">
                         <button
                             type="button"
-                            onClick={() => setShowBodyPreview(!showBodyPreview)}
-                            className="text-sm font-medium text-primary hover:text-primary flex items-center gap-1"
+                            onClick={() => {
+                                if (showBodyPreview) {
+                                    setShowBodyPreview(false);
+                                    setIsBodyTemplateEditable(true);
+                                } else {
+                                    setShowBodyPreview(true);
+                                }
+                            }}
+                            className={`text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
+                                showBodyPreview
+                                    ? 'bg-card border-border text-foreground hover:bg-muted'
+                                    : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'
+                            }`}
                         >
-                            <Icon name={showBodyPreview ? 'Code' : 'Eye'} size={16} />
-                            {showBodyPreview ? 'Edit HTML' : 'Show Preview'}
+                            <Icon name={showBodyPreview ? 'Code' : 'Eye'} size={15} />
+                            {showBodyPreview ? 'Edit Code' : 'Show Preview'}
                         </button>
                     </div>
                 </div>
 
                 <div className="p-0">
                     {showBodyPreview ? (
-                        <div className="bg-card p-8 overflow-auto max-h-[500px]">
+                        <div className="bg-card p-6 overflow-auto max-h-[500px]">
                             <div className="border border-dashed border-border rounded-lg p-4 bg-background">
-                                <p className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold">Email Preview</p>
+                                <p className="text-xs text-muted-foreground mb-4 text-center uppercase tracking-wider font-semibold">Email Body Live Preview</p>
                                 <div 
-                                    className="bg-card shadow-sm mx-auto"
+                                    className="bg-card shadow-sm mx-auto overflow-x-auto"
                                     dangerouslySetInnerHTML={{ __html: salaryEmailBodyTemplate }} 
                                 />
                             </div>
@@ -632,8 +633,7 @@ const FinancePolicySettings = () => {
                         <textarea
                             value={salaryEmailBodyTemplate}
                             onChange={(e) => setSalaryEmailBodyTemplate(e.target.value)}
-                            readOnly={!isBodyTemplateEditable}
-                            className={`w-full h-[400px] p-5 font-mono text-sm text-foreground bg-sidebar !text-green-400 focus:outline-none ${!isBodyTemplateEditable ? 'opacity-80 cursor-not-allowed' : ''}`}
+                            className="w-full h-[400px] p-5 font-mono text-sm text-emerald-400 bg-slate-950 focus:outline-none"
                             spellCheck="false"
                         />
                     )}

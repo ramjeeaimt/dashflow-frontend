@@ -15,6 +15,39 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
 
   const [formData, setFormData] = useState({ startDate: '', endDate: '', type: 'casual', reason: '' });
 
+  // Calculate actual working days excluding company holidays & weekends
+  const dateCalculation = React.useMemo(() => {
+    if (!formData.startDate || !formData.endDate) return null;
+    const start = new Date(formData.startDate + 'T00:00:00');
+    const end = new Date(formData.endDate + 'T00:00:00');
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return null;
+
+    const companyHolidays = Array.isArray(user?.company?.holidays) ? user.company.holidays : [];
+    let calendarDays = 0;
+    let workingDays = 0;
+    const holidayHits = [];
+    let weekendDays = 0;
+
+    const cur = new Date(start);
+    while (cur <= end) {
+      calendarDays++;
+      const isoStr = cur.toISOString().split('T')[0];
+      const dayOfWeek = cur.getDay(); // 0 = Sun, 6 = Sat
+
+      const holiday = companyHolidays.find((h) => h.date === isoStr);
+      if (holiday) {
+        holidayHits.push(holiday);
+      } else if (dayOfWeek === 0 || dayOfWeek === 6) {
+        weekendDays++;
+      } else {
+        workingDays++;
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    return { calendarDays, workingDays, holidayHits, weekendDays };
+  }, [formData.startDate, formData.endDate, user?.company?.holidays]);
+
   useEffect(() => {
     if (activeId) fetchEmployeeLeaves(activeId);
   }, [activeId]);
@@ -113,6 +146,35 @@ const LeaveDashboard = ({ employeeId: propEmployeeId }) => {
                     <input type="date" required min={formData.startDate || todayStr} value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="w-full h-10 px-3 bg-muted/60 border border-border rounded-lg text-sm outline-none focus:border-slate-900" />
                   </div>
                 </div>
+
+                {/* Holiday & Working Days Calculation Preview */}
+                {dateCalculation && (
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border/80 text-xs space-y-1.5 animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between font-semibold">
+                      <span className="text-muted-foreground">Duration:</span>
+                      <span className="text-foreground">
+                        {dateCalculation.workingDays} working {dateCalculation.workingDays === 1 ? 'day' : 'days'}
+                        <span className="text-muted-foreground font-normal ml-1">
+                          ({dateCalculation.calendarDays} calendar {dateCalculation.calendarDays === 1 ? 'day' : 'days'})
+                        </span>
+                      </span>
+                    </div>
+
+                    {dateCalculation.holidayHits.length > 0 && (
+                      <div className="pt-1 border-t border-border/50 text-[11px] text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                        <span>✨ Includes {dateCalculation.holidayHits.length} company holiday:</span>
+                        <span className="font-semibold">{dateCalculation.holidayHits.map(h => h.name).join(', ')}</span>
+                      </div>
+                    )}
+
+                    {dateCalculation.weekendDays > 0 && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Excludes {dateCalculation.weekendDays} weekend {dateCalculation.weekendDays === 1 ? 'day' : 'days'}.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-muted-foreground uppercase">Note</label>
                   <textarea required value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} className="w-full h-24 p-3 bg-muted/60 border border-border rounded-lg text-sm outline-none resize-none focus:border-slate-900" placeholder="Type your reason..."></textarea>

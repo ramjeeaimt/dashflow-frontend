@@ -12,7 +12,6 @@ import RewardSystemSettings from '../components/RewardSystemSettings';
 import FinancePolicySettings from '../components/FinancePolicySettings';
 
 const CompanyProfile = () => {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTab, setActiveTab] = useState('details');
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -36,14 +35,11 @@ const CompanyProfile = () => {
         <div className="min-h-screen bg-background">
             <Header onToggleSidebar={() => setIsMobileSidebarOpen(true)} />
             <Sidebar
-                isCollapsed={sidebarCollapsed}
-                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                 isMobileOpen={isMobileSidebarOpen}
                 onMobileClose={() => setIsMobileSidebarOpen(false)}
             />
 
-            <main className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
- } pt-16 pb-8`}>
+            <main className="transition-all duration-300 lg:ml-60 pt-16 pb-8">
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="mb-8">
                         <BreadcrumbNavigation items={breadcrumbItems} />
@@ -53,9 +49,9 @@ const CompanyProfile = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Internal Sidebar */}
-                        <aside className="lg:w-64 flex-shrink-0">
+                    <div className="flex flex-col lg:flex-row gap-8 items-start">
+                        {/* Sticky Internal Navigation Sidebar */}
+                        <aside className="lg:w-64 w-full flex-shrink-0 lg:sticky lg:top-20 self-start z-10">
                             <nav className="space-y-1">
                                 {tabs.map((tab) => (
                                     <button

@@ -1,4 +1,8 @@
-html,
+html {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -6,10 +10,9 @@ body {
   font-size: 14px;
   line-height: 1.5;
   background-color: #f4f5f8;
-  /* Safety net: never let a stray wide element create a horizontal page
-     scrollbar on mobile. Intentional scroll regions use their own
-     overflow-x-auto containers, which are unaffected. */
-  overflow-x: hidden;
+  /* Safety net: overflow-x clip prevents horizontal overflow without creating
+     a scroll container that breaks CSS position: sticky on page sidebars and tables */
+  overflow-x: clip;
   max-width: 100%;
 }
 
@@ -143,13 +146,16 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Sidebar width adjustments: override Tailwind w-60 and ml-60 classes to 270px */
+/* Sidebar width adjustments: override Tailwind w-60, ml-60 and left-60 classes to 270px */
 @media (min-width: 1024px) {
   .lg\:w-60 {
     width: 270px !important;
   }
   .lg\:ml-60 {
     margin-left: 270px !important;
+  }
+  .lg\:left-60 {
+    left: 270px !important;
   }
 }
 

@@ -14,7 +14,9 @@ let savedDesktopScroll = (() => {
   }
 })();
 
-const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, onMobileClose }) => {
+const Sidebar = ({ isMobileOpen = false, onMobileClose }) => {
+  // Static sidebar: always permanently fixed and expanded at standard width (w-60)
+  const isCollapsed = false;
   const navigate = useNavigate();
   const location = useLocation();
   const activePath = location.pathname;
@@ -83,6 +85,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
             { key: 'quick-attendance', label: 'Quick Attendance', icon: 'Clock3', path: '/employee-check-in-check-out', alwaysShow: true },
             { key: 'my-attendance', label: 'My Attendance', icon: 'CalendarCheck', path: '/employee-attendance', alwaysShow: true },
             { key: 'my-leaves', label: 'My Leaves', icon: 'CalendarDays', path: '/employee/leaves', alwaysShow: true },
+            { key: 'holiday-calendar', label: 'Holiday Calendar', icon: 'Calendar', path: '/holiday-calendar', alwaysShow: true },
             { key: 'my-payroll', label: 'My Payroll', icon: 'ReceiptText', path: '/employee/payroll', alwaysShow: true },
             { key: 'profile', label: 'Profile', icon: 'UserCircle2', path: '/profile', alwaysShow: true },
           ]
@@ -97,7 +100,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         items: [
           { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', path: '/dashboard', alwaysShow: true },
           { key: 'notifications', label: 'Notifications', icon: 'Bell', path: '/notifications', permission: { action: 'read', resource: 'notification' } },
-          { key: 'email-templates', label: 'Email Templates', icon: 'Mail', path: '/notifications/templates', permission: { action: 'read', resource: 'notification' } },
+          { key: 'email-templates', label: 'Email Templates', icon: 'Mail', path: '/notifications/templates', permission: { action: 'manage', resource: 'notification' } },
         ]
       },
       {
@@ -112,7 +115,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
               { key: 'employee-directory', label: 'Directory', path: '/employee-management', permission: { action: 'read', resource: 'employee' } },
               { key: 'employee-leaves', label: 'Leave Requests', path: '/employee-leave', permission: { action: 'manage', resource: 'leave' } },
               { key: 'attendance', label: 'Attendance', path: '/attendance-management', permission: { action: 'manage', resource: 'attendance' } },
-
+              { key: 'holiday-calendar', label: 'Holiday Calendar', path: '/holiday-calendar', permission: { action: 'manage', resource: 'attendance' } },
             ]
           },
           !user?.roles?.some(r => r.name === 'Admin' || r.name === 'Super Admin') && {
@@ -122,6 +125,7 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
             children: [
               { key: 'my-attendance', label: 'My Attendance', path: '/employee-attendance', alwaysShow: true },
               { key: 'my-leaves', label: 'My Leaves', path: '/employee/leaves', alwaysShow: true },
+              { key: 'holiday-calendar', label: 'Holiday Calendar', path: '/holiday-calendar', alwaysShow: true },
               { key: 'my-payroll', label: 'My Payroll', path: '/employee/payroll', alwaysShow: true },
             ]
           }
@@ -390,27 +394,10 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
         </nav>
       </aside>
 
-      <aside className={`hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:h-screen lg:flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 overflow-hidden ${isCollapsed ? 'lg:w-16' : 'lg:w-60'
- }`}>
-        <div className="flex items-center justify-between p-4 border-b border-sidebar-border min-h-[64px]">
-          {!isCollapsed ? (
-            <>
-              <BrandMark />
-              <button
-                onClick={onToggleCollapse}
-                className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-muted rounded-lg transition-colors duration-150"
-              >
-                <Icon name="ChevronLeft" size={16} />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={onToggleCollapse}
-              className="p-1.5 text-sidebar-muted hover:text-sidebar-foreground hover:bg-muted rounded-lg transition-colors duration-150 mx-auto"
-            >
-              <Icon name="ChevronRight" size={16} />
-            </button>
-          )}
+      {/* Static desktop sidebar: permanently fixed on the left at w-60 */}
+      <aside className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-60 lg:h-screen lg:flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border overflow-hidden">
+        <div className="flex items-center px-4 border-b border-sidebar-border h-16 shrink-0">
+          <BrandMark />
         </div>
 
         <nav
@@ -421,23 +408,21 @@ const Sidebar = ({ isCollapsed = false, onToggleCollapse, isMobileOpen = false, 
           {renderSectionContent(false)}
         </nav>
 
-        {!isCollapsed && (
-          <div className="border-t border-sidebar-border p-4">
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/70 px-3 py-2.5">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
-                {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-sidebar-foreground truncate">
-                  {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.email}
-                </p>
-                <p className="text-[11px] text-sidebar-muted truncate">
-                  {isCompanyAdmin ? 'Admin' : isAdmin ? 'Staff' : 'Employee'}
-                </p>
-              </div>
+        <div className="border-t border-sidebar-border p-4 shrink-0">
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/70 px-3 py-2.5">
+            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
+              {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-sidebar-foreground truncate">
+                {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.email}
+              </p>
+              <p className="text-[11px] text-sidebar-muted truncate">
+                {isCompanyAdmin ? 'Admin' : isAdmin ? 'Staff' : 'Employee'}
+              </p>
             </div>
           </div>
-        )}
+        </div>
       </aside>
     </>
   );

@@ -111,6 +111,10 @@ export const API_ENDPOINTS = {
         BASE: 'https://difmo-api.vercel.app/api/applications',
         UPDATE_STATUS: (id) => `https://difmo-api.vercel.app/api/applications/${id}/status`,
     },
+    HOLIDAYS: {
+        BASE: (companyId) => `/system-company/${companyId}/holidays`,
+        BY_ID: (companyId, holidayId) => `/system-company/${companyId}/holidays/${holidayId}`,
+    },
     CONTACT: {
         BASE: '/contact',
     }
