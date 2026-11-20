@@ -20,6 +20,7 @@ import AttendanceTimeline, { WorkModeSummary } from '../../attendance/components
 import AttendanceCalendar from '../../attendance/components/AttendanceCalendar';
 import WorkModeBadge from '../../attendance/components/WorkModeBadge';
 import IdCardModal from '../components/IdCardModal';
+import { exportSingleEmployeeDossier } from '../../../utils/excelExport';
 
 const RECORD_TABS = [
     { key: 'attendance', label: 'Attendance', icon: 'Clock' },
@@ -98,6 +99,31 @@ const EmployeeDetailsPage = () => {
         reason: '',
         status: 'APPROVED'
     });
+
+    // Sibling employees for switching between profiles
+    const [siblingEmployees, setSiblingEmployees] = useState([]);
+
+    useEffect(() => {
+        let isMounted = true;
+        const loadAllEmployees = async () => {
+            try {
+                const res = await employeeService.getAll();
+                const list = Array.isArray(res) ? res : (res?.data || []);
+                if (isMounted && list.length > 0) {
+                    list.sort((a, b) => {
+                        const nameA = `${a.user?.firstName || ''} ${a.user?.lastName || ''}`.trim().toLowerCase();
+                        const nameB = `${b.user?.firstName || ''} ${b.user?.lastName || ''}`.trim().toLowerCase();
+                        return nameA.localeCompare(nameB);
+                    });
+                    setSiblingEmployees(list);
+                }
+            } catch (err) {
+                console.warn('Failed to load sibling employees:', err);
+            }
+        };
+        loadAllEmployees();
+        return () => { isMounted = false; };
+    }, [currentUser?.company?.id]);
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -458,6 +484,21 @@ const EmployeeDetailsPage = () => {
         currentRoleIds.some(rid => roles.find(r => r.id === rid)?.name === 'Manager') &&
         { title: 'Promoted to Management', date: 'Active', icon: 'TrendingUp', color: 'bg-primary' }
     ].filter(Boolean) : [];
+
+    // Sibling navigation indices for employee switching
+    const currentIdx = siblingEmployees.findIndex(e => String(e.id) === String(employee?.id || id));
+    const prevEmployee = currentIdx > 0 ? siblingEmployees[currentIdx - 1] : null;
+    const nextEmployee = currentIdx >= 0 && currentIdx < siblingEmployees.length - 1 ? siblingEmployees[currentIdx + 1] : null;
+
+    const handleDownloadExcel = () => {
+        try {
+            const fileName = exportSingleEmployeeDossier(employee, { tasks, leaves });
+            toast.success(`Downloaded ${fileName} successfully!`);
+        } catch (err) {
+            console.error('Failed to export employee dossier:', err);
+            toast.error('Failed to generate Excel download.');
+        }
+    };
  
     return (
         <div className="min-h-screen bg-background">
@@ -478,30 +519,96 @@ const EmployeeDetailsPage = () => {
                         </div>
                     ) : (
                         <>
-                            {/* TOP ACTION BAR */}
-                            <div className="flex items-center justify-between mb-6 bg-card p-3 rounded-lg border border-border shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted/60 rounded-xl transition-all"><Icon name="ArrowLeft" size={20} className="text-muted-foreground/70" /></button>
-                                    <h1 className="font-bold text-foreground">Employee Command Center</h1>
+                            {/* TOP ACTION BAR WITH EMPLOYEE SWITCHER & EXCEL DOWNLOAD */}
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6 bg-card p-3 rounded-xl border border-border shadow-xs gap-3">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <button onClick={() => navigate('/employee-management')} className="p-2 hover:bg-muted/60 rounded-xl transition-all border border-border/50" title="Back to Employee Directory">
+                                        <Icon name="ArrowLeft" size={20} className="text-muted-foreground/70" />
+                                    </button>
+                                    <div>
+                                        <h1 className="font-bold text-foreground text-sm sm:text-base whitespace-nowrap">Employee Command Center</h1>
+                                    </div>
+
+                                    {/* EMPLOYEE SWITCHER */}
+                                    <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border/60">
+                                        <button
+                                            onClick={() => prevEmployee && navigate(`/employees/${prevEmployee.id}${profileTab ? `?tab=${profileTab}` : ''}`)}
+                                            disabled={!prevEmployee}
+                                            className="p-1.5 hover:bg-card rounded-lg text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-2xs"
+                                            title={prevEmployee ? `Previous: ${prevEmployee.user?.firstName || 'Employee'}` : 'First employee'}
+                                        >
+                                            <Icon name="ChevronLeft" size={16} />
+                                        </button>
+
+                                        <div className="relative">
+                                            <select
+                                                value={employee?.id || id}
+                                                onChange={(e) => navigate(`/employees/${e.target.value}${profileTab ? `?tab=${profileTab}` : ''}`)}
+                                                className="appearance-none bg-card hover:bg-card/90 text-foreground text-xs font-semibold py-1.5 pl-3 pr-8 rounded-lg border border-border/60 focus:outline-hidden focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer max-w-[170px] sm:max-w-[210px] truncate shadow-2xs"
+                                            >
+                                                {siblingEmployees.length > 0 ? (
+                                                    siblingEmployees.map((emp, idx) => {
+                                                        const u = emp.user || {};
+                                                        const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Employee';
+                                                        const code = emp.employeeCode || emp.designation?.title || 'Staff';
+                                                        return (
+                                                            <option key={emp.id} value={emp.id}>
+                                                                {idx + 1}. {name} ({code})
+                                                            </option>
+                                                        );
+                                                    })
+                                                ) : (
+                                                    <option value={employee?.id || id}>
+                                                        {employee?.user?.firstName || ''} {employee?.user?.lastName || ''} ({employee?.employeeCode || 'N/A'})
+                                                    </option>
+                                                )}
+                                            </select>
+                                            <Icon name="ChevronDown" size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 pointer-events-none" />
+                                        </div>
+
+                                        <button
+                                            onClick={() => nextEmployee && navigate(`/employees/${nextEmployee.id}${profileTab ? `?tab=${profileTab}` : ''}`)}
+                                            disabled={!nextEmployee}
+                                            className="p-1.5 hover:bg-card rounded-lg text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-2xs"
+                                            title={nextEmployee ? `Next: ${nextEmployee.user?.firstName || 'Employee'}` : 'Last employee'}
+                                        >
+                                            <Icon name="ChevronRight" size={16} />
+                                        </button>
+
+                                        {siblingEmployees.length > 0 && (
+                                            <span className="text-[10px] font-bold text-muted-foreground/70 px-2 py-0.5 bg-card rounded-md border border-border/40 hidden sm:inline-block">
+                                                {currentIdx >= 0 ? currentIdx + 1 : 1}/{siblingEmployees.length}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <button onClick={() => setIsEditModalOpen(true)} className="px-4 py-2 bg-blue-50 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition-all flex items-center gap-2">
-                                        <Icon name="Pencil" size={14} /> Edit Details
+
+                                <div className="flex items-center gap-2 self-end lg:self-auto flex-wrap">
+                                    <button 
+                                        onClick={handleDownloadExcel} 
+                                        className="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-1.5 border border-emerald-200/60 shadow-2xs cursor-pointer"
+                                        title="Download complete employee profile as an Excel (.xlsx) file"
+                                    >
+                                        <Icon name="FileSpreadsheet" size={14} className="text-emerald-600" />
+                                        <span>Download Excel</span>
                                     </button>
-                                    <button onClick={openPromote} className="px-4 py-2 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2">
-                                        <Icon name="TrendingUp" size={14} /> Promote
+                                    <button onClick={() => setIsEditModalOpen(true)} className="px-3.5 py-2 bg-blue-50 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition-all flex items-center gap-1.5 border border-blue-200/50">
+                                        <Icon name="Pencil" size={13} /> Edit Details
                                     </button>
-                                    <button onClick={() => setShowIdCard(true)} className="px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/10 transition-all flex items-center gap-2">
-                                        <Icon name="CreditCard" size={14} /> Generate ID Card
+                                    <button onClick={openPromote} className="px-3.5 py-2 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-xl hover:bg-indigo-100 transition-all flex items-center gap-1.5 border border-indigo-200/50">
+                                        <Icon name="TrendingUp" size={13} /> Promote
+                                    </button>
+                                    <button onClick={() => setShowIdCard(true)} className="px-3.5 py-2 bg-primary/10 text-primary text-xs font-bold rounded-xl hover:bg-primary/20 transition-all flex items-center gap-1.5 border border-primary/20">
+                                        <Icon name="CreditCard" size={13} /> Generate ID Card
                                     </button>
                                     <div className="relative">
-                                        <button onClick={() => setActiveMenu(activeMenu === 'main' ? null : 'main')} className="p-2 bg-sidebar text-white rounded-xl shadow-sm "><Icon name="MoreHorizontal" size={20} /></button>
+                                        <button onClick={() => setActiveMenu(activeMenu === 'main' ? null : 'main')} className="p-2 bg-sidebar text-white rounded-xl shadow-xs"><Icon name="MoreHorizontal" size={18} /></button>
                                         {activeMenu === 'main' && (
-                                            <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-sm py-2 z-50">
+                                            <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-md py-2 z-50">
                                                 <button onClick={() => handleAction('block')} className="w-full px-4 py-2 text-left text-xs font-bold text-muted-foreground hover:bg-muted/60 flex items-center gap-2"><Icon name="Slash" size={14} /> Block Access</button>
                                                 <button onClick={() => handleAction('inactive')} className="w-full px-4 py-2 text-left text-xs font-bold text-muted-foreground hover:bg-muted/60 flex items-center gap-2"><Icon name="Moon" size={14} /> Make Inactive</button>
-                                                <div className="border-t border-slate-50 my-1"></div>
-                                                <button onClick={() => handleAction('terminate')} className="w-full px-4 py-2 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2"><Icon name="UserX" size={14} /> Terminate</button>
+                                                <div className="border-t border-border/40 my-1"></div>
+                                                <button onClick={() => handleAction('terminate')} className="w-full px-4 py-2 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2"><Icon name="UserX" size={14} /> Terminate</button>
                                             </div>
                                         )}
                                     </div>

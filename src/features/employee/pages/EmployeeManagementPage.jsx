@@ -16,6 +16,7 @@ import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import Pagination from '../../../components/ui/Pagination';
 import toast from 'react-hot-toast';
 import { isSystemAdmin as isSystemAdminUser } from '../../../config/roles';
+import { exportEmployeesToExcel } from '../../../utils/excelExport';
 
 const EmployeeManagement = () => {
   const navigate = useNavigate();
@@ -188,19 +189,41 @@ const EmployeeManagement = () => {
   };
 
   const handleExportEmployees = () => {
-    console.log('Export employees triggered');
-    alert('Export feature coming soon!');
+    try {
+      const targetEmployees = selectedEmployees.length > 0
+        ? employees.filter(e => selectedEmployees.includes(e.id))
+        : (filteredAndSortedEmployees && filteredAndSortedEmployees.length > 0 ? filteredAndSortedEmployees : employees);
+
+      if (!targetEmployees || targetEmployees.length === 0) {
+        toast.error('No employee records available to export.');
+        return;
+      }
+
+      const fileName = selectedEmployees.length > 0
+        ? `Selected_Employees_(${targetEmployees.length}).xlsx`
+        : 'Employee_Directory.xlsx';
+
+      exportEmployeesToExcel(targetEmployees, fileName);
+      toast.success(`Exported ${targetEmployees.length} employee(s) to Excel!`);
+    } catch (err) {
+      console.error('Failed to export employees to Excel:', err);
+      toast.error('Failed to export employee records.');
+    }
   };
 
   const handleBulkAction = async (action, employeeIds) => {
+    if (action === 'export') {
+      handleExportEmployees();
+      return;
+    }
     if (action === 'bulk-check-in') {
       try {
         const notes = prompt('Enter notes for bulk check-in (optional):');
         await bulkCheckIn(employeeIds, user.company.id, notes);
-        alert('Bulk check-in successful!');
+        toast.success('Bulk check-in successful!');
         setSelectedEmployees([]);
       } catch (error) {
-        alert('Failed to process bulk check-in.');
+        toast.error('Failed to process bulk check-in.');
       }
     } else {
       setSelectedEmployees([]);

@@ -80,10 +80,15 @@ const EmployeeActions = ({
 
             <button
               onClick={onExportEmployees}
-              className="flex items-center space-x-2 px-4 py-2.5 border border-border bg-card text-foreground font-semibold rounded-xl text-xs hover:bg-muted/60 transition-colors shadow-sm"
+              className={`flex items-center space-x-2 px-4 py-2.5 border rounded-xl text-xs font-semibold transition-all shadow-sm ${
+                selectedEmployees?.length > 0
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 hover:bg-emerald-100'
+                  : 'border-border bg-card text-foreground hover:bg-muted/60'
+              }`}
+              title={selectedEmployees?.length > 0 ? `Download Excel spreadsheet for ${selectedEmployees.length} selected employee(s)` : 'Download Excel spreadsheet for all employees'}
             >
-              <Icon name="Download" size={14} />
-              <span>Export</span>
+              <Icon name="FileSpreadsheet" size={14} className={selectedEmployees?.length > 0 ? 'text-emerald-600' : 'text-primary'} />
+              <span>{selectedEmployees?.length > 0 ? `Export Excel (${selectedEmployees.length})` : 'Export Excel'}</span>
             </button>
           </div>
         </div>
