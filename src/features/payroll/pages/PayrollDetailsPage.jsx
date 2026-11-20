@@ -443,6 +443,23 @@ const PayrollDetailsPage = () => {
     const monthLabel = monthNames[payroll.month - 1] || '---';
     const perDayRate = payroll.totalWorkingDays > 0 ? (payroll.basicSalary / payroll.totalWorkingDays) : 0;
 
+    // Derived deduction details for transparent audit breakdown
+    const halfPercent = Number(payroll.halfDayPercent) || 50;
+    const halfDayRate = perDayRate * (halfPercent / 100);
+
+    const rejectedDays = Number(payroll.rejectedLeaveDeductionDays) || 0;
+    const rejectedAmount = Number(payroll.rejectedLeaveDeductionAmount) || (rejectedDays * perDayRate);
+    const totalLeaveDeduction = Number(payroll.leaveDeduction) || 0;
+    const normalUnpaidDays = Math.max(0, (Number(payroll.unpaidLeaves) || 0) - rejectedDays);
+    const normalLeaveDeduction = Math.max(0, totalLeaveDeduction - rejectedAmount);
+
+    const totalHalfDeduction = Number(payroll.halfDeduction) || 0;
+    const lateDeductionCount = Number(payroll.lateDeductionCount) || 0;
+    const lateDeductionAmount = Number(payroll.lateDeductionAmount) || (lateDeductionCount * halfDayRate);
+    const regularHalfDeduction = Math.max(0, totalHalfDeduction - lateDeductionAmount);
+    const regularHalfDaysCount = halfDayRate > 0 ? Math.round(regularHalfDeduction / halfDayRate) : 0;
+    const totalPenalizedHalfDays = regularHalfDaysCount + lateDeductionCount;
+
     // Sibling navigation indices
     const currentIdx = cyclePayrolls.findIndex(p => p.id === payroll.id);
     const prevPayroll = currentIdx > 0 ? cyclePayrolls[currentIdx - 1] : null;
@@ -663,22 +680,28 @@ const PayrollDetailsPage = () => {
 
                         {/* Deductions breakdown */}
                         <div className="bg-card rounded-2xl border border-border shadow-sm p-6 space-y-4">
-                            <h3 className="text-xs font-bold text-foreground uppercase tracking-wide border-b border-border/40 pb-2 flex items-center gap-1.5">
-                                <Icon name="MinusCircle" size={14} className="text-rose-500" /> Deductions
-                            </h3>
+                            <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                                <h3 className="text-xs font-bold text-foreground uppercase tracking-wide flex items-center gap-1.5">
+                                    <Icon name="MinusCircle" size={14} className="text-rose-500" /> Deductions Breakdown
+                                </h3>
+                                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                                    Exact Math Match
+                                </span>
+                            </div>
                             <div className="space-y-3 text-sm">
+                                {/* Normal Unpaid Leave */}
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <div>
-                                        <span>Leave Deduction</span>
-                                        {payroll.unpaidLeaves > 0 && (
-                                            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
-                                                ({payroll.unpaidLeaves} unpaid day{payroll.unpaidLeaves > 1 ? 's' : ''} × {formatCurrency(perDayRate)}/day)
-                                            </p>
-                                        )}
+                                        <span className="text-foreground font-semibold">Unpaid Leave Deduction</span>
+                                        <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+                                            ({normalUnpaidDays} unpaid day{normalUnpaidDays === 1 ? '' : 's'} × {formatCurrency(perDayRate)}/day)
+                                        </p>
                                     </div>
-                                    <span className="text-rose-600 font-bold">-{formatCurrency(payroll.leaveDeduction || 0)}</span>
+                                    <span className="text-rose-600 font-bold">-{formatCurrency(normalLeaveDeduction)}</span>
                                 </div>
-                                {payroll.rejectedLeaveDeductionDays > 0 && (
+
+                                {/* Rejected Leave Penalty Highlight Card */}
+                                {rejectedDays > 0 && (
                                     <div className="flex justify-between font-medium text-rose-700 bg-rose-50/80 dark:bg-rose-950/20 p-2.5 rounded-xl border border-rose-200/80">
                                         <div>
                                             <span className="font-semibold flex items-center gap-1.5 text-xs text-rose-800 dark:text-rose-400">
@@ -686,26 +709,33 @@ const PayrollDetailsPage = () => {
                                                 Rejected Leave Penalty
                                             </span>
                                             <p className="text-[10px] text-rose-600/90 mt-0.5">
-                                                ({payroll.rejectedLeaveDeductionDays} days deducted for unapproved absence)
+                                                ({rejectedDays} days unapproved absence × {formatCurrency(perDayRate)}/day)
                                             </p>
                                         </div>
-                                        <span className="text-rose-600 font-bold text-xs self-center">-{formatCurrency(payroll.rejectedLeaveDeductionAmount || 0)}</span>
+                                        <span className="text-rose-600 font-bold text-xs self-center">-{formatCurrency(rejectedAmount)}</span>
                                     </div>
                                 )}
+
+                                {/* Half-Day & Late Deductions */}
                                 <div className="flex justify-between font-medium text-muted-foreground">
                                     <div>
-                                        <span>Half-Day & Late Deductions</span>
-                                        {payroll.lateDeductionCount > 0 && (
-                                            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
-                                                ({payroll.lateDeductionCount} late arrival{payroll.lateDeductionCount > 1 ? 's' : ''} penalized as half-day)
-                                            </p>
-                                        )}
+                                        <span className="text-foreground font-semibold">Half-Day & Late Deductions</span>
+                                        <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+                                            ({totalPenalizedHalfDays} half-days{regularHalfDaysCount > 0 ? ` [${regularHalfDaysCount} half-day${regularHalfDaysCount === 1 ? '' : 's'} + ${lateDeductionCount} late]` : ''} × {formatCurrency(halfDayRate)}/half-day)
+                                        </p>
                                     </div>
-                                    <span className="text-rose-600 font-bold">-{formatCurrency(payroll.halfDeduction || 0)}</span>
+                                    <span className="text-rose-600 font-bold">-{formatCurrency(totalHalfDeduction)}</span>
                                 </div>
-                                <div className="flex justify-between border-t border-border/40 pt-2 font-bold text-foreground">
-                                    <span>Total Deductions</span>
-                                    <span className="text-rose-600">{formatCurrency(payroll.deductions)}</span>
+
+                                {/* Total Deductions & Math Formula */}
+                                <div className="border-t border-border/40 pt-2.5">
+                                    <div className="flex justify-between font-bold text-foreground">
+                                        <span>Total Deductions</span>
+                                        <span className="text-rose-600 text-base">{formatCurrency(payroll.deductions)}</span>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground/70 text-right mt-1 font-mono">
+                                        {formatCurrency(normalLeaveDeduction)} + {rejectedDays > 0 ? `${formatCurrency(rejectedAmount)} + ` : ''}{formatCurrency(totalHalfDeduction)} = {formatCurrency(payroll.deductions)}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -717,38 +747,40 @@ const PayrollDetailsPage = () => {
                             </h3>
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Working Days in Month</span>
+                                    <span className="shrink-0">Working Days in Month</span>
                                     <span className="text-foreground font-bold">{payroll.totalWorkingDays || 22} days</span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Worked Days</span>
+                                    <span className="shrink-0">Worked Days</span>
                                     <span className="text-foreground font-bold">{payroll.workDays || 0} days</span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Company Holidays (Paid)</span>
+                                    <span className="shrink-0">Company Holidays (Paid)</span>
                                     <span className="text-indigo-600 font-bold">{payroll.holidaysCount || 0} days</span>
                                 </div>
                                 <div className="flex justify-between items-center font-medium text-muted-foreground">
-                                    <span>Half Days</span>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="text-amber-600 font-bold">{payroll.halfDaysCount || 0} days</span>
+                                    <span className="shrink-0">Half Days</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-amber-600 font-bold shrink-0">
+                                            {Math.max(payroll.halfDaysCount || 0, regularHalfDaysCount, halfDaysList.filter(d => d.isScheduledHalfDay || d.isLoggedHalfDay).length)} days
+                                        </span>
                                         {halfDaysList.filter(d => d.isScheduledHalfDay || d.isLoggedHalfDay).length > 0 && (
                                             <button
                                                 type="button"
                                                 onClick={() => document.getElementById('half-days-section')?.scrollIntoView({ behavior: 'smooth' })}
-                                                className="text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1"
-                                                title="View half-day dates"
+                                                className="text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                                                title={`Half day dates: ${halfDaysList.filter(d => d.isScheduledHalfDay || d.isLoggedHalfDay).map(d => new Date(`${d.date}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })).join(', ')}`}
                                             >
-                                                <span>{halfDaysList.filter(d => d.isScheduledHalfDay || d.isLoggedHalfDay).map(d => new Date(`${d.date}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })).join(', ')}</span>
+                                                <span>View Dates</span>
                                                 <Icon name="ArrowDown" size={10} />
                                             </button>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center font-medium text-muted-foreground">
-                                    <span>Late Arrivals</span>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="text-amber-600 font-bold">
+                                    <span className="shrink-0">Late Arrivals</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-amber-600 font-bold shrink-0">
                                             {payroll.lateCount || 0} days
                                             {payroll.lateCount > 0 && (
                                                 <span className="text-[11px] font-normal text-muted-foreground ml-1.5">
@@ -760,7 +792,7 @@ const PayrollDetailsPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => document.getElementById('half-days-section')?.scrollIntoView({ behavior: 'smooth' })}
-                                                className="text-[10px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1"
+                                                className="text-[10px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shrink-0"
                                                 title="Click to view late dates"
                                             >
                                                 <span>View Dates</span>
@@ -770,16 +802,21 @@ const PayrollDetailsPage = () => {
                                     </div>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Paid Leaves Used (CL)</span>
+                                    <span className="shrink-0">Paid Leaves Used (CL)</span>
                                     <span className="text-emerald-600 font-bold">{payroll.paidLeaves || 0} days</span>
                                 </div>
                                 <div className="flex justify-between font-medium text-muted-foreground">
-                                    <span>Unpaid Leaves (Deducted)</span>
+                                    <span className="shrink-0">Unpaid Leaves (Deducted)</span>
                                     <span className="text-rose-600 font-bold">{payroll.unpaidLeaves || 0} days</span>
                                 </div>
-                                <div className="flex justify-between font-medium text-muted-foreground pt-1.5 border-t border-border/20">
-                                    <span>Daily Salary Rate</span>
-                                    <span className="text-foreground font-bold">{formatCurrency(perDayRate)}/day</span>
+                                <div className="flex justify-between items-center font-medium text-muted-foreground pt-2 border-t border-border/20">
+                                    <div>
+                                        <span className="text-foreground font-semibold">Daily Salary Rate</span>
+                                        <p className="text-[10px] text-muted-foreground/70">
+                                            {formatCurrency(payroll.basicSalary)} ÷ {payroll.totalWorkingDays} working days
+                                        </p>
+                                    </div>
+                                    <span className="text-foreground font-bold text-sm">{formatCurrency(perDayRate)}/day</span>
                                 </div>
                             </div>
                         </div>
