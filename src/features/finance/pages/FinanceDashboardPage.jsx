@@ -49,6 +49,11 @@ import { format, isValid, parseISO } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
 const PIE_COLORS = ['#2563eb', '#dc2626', '#d97706', '#059669', '#7c3aed', '#db2777', '#0891b2'];
+const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const FULL_MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 const safeParse = (dateStr) => {
     if (!dateStr) return new Date();
@@ -78,9 +83,14 @@ const FinanceDashboardPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const PAGE_SIZE = 10;
 
-    // Chart data
-    const [trendData, setTrendData] = useState([]);
-    const [categoryData, setCategoryData] = useState([]);
+    // Period & Timeframe filters for Dashboard Cards & Overview
+    const [periodFilter, setPeriodFilter] = useState('all'); // 'all' | 'year' | 'month'
+    const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth());
+
+    // Cash Flow Chart Controls
+    const [chartViewMode, setChartViewMode] = useState('monthly'); // 'monthly' | 'yearly'
+    const [chartRange, setChartRange] = useState('last6'); // 'last6' | 'last12' | 'year'
 
     // Active section tab
     const [activeTab, setActiveTab] = useState('overview'); // overview | history
@@ -120,57 +130,6 @@ const FinanceDashboardPage = () => {
 
             setExpenses(expensesData);
             setPayrolls(payrollsData);
-
-            // Category pie data
-            const categoryMap = {};
-            expensesData.forEach(exp => {
-                if (exp.type !== 'credit' && exp.status === 'approved') {
-                    const cat = exp.category || 'Misc';
-                    categoryMap[cat] = (categoryMap[cat] || 0) + Number(exp.amount || 0);
-                }
-            });
-            // Add payroll as a category
-            if (totalPayroll > 0) categoryMap['Payroll'] = (categoryMap['Payroll'] || 0) + totalPayroll;
-
-            setCategoryData(
-                Object.entries(categoryMap)
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([name, value], i) => ({ name, value, color: PIE_COLORS[i % PIE_COLORS.length] }))
-            );
-
-            // Monthly trend (last 6 months)
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const trendMap = {};
-            const today = new Date();
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                trendMap[`${d.getFullYear()}-${d.getMonth()}`] = {
-                    month: months[d.getMonth()],
-                    revenue: 0,
-                    expenses: 0,
-                    payroll: 0,
-                    year: d.getFullYear(),
-                    monthNum: d.getMonth()
-                };
-            }
-
-            expensesData.forEach(exp => {
-                const d = safeParse(exp.date);
-                const key = `${d.getFullYear()}-${d.getMonth()}`;
-                if (trendMap[key] && exp.status === 'approved') {
-                    if (exp.type === 'credit') trendMap[key].revenue += Number(exp.amount || 0);
-                    else trendMap[key].expenses += Number(exp.amount || 0);
-                }
-            });
-
-            payrollsData.forEach(p => {
-                const pMonth = p.month ? p.month - 1 : safeParse(p.createdAt).getMonth();
-                const pYear = p.year || safeParse(p.createdAt).getFullYear();
-                const key = `${pYear}-${pMonth}`;
-                if (trendMap[key] && p.financeStatus === 'approved') trendMap[key].payroll += Number(p.netSalary || p.amount || p.total || 0);
-            });
-
-            setTrendData(Object.values(trendMap).sort((a, b) => a.year !== b.year ? a.year - b.year : a.monthNum - b.monthNum));
         } catch (error) {
             console.error('Failed to fetch finance data:', error);
             toast.error('Failed to load financial data');
@@ -178,6 +137,197 @@ const FinanceDashboardPage = () => {
             setIsLoading(false);
         }
     };
+
+    // Available years dynamically discovered from data
+    const availableYears = useMemo(() => {
+        const currentYr = new Date().getFullYear();
+        const yrs = new Set([currentYr, currentYr - 1, currentYr - 2]);
+        expenses.forEach(e => {
+            if (e.date) {
+                const y = safeParse(e.date).getFullYear();
+                if (y > 2000 && y < 2100) yrs.add(y);
+            }
+        });
+        payrolls.forEach(p => {
+            const y = p.year || (p.createdAt ? safeParse(p.createdAt).getFullYear() : null);
+            if (y && y > 2000 && y < 2100) yrs.add(Number(y));
+        });
+        return Array.from(yrs).sort((a, b) => b - a);
+    }, [expenses, payrolls]);
+
+    // Period summary calculation based on active filter (All Time, Specific Year, or Specific Month)
+    const periodSummary = useMemo(() => {
+        if (periodFilter === 'all') {
+            return summary;
+        }
+
+        let filteredExp = expenses.filter(e => e.status === 'approved');
+        let filteredPay = payrolls.filter(p => p.financeStatus === 'approved');
+
+        if (periodFilter === 'year' || periodFilter === 'month') {
+            filteredExp = filteredExp.filter(e => safeParse(e.date).getFullYear() === selectedYear);
+            filteredPay = filteredPay.filter(p => {
+                const y = p.year || safeParse(p.createdAt).getFullYear();
+                return y === selectedYear;
+            });
+        }
+
+        if (periodFilter === 'month') {
+            filteredExp = filteredExp.filter(e => safeParse(e.date).getMonth() === selectedMonth);
+            filteredPay = filteredPay.filter(p => {
+                const m = p.month ? p.month - 1 : safeParse(p.createdAt).getMonth();
+                return m === selectedMonth;
+            });
+        }
+
+        const totalCredit = filteredExp.reduce((acc, e) => acc + (e.type === 'credit' ? Number(e.amount || 0) : 0), 0);
+        const totalDebit = filteredExp.reduce((acc, e) => acc + (e.type !== 'credit' ? Number(e.amount || 0) : 0), 0);
+        const totalPayroll = filteredPay.reduce((acc, p) => acc + Number(p.netSalary || p.amount || p.total || 0), 0);
+
+        return {
+            turnover: totalCredit,
+            totalCredit,
+            totalDebit,
+            totalExpenses: totalDebit,
+            totalPayroll,
+            disbursementsCount: filteredPay.length
+        };
+    }, [summary, expenses, payrolls, periodFilter, selectedYear, selectedMonth]);
+
+    const activeSummary = periodFilter === 'all' ? summary : periodSummary;
+
+    const periodBadgeText = useMemo(() => {
+        if (periodFilter === 'all') return 'All Time';
+        if (periodFilter === 'year') return `Year ${selectedYear}`;
+        return `${SHORT_MONTHS[selectedMonth]} ${selectedYear}`;
+    }, [periodFilter, selectedYear, selectedMonth]);
+
+    // Dynamic Category pie data reacting to period filter
+    const categoryData = useMemo(() => {
+        const categoryMap = {};
+        let filteredExp = expenses.filter(exp => exp.type !== 'credit' && exp.status === 'approved');
+        let filteredPay = payrolls.filter(p => p.financeStatus === 'approved');
+
+        if (periodFilter === 'year' || periodFilter === 'month') {
+            filteredExp = filteredExp.filter(e => safeParse(e.date).getFullYear() === selectedYear);
+            filteredPay = filteredPay.filter(p => (p.year || safeParse(p.createdAt).getFullYear()) === selectedYear);
+        }
+        if (periodFilter === 'month') {
+            filteredExp = filteredExp.filter(e => safeParse(e.date).getMonth() === selectedMonth);
+            filteredPay = filteredPay.filter(p => (p.month ? p.month - 1 : safeParse(p.createdAt).getMonth()) === selectedMonth);
+        }
+
+        filteredExp.forEach(exp => {
+            const cat = exp.category || 'Misc';
+            categoryMap[cat] = (categoryMap[cat] || 0) + Number(exp.amount || 0);
+        });
+
+        const totalPayroll = filteredPay.reduce((acc, p) => acc + Number(p.netSalary || p.amount || p.total || 0), 0);
+        if (totalPayroll > 0) categoryMap['Payroll'] = (categoryMap['Payroll'] || 0) + totalPayroll;
+
+        return Object.entries(categoryMap)
+            .sort((a, b) => b[1] - a[1])
+            .map(([name, value], i) => ({ name, value, color: PIE_COLORS[i % PIE_COLORS.length] }));
+    }, [expenses, payrolls, periodFilter, selectedYear, selectedMonth]);
+
+    // Cash Flow Chart Data supporting Monthly (with Month + Year) & Yearly views
+    const chartData = useMemo(() => {
+        if (!expenses.length && !payrolls.length) return [];
+
+        if (chartViewMode === 'yearly') {
+            const yearMap = {};
+            const yrsSorted = [...availableYears].sort((a, b) => a - b);
+            yrsSorted.forEach(y => {
+                yearMap[y] = {
+                    label: String(y),
+                    fullLabel: `Year ${y}`,
+                    year: y,
+                    revenue: 0,
+                    expenses: 0,
+                    payroll: 0
+                };
+            });
+
+            expenses.forEach(exp => {
+                if (exp.status !== 'approved') return;
+                const y = safeParse(exp.date).getFullYear();
+                if (yearMap[y]) {
+                    if (exp.type === 'credit') yearMap[y].revenue += Number(exp.amount || 0);
+                    else yearMap[y].expenses += Number(exp.amount || 0);
+                }
+            });
+
+            payrolls.forEach(p => {
+                if (p.financeStatus !== 'approved') return;
+                const y = p.year || safeParse(p.createdAt).getFullYear();
+                if (yearMap[y]) {
+                    yearMap[y].payroll += Number(p.netSalary || p.amount || p.total || 0);
+                }
+            });
+
+            return Object.values(yearMap);
+        }
+
+        // Monthly mode
+        const trendMap = {};
+        const today = new Date();
+
+        if (chartRange === 'year') {
+            for (let m = 0; m < 12; m++) {
+                const key = `${selectedYear}-${m}`;
+                trendMap[key] = {
+                    month: SHORT_MONTHS[m],
+                    label: `${SHORT_MONTHS[m]} '${String(selectedYear).slice(-2)}`,
+                    fullLabel: `${FULL_MONTHS[m]} ${selectedYear}`,
+                    year: selectedYear,
+                    monthNum: m,
+                    revenue: 0,
+                    expenses: 0,
+                    payroll: 0
+                };
+            }
+        } else {
+            const count = chartRange === 'last12' ? 12 : 6;
+            for (let i = count - 1; i >= 0; i--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                const yr = d.getFullYear();
+                const m = d.getMonth();
+                const key = `${yr}-${m}`;
+                trendMap[key] = {
+                    month: SHORT_MONTHS[m],
+                    label: `${SHORT_MONTHS[m]} '${String(yr).slice(-2)}`,
+                    fullLabel: `${FULL_MONTHS[m]} ${yr}`,
+                    year: yr,
+                    monthNum: m,
+                    revenue: 0,
+                    expenses: 0,
+                    payroll: 0
+                };
+            }
+        }
+
+        expenses.forEach(exp => {
+            if (exp.status !== 'approved') return;
+            const d = safeParse(exp.date);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            if (trendMap[key]) {
+                if (exp.type === 'credit') trendMap[key].revenue += Number(exp.amount || 0);
+                else trendMap[key].expenses += Number(exp.amount || 0);
+            }
+        });
+
+        payrolls.forEach(p => {
+            if (p.financeStatus !== 'approved') return;
+            const pMonth = p.month ? p.month - 1 : safeParse(p.createdAt).getMonth();
+            const pYear = p.year || safeParse(p.createdAt).getFullYear();
+            const key = `${pYear}-${pMonth}`;
+            if (trendMap[key]) {
+                trendMap[key].payroll += Number(p.netSalary || p.amount || p.total || 0);
+            }
+        });
+
+        return Object.values(trendMap).sort((a, b) => a.year !== b.year ? a.year - b.year : a.monthNum - b.monthNum);
+    }, [expenses, payrolls, chartViewMode, chartRange, selectedYear, availableYears]);
 
     const formatCurrency = (amount) =>
         new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0);
@@ -335,14 +485,15 @@ const FinanceDashboardPage = () => {
         { label: 'Finance', path: '/finance' },
     ];
 
-    const netProfit = (summary?.turnover || 0) - (summary?.totalExpenses || 0) - (summary?.totalPayroll || 0);
+    const netProfit = (activeSummary?.turnover || 0) - (activeSummary?.totalExpenses || 0) - (activeSummary?.totalPayroll || 0);
 
     // Custom tooltip for area chart
     const AreaTooltip = ({ active, payload, label }) => {
         if (!active || !payload?.length) return null;
+        const fullTitle = payload[0]?.payload?.fullLabel || label;
         return (
             <div className="bg-card border border-border shadow-sm rounded-xl p-4 text-sm">
-                <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-2">{label}</p>
+                <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider mb-2">{fullTitle}</p>
                 {payload.map((entry, i) => (
                     <div key={i} className="flex items-center justify-between gap-8 mt-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: entry.color }}>{entry.name}</span>
@@ -391,6 +542,83 @@ const FinanceDashboardPage = () => {
                         </div>
                     </div>
 
+                    {/* Period Filter Bar: All Time | Yearly | Monthly */}
+                    <div className="bg-card border border-border rounded-xl p-3 sm:p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1.5 mr-1">
+                                <Calendar size={14} className="text-primary" /> Period:
+                            </span>
+                            <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border text-xs font-semibold">
+                                <button
+                                    type="button"
+                                    onClick={() => setPeriodFilter('all')}
+                                    className={`px-3 py-1.5 rounded-md transition-all ${periodFilter === 'all' ? 'bg-primary text-white shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    All Time
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setPeriodFilter('year');
+                                        if (chartViewMode === 'monthly') setChartRange('year');
+                                    }}
+                                    className={`px-3 py-1.5 rounded-md transition-all ${periodFilter === 'year' ? 'bg-primary text-white shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    Yearly
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setPeriodFilter('month')}
+                                    className={`px-3 py-1.5 rounded-md transition-all ${periodFilter === 'month' ? 'bg-primary text-white shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    Monthly
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Interactive Year & Month Dropdowns */}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                            {(periodFilter === 'year' || periodFilter === 'month') && (
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-semibold text-muted-foreground">Year:</span>
+                                    <select
+                                        value={selectedYear}
+                                        onChange={(e) => {
+                                            const yr = parseInt(e.target.value);
+                                            setSelectedYear(yr);
+                                        }}
+                                        className="bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs font-bold text-foreground focus:ring-2 focus:ring-primary outline-none cursor-pointer"
+                                    >
+                                        {availableYears.map(yr => (
+                                            <option key={yr} value={yr}>{yr}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {periodFilter === 'month' && (
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-semibold text-muted-foreground">Month:</span>
+                                    <select
+                                        value={selectedMonth}
+                                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                                        className="bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs font-bold text-foreground focus:ring-2 focus:ring-primary outline-none cursor-pointer"
+                                    >
+                                        {FULL_MONTHS.map((m, idx) => (
+                                            <option key={idx} value={idx}>{m}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            <div className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-md border border-primary/20">
+                                {periodFilter === 'all' && 'All-Time Financials'}
+                                {periodFilter === 'year' && `Full Year ${selectedYear}`}
+                                {periodFilter === 'month' && `${FULL_MONTHS[selectedMonth]} ${selectedYear}`}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Summary Cards */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                         {/* Turnover / Income */}
@@ -398,10 +626,10 @@ const FinanceDashboardPage = () => {
                             <div>
                                 <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Total Income</p>
                                 <h3 className="text-2xl font-bold text-foreground tracking-tight leading-none mb-1.5">
-                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(summary?.turnover)}
+                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(activeSummary?.turnover)}
                                 </h3>
                                 <div className="flex items-center text-[10px] font-bold text-emerald-600 uppercase tracking-tight">
-                                    <ArrowUpRight size={12} className="mr-1" /> Credits Received
+                                    <ArrowUpRight size={12} className="mr-1" /> {periodFilter === 'all' ? 'Credits Received' : `${periodBadgeText} Income`}
                                 </div>
                             </div>
                             <div className="w-11 h-11 bg-primary/10 rounded-xl flex items-center justify-center text-primary transition-transform">
@@ -414,10 +642,10 @@ const FinanceDashboardPage = () => {
                             <div>
                                 <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wider mb-1">Total Expenses</p>
                                 <h3 className="text-2xl font-bold text-foreground tracking-tight leading-none mb-1.5">
-                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(summary?.totalExpenses)}
+                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(activeSummary?.totalExpenses)}
                                 </h3>
                                 <div className="flex items-center text-[10px] font-bold text-rose-500 uppercase tracking-tight">
-                                    <TrendingDown size={12} className="mr-1" /> Operational Spend
+                                    <TrendingDown size={12} className="mr-1" /> {periodFilter === 'all' ? 'Operational Spend' : `${periodBadgeText} Spend`}
                                 </div>
                             </div>
                             <div className="w-11 h-11 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 transition-transform">
@@ -430,9 +658,13 @@ const FinanceDashboardPage = () => {
                             <div>
                                 <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Total Payroll</p>
                                 <h3 className="text-2xl font-bold text-foreground tracking-tight leading-none mb-1.5">
-                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(summary?.totalPayroll)}
+                                    {isLoading ? <span className="h-7 w-28 bg-muted rounded animate-pulse block" /> : formatCurrency(activeSummary?.totalPayroll)}
                                 </h3>
-                                <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-tight">{payrolls.filter(p => p.financeStatus === 'approved').length} disbursements</p>
+                                <p className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-tight">
+                                    {periodFilter === 'all'
+                                        ? `${payrolls.filter(p => p.financeStatus === 'approved').length} disbursements`
+                                        : `${activeSummary?.disbursementsCount || 0} disbursements (${periodBadgeText})`}
+                                </p>
                             </div>
                             <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 transition-transform">
                                 <Wallet size={22} />
@@ -448,7 +680,7 @@ const FinanceDashboardPage = () => {
                                 </h3>
                                 <div className="flex items-center text-[10px] font-bold text-white/80 uppercase tracking-tight">
                                     <span className="w-2 h-2 bg-white/60 mr-2 rounded-full animate-pulse" />
-                                    {netProfit >= 0 ? 'Healthy' : 'Deficit'}
+                                    {netProfit >= 0 ? 'Healthy' : 'Deficit'} {periodFilter !== 'all' ? `• ${periodBadgeText}` : ''}
                                 </div>
                             </div>
                             <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center text-white transition-transform">
@@ -483,20 +715,66 @@ const FinanceDashboardPage = () => {
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {/* Revenue vs Expenses Area Chart */}
                                 <div className="lg:col-span-2 bg-card p-6 border border-border shadow-sm">
-                                    <div className="flex justify-between items-start mb-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                         <div>
-                                            <h3 className="text-lg font-bold text-foreground tracking-tight">Monthly Cash Flow</h3>
-                                            <p className="text-muted-foreground text-xs mt-0.5">Income vs Expenses vs Payroll — Last 6 months</p>
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-lg font-bold text-foreground tracking-tight">
+                                                    {chartViewMode === 'yearly' ? 'Yearly Cash Flow' : 'Monthly Cash Flow'}
+                                                </h3>
+                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase">
+                                                    {chartViewMode === 'yearly' ? 'Annual View' : (chartRange === 'year' ? `Full Year ${selectedYear}` : chartRange === 'last12' ? 'Trailing 12 Mo' : 'Trailing 6 Mo')}
+                                                </span>
+                                            </div>
+                                            <p className="text-muted-foreground text-xs mt-0.5">
+                                                {chartViewMode === 'yearly'
+                                                    ? 'Annual Income vs Expenses vs Payroll across years'
+                                                    : `Income vs Expenses vs Payroll — ${chartRange === 'year' ? `All 12 months of ${selectedYear}` : chartRange === 'last12' ? 'Last 12 months' : 'Last 6 months'}`}
+                                            </p>
                                         </div>
-                                        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider flex-wrap justify-end">
-                                            <div className="flex items-center gap-1.5 text-primary"><div className="w-3 h-1 bg-primary rounded" /> Income</div>
-                                            <div className="flex items-center gap-1.5 text-rose-500"><div className="w-3 h-1 bg-rose-400 rounded" /> Expenses</div>
-                                            <div className="flex items-center gap-1.5 text-amber-500"><div className="w-3 h-1 bg-amber-400 rounded" /> Payroll</div>
+
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            {/* View Mode Toggle: Monthly | Yearly */}
+                                            <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border text-xs font-semibold">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setChartViewMode('monthly')}
+                                                    className={`px-3 py-1.5 rounded-md transition-all ${chartViewMode === 'monthly' ? 'bg-card text-foreground shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                                >
+                                                    Monthly
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setChartViewMode('yearly')}
+                                                    className={`px-3 py-1.5 rounded-md transition-all ${chartViewMode === 'yearly' ? 'bg-card text-foreground shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                                                >
+                                                    Yearly
+                                                </button>
+                                            </div>
+
+                                            {/* Monthly Range Selector */}
+                                            {chartViewMode === 'monthly' && (
+                                                <select
+                                                    value={chartRange}
+                                                    onChange={(e) => setChartRange(e.target.value)}
+                                                    className="bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs font-semibold text-foreground focus:ring-1 focus:ring-primary outline-none cursor-pointer"
+                                                >
+                                                    <option value="last6">Last 6 Months</option>
+                                                    <option value="last12">Last 12 Months</option>
+                                                    <option value="year">Full Year {selectedYear}</option>
+                                                </select>
+                                            )}
+
+                                            {/* Legend */}
+                                            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider">
+                                                <div className="flex items-center gap-1.5 text-primary"><div className="w-2.5 h-1 bg-primary rounded" /> Income</div>
+                                                <div className="flex items-center gap-1.5 text-rose-500"><div className="w-2.5 h-1 bg-rose-400 rounded" /> Expenses</div>
+                                                <div className="flex items-center gap-1.5 text-amber-500"><div className="w-2.5 h-1 bg-amber-400 rounded" /> Payroll</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="h-[300px]">
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                                 <defs>
                                                     <linearGradient id="colRev" x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
@@ -512,7 +790,7 @@ const FinanceDashboardPage = () => {
                                                     </linearGradient>
                                                 </defs>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }} dy={8} />
+                                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }} dy={8} />
                                                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }} tickFormatter={(v) => `₹${v >= 1000 ? (v / 1000).toFixed(0) + 'K' : v}`} />
                                                 <Tooltip content={<AreaTooltip />} />
                                                 <Area type="monotone" dataKey="revenue" name="Income" stroke="#2563eb" strokeWidth={2.5} fill="url(#colRev)" activeDot={{ r: 5, strokeWidth: 3, stroke: '#fff', fill: '#2563eb' }} />
@@ -527,7 +805,9 @@ const FinanceDashboardPage = () => {
                                 <div className="bg-card p-6 border border-border shadow-sm flex flex-col">
                                     <div className="mb-4">
                                         <h3 className="text-lg font-bold text-foreground">Expense Breakdown</h3>
-                                        <p className="text-muted-foreground text-xs mt-0.5">Spending by category</p>
+                                        <p className="text-muted-foreground text-xs mt-0.5">
+                                            {periodFilter === 'all' ? 'Spending by category — All time' : `Spending by category — ${periodBadgeText}`}
+                                        </p>
                                     </div>
                                     {categoryData.length > 0 ? (
                                         <>
