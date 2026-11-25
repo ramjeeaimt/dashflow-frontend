@@ -257,40 +257,44 @@ const PayrollPage = () => {
         const payrollMap = new Map();
         (payrollData || []).forEach(p => payrollMap.set(p.employeeId, p));
 
-        // Create a set of employee IDs from employeesList
-        const employeeIds = new Set(employeesList.map(e => e.id));
+        // Filter only active employees (inactive employees will not be shown or processed unless made active)
+        const activeEmployees = (employeesList || []).filter(e => (e.status || 'active').toLowerCase() === 'active');
+        const employeeIds = new Set(activeEmployees.map(e => e.id));
 
-        // Start with the list of employees fetched from the API
-        const visibleEmployees = [...employeesList];
+        const visibleEmployees = [...activeEmployees];
 
-        // For any generated payroll record of an employee not in the employeesList, append them
+        // For any generated payroll record of an employee, only include if the employee is active
         (payrollData || []).forEach(p => {
             if (p.employee && !employeeIds.has(p.employeeId)) {
-                visibleEmployees.push(p.employee);
-                employeeIds.add(p.employeeId);
+                if ((p.employee.status || 'active').toLowerCase() === 'active') {
+                    visibleEmployees.push(p.employee);
+                    employeeIds.add(p.employeeId);
+                }
             }
         });
 
-        // Create a list including visible employees
-        const allRows = visibleEmployees.map(emp => {
-            const existingPayroll = payrollMap.get(emp.id);
-            return {
-                id: existingPayroll?.id || `temp-${emp.id}`,
-                isGenerated: !!existingPayroll,
-                employee: emp,
-                employeeId: emp.id,
-                basicSalary: existingPayroll ? Math.round(existingPayroll.basicSalary ?? (emp.salary || 0)) : Math.round(emp.salary || 0),
-                allowances: existingPayroll ? Math.round(existingPayroll.allowances ?? 0) : 0,
-                deductions: existingPayroll ? Math.round(existingPayroll.deductions ?? 0) : 0,
-                leaveDeduction: existingPayroll ? Math.round(existingPayroll.leaveDeduction ?? 0) : 0,
-                halfDeduction: existingPayroll ? Math.round(existingPayroll.halfDeduction ?? 0) : 0,
-                netSalary: existingPayroll ? Math.round(existingPayroll.netSalary ?? 0) : Math.round(emp.salary || 0),
-                status: (existingPayroll?.status === 'pending' ? 'draft' : existingPayroll?.status) || 'not-generated',
-                month: existingPayroll?.month || selectedMonth,
-                year: existingPayroll?.year || selectedYear,
-                record: existingPayroll
-            };
-        });
+        // Create a list strictly including active employees
+        const allRows = visibleEmployees
+            .filter(emp => (emp.status || 'active').toLowerCase() === 'active')
+            .map(emp => {
+                const existingPayroll = payrollMap.get(emp.id);
+                return {
+                    id: existingPayroll?.id || `temp-${emp.id}`,
+                    isGenerated: !!existingPayroll,
+                    employee: emp,
+                    employeeId: emp.id,
+                    basicSalary: existingPayroll ? Math.round(existingPayroll.basicSalary ?? (emp.salary || 0)) : Math.round(emp.salary || 0),
+                    allowances: existingPayroll ? Math.round(existingPayroll.allowances ?? 0) : 0,
+                    deductions: existingPayroll ? Math.round(existingPayroll.deductions ?? 0) : 0,
+                    leaveDeduction: existingPayroll ? Math.round(existingPayroll.leaveDeduction ?? 0) : 0,
+                    halfDeduction: existingPayroll ? Math.round(existingPayroll.halfDeduction ?? 0) : 0,
+                    netSalary: existingPayroll ? Math.round(existingPayroll.netSalary ?? 0) : Math.round(emp.salary || 0),
+                    status: (existingPayroll?.status === 'pending' ? 'draft' : existingPayroll?.status) || 'not-generated',
+                    month: existingPayroll?.month || selectedMonth,
+                    year: existingPayroll?.year || selectedYear,
+                    record: existingPayroll
+                };
+            });
 
         if (!searchTerm.trim()) return allRows;
 
