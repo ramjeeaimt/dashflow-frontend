@@ -1000,7 +1000,7 @@ const PayrollPage = () => {
                                                                             </button>
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    setReviewPayroll(row.record);
+                                                                                    setReviewPayroll(row.record ? { ...row.record, employee: row.employee || row.record.employee } : row);
                                                                                     setReviewModalMode('send');
                                                                                     setIsReviewModalOpen(true);
                                                                                 }}
@@ -1012,7 +1012,7 @@ const PayrollPage = () => {
                                                                     ) : row.status === 'sent' ? (
                                                                         <button
                                                                             onClick={() => {
-                                                                                setReviewPayroll(row.record);
+                                                                                setReviewPayroll(row.record ? { ...row.record, employee: row.employee || row.record.employee } : row);
                                                                                 setReviewModalMode('send');
                                                                                 setIsReviewModalOpen(true);
                                                                             }}
@@ -1040,7 +1040,7 @@ const PayrollPage = () => {
                                                                     {(row.status === 'draft' || row.status === 'sent') && (
                                                                         <button
                                                                             onClick={() => {
-                                                                                setReviewPayroll(row.record);
+                                                                                setReviewPayroll(row.record ? { ...row.record, employee: row.employee || row.record.employee } : row);
                                                                                 setReviewModalMode('edit');
                                                                                 setIsReviewModalOpen(true);
                                                                             }}

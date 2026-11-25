@@ -151,8 +151,8 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                         return res;
                     };
 
-                    setEvaluatedPayslipHtml(hasValidCustomPayslip ? payslipHtml : replacePlaceholders(payslipHtml));
-                    setEvaluatedEmailBodyHtml(hasValidCustomEmail ? emailBodyHtml : replacePlaceholders(emailBodyHtml));
+                    setEvaluatedPayslipHtml(replacePlaceholders(payslipHtml));
+                    setEvaluatedEmailBodyHtml(replacePlaceholders(emailBodyHtml));
                 } catch (error) {
                     console.error("Error fetching company templates:", error);
                     setEvaluatedPayslipHtml('<div>Error loading templates.</div>');
