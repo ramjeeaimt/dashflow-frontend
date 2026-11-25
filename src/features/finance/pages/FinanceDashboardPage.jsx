@@ -45,6 +45,7 @@ import BreadcrumbNavigation from '../../../components/ui/BreadcrumbNavigation';
 import ExpenseModal from '../components/ExpenseModal';
 import ExpenseViewModal from '../components/ExpenseViewModal';
 import PayrollEditModal from '../components/PayrollEditModal';
+import FinanceExportModal from '../components/FinanceExportModal';
 import { format, isValid, parseISO } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
@@ -72,6 +73,7 @@ const FinanceDashboardPage = () => {
     const [viewingExpense, setViewingExpense] = useState(null);
     const [editingPayroll, setEditingPayroll] = useState(null);
     const [isPayrollModalOpen, setIsPayrollModalOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const { user } = useAuthStore();
 
     // Filters
@@ -526,6 +528,14 @@ const FinanceDashboardPage = () => {
                         </div>
                         <div className="flex items-center gap-3">
                             <button
+                                onClick={() => setIsExportModalOpen(true)}
+                                className="inline-flex items-center gap-2 px-4 py-2.5 border border-primary/30 bg-primary/10 text-primary font-bold rounded-xl text-sm hover:bg-primary/20 transition-all shadow-xs cursor-pointer"
+                                title="Export financial reports (single month, multi-month, yearly, or custom ledger in Excel/CSV)"
+                            >
+                                <Download size={16} />
+                                Export Report
+                            </button>
+                            <button
                                 onClick={fetchFinanceData}
                                 className="inline-flex items-center gap-2 px-4 py-2.5 border border-border bg-card text-muted-foreground font-semibold rounded-xl text-sm hover:bg-muted/60 transition-all"
                             >
@@ -576,7 +586,7 @@ const FinanceDashboardPage = () => {
                             </div>
                         </div>
 
-                        {/* Interactive Year & Month Dropdowns */}
+                        {/* Interactive Year & Month Dropdowns & Quick Export Action */}
                         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                             {(periodFilter === 'year' || periodFilter === 'month') && (
                                 <div className="flex items-center gap-1.5">
@@ -616,6 +626,16 @@ const FinanceDashboardPage = () => {
                                 {periodFilter === 'year' && `Full Year ${selectedYear}`}
                                 {periodFilter === 'month' && `${FULL_MONTHS[selectedMonth]} ${selectedYear}`}
                             </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setIsExportModalOpen(true)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 bg-card hover:bg-muted/80 border border-border rounded-lg text-xs font-bold text-foreground transition-all cursor-pointer shadow-2xs"
+                                title="Export data for this period or configure custom multi-month range"
+                            >
+                                <Download size={13} className="text-primary" />
+                                Export
+                            </button>
                         </div>
                     </div>
 
@@ -969,7 +989,11 @@ const FinanceDashboardPage = () => {
                                                 <X size={14} /> Clear
                                             </button>
                                         )}
-                                        <button className="p-2.5 bg-muted/60 border border-border text-muted-foreground rounded-lg hover:bg-muted transition-all" title="Export CSV">
+                                        <button
+                                            onClick={() => setIsExportModalOpen(true)}
+                                            className="p-2.5 bg-muted/60 border border-border text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-all cursor-pointer"
+                                            title="Export financial records (Excel / CSV)"
+                                        >
                                             <Download size={18} />
                                         </button>
                                     </div>
@@ -1158,6 +1182,17 @@ const FinanceDashboardPage = () => {
                     onClose={() => { setIsPayrollModalOpen(false); setEditingPayroll(null); }}
                     payroll={editingPayroll}
                     onSave={handleSavePayroll}
+                />
+                <FinanceExportModal
+                    isOpen={isExportModalOpen}
+                    onClose={() => setIsExportModalOpen(false)}
+                    allTransactions={allTransactions}
+                    filteredTransactions={filteredTransactions}
+                    availableYears={availableYears}
+                    defaultYear={selectedYear}
+                    defaultMonth={selectedMonth}
+                    knownCategories={knownCategories}
+                    companyName={user?.company?.name || 'Difmo'}
                 />
             </main>
         </div>
