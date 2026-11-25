@@ -3,6 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import useAuthStore from '../../../store/useAuthStore';
 import api from '../../../api/client';
+import { getPayrollPlaceholderData, interpolatePayrollTemplate } from '../../../utils/payrollInterpolate';
 
 const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = 'send' }) => {
     const { user } = useAuthStore();
@@ -68,7 +69,8 @@ const PayrollReviewModal = ({ isOpen, onClose, payroll, onSend, onSave, mode = '
                     };
 
                     const replacePlaceholders = (html) => {
-                        let res = html;
+                        const placeholderData = getPayrollPlaceholderData(payroll, month, year);
+                        let res = interpolatePayrollTemplate(html, placeholderData);
                         res = res.replace(/\$\{empName\}/g, empName);
                         res = res.replace(/\$\{name\}/g, empName);
                         res = res.replace(/\$\{employeeName\}/g, empName);

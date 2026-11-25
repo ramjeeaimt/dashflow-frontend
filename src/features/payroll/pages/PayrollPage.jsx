@@ -14,6 +14,7 @@ import PayrollDetailsModal from '../components/PayrollDetailsModal';
 import PayrollReviewModal from '../components/PayrollReviewModal';
 import { usePayrollStore } from '../../../store/payrollStore';
 import { SkeletonRows } from '../../../components/ui/Skeleton';
+import { getPayrollPlaceholderData, interpolatePayrollTemplate } from '../../../utils/payrollInterpolate';
 const PayrollPage = () => {
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -304,14 +305,23 @@ const PayrollPage = () => {
         });
     }, [payrollData, employeesList, searchTerm, selectedMonth, selectedYear]);
 
-    const renderCustomPayrollHtml = (templateText, employeeName, month, year, salary, activeTpl = {}) => {
-        let finalMessage = templateText || '';
-        finalMessage = finalMessage.replace(/\${employeeName}/g, employeeName);
-        finalMessage = finalMessage.replace(/\${name}/g, employeeName);
-        finalMessage = finalMessage.replace(/\${month}/g, month.toString());
-        finalMessage = finalMessage.replace(/\${year}/g, year.toString());
-        finalMessage = finalMessage.replace(/\${salary}/g, salary);
-        finalMessage = finalMessage.replace(/\${netSalary}/g, salary);
+    const renderCustomPayrollHtml = (templateText, rowOrName, month, year, salary, activeTpl = {}) => {
+        let placeholderData;
+        if (rowOrName && typeof rowOrName === 'object') {
+            placeholderData = getPayrollPlaceholderData(rowOrName, month, year);
+        } else {
+            const empName = typeof rowOrName === 'string' ? rowOrName : 'Employee';
+            placeholderData = getPayrollPlaceholderData({
+                employeeName: empName,
+                basicSalary: salary,
+                netPayable: salary,
+                netSalary: salary,
+                month,
+                year
+            }, month, year);
+        }
+
+        const finalMessage = interpolatePayrollTemplate(templateText, placeholderData);
 
         const currentYear = new Date().getFullYear();
         const bannerUrl = 'https://res.cloudinary.com/dxju8ikk4/image/upload/v1777468072/difmo_banner_final.png';
@@ -458,7 +468,7 @@ const PayrollPage = () => {
                 if (activeTpl) {
                     const empName = `${row.employee?.user?.firstName || ''} ${row.employee?.user?.lastName || ''}`.trim() || 'Employee';
                     const netSalaryFormatted = Number(row.netPayable || row.netSalary || row.basicSalary || 0).toFixed(2);
-                    customHtml = renderCustomPayrollHtml(activeTpl.message, empName, selectedMonth, selectedYear, netSalaryFormatted, activeTpl);
+                    customHtml = renderCustomPayrollHtml(activeTpl.message, row, selectedMonth, selectedYear, netSalaryFormatted, activeTpl);
 
                     if (customNotes && customNotes.trim() !== '') {
                         customHtml = customHtml.replace(
