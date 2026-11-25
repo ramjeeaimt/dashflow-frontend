@@ -1,6 +1,7 @@
 /**
- * Universal Payroll Template Interpolator
- * Replaces all placeholders ([Employee Name], {employeeName}, ${employeeName}, [DIF00XX], [Pay Period], etc.)
+ * Universal Payroll Template Interpolator & Standard Payslip ID Engine
+ * Generates unique, enterprise-standard, long Payslip IDs and
+ * replaces all placeholders ([Employee Name], [Payslip ID], {employeeName}, ${employeeName}, [DIF00XX], [Pay Period], etc.)
  * with real, dynamic employee and payroll data.
  */
 
@@ -8,6 +9,37 @@ const MONTH_NAMES = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
 ];
+
+/**
+ * Generates an authoritative, standard long corporate Payslip ID:
+ * Format: {COMPANY}-PAY-{YYYY}{MM}-{EMP_CODE}-{SUFFIX}
+ * Example: DIFMO-PAY-202611-DIF0012-279057
+ */
+export function generateStandardPayslipId(payroll, selectedMonth, selectedYear) {
+    if (!payroll) return 'DIFMO-PAY-STANDARD-REF';
+    const employee = payroll.employee || {};
+    const company = employee.company || payroll.company || {};
+    const companyName = company.name || 'DIFMO';
+    const companyPrefix = companyName.replace(/[^a-zA-Z0-9]/g, '').slice(0, 5).toUpperCase() || 'DIFMO';
+
+    const monthNum = Number(payroll.month || selectedMonth || new Date().getMonth() + 1);
+    const yearNum = Number(payroll.year || selectedYear || new Date().getFullYear());
+    const monthPadded = String(monthNum).padStart(2, '0');
+    const yearStr = String(yearNum);
+
+    const empCode = (employee.employeeCode || payroll.employeeCode || 'EMP').toUpperCase();
+
+    // Deterministic 6-char hex/alphanumeric suffix from payroll ID or unique hash
+    let rawId = String(payroll.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (rawId.startsWith('PAYROLL')) {
+        rawId = rawId.replace('PAYROLL', '');
+    }
+    const suffix = rawId && rawId.length >= 6
+        ? rawId.slice(-6)
+        : ((Math.abs((yearNum * 100 + monthNum) * 31 + empCode.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) * 7919) % 16777215).toString(16).padStart(6, '0').toUpperCase();
+
+    return `${companyPrefix}-PAY-${yearStr}${monthPadded}-${empCode}-${suffix}`;
+}
 
 /**
  * Extracts structured placeholder values from a payroll row and date context.
@@ -86,7 +118,11 @@ export function getPayrollPlaceholderData(row, selectedMonth, selectedYear) {
     const designation = employee.designation?.name || employee.role || 'Team Member';
     const department = employee.department?.name || 'Operations';
 
+    // Long & Standard Payslip ID
+    const payslipId = generateStandardPayslipId(row, monthNum, yearNum);
+
     return {
+        payslipId,
         employeeName,
         employeeCode,
         monthNum,
@@ -111,13 +147,18 @@ export function getPayrollPlaceholderData(row, selectedMonth, selectedYear) {
 /**
  * Interpolates template text with dynamic data.
  * Supports:
- * - Square brackets: [Employee Name], [Month Year], [DIF00XX], [Pay Period], [Net Amount], [Bank Name], [XXXX]
- * - Curly braces: {employeeName}, {monthYear}, {netSalary}, {bankName}, etc.
- * - Template literals: ${employeeName}, ${name}, ${month}, ${year}, ${salary}, ${netSalary}
+ * - Square brackets: [Payslip ID], [Employee Name], [Month Year], [DIF00XX], [Pay Period], [Net Amount], [Bank Name], [XXXX]
+ * - Curly braces: {payslipId}, {employeeName}, {monthYear}, {netSalary}, {bankName}, etc.
+ * - Template literals: ${payslipId}, ${employeeName}, ${name}, ${month}, ${year}, ${salary}, ${netSalary}
  */
 export function interpolatePayrollTemplate(templateText, data) {
     if (!templateText) return '';
     let res = String(templateText);
+
+    // 0. Payslip ID / Reference (Long & Standard: e.g. DIFMO-PAY-202611-DIF0012-279057)
+    res = res.replace(/\[(payslip\s*id|payslip\s*no|payslip\s*number|slip\s*id|payslip-id|payslip_id|payslip)\]/gi, data.payslipId);
+    res = res.replace(/\{(\s*payslipId|\s*payslip_id|\s*payslipNo|\s*payslipNumber\s*)\}/gi, data.payslipId);
+    res = res.replace(/\$\{(\s*payslipId|\s*payslip_id|\s*payslipNo|\s*payslipNumber|\s*slipId\s*)\}/gi, data.payslipId);
 
     // 1. Employee Name
     res = res.replace(/\[(employee\s*name|name|emp\s*name)\]/gi, data.employeeName);

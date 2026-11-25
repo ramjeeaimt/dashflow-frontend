@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Printer, User, DollarSign, Calendar, FileText, CheckCircle, AlertCircle, TrendingUp, TrendingDown, Mail, Loader2 } from 'lucide-react';
+import { X, Printer, User, DollarSign, Calendar, FileText, CheckCircle, AlertCircle, TrendingUp, TrendingDown, Mail, Loader2, Copy } from 'lucide-react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import { generateStandardPayslipId } from '../../../utils/payrollInterpolate';
+import { toast } from 'react-hot-toast';
 
 const PayrollDetailsModal = ({ isOpen, onClose, payroll, onSendEmail }) => {
     const [localNotes, setLocalNotes] = useState('');
@@ -62,7 +64,7 @@ const PayrollDetailsModal = ({ isOpen, onClose, payroll, onSendEmail }) => {
                         </div>
                         <div className="space-y-1">
                             <h2 className="text-2xl font-bold text-foreground tracking-tight">{fullName}</h2>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-wrap">
                                 <span className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">{employee.employeeCode}</span>
                                 <span className="w-1 h-1 bg-border rounded-full"></span>
                                 <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-tight py-0.5 px-2 rounded-lg ${
@@ -71,6 +73,20 @@ const PayrollDetailsModal = ({ isOpen, onClose, payroll, onSendEmail }) => {
                                     {payroll.status === 'paid' ? <CheckCircle size={10} strokeWidth={3} /> : <AlertCircle size={10} strokeWidth={3} />}
                                     {payroll.status}
                                 </span>
+                                <span className="w-1 h-1 bg-border rounded-full"></span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const pid = generateStandardPayslipId(payroll, payroll.month, payroll.year);
+                                        navigator.clipboard?.writeText(pid);
+                                        toast.success(`Copied Payslip ID: ${pid}`);
+                                    }}
+                                    className="inline-flex items-center gap-1.5 font-mono text-[11px] bg-primary/10 hover:bg-primary/20 text-primary font-semibold px-2 py-0.5 rounded border border-primary/20 transition-colors cursor-pointer"
+                                    title="Click to copy Standard Payslip ID"
+                                >
+                                    <Copy size={11} />
+                                    <span>{generateStandardPayslipId(payroll, payroll.month, payroll.year)}</span>
+                                </button>
                             </div>
                         </div>
                     </div>

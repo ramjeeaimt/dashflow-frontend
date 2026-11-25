@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { generateStandardPayslipId } from './payrollInterpolate';
 
 const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const FULL_MONTHS = [
@@ -241,6 +242,7 @@ export const exportFinanceToExcel = (transactions = [], options = {}) => {
             'Gross Salary (₹)': Number(raw.grossSalary || raw.salary || p.amount || 0),
             'Total Deductions (₹)': Number(raw.deductions || 0),
             'Status': (p.status || 'Approved').toUpperCase(),
+            'Payslip ID': generateStandardPayslipId(raw, raw.month, raw.year),
             'Payroll ID': p.id || '—'
         };
     });
@@ -259,6 +261,7 @@ export const exportFinanceToExcel = (transactions = [], options = {}) => {
             { wch: 16 }, // Gross
             { wch: 18 }, // Deductions
             { wch: 14 }, // Status
+            { wch: 32 }, // Payslip ID
             { wch: 20 }  // ID
         ];
         XLSX.utils.book_append_sheet(workbook, payrollSheet, 'Payroll Register');

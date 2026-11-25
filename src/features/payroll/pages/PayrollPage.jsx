@@ -14,7 +14,7 @@ import PayrollDetailsModal from '../components/PayrollDetailsModal';
 import PayrollReviewModal from '../components/PayrollReviewModal';
 import { usePayrollStore } from '../../../store/payrollStore';
 import { SkeletonRows } from '../../../components/ui/Skeleton';
-import { getPayrollPlaceholderData, interpolatePayrollTemplate } from '../../../utils/payrollInterpolate';
+import { getPayrollPlaceholderData, interpolatePayrollTemplate, generateStandardPayslipId } from '../../../utils/payrollInterpolate';
 const PayrollPage = () => {
     const navigate = useNavigate();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -862,7 +862,23 @@ const PayrollPage = () => {
                                                                         </span>
                                                                     )}
                                                                 </p>
-                                                                <p className="text-xs text-muted-foreground">{row.employee?.employeeCode}</p>
+                                                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                                                                    <span className="font-semibold text-foreground/80">{row.employee?.employeeCode}</span>
+                                                                    {row.isGenerated && (
+                                                                        <span
+                                                                            className="font-mono text-[10px] tracking-tight bg-muted/90 hover:bg-muted text-primary px-1.5 py-0.5 rounded border border-border/70 select-all cursor-pointer transition-colors"
+                                                                            title="Official Payslip ID (Click to copy)"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                const pid = generateStandardPayslipId(row, selectedMonth, selectedYear);
+                                                                                navigator.clipboard?.writeText(pid);
+                                                                                toast.success(`Copied Payslip ID: ${pid}`);
+                                                                            }}
+                                                                        >
+                                                                            {generateStandardPayslipId(row, selectedMonth, selectedYear)}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </td>
