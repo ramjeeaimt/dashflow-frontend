@@ -31,52 +31,56 @@ const FinancialSummaryCard = ({ data, loading }) => {
   };
 
   return (
-    <div className="bg-card transition-all duration-300">
-      <div className="flex flex-col lg:flex-row border-b border-slate-50">
-        <div className="p-5 sm:p-8 lg:w-1/3 space-y-2">
+    <div className="bg-card h-full flex flex-col justify-between transition-all duration-300">
+      <div className="border-b border-border/60">
+        <div className="px-5 pt-5 pb-4 sm:px-6 sm:pt-6 sm:pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="space-y-1">
             <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-wide text-primary">
-                <Icon name="Activity" size={14} />
-                <span>FISCAL SUMMARY</span>
+              <Icon name="Activity" size={14} />
+              <span>FISCAL SUMMARY</span>
             </div>
-            <h3 className="text-base font-semibold text-foreground tracking-tight">Finance</h3>
-            <p className="text-xs text-muted-foreground/70 font-medium tracking-tight">Real-time aggregate data stream</p>
+            <div className="flex items-baseline gap-2.5">
+              <h3 className="text-base font-semibold text-foreground tracking-tight">Finance</h3>
+              <p className="text-xs text-muted-foreground/70 font-medium tracking-tight">Real-time aggregate data stream</p>
+            </div>
+          </div>
         </div>
 
-        <div className="p-5 sm:p-8 flex-1 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 bg-muted/30">
-            {/* TURNOVER */}
-            <div className="bg-card p-5 rounded-lg border border-border shadow-sm space-y-2 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70">Turnover</p>
-                <p className="text-lg sm:text-2xl font-bold text-foreground tracking-tight break-words">{formatCurrency(turnover || 0)}</p>
-            </div>
+        <div className="px-5 pb-5 sm:px-6 sm:pb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 bg-muted/30 pt-4">
+          {/* TURNOVER */}
+          <div className="bg-card p-4 rounded-lg border border-border shadow-sm space-y-1.5 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70 truncate">Turnover</p>
+            <p className="text-base sm:text-lg xl:text-xl font-bold text-foreground tracking-tight tabular-nums whitespace-nowrap">{formatCurrency(turnover || 0)}</p>
+          </div>
 
-            {/* NET PROFIT */}
-            <div className={`p-5 rounded-lg border shadow-sm space-y-2 min-w-0 ${netProfit >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-wide ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>Net Profit</p>
-                <p className={`text-lg sm:text-2xl font-bold tracking-tight break-words ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
-                    {formatCurrency(netProfit || 0)}
-                </p>
-            </div>
+          {/* NET PROFIT */}
+          <div className={`p-4 rounded-lg border shadow-sm space-y-1.5 min-w-0 ${netProfit >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
+            <p className={`text-[10px] font-bold uppercase tracking-wide truncate ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>Net Profit</p>
+            <p className={`text-base sm:text-lg xl:text-xl font-bold tracking-tight tabular-nums whitespace-nowrap ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+              {formatCurrency(netProfit || 0)}
+            </p>
+          </div>
 
-            {/* PAYROLL */}
-            <div className="bg-card p-5 rounded-lg border border-border shadow-sm space-y-2 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70">Payroll</p>
-                <p className="text-lg sm:text-2xl font-bold text-foreground tracking-tight break-words">{formatCurrency(totalPayroll || 0)}</p>
-            </div>
+          {/* PAYROLL */}
+          <div className="bg-card p-4 rounded-lg border border-border shadow-sm space-y-1.5 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70 truncate">Payroll</p>
+            <p className="text-base sm:text-lg xl:text-xl font-bold text-foreground tracking-tight tabular-nums whitespace-nowrap">{formatCurrency(totalPayroll || 0)}</p>
+          </div>
 
-            {/* EXPENSES */}
-            <div className="bg-card p-5 rounded-lg border border-border shadow-sm space-y-2 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70">Expenses</p>
-                <p className="text-lg sm:text-2xl font-bold text-foreground tracking-tight break-words">{formatCurrency(totalExpenses || 0)}</p>
-            </div>
+          {/* EXPENSES */}
+          <div className="bg-card p-4 rounded-lg border border-border shadow-sm space-y-1.5 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70 truncate">Expenses</p>
+            <p className="text-base sm:text-lg xl:text-xl font-bold text-foreground tracking-tight tabular-nums whitespace-nowrap">{formatCurrency(totalExpenses || 0)}</p>
+          </div>
         </div>
       </div>
 
-      <div className="p-5 sm:p-8 space-y-6">
+      <div className="p-5 sm:p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Budget Distribution</span>
-          <div className="bg-sidebar text-white px-4 py-2 text-[10px] font-bold uppercase tracking-wide rounded-lg shadow-sm flex items-center space-x-2">
+          <div className="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide rounded-lg shadow-sm flex items-center space-x-1.5 whitespace-nowrap">
             <Icon name="TrendingUp" size={12} strokeWidth={3} />
-            <span>{formatCurrency(outgoingTotal)} OUTGOING</span>
+            <span className="tabular-nums">{formatCurrency(outgoingTotal || 0)} OUTGOING</span>
           </div>
         </div>
         
@@ -85,17 +89,17 @@ const FinancialSummaryCard = ({ data, loading }) => {
             style={{ width: `${payrollPct}%` }} 
             className="h-full bg-primary rounded-full transition-all duration-1000 ease-out flex items-center justify-center overflow-hidden shadow-sm"
           >
-             <span className="text-[8px] font-bold text-white px-2">PAYROLL</span>
+             <span className="text-[8px] font-bold text-white px-2 truncate">PAYROLL</span>
           </div>
           <div 
             style={{ width: `${expensesPct}%` }} 
             className="h-full bg-slate-400 rounded-full transition-all duration-1000 ease-out ml-1 flex items-center justify-center overflow-hidden"
           >
-             <span className="text-[8px] font-bold text-white px-2">MARKETING/OPS</span>
+             <span className="text-[8px] font-bold text-white px-2 truncate">MARKETING/OPS</span>
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t border-slate-50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-5 border-t border-border/60">
             <div className="flex flex-wrap items-center gap-4 sm:gap-8">
                 <div className="flex items-center space-x-3">
                     <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>

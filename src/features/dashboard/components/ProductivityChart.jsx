@@ -95,18 +95,18 @@ const ProductivityChart = ({ data, loading }) => {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50">
+      <div className="flex items-end justify-between gap-3 mt-8 pt-6 border-t border-border/60">
         <div className="flex flex-col">
-          <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70 font-bold mb-1">AGGREGATE_EFFICIENCY</span>
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70 font-bold mb-1">Aggregate Efficiency</span>
           <div className="flex items-center space-x-3">
-            <span className="text-3xl font-bold text-foreground tracking-tight">{avgProductivity.toFixed(1)}%</span>
+            <span className="text-3xl font-bold text-foreground tracking-tight tabular-nums">{avgProductivity.toFixed(1)}%</span>
             <div className="flex items-center bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-lg">
               <Icon name="TrendingUp" size={10} className="mr-1" strokeWidth={3} />
               +2.4%
             </div>
           </div>
         </div>
-        <button className="text-xs font-bold text-foreground hover:text-primary transition-colors flex items-center gap-1 group">
+        <button className="text-xs font-bold text-foreground hover:text-primary transition-colors flex items-center gap-1 group pb-1 whitespace-nowrap">
           Detailed Analysis
           <Icon name="ArrowRight" size={14} className="transition-transform group-hover:translate-x-1" />
         </button>
